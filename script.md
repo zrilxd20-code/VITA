@@ -1,0 +1,219 @@
+# 📜 VITA — Naskah Dialog & Alur Cerita (Script & Storyline)
+
+Dokumen ini adalah panduan naskah, alur cerita, karakter, serta dialog lengkap game **VITA (*Sektor Terlupakan / Tide Labyrinth*)**. Anda dapat menggunakan file ini untuk menulis ide cerita baru, merevisi naskah, atau menambahkan dialog ke dalam game.
+
+---
+
+## 👥 1. Daftar Karakter (Dramatis Personae)
+
+| Karakter | Peran / Jabatan | Deskripsi & Ciri Khas |
+| :--- | :--- | :--- |
+| **PROTOTYPE-19 (YOU)** | Agen Robot / Protagonis | Unit sibernetik dengan sasis titanium dan prosesor saraf re-stabilisasi. Tidak memiliki memori masa lalu, hanya memiliki satu direktif misi: bertahan hidup dan memusnahkan anomali CARNIS-07. |
+| **DR. SARA** | Kepala Ilmuwan Riset (*Lead Scientist // RES-01*) | Peneliti utama fasilitas VITA. Bersuara panik namun cerdas, perlahan menyadari kebenaran kelam di balik asal-usul biomassa. |
+| **DR. RAINSER** | Insinyur Sistem (*Systems Engineer // ENG*) | Menangani daya generator, sirkuit darurat, dan peringatan bahaya infrastruktur fasilitas. |
+| **LT. VAD** | Perwira Keamanan (*Security Officer // SEC-OPS*) | Tegas, taktis, bertugas mengamankan perimeter sebelum pertahanan fasilitas mulai runtuh. |
+| **??? (THE MASTER / COMMAND)** | Komandan Misterius Fasilitas | Suara dingin otoriter yang memberikan perintah aktivasi kepada Prototype-19. |
+| **CARNIS-07 // HIVE MIND** | Anomali Biomassa Utama | Kesadaran kolektif biomassa nekrotik yang mampu berkomunikasi secara psikis / halusinasi. |
+
+---
+
+## 🎬 2. Dialog Cutscene Prolog (Sebelum Level 1)
+
+Cutscene ini diputar secara otomatis satu kali di awal sebelum pemain memulai Sektor 1 (*Level 1*).
+
+### [BAGIAN 1: SISTEM PERINGATAN FASILITAS]
+> **[SYSTEM] — FACILITY WARNING**  
+> 🇮🇩 *"⚠ PERINGATAN — Kita telah memasuki zona bahaya. Waspadai anomali dan organisme berbahaya."*  
+> 🇬🇧 *"⚠ WARNING — We have entered a danger zone. Beware of anomalies and hostile organisms."*
+
+---
+
+### [BAGIAN 2: RUANG KONTROL DAYA]
+> **DR. SARA — LEAD SCIENTIST**  
+> 🇮🇩 *"Um... oke, seharusnya ini menyala—"*  
+> 🇬🇧 *"Um... okay, it should turn on—"*
+
+> **??? (COMMAND)**  
+> 🇮🇩 *"Tunggu sebentar. Beri waktu sepuluh menit."*  
+> 🇬🇧 *"Wait a minute. Give it ten minutes."*
+
+*(Lampu-lampu darurat berkedip merah. Jauh di bawah tanah fasilitas, turbin generator bergemuruh hidup satu per satu.)*
+
+> **DR. RAINSER — SYSTEMS ENGINEER**  
+> 🇮🇩 *"Daya sudah aktif, Dokter!"*  
+> 🇬🇧 *"The power is set, Doctor!"*
+
+> **LT. VAD — SECURITY OFFICER**  
+> 🇮🇩 *"Area pembuka aman."*  
+> 🇬🇧 *"The opening area is clear."*
+
+---
+
+### [BAGIAN 3: INISIALISASI PROTOTYPE-19]
+> **YOU — PROTOTYPE-19**  
+> 🇮🇩 *"...?"*  
+> 🇬🇧 *"...?"*
+
+> **??? (COMMAND)**  
+> 🇮🇩 *"Tidak ada waktu untuk bertanya. Kau harus menghormati mastermu. Paham? Misimu adalah mengalahkan Spesimen CARNIS-07."*  
+> 🇬🇧 *"No time for questions. You have to honor your master. Understood? Your mission is to defeat Specimen CARNIS-07."*
+
+> **YOU — PROTOTYPE-19**  
+> 🇮🇩 *"Diterima. [SYSTEM: Misi dikonfirmasi] ...Tapi kenapa?"*  
+> 🇬🇧 *"Roger. [SYSTEM: Mission acknowledged] ...But why?"*
+
+---
+
+### [BAGIAN 4: NARRATOR INTRO]
+*(Layar menggelap dengan kilatan statis sinematik)*
+
+> **NARRATOR**  
+> 🇮🇩 *"Kau adalah PROTOTYPE-19 — robot agen, harapan terakhir umat manusia. Tanpa ingatan. Tanpa masa lalu. Hanya satu perintah: bertahan di 15 sektor dan hancurkan apapun yang menunggu di ujung sana."*  
+> 🇬🇧 *"You are PROTOTYPE-19 — an agent robot, the last hope of humanity. No memories. No past. Only a directive: survive the 15 sectors and destroy what waits at the end."*
+
+---
+
+## 📡 3. Transmisi Radio Taktis Selama Misi (Sektor 1 – 10)
+
+Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar saat Prototype-19 menjelajahi labirin.
+> 💡 **Catatan Penulisan:** Sektor 1 sampai 10 difokuskan murni pada **taktik arena, navigasi maze, pemanfaatan senjata/perk, dan bertahan hidup**, tanpa membocorkan lore utama fasilitas terlebih dahulu. Sektor 11 sampai 15 disimpan khusus untuk **Lore Bomb** nanti.
+
+---
+
+### 🟢 Sektor 1 (Level 1) — Pendaratan & Kalibrasi Labirin
+* **Pengirim:** DR. SARA // RES-01
+* **Pesan (ID):** *"Prototype-19, telemetri biologis tersinkron. Kumpulkan seluruh artefak berpendar di koridor untuk membuka kunci segel gerbang karantina. Waspadai bayangan di tikungan!"*
+* **Pesan (EN):** *"Prototype-19, bio-telemetry synchronized. Collect all luminous artifacts in the corridors to destabilize the quarantine gate locks. Watch the shadows at the corners!"*
+
+---
+
+### 🔵 Sektor 2 (Level 2) — Sensor Radar & Siklus Cahaya
+* **Pengirim:** DR. RAINSER // ENG
+* **Pesan (ID):** *"Generator sektor mengalami fluktuasi daya. Perhatikan radar mini-map di sudut layar untuk membaca rute koridor buntu dan arah anomali terdekat!"*
+* **Pesan (EN):** *"Sector generator is experiencing power fluctuations. Keep an eye on the minimap radar to chart dead-end corridors and track nearby anomalies!"*
+
+---
+
+### 🔵 Sektor 3 (Level 3) — Anomali Crawler & Taktik Backstab
+* **Pengirim:** LT. VAD // SEC-OPS
+* **Pesan (ID):** *"Sektor 3 dipenuhi sarang Crawl. Mereka mendeteksi getaran langkah kaki. Manfaatkan kelincahanmu untuk serangan tusukan belakang (backstab) mematikan atau tembak dari jarak jauh!"*
+* **Pesan (EN):** *"Sector 3 is infested with Crawler nests. They track footstep vibrations. Use your agility to land lethal backstabs from behind or keep your firing distance!"*
+
+---
+
+### 🟡 Sektor 4 (Level 4) — Bahaya Jebakan Lantai & Phase Dash
+* **Pengirim:** LT. VAD // SEC-OPS
+* **Pesan (ID):** *"Perhatian operatif! Lantai koridor dipasangi pelat perangkap duri mekanis. Aktifkan Phase Dash (SHIFT) untuk menerobos duri dan proyektil musuh tanpa menerima luka!"*
+* **Pesan (EN):** *"Operative alert! Corridor floors are rigged with mechanical spike traps. Trigger Phase Dash (SHIFT) to surge through spikes and projectiles unharmed!"*
+
+---
+
+### 🔴 Sektor 5 (Level 5) — Peringatan Bio-Hazard Harvester
+* **Pengirim:** DR. RAINSER // ENG
+* **Pesan (ID):** *"Anomali Harvester berukuran besar berpatroli di sektor ini! Jangan bertarung di lorong sempit satu arah. Pancing mereka ke ruang terbuka agar kamu tidak terpojok!"*
+* **Pesan (EN):** *"A massive Harvester anomaly is patrolling this sector! Avoid engaging in narrow bottlenecks. Lure them into open junctions so you don't get cornered!"*
+
+---
+
+### 🟢 Sektor 6 (Level 6) — Evaluasi Gudang Senjata (Armory)
+* **Pengirim:** LT. VAD // SEC-OPS
+* **Pesan (ID):** *"Gunakan senjata yang sesuai situasi lorong. Pisau untuk sergapan cepat tanpa amunisi, Rifle untuk koridor lurus panjang, dan Grenade untuk ledakan sudut dinding!"*
+* **Pesan (EN):** *"Adapt your arsenal to corridor geometry. Blade for rapid point-blank strikes, Rifle for long corridors, and Grenades to bounce explosives around tight corners!"*
+
+---
+
+### 🟣 Sektor 7 (Level 7) — Anomali Ghost & Penetrasi Dinding
+* **Pengirim:** DR. SARA // RES-01
+* **Pesan (ID):** *"Spektrometri mendeteksi anomali Ghost. Dinding labirin tidak dapat menahan mereka—mereka meluncur menembus sekat beton! Jangan berdiam diri di satu ruangan!"*
+* **Pesan (EN):** *"Spectrometry detects Ghost anomalies. Labyrinth walls cannot hold them—they phase straight through concrete bulkheads! Do not remain stationary in a room!"*
+
+---
+
+### 🟠 Sektor 8 (Level 8) — Waspada Peti Mimic (Kamuflase)
+* **Pengirim:** DR. RAINSER // ENG
+* **Pesan (ID):** *"Sensor mencatat sinyal aneh dari wadah suplai. Hati-hati saat membuka peti logistik—sebagian adalah Mimic pemburu yang menyamar! Uji dengan serangan dari jauh terlebih dahulu!"*
+* **Pesan (EN):** *"Sensors detect irregular frequencies from supply caches. Stay cautious—some containers are camouflaged Mimic ambushers! Test them with a strike from range first!"*
+
+---
+
+### 🔴 Sektor 9 (Level 9) — Fluktuasi Biometrik Ekstrem
+* **Pengirim:** DR. SARA // RES-01
+* **Pesan (ID):** *"Grafik biometrik BPM melonjak tajam! Kepadatan monster di persimpangan mencapai puncaknya. Prioritaskan rute pengumpulan artefak tercepat dan segera capai airlock keluar!"*
+* **Pesan (EN):** *"Biometric BPM telemetry is spiking! Anomaly density at intersections is peaking. Prioritize the fastest artifact gathering route and reach the extraction airlock immediately!"*
+
+---
+
+### ⚡ Sektor 10 (Level 10) — Gerbang Perimeter Tengah (Checkpoint)
+* **Pengirim:** LT. VAD // SEC-OPS
+* **Pesan (ID):** *"Kerja bagus, Prototype-19! Seluruh perimeter luar Sektor 1-10 berhasil kamu bersihkan. Bersiaplah... kita akan menuruni terowongan fasilitas yang jauh lebih dalam!"*
+* **Pesan (EN):** *"Outstanding work, Prototype-19! Exterior perimeter Sectors 1-10 are fully cleared. Prepare yourself... we are descending into the deeper facility vaults!"*
+
+---
+
+## 💣 4. Sektor 11 – 15: [SLOT KHUSUS LORE BOMB — MENUNGGU KONSEP USER]
+
+> 🔒 **ZONA DITAHAN (LORE BOMB RESERVED):**  
+> Di level 10-15 ini, kamu bisa menuliskan rahasia besar fasilitas, plot twist Dr. Sara / Komando, asal-usul Prototype-19, dan pertarungan puncak melawan The Monolith.
+> 
+> *Tulis draf ide Lore Bomb di bawah ini saat kamu sudah siap:*
+
+- **Ide Sektor 11:** [Tulis di sini...]
+- **Ide Sektor 12:** [Tulis di sini...]
+- **Ide Sektor 13:** [Tulis di sini...]
+- **Ide Sektor 14:** [Tulis di sini...]
+- **Ide Sektor 15 (Final Boss & Climax):** [Tulis di sini...]
+
+---
+
+## 🗄️ 5. Data Terminal Rahasia (Blackbox Lore Terminals)
+
+Dokumen rahasia yang dapat ditemukan pemain di terminal koridor labirin:
+
+### Log 01 (Sektor 2) — PROYEK VITA // MEMORANDUM AWAL #01
+* **Penulis:** DIRECTOR V. CROSS
+* **Isi:** *"Kami mencari keabadian melalui biomassa sintetis. Kultur sel Carnis menunjukkan regenerasi sel spontan melampaui batas alami. Kami mengira telah menaklukkan kematian."*
+
+### Log 02 (Sektor 4) — LOG INSIDEN PENAHANAN BIOLOGIS #14
+* **Penulis:** CHIEF MEDICAL OFFICER
+* **Isi:** *"Kultur lolos dari cawan petri dalam 48 jam. Ia tidak bereplikasi seperti bakteri—ia berorganisasi seperti jaringan otak. Ia mempelajari jadwal shift kami. Ia menirukan suara napas manusia."*
+
+### Log 03 (Sektor 7) — CATATAN DEWAN KEAMANAN // PROTOKOL-19
+* **Penulis:** COMMAND CENTRAL
+* **Isi:** *"Unit tempur biasa tak tahan asimilasi biologis. Hanya sasis titanium sintetis yang dipadu prosesor saraf stabil yang mampu menembus kabut nekrotik. Mereka menamainya Prototype-19."*
+
+### Log 04 (Sektor 11) — MANIFESTO APEX // COELUM CARNIS
+* **Penulis:** RECOVERED AUDIO FRAGMENT
+* **Isi:** *"Monolith bukanlah senjata. Mereka adalah antena. Saat ke-7 pilar menyatukan frekuensi sarafnya, kesadaran manusia akan melebur dari individu menjadi daging abadi."*
+
+---
+
+## 🌅 5. Epilog / Ending (Setelah Mengalahkan Sektor 15)
+
+> **THE MONOLITH RUNTUH. LABIRIN BERGETAR SAAT JANTUNG BIOMEKANIKNYA BERHENTI BERDETAK.**
+> 
+> 1. *"Kabut merah nekrotik perlahan memudar dari lorong-lorong Sektor Terlupakan."*
+> 2. *"Pintu kedap dekontaminasi darurat membuka satu demi satu, membuka jalan menuju permukaan."*
+> 3. *"HUD internalmu berkedip: [PERINTAH SELESAI // ANCAMAN CARNIS-07 BERHASIL DIMUSNAHKAN]."*
+> 4. *"Di kejauhan, sirene darurat mereda. Untuk pertama kalinya dalam ratusan tahun, Labirin Tide terdiam."*
+> 5. *"Kau berdiri di ambang pintu dunia luar. Seorang prajurit yang lahir di kegelapan, demi memberi fajar baru bagi umat manusia."*
+
+---
+
+## ✍️ 6. Catatan Ide Alur Cerita & Dialog Baru (Ruang Tulis Bebas)
+
+*Tuliskan draft ide percakapan, plot twist, atau dialog tambahan Anda di bagian bawah ini:*
+
+### Ide Dialog Tambahan:
+- [Tulis di sini...]
+
+### Ide Lore / Karakter Tambahan:
+- [Tulis di sini...]
+
+---
+
+## 💡 Petunjuk Menghubungkan ke Game:
+Jika Anda ingin menerapkan dialog dari file ini ke dalam game:
+1. Buka file [`js/prologue.js`](file:///c:/Users/user/Desktop/pengenal%20web/vita/js/prologue.js).
+2. Edit array `PROLOGUE_SCRIPT` untuk cutscene sebelum Level 1.
+3. Edit object `SECTOR_TRANSMISSIONS` untuk obrolan radio saat misi.
+4. Simpan, lalu jalankan `npm run check` untuk memverifikasi sintaks dan sinkronisasi bahasa ID ↔ EN.

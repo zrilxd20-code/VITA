@@ -1,0 +1,103 @@
+{
+  "name": "VITA — Forgotten Sector",
+  "short_name": "VITA",
+  "id": "/vita-forgotten-sector",
+  "description": "Top-down survival horror maze roguelite across 15 procedural sectors with zero external assets.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0a12",
+  "theme_color": "#0a0a12",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "games",
+    "action",
+    "entertainment"
+  ],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Mulai Operasi",
+      "short_name": "Main",
+      "description": "Luncurkan drone operatif ke Sektor Labirin",
+      "url": "./index.html?action=play",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Papan Rekor",
+      "short_name": "Rekor",
+      "description": "Lihat peringkat operatif global & lokal",
+      "url": "./index.html?action=leaderboard",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Pengaturan Sistem",
+      "short_name": "Opsi",
+      "description": "Atur volume audio, kualitas visual & tingkat kesulitan",
+      "url": "./index.html?action=settings",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Taktis Labirin Roguelite Operatif"
+    },
+    {
+      "src": "./screenshot-narrow.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Drone Tempur Menembus Sektor Terlupakan"
+    }
+  ]
+}

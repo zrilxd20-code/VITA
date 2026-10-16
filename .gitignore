@@ -1,0 +1,15 @@
+# VITA v2.0 — Web-only (zero external runtime assets, Node stdlib tooling)
+node_modules/
+.env
+
+# VITA user-local (jangan commit state pemain)
+vita_local.json
+
+# Editor
+.vscode/
+.idea/
+*.code-workspace
+
+# Backup lokal
+backup/
+scratch/

@@ -1,0 +1,2482 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+body {
+            background: #06020a;
+            font-family: 'Courier New', Consolas, 'Segoe UI', monospace;
+            letter-spacing: 0.5px;
+        }
+/* Kunci scroll hanya saat main game; halaman home tetap bisa di-scroll. */
+body.game-on { overflow: hidden; }
+body.hidemouse { cursor: none; }
+#gameView #minimap {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    border: 2px solid rgba(0, 240, 255, 0.7);
+    border-radius: 4px;
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.35), inset 0 0 14px rgba(0, 240, 255, 0.15);
+}
+#gameView #controls {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(8, 12, 22, 0.88);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-radius: 4px;
+    padding: 6px 14px;
+    color: #cbd5e1;
+    font-size: 11px;
+}
+body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opacity: 0; }
+#gameView canvas {
+            display: block;
+            image-rendering: pixelated;
+        }
+#gameView /* Lapisan suasana: kabut, CRT, vignette */
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            z-index: 130;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.18) 0px,
+                rgba(0, 0, 0, 0.18) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            opacity: 0.28;
+        }
+#gameView .vignette {
+            position: fixed;
+            inset: 0;
+            z-index: 129;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(10, 0, 3, 0.7) 100%);
+        }
+#gameView .fog {
+            position: fixed;
+            inset: -12%;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 55% 40% at 28% 45%, rgba(140, 42, 30, 0.20), transparent 70%),
+                radial-gradient(ellipse 50% 38% at 72% 60%, rgba(95, 22, 34, 0.16), transparent 70%);
+            filter: blur(26px);
+            animation: fogDrift 24s ease-in-out infinite alternate;
+            opacity: 0.7;
+        }
+@keyframes fogDrift {
+            from { transform: translate(-5%, -2%) scale(1.06); }
+            to   { transform: translate(5%, 3%) scale(1.14); }
+        }
+#gameView #ui {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 10;
+    pointer-events: none;
+    color: #e7d6cf;
+    font-size: 13px;
+    font-weight: 700;
+    background: rgba(8, 12, 22, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-left: 3px solid #00f0ff;
+    border-radius: 4px;
+    padding: 10px 14px;
+    min-width: 215px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), inset 0 0 14px rgba(0, 240, 255, 0.08);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.85);
+}
+#gameView #ui div {
+            margin-bottom: 0;
+            padding: 4px 0;
+            background: none;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(190, 40, 40, 0.14);
+        }
+#gameView #ui div:last-child { border-bottom: none; }
+#gameView #ui .ui-header {
+            border-bottom: 1px solid rgba(255, 60, 40, 0.35);
+            padding-bottom: 5px;
+            margin-bottom: 3px;
+        }
+#gameView #ui .ui-badge {
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: #ff8a3d;
+            background: rgba(40, 10, 10, 0.6);
+            border: 1px solid rgba(255, 60, 40, 0.4);
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            text-shadow: 0 0 6px rgba(255, 100, 50, 0.5);
+        }
+#gameView #ui .bio-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+#gameView #ui .bpm-val {
+            color: #2ecc71;
+            font-size: 11px;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+#gameView #ui .bpm-val.bpm-panic {
+            color: #ff3b3b;
+            animation: bpmThrob 0.5s ease-in-out infinite alternate;
+        }
+@keyframes bpmThrob {
+            from { transform: scale(1); text-shadow: 0 0 4px #ff3b3b; }
+            to { transform: scale(1.08); text-shadow: 0 0 12px #ff0000; }
+        }
+#gameView #ekgCanvas {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 60, 60, 0.25);
+            border-radius: 2px;
+            display: block;
+        }
+#gameView #ui [id^="lbl"] {
+            color: #a1887f;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+#gameView .dossier-frame {
+            background: rgba(14, 4, 8, 0.95);
+            border: 2px solid rgba(190, 30, 30, 0.65);
+            border-radius: 6px;
+            padding: 28px 36px;
+            max-width: min(520px, 92vw);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), inset 0 0 32px rgba(120, 10, 10, 0.25);
+            position: relative;
+            clip-path: polygon(
+                12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px),
+                calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px
+            );
+        }
+#gameView .win-frame {
+            border-color: rgba(241, 196, 15, 0.7);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), inset 0 0 32px rgba(241, 196, 15, 0.15);
+        }
+#gameView .dossier-header {
+            border-bottom: 1px solid rgba(255, 60, 40, 0.35);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+#gameView .dossier-header.win {
+            border-color: rgba(241, 196, 15, 0.4);
+        }
+#gameView .dossier-stamp {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #ff3b3b;
+            border: 2px solid #ff3b3b;
+            padding: 4px 14px;
+            text-transform: uppercase;
+            transform: rotate(-2deg);
+            margin-bottom: 8px;
+            background: rgba(60, 10, 10, 0.4);
+            box-shadow: 0 0 12px rgba(255, 40, 40, 0.4);
+        }
+#gameView .dossier-stamp.win {
+            color: #f1c40f;
+            border-color: #f1c40f;
+            background: rgba(50, 40, 10, 0.4);
+            box-shadow: 0 0 14px rgba(241, 196, 15, 0.4);
+        }
+#gameView .dossier-ref {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: rgba(200, 150, 140, 0.7);
+            text-transform: uppercase;
+        }
+#gameView .dossier-body {
+            text-align: left;
+            margin: 18px 0;
+            border: 1px solid rgba(190, 40, 40, 0.2);
+            background: rgba(8, 2, 4, 0.6);
+            padding: 14px 18px;
+            border-radius: 4px;
+        }
+#gameView .dossier-body p {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+#gameView .dossier-val {
+            color: #f5e6e1;
+            font-weight: 700;
+        }
+#gameView .dossier-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+#gameView .dossier-actions .btn {
+            margin-top: 0;
+        }
+#gameView #controls {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: min(720px, calc(100vw - 32px));
+            color: #c9b0a8;
+            font-size: 12px;
+            letter-spacing: 1px;
+            line-height: 1.6;
+            z-index: 10;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.7);
+            pointer-events: none;
+            text-align: center;
+            background: rgba(10, 2, 6, 0.82);
+            padding: 8px 18px;
+            border-radius: 6px;
+            border: 1px solid rgba(190, 40, 40, 0.35);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+#gameView #startScreen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            background: rgba(5, 1, 7, 0.8);
+            color: #e7d6cf;
+            text-align: center;
+            pointer-events: auto;
+        }
+#gameView #deathScreen, #gameView #winScreen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            background: rgba(5, 1, 7, 0.88);
+            color: #e7d6cf;
+            text-align: center;
+            pointer-events: auto;
+            overflow-y: auto;
+            padding: 24px 16px;
+            box-sizing: border-box;
+        }
+#gameView #deathScreen .dossier-frame, #gameView #winScreen .dossier-frame {
+            margin: auto;
+            position: relative;
+            z-index: 505;
+            pointer-events: auto;
+        }
+#gameView #deathScreen .dossier-actions {
+            position: relative;
+            z-index: 510;
+            pointer-events: auto;
+        }
+#gameView #deathScreen .dossier-actions .btn,
+#gameView #deathScreen #btnRetryLevel,
+#gameView #deathScreen #btnRetry {
+            position: relative;
+            z-index: 520;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+#gameView #startScreen h1, #gameView #deathScreen h2, #gameView #winScreen h2 {
+            font-family: 'Courier New', Consolas, monospace;
+            font-weight: 700;
+            font-size: 50px;
+            margin-bottom: 18px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            text-shadow: 0 0 22px rgba(255, 40, 40, 0.75), 3px 3px 0 rgba(60, 5, 5, 0.8);
+        }
+#gameView #winGrade {
+            font-size: 44px;
+            font-weight: 700;
+            color: #f1c40f;
+            text-shadow: 0 0 18px rgba(241, 196, 15, 0.7);
+            letter-spacing: 4px;
+        }
+#gameView #newBestBadge {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #f1c40f;
+            text-shadow: 0 0 16px rgba(241, 196, 15, 0.8);
+            animation: vitaPulse 1s ease-in-out infinite;
+        }
+@keyframes vitaPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.65; transform: scale(1.06); }
+        }
+@media (prefers-reduced-motion: reduce) {
+            #gameView #newBestBadge { animation: none; }
+        }
+#gameView #startScreen {
+            /* Bisa di-scroll: menu + panel admin kadang lebih tinggi dari layar,
+               dan justify center biasa bikin bagian atas kepotong tak terlihat. */
+            overflow-y: auto;
+            justify-content: safe center;
+            padding: 32px 16px;
+            background:
+                radial-gradient(ellipse at 22% 25%, rgba(160, 25, 18, 0.38), transparent 42%),
+                radial-gradient(ellipse at 80% 75%, rgba(95, 15, 42, 0.30), transparent 42%),
+                linear-gradient(135deg, rgba(6, 2, 10, 0.97), rgba(12, 4, 8, 0.95));
+        }
+#gameView #startScreen h1 {
+            font-size: clamp(64px, 11vw, 116px);
+            letter-spacing: 16px;
+            background: linear-gradient(180deg, #ff2b2b, #a00d0d 55%, #2a0000 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: none;
+            filter: drop-shadow(0 0 18px rgba(255, 40, 40, 0.55));
+        }
+#gameView #startScreen .eyebrow {
+            color: rgba(214, 128, 114, 0.8);
+            font-size: 13px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            border: 1px solid rgba(190, 40, 40, 0.35);
+            padding: 6px 14px;
+            background: rgba(10, 3, 6, 0.6);
+        }
+#gameView #startScreen .subtitle {
+            color: #b08f88;
+            font-size: 18px;
+            margin-bottom: 22px;
+            letter-spacing: 2px;
+        }
+#gameView #startScreen .ambient {
+            font-size: 12px;
+            color: rgba(200, 120, 110, 0.5);
+            letter-spacing: 3px;
+            margin-bottom: 24px;
+            animation: subtleBlink 3.4s step-end infinite;
+        }
+@keyframes subtleBlink { 50% { opacity: 0.4; } }
+#gameView .start-operative-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(32, 10, 16, 0.8);
+    border: 1px solid rgba(255, 60, 40, 0.45);
+    border-radius: 20px;
+    padding: 6px 14px;
+    margin: 10px 0 16px;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #e7d6cf;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 12px rgba(255, 40, 40, 0.15);
+}
+#gameView .start-operative-banner:hover {
+    border-color: #ff5e57;
+    background: rgba(55, 14, 22, 0.95);
+    box-shadow: 0 0 18px rgba(255, 60, 40, 0.4);
+    transform: translateY(-1px);
+}
+#gameView .start-operative-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(255, 60, 40, 0.25);
+    border: 1px solid rgba(255, 60, 40, 0.5);
+    color: #ff9b9b;
+    font-weight: 700;
+}
+#gameView #startScreen .menu-actions {
+            display: grid;
+            gap: 10px;
+            width: min(320px, 86vw);
+        }
+#gameView #startScreen .menu-actions .btn { margin-top: 0; }
+#gameView #startScreen .menu-actions .secondary {
+            background: rgba(30, 8, 12, 0.6);
+            border: 1px solid rgba(255, 90, 70, 0.3);
+            color: #d8c0b8;
+            box-shadow: none;
+        }
+#gameView #homeSettings, #gameView #homeControls, #gameView #adminLogin, #gameView #adminPanel {
+            display: none;
+            width: min(430px, 88vw);
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 4px;
+            background: rgba(14, 4, 8, 0.92);
+            border: 1px solid rgba(190, 40, 40, 0.4);
+            box-shadow: inset 0 0 26px rgba(120, 10, 10, 0.15);
+        }
+#gameView #adminPanel { border-color: rgba(241, 196, 15, 0.55); }
+#gameView .admin-levels {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+        }
+#gameView .admin-levels button {
+            padding: 8px 0;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 14px;
+            background: rgba(30, 8, 12, 0.8);
+            border: 1px solid rgba(255, 90, 70, 0.35);
+            color: #e7d6cf;
+            border-radius: 4px;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+#gameView .admin-levels button:hover { border-color: #f1c40f; color: #f1c40f; }
+#gameView #adminPanel .btn { padding: 10px 12px; font-size: 13px; margin-top: 0; }
+#gameView #homeSettings label {
+            display: block;
+            text-align: left;
+            margin: 10px 0;
+            color: #d8b8b0;
+        }
+#gameView #homeSettings input { width: 100%; accent-color: #ff3636; }
+#gameView #homeSettings select {
+            width: 100%;
+            margin-top: 6px;
+            background: #12060a;
+            color: #e7d6cf;
+            border: 1px solid rgba(190, 40, 40, 0.4);
+            padding: 4px;
+            font-family: inherit;
+        }
+#gameView #homeSettings .btn, #gameView #homeControls .btn {
+            margin-top: 12px;
+            padding: 10px 24px;
+            font-size: 15px;
+        }
+#gameView #startScreen p, #gameView #deathScreen p, #gameView #winScreen p {
+            font-size: 16px;
+            margin-bottom: 10px;
+            opacity: 0.85;
+            letter-spacing: 1px;
+        }
+#gameView .btn {
+            margin-top: 25px;
+            padding: 14px 40px;
+            font-size: 17px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ff3b3b, #8f0d0d);
+            color: #1c0202;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            pointer-events: auto;
+            clip-path: polygon(
+                8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px),
+                calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px
+            );
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.12);
+            transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+#gameView .btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 0 22px rgba(255, 40, 40, 0.4), 0 10px 30px rgba(0,0,0,0.55);
+            filter: brightness(1.1);
+        }
+#gameView .btn:focus-visible {
+            outline: 2px solid #ff8a3d;
+            outline-offset: 3px;
+        }
+#gameView .btn:active { transform: translateY(0) scale(0.98); }
+/* Minimap styling defined centrally with cyan neon pulse */
+#gameView #levelAnnounce {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 72px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-weight: 700;
+            letter-spacing: 10px;
+            color: #ff3b3b;
+            z-index: 50;
+            text-shadow: 0 0 30px rgba(255, 40, 40, 0.8), 4px 4px 0 rgba(20, 2, 2, 0.9);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+#gameView .hp-bar-container {
+            width: 200px;
+            height: 18px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 3px;
+            border: 1px solid rgba(190, 40, 40, 0.4);
+            overflow: hidden;
+        }
+#gameView .hp-bar {
+            height: 100%;
+            background: var(--hp-color, linear-gradient(90deg, #ff3b3b, #8f0d0d));
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+#gameView .hp-bar.hp-critical {
+            animation: hpPulse 0.6s ease-in-out infinite;
+        }
+@keyframes hpPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+#gameView #pauseScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 120;
+            background: rgba(5, 1, 7, 0.85);
+            color: #e7d6cf;
+            text-align: center;
+            pointer-events: auto;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+#gameView #pauseScreen.open {
+            display: flex;
+            opacity: 1;
+        }
+#gameView #pauseScreen h2 {
+            font-size: 52px;
+            margin-bottom: 26px;
+            letter-spacing: 8px;
+            color: #ff3b3b;
+            text-shadow: 0 0 24px rgba(255, 40, 40, 0.6);
+            font-family: 'Courier New', Consolas, monospace;
+            text-transform: uppercase;
+        }
+#gameView #pauseScreen .btn { margin-top: 10px; }
+/* Layar kecil: HUD ringkas, minimap menyusut, judul tak meluap */
+@media (max-width: 640px) {
+    #gameView #ui { top: 10px; left: 10px; font-size: 12px; min-width: 0; padding: 8px 10px; }
+    #gameView #minimap { width: 120px; height: 120px; top: 10px; right: 10px; }
+    #gameView #controls { display: none; }
+    #gameView #startScreen h1 { letter-spacing: 8px; }
+    #gameView #levelAnnounce { font-size: 44px; letter-spacing: 6px; }
+    #gameView #startScreen h1, #gameView #deathScreen h2, #gameView #winScreen h2 { font-size: 34px; }
+}
+/* Layar sangat kecil (<380px): joystick & tombol sentuh mengecil agar tak tumpang tindih */
+@media (max-width: 380px) {
+    #gameView #stickZone { width: 112px; height: 112px; }
+    #gameView #stickBase { width: 84px; height: 84px; margin: -42px 0 0 -42px; }
+    #gameView #stickKnob { width: 40px; height: 40px; margin: -20px 0 0 -20px; }
+    #gameView #touchBtns { gap: 8px; }
+    #gameView #touchBtns button { width: 52px; height: 52px; font-size: 20px; }
+    #gameView #btnTouchAtk { width: 60px; height: 60px; font-size: 24px; }
+    #gameView #minimap { width: 96px; height: 96px; }
+}
+#gameView canvas { touch-action: none; }
+#gameView #touchUI {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: none;
+    pointer-events: none;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    opacity: var(--touch-opacity, 0.85);
+}
+body.game-on.touch-on #gameView #touchUI { display: block; }
+@media (pointer: coarse) {
+    body.game-on.touch-on #gameView #touchUI { display: block; }
+}
+#gameView #stickZone {
+    width: 150px;
+    height: 150px;
+    position: fixed;
+    left: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    pointer-events: auto;
+    touch-action: none;
+    transform: scale(var(--touch-scale, 1));
+    transform-origin: center center;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+#gameView #stickBase {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 110px; height: 110px;
+    margin: -55px 0 0 -55px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 138, 61, 0.5);
+    background: rgba(10, 2, 6, 0.45);
+}
+#gameView #stickKnob {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 52px; height: 52px;
+    margin: -26px 0 0 -26px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ff8a3d, #8f0d0d);
+    box-shadow: 0 0 16px rgba(255, 60, 40, 0.5);
+}
+#gameView #touchBtns {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+#gameView #touchBtns button {
+    position: fixed;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    font-size: 26px;
+    background: rgba(14, 4, 8, 0.72);
+    color: #e7d6cf;
+    border: 2px solid rgba(255, 138, 61, 0.55);
+    cursor: pointer;
+    touch-action: none;
+    pointer-events: auto;
+    transform: scale(var(--touch-scale, 1));
+    transform-origin: center center;
+    transition: transform 0.1s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+#gameView #touchBtns button:active {
+    transform: scale(calc(var(--touch-scale, 1) * 0.93));
+    background: rgba(60, 10, 10, 0.85);
+}
+#gameView #btnTouchAtk {
+    right: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    width: 76px;
+    height: 76px;
+    font-size: 30px;
+    border-color: rgba(241, 196, 15, 0.75);
+}
+#gameView #btnTouchDash {
+    right: 108px;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+}
+#gameView #btnTouchWeapon {
+    right: 184px;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+}
+#gameView #btnTouchPause {
+    right: 260px;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+}
+/* Win grade color classes */
+#gameView #winGrade {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 4px;
+        }
+#gameView #winGrade.grade-S { color: #f1c40f; text-shadow: 0 0 18px rgba(241, 196, 15, 0.7), 0 0 40px rgba(241, 196, 15, 0.3); }
+#gameView #winGrade.grade-A { color: #2ecc71; text-shadow: 0 0 14px rgba(46, 204, 113, 0.6); }
+#gameView #winGrade.grade-B { color: #3498db; text-shadow: 0 0 12px rgba(52, 152, 219, 0.5); }
+#gameView #winGrade.grade-C { color: #a1887f; }
+#gameView #newBestBadge {
+            color: #f1c40f;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            animation: bestGlow 1.2s ease-in-out infinite;
+        }
+@keyframes bestGlow {
+            0%, 100% { text-shadow: 0 0 8px rgba(241, 196, 15, 0.4); }
+            50% { text-shadow: 0 0 22px rgba(241, 196, 15, 0.9), 0 0 40px rgba(241, 196, 15, 0.4); }
+        }
+/* Death/Win screen fade-in */
+#gameView #deathScreen, #gameView #winScreen {
+            animation: screenFadeIn 0.5s ease-out;
+        }
+@keyframes screenFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+/* Level zone name tag */
+#gameView #levelAnnounce .zone-name {
+            display: block;
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(200, 120, 110, 0.7);
+            margin-top: 6px;
+        }
+
+/* EAS Emergency Broadcast Overlay Style */
+#gameView .eas-broadcast {
+    display: inline-block;
+    padding: 14px 24px;
+    background: rgba(30, 2, 6, 0.88);
+    border: 2px solid #ff2222;
+    box-shadow: 0 0 25px rgba(255, 34, 34, 0.6), inset 0 0 15px rgba(255, 34, 34, 0.3);
+    text-shadow: 0 0 10px #ff2222;
+    animation: easPulse 0.8s infinite alternate;
+}
+@keyframes easPulse {
+    from { border-color: #ff2222; box-shadow: 0 0 20px rgba(255, 34, 34, 0.5); }
+    to   { border-color: #ffffff; box-shadow: 0 0 35px rgba(255, 255, 255, 0.8); }
+}
+#gameView .eas-broadcast .eas-header {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: #ffd700;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-shadow: 0 0 6px #ffd700;
+}
+#gameView .eas-broadcast .eas-title {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: #ff4757;
+    margin-bottom: 6px;
+}
+#gameView .eas-broadcast .eas-sub {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: #ffffff;
+    opacity: 0.9;
+}
+
+#gameView .hud-icon {
+    width: 14px;
+    height: 14px;
+    fill: #ff6432;
+    display: inline-block;
+    vertical-align: -2px;
+    margin-right: 5px;
+    filter: drop-shadow(0 0 4px rgba(255, 60, 40, 0.5));
+}
+
+#gameView .btn-icon {
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+    display: inline-block;
+    vertical-align: -2px;
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+/* ====================================================================
+   VITA - ARSENAL & WEAPON SYSTEM STYLES
+   ==================================================================== */
+
+/* Touch Weapon Switcher Button Badge */
+#gameView #btnTouchWeapon {
+    position: relative;
+    border-color: rgba(0, 240, 255, 0.65);
+    background: rgba(4, 18, 28, 0.8);
+}
+#gameView #btnTouchWeapon .touch-weapon-tag {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-family: 'Courier New', Consolas, monospace;
+    background: #00f0ff;
+    color: #050a10;
+    padding: 1px 5px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+/* Weapon HUD Bar (Bottom Center of Game Screen) */
+#gameView .weapon-hud-bar {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 55;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: rgba(10, 4, 14, 0.85);
+    border: 1px solid rgba(255, 100, 50, 0.35);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    pointer-events: auto;
+    user-select: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+body.hud-hidden #gameView .weapon-hud-bar {
+    display: none;
+}
+
+#gameView .weapon-slots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#gameView .weapon-slot-btn {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(20, 10, 25, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+#gameView .weapon-slot-btn:hover {
+    border-color: rgba(255, 180, 50, 0.7);
+    background: rgba(40, 20, 45, 0.8);
+}
+#gameView .weapon-slot-btn.active {
+    border-color: #00f0ff;
+    background: rgba(0, 240, 255, 0.15);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+    transform: translateY(-2px);
+}
+#gameView .weapon-slot-btn .slot-key {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 9px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+}
+#gameView .weapon-slot-btn.active .slot-key {
+    color: #00f0ff;
+}
+#gameView .weapon-slot-btn .slot-icon {
+    width: 22px;
+    height: 22px;
+    fill: #e7d6cf;
+}
+#gameView .weapon-slot-btn.active .slot-icon {
+    fill: #00f0ff;
+    filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.8));
+}
+#gameView .weapon-slot-btn .slot-cooldown-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    background: rgba(231, 76, 60, 0.45);
+    border-radius: 0 0 5px 5px;
+    transition: height 0.05s linear;
+}
+
+#gameView .weapon-status-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+}
+#gameView .weapon-active-title {
+    font-size: 11px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #00f0ff;
+    text-transform: uppercase;
+}
+#gameView .weapon-gauge-track {
+    width: 90px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+#gameView .weapon-gauge-bar {
+    width: 0%;
+    height: 100%;
+    border-radius: 2px;
+    background: #00f0ff;
+    transition: width 0.08s linear, background-color 0.2s ease;
+}
+#gameView .weapon-gauge-bar.overheat {
+    background: #ff3b3b;
+    animation: hpPulse 0.4s infinite;
+}
+#gameView .weapon-hotkey-hint {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.5px;
+    font-family: 'Courier New', Consolas, monospace;
+}
+
+/* Inter-Level Weapon Select Screen (Arsenal Modal) */
+#gameView #weaponSelectScreen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    background: rgba(4, 2, 7, 0.92);
+    backdrop-filter: blur(8px);
+    color: #e7d6cf;
+    text-align: center;
+    pointer-events: auto;
+    padding: 24px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+#gameView #weaponSelectScreen.open {
+    display: flex;
+    animation: screenFadeIn 0.3s ease-out;
+}
+#gameView #weaponSelectScreen .eyebrow {
+    color: #f39c12;
+    font-size: 12px;
+    letter-spacing: 5px;
+    font-family: 'Courier New', Consolas, monospace;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+#gameView #weaponSelectScreen h2 {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 38px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #00f0ff;
+    text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+}
+#gameView #weaponSelectScreen .subtitle {
+    font-size: 14px;
+    color: rgba(230, 220, 215, 0.8);
+    max-width: 650px;
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+}
+
+#gameView .weapon-cards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 18px;
+    max-width: 960px;
+    width: 100%;
+}
+
+#gameView .weapon-card {
+    flex: 1 1 240px;
+    max-width: 290px;
+    min-width: 220px;
+    background: rgba(14, 8, 20, 0.88);
+    border: 1px solid rgba(255, 120, 50, 0.4);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+#gameView .weapon-card:hover {
+    transform: translateY(-6px);
+    border-color: #00f0ff;
+    box-shadow: 0 0 24px rgba(0, 240, 255, 0.35);
+}
+#gameView .weapon-card.perk-card {
+    border-color: rgba(255, 215, 0, 0.55);
+    background: radial-gradient(circle at 50% 10%, rgba(255, 215, 0, 0.08) 0%, rgba(14, 8, 20, 0.94) 75%);
+}
+#gameView .weapon-card.perk-card:hover {
+    border-color: #ffd700;
+    box-shadow: 0 0 28px rgba(255, 215, 0, 0.45);
+}
+#gameView .weapon-card.perk-card .weapon-card-tag {
+    color: #ffd700;
+}
+#gameView .weapon-card.perk-card .btn-choose-weapon {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: #000;
+    font-weight: 800;
+}
+#gameView .weapon-card.perk-card .btn-choose-weapon:hover {
+    background: linear-gradient(135deg, #ffd700, #f39c12);
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
+}
+#gameView .weapon-card-tag {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: #f39c12;
+    letter-spacing: 1px;
+}
+#gameView .weapon-card-icon-box {
+    width: 80px;
+    height: 70px;
+    margin: 18px 0 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.12) 0%, transparent 70%);
+    border-radius: 6px;
+}
+#gameView .weapon-card-icon-box svg {
+    width: 48px;
+    height: 48px;
+    fill: #00f0ff;
+    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6));
+}
+#gameView .weapon-card h3 {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 18px;
+    margin: 0 0 6px 0;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+#gameView .weapon-card-role {
+    font-size: 11px;
+    color: #f39c12;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+#gameView .weapon-card-desc {
+    font-size: 12px;
+    color: rgba(220, 215, 210, 0.85);
+    line-height: 1.45;
+    margin-bottom: 14px;
+    min-height: 50px;
+}
+#gameView .weapon-specs-box {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 14px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+#gameView .spec-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-family: 'Courier New', monospace;
+}
+#gameView .spec-label { color: rgba(255, 255, 255, 0.5); }
+#gameView .spec-val { color: #fff; font-weight: 700; }
+#gameView .spec-val.pro { color: #2ecc71; }
+#gameView .spec-val.con { color: #e74c3c; }
+
+#gameView .btn-choose-weapon {
+    width: 100%;
+    padding: 10px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(0, 168, 255, 0.4));
+    border: 1px solid #00f0ff;
+    color: #ffffff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+#gameView .btn-choose-weapon:hover {
+    background: #00f0ff;
+    color: #05050d;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.8);
+}
+
+/* Decorative HUD brackets for Arsenal Modal */
+#gameView .armory-hud-bracket {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border: 2px solid #00f0ff;
+    pointer-events: none;
+    opacity: 0.6;
+}
+#gameView .armory-hud-bracket.top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+#gameView .armory-hud-bracket.top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+#gameView .armory-hud-bracket.bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+#gameView .armory-hud-bracket.bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+/* Responsive Adjustments for Mobile */
+@media (max-width: 640px) {
+    #gameView .weapon-hud-bar {
+        bottom: 84px; /* Naikkan di atas touch controls */
+        padding: 5px 8px;
+        transform: scale(0.9) translateX(-55%);
+        transform-origin: bottom center;
+    }
+    #gameView .weapon-slot-btn {
+        width: 38px;
+        height: 38px;
+    }
+    #gameView #weaponSelectScreen h2 {
+        font-size: 24px;
+        letter-spacing: 3px;
+    }
+    #gameView #weaponSelectScreen .subtitle {
+        font-size: 12px;
+    }
+    #gameView .weapon-card {
+        padding: 12px;
+        max-width: 260px;
+    }
+}
+
+/* ============================================================
+   PROLOGUE CUTSCENE — Cinematic Narrative Overlay
+   ============================================================ */
+#prologueScreen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: #020005;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: 'Courier New', Consolas, monospace;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    padding: 40px 16px 100px;
+    box-sizing: border-box;
+}
+#prologueScreen.active { display: flex; }
+
+/* Custom retro terminal scrollbar */
+#prologueScreen::-webkit-scrollbar {
+    width: 6px;
+}
+#prologueScreen::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.5);
+}
+#prologueScreen::-webkit-scrollbar-thumb {
+    background: rgba(255, 60, 40, 0.35);
+    border-radius: 3px;
+}
+#prologueScreen::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 80, 50, 0.6);
+}
+
+/* Ambient noise grain overlay */
+#prologueScreen::before {
+    content: '';
+    position: fixed;
+    inset: -50%;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 256px;
+    pointer-events: none;
+    animation: prologueGrain 0.4s steps(4) infinite;
+}
+@keyframes prologueGrain {
+    0%, 100% { transform: translate(0,0); }
+    25% { transform: translate(-5%,-3%); }
+    50% { transform: translate(3%,5%); }
+    75% { transform: translate(-3%,-5%); }
+}
+
+/* CRT scanlines overlay on prologue */
+#prologueScreen::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.15) 0px,
+        rgba(0,0,0,0.15) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    opacity: 0.35;
+}
+
+/* Vignette for prologue */
+.prologue-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+}
+
+/* The text container */
+.prologue-content {
+    position: relative;
+    z-index: 10;
+    max-width: 700px;
+    width: 92%;
+    margin: auto 0;
+    padding: 20px 10px;
+    text-align: left;
+}
+
+/* Classification header stamp */
+.prologue-header {
+    text-align: center;
+    margin-bottom: 36px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.prologue-header.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.prologue-classify {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #ff2222;
+    border: 1px solid rgba(255,34,34,0.3);
+    padding: 4px 18px;
+    margin-bottom: 12px;
+    animation: prologuePulse 2s ease-in-out infinite;
+}
+@keyframes prologuePulse {
+    0%, 100% { opacity: 0.7; border-color: rgba(255,34,34,0.2); }
+    50% { opacity: 1; border-color: rgba(255,34,34,0.6); }
+}
+.prologue-date {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: rgba(180,170,160,0.5);
+    margin-top: 8px;
+}
+
+/* Individual narrative line */
+.prologue-line {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    margin-bottom: 14px;
+    line-height: 1.7;
+    font-size: 15px;
+    color: rgba(200,195,185,0);
+}
+.prologue-line.visible {
+    opacity: 1;
+    transform: translateY(0);
+    color: rgba(200,195,185,0.88);
+}
+.prologue-line.narrator {
+    color: rgba(200,195,185,0.65);
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+.prologue-line.narrator.visible {
+    color: rgba(200,195,185,0.55);
+}
+.prologue-line.speaker {
+    padding-left: 20px;
+    border-left: 2px solid rgba(255,80,50,0.25);
+}
+.prologue-line .speaker-tag {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #d44a2a;
+    margin-bottom: 3px;
+    font-style: normal;
+}
+.prologue-line .dialogue {
+    color: rgba(230,220,210,0.88);
+    font-style: normal;
+}
+.prologue-line.visible .dialogue {
+    color: rgba(230,220,210,0.88);
+}
+
+/* Typewriter cursor */
+.prologue-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: rgba(255,80,50,0.7);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: prologueBlink 0.6s steps(1) infinite;
+}
+@keyframes prologueBlink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+
+/* Section dividers */
+.prologue-divider {
+    display: block;
+    text-align: center;
+    margin: 22px 0;
+    font-size: 10px;
+    letter-spacing: 8px;
+    color: rgba(255,50,30,0.25);
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+.prologue-divider.visible { opacity: 1; }
+
+/* Glitch header effect */
+.prologue-glitch {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 8px;
+    color: #ff3b3b;
+    text-shadow: 0 0 12px rgba(255,30,30,0.4);
+    margin-bottom: 30px;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    position: relative;
+}
+.prologue-glitch.visible { opacity: 1; }
+.prologue-glitch::before,
+.prologue-glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.7;
+}
+.prologue-glitch.visible::before {
+    animation: prologueGlitch1 3s infinite;
+    color: #0ff;
+    z-index: -1;
+}
+.prologue-glitch.visible::after {
+    animation: prologueGlitch2 3s infinite;
+    color: #f0f;
+    z-index: -2;
+}
+@keyframes prologueGlitch1 {
+    0%, 92%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+    93% { clip-path: inset(20% 0 40% 0); transform: translate(-3px, 1px); }
+    96% { clip-path: inset(60% 0 5% 0); transform: translate(3px, -1px); }
+}
+@keyframes prologueGlitch2 {
+    0%, 94%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+    95% { clip-path: inset(40% 0 20% 0); transform: translate(2px, 2px); }
+    98% { clip-path: inset(10% 0 70% 0); transform: translate(-2px, -1px); }
+}
+
+/* Skip / continue button */
+.prologue-skip-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 9010;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(200,195,185,0.5);
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+.prologue-skip-btn:hover {
+    background: rgba(255,80,50,0.12);
+    border-color: rgba(255,80,50,0.4);
+    color: rgba(255,200,180,0.8);
+}
+
+/* Continue prompt at bottom */
+.prologue-continue {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9010;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+.prologue-continue.visible { opacity: 1; }
+.prologue-continue-text {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(200,195,185,0.45);
+    animation: prologueContinuePulse 2s ease-in-out infinite;
+}
+@keyframes prologueContinuePulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.9; }
+}
+
+/* Fade out the entire prologue */
+#prologueScreen.fade-out {
+    animation: prologueFadeOut 1.2s ease forwards;
+}
+@keyframes prologueFadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Static burst effect */
+.prologue-static {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,0.03) 0px,
+        transparent 1px,
+        transparent 2px,
+        rgba(255,255,255,0.02) 3px
+    );
+    mix-blend-mode: screen;
+}
+.prologue-static.flash {
+    animation: prologueStaticFlash 0.15s steps(3) forwards;
+}
+@keyframes prologueStaticFlash {
+    0% { opacity: 0.7; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0; }
+}
+
+@media (max-width: 640px) {
+    .prologue-content { padding: 20px 14px; }
+    .prologue-line { font-size: 13px; margin-bottom: 10px; }
+    .prologue-glitch { font-size: 20px; letter-spacing: 4px; }
+    .prologue-classify { font-size: 9px; letter-spacing: 4px; }
+    .prologue-skip-btn { bottom: 16px; right: 16px; font-size: 10px; padding: 6px 14px; }
+}
+
+/* ============================================================
+   TACTICAL COMMS TRANSCEIVER BOX (IN-MISSION RADIO CHATTER)
+   ============================================================ */
+.comms-box {
+    position: fixed;
+    top: 20px;
+    right: 215px; /* Sits cleanly to the left of the minimap */
+    width: 320px;
+    max-width: calc(100vw - 40px);
+    background: rgba(8, 14, 22, 0.94);
+    border: 1px solid rgba(0, 229, 255, 0.45);
+    border-left: 4px solid #00e5ff;
+    border-radius: 4px;
+    padding: 10px 12px;
+    z-index: 135;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.75), inset 0 0 15px rgba(0, 229, 255, 0.1);
+    color: #e0f7fa;
+    font-family: inherit;
+    pointer-events: none;
+    animation: commsSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes commsSlideIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.comms-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+    margin-bottom: 6px;
+}
+.comms-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    background: rgba(0, 229, 255, 0.15);
+    border: 1px solid #00e5ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.comms-avatar svg {
+    width: 16px;
+    height: 16px;
+    fill: #00e5ff;
+}
+.comms-meta {
+    flex: 1;
+    min-width: 0;
+}
+.comms-sender {
+    font-size: 11px;
+    font-weight: 700;
+    color: #00e5ff;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.comms-freq {
+    font-size: 9px;
+    color: #80deea;
+    letter-spacing: 0.5px;
+}
+.comms-signal {
+    font-size: 9px;
+    color: #2ecc71;
+    letter-spacing: 1px;
+    font-weight: bold;
+    animation: commsBlink 1s infinite alternate;
+}
+@keyframes commsBlink {
+    from { opacity: 0.5; }
+    to { opacity: 1; text-shadow: 0 0 6px #2ecc71; }
+}
+.comms-body {
+    font-size: 11px;
+    line-height: 1.45;
+    color: #b2ebf2;
+    text-shadow: 0 0 1px rgba(0,0,0,0.8);
+}
+
+/* ============================================================
+   CINEMATIC BOSS HUD (TOP CENTER SCREEN)
+   ============================================================ */
+.boss-hud {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(540px, 90vw);
+    background: rgba(12, 3, 5, 0.92);
+    border: 1px solid rgba(255, 30, 60, 0.5);
+    border-radius: 4px;
+    padding: 8px 14px;
+    z-index: 136;
+    box-shadow: 0 8px 32px rgba(255, 0, 40, 0.25), inset 0 0 20px rgba(180, 0, 30, 0.15);
+    pointer-events: none;
+    animation: bossHudAppear 0.5s ease-out forwards;
+}
+@keyframes bossHudAppear {
+    from { opacity: 0; transform: translate(-50%, -20px) scale(0.95); }
+    to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+.boss-hud-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+}
+.boss-hud-threat {
+    color: #ff3344;
+    font-size: 10px;
+    animation: threatPulse 0.8s infinite alternate;
+}
+@keyframes threatPulse {
+    from { opacity: 0.7; }
+    to { opacity: 1; text-shadow: 0 0 8px #ff0033; }
+}
+.boss-hud-name {
+    color: #ffffff;
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    text-shadow: 0 0 8px rgba(255, 50, 50, 0.6);
+}
+.boss-hud-phase {
+    color: #ffd700;
+    font-size: 10px;
+}
+.boss-bar-track {
+    width: 100%;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 50, 70, 0.4);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+.boss-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #b71540 0%, #ff2a2a 50%, #ff9f43 100%);
+    box-shadow: 0 0 12px rgba(255, 40, 40, 0.8);
+    transition: width 0.2s ease-out;
+}
+
+/* ============================================================
+   COMBAT ADRENALINE COMBO BANNER
+   ============================================================ */
+.combo-banner {
+    position: fixed;
+    top: 36%;
+    right: 28px;
+    transform: translateY(-50%);
+    z-index: 136;
+    pointer-events: none;
+    text-align: right;
+    animation: comboPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes comboPop {
+    from { opacity: 0; transform: translateY(-50%) scale(0.6) rotate(-5deg); }
+    to { opacity: 1; transform: translateY(-50%) scale(1) rotate(0deg); }
+}
+.combo-count {
+    display: inline-block;
+    font-size: 26px;
+    font-weight: 900;
+    font-style: italic;
+    color: #00f0ff;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+    margin-right: 6px;
+}
+.combo-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #ffd700;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+}
+
+/* ============================================================
+   CLASSIFIED LORE TERMINAL & CODEX MODALS (INGAME HIGH-Z)
+   ============================================================ */
+#loreModal, #codexModal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10000 !important;
+    background: rgba(3, 7, 18, 0.88) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    display: none;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: auto !important;
+}
+#loreModal.open, #codexModal.open {
+    display: flex !important;
+    opacity: 1 !important;
+}
+#loreModal .modal, #codexModal .modal {
+    width: 100%;
+    max-width: 580px;
+    background: linear-gradient(180deg, #0b1523, #040910);
+    border: 1px solid rgba(0, 240, 255, 0.5);
+    border-radius: 6px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), inset 0 0 24px rgba(0, 240, 255, 0.12);
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.lore-modal {
+    border-color: rgba(0, 229, 255, 0.6) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), inset 0 0 32px rgba(0, 229, 255, 0.15) !important;
+}
+.lore-body-wrapper {
+    background: rgba(3, 8, 14, 0.85);
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    border-radius: 4px;
+    padding: 16px;
+    margin-top: 12px;
+}
+.lore-meta {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: #00e5ff;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.lore-content {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #e0f7fa;
+    font-family: inherit;
+}
+
+/* ============================================================
+   CINEMATIC EPILOGUE SCREEN (SECTOR 15 PURGE)
+   ============================================================ */
+#epilogueScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 180;
+    background: #020204;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #f5e6d3;
+    font-family: inherit;
+}
+.epilogue-content {
+    max-width: 680px;
+    width: 90vw;
+    padding: 30px;
+    background: rgba(8, 4, 6, 0.85);
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    border-radius: 6px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), inset 0 0 24px rgba(255, 215, 0, 0.08);
+}
+
+/* Low HP Red Vascular Pulse on Screen Border */
+body.low-health-warning #gameView .vignette {
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(180, 0, 20, 0.65) 100%) !important;
+    animation: lowHpPulse 1s infinite alternate !important;
+}
+@keyframes lowHpPulse {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
+}
+
+
+/* VITA v2.0 industrial HUD polish */
+#gameView #touchUI button{min-width:56px;min-height:56px;}
+#gameView .weapon-hud-bar{backdrop-filter:blur(8px);}
+#gameView #pauseScreen.open{display:flex;}
+@media (max-width:700px){#gameView #ui{font-size:12px;max-width:62vw;}#gameView #minimap{width:120px;height:120px;}}
+
+/* ============================================================
+   CLASSIFIED CODEX ARCHIVES MODAL
+   ============================================================ */
+.codex-modal {
+    border-color: rgba(0, 229, 255, 0.6) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), inset 0 0 32px rgba(0, 229, 255, 0.12) !important;
+    max-width: 820px !important;
+    width: 95vw !important;
+}
+.codex-layout {
+    display: flex;
+    gap: 16px;
+    margin-top: 14px;
+    min-height: 320px;
+}
+.codex-sidebar-list {
+    width: 250px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 340px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.codex-log-item {
+    background: rgba(6, 12, 20, 0.75);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 4px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 180ms ease-out;
+}
+.codex-log-item:hover {
+    border-color: #00e5ff;
+    background: rgba(0, 229, 255, 0.12);
+    transform: translateX(3px);
+}
+.codex-log-item.active {
+    border-color: #00e5ff;
+    background: rgba(0, 229, 255, 0.18);
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+}
+.codex-log-item.locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    border-style: dashed;
+}
+.codex-log-item.locked:hover {
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(6, 12, 20, 0.75);
+}
+.codex-log-num {
+    font-size: 9.5px;
+    letter-spacing: 1.5px;
+    color: #00e5ff;
+    font-weight: bold;
+}
+.codex-log-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #f2e9e4;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.codex-log-status {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: rgba(242, 233, 228, 0.4);
+    margin-top: 4px;
+}
+.codex-reader-panel {
+    flex: 1;
+    background: rgba(3, 8, 14, 0.92);
+    border: 1px solid rgba(0, 229, 255, 0.28);
+    border-radius: 4px;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 340px;
+}
+.codex-stamp {
+    display: inline-block;
+    border: 1px solid rgba(255, 59, 59, 0.7);
+    color: #ff3b3b;
+    padding: 2px 8px;
+    font-size: 9.5px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+.codex-doc-title {
+    color: #00e5ff;
+    font-size: 15px;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+.codex-doc-meta {
+    font-size: 10.5px;
+    color: rgba(242, 233, 228, 0.55);
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+.codex-doc-body {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #e0f7fa;
+    font-style: italic;
+}
+.codex-empty-msg {
+    color: rgba(242, 233, 228, 0.4);
+    font-size: 13px;
+    text-align: center;
+    padding: 60px 15px;
+}
+@media (max-width: 640px) {
+    .codex-layout { flex-direction: column; }
+    .codex-sidebar-list { width: 100%; max-height: 130px; }
+    .codex-reader-panel { max-height: 200px; }
+}
+
+
+
+
+/* Cinematic Death Screen Animation */
+@keyframes dossierFlicker {
+    0% { opacity: 0; transform: scale(0.96) translateY(12px); filter: blur(4px); }
+    60% { opacity: 0.9; filter: blur(0px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+#gameView #deathScreen.cinematic-open .dossier-frame {
+    animation: dossierFlicker 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Pause Menu Live Stats Bar */
+#gameView #pauseScreen .pause-stats-box {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin: 8px auto 20px auto;
+    padding: 8px 16px;
+    background: rgba(0, 240, 255, 0.07);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    border-radius: 6px;
+    font-family: 'Courier New', Consolas, monospace;
+}
+#gameView #pauseScreen .pause-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+}
+#gameView #pauseScreen .pause-stat-lbl {
+    color: #64748b;
+    font-size: 9px;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+#gameView #pauseScreen .pause-stat-val {
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: bold;
+}
+#gameView #pauseScreen .pause-stat-val.text-cyan {
+    color: #00f0ff;
+}
+
+/* ============================================================
+   LEVEL 1 LIVE FIELD TUTORIAL HUD (CYBERPUNK GLASSMORPHIC RIBBON)
+   ============================================================ */
+.tutorial-hud-banner {
+    position: fixed;
+    bottom: 92px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 600;
+    width: min(560px, 92vw);
+    background: linear-gradient(135deg, rgba(3, 14, 28, 0.94), rgba(4, 9, 18, 0.96));
+    border: 1px solid rgba(0, 240, 255, 0.55);
+    border-radius: 6px;
+    padding: 10px 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85), 0 0 16px rgba(0, 240, 255, 0.22);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #e0f7fa;
+    font-family: inherit;
+    pointer-events: auto;
+    animation: tutSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+@keyframes tutSlideUp {
+    from { transform: translate(-50%, 20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+.tutorial-badge-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.tutorial-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #00f0ff;
+    text-transform: uppercase;
+}
+.tutorial-skip-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+}
+.tutorial-skip-btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.15);
+}
+.tutorial-instruction-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.tutorial-icon-pulse {
+    font-size: 20px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 240, 255, 0.12);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-radius: 4px;
+    flex-shrink: 0;
+    animation: tutPulse 1.6s infinite ease-in-out;
+}
+@keyframes tutPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(0, 240, 255, 0); }
+    50% { transform: scale(1.08); box-shadow: 0 0 10px rgba(0, 240, 255, 0.4); }
+}
+.tutorial-text-block {
+    flex: 1;
+    min-width: 0;
+}
+.tutorial-msg {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #ffffff;
+}
+.tutorial-sub {
+    font-size: 10px;
+    color: #38bdf8;
+    margin-top: 2px;
+}
+.tutorial-status-indicator {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid #38bdf8;
+    color: #38bdf8;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+.tutorial-status-indicator.success {
+    background: rgba(34, 197, 94, 0.25);
+    border-color: #22c55e;
+    color: #4ade80;
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+/* ============================================================
+   DEVICE SELECTION MODAL (PC VS MOBILE)
+   ============================================================ */
+.device-modal-card {
+    max-width: 580px;
+    width: 95%;
+    background: rgba(10, 12, 20, 0.96) !important;
+    border: 1px solid rgba(0, 229, 255, 0.5) !important;
+    box-shadow: 0 0 40px rgba(0, 229, 255, 0.22), 0 16px 48px rgba(0, 0, 0, 0.9) !important;
+    padding: 24px;
+    border-radius: 10px;
+    color: #e6edf3;
+}
+.device-modal-intro {
+    font-size: 13px;
+    color: #c0cfdb;
+    margin: 0 0 18px 0;
+    line-height: 1.5;
+}
+.device-choices-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.device-choice-card {
+    display: flex;
+    flex-direction: column;
+    background: rgba(16, 20, 32, 0.85);
+    border: 2px solid rgba(0, 229, 255, 0.25);
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+}
+.device-choice-card:hover {
+    background: rgba(22, 28, 48, 0.95);
+    border-color: rgba(0, 229, 255, 0.7);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 229, 255, 0.2);
+}
+.device-choice-card.selected {
+    background: rgba(12, 32, 48, 0.95);
+    border-color: #00f0ff;
+    box-shadow: 0 0 24px rgba(0, 240, 255, 0.35), inset 0 0 12px rgba(0, 240, 255, 0.15);
+}
+.device-choice-icon {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+.device-choice-head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+.device-choice-head h4 {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.8px;
+    color: #fff;
+    font-weight: 700;
+}
+.device-tag-rec {
+    display: inline-block;
+    align-self: flex-start;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(0, 229, 255, 0.15);
+    color: #00f0ff;
+    border: 1px solid rgba(0, 229, 255, 0.4);
+}
+.device-choice-card p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #9ab0c4;
+}
+.device-select-indicator {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 229, 255, 0.4);
+    transition: all 0.2s ease;
+}
+.device-choice-card.selected .device-select-indicator {
+    border-color: #00f0ff;
+    background: #00f0ff;
+    box-shadow: 0 0 8px #00f0ff;
+}
+.device-modal-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-top: 1px solid rgba(0, 229, 255, 0.2);
+    padding-top: 14px;
+}
+.device-remember-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #c0cfdb;
+    cursor: pointer;
+}
+.device-remember-label input[type="checkbox"] {
+    accent-color: #00f0ff;
+}
+.device-action-row {
+    display: flex;
+    justify-content: flex-end;
+}
+@media (max-width: 520px) {
+    .device-choices-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
+/* Start screen device mode indicator */
+.start-device-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px auto 14px;
+    padding: 6px 14px;
+    background: rgba(14, 18, 28, 0.85);
+    border: 1px solid rgba(0, 229, 255, 0.45);
+    border-radius: 20px;
+    color: #e0f2fe;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+}
+.start-device-pill:hover {
+    background: rgba(20, 30, 48, 0.95);
+    border-color: #00f0ff;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+    transform: translateY(-1px);
+}
+.start-device-pill .device-pill-btn {
+    color: #00f0ff;
+    font-weight: bold;
+    text-decoration: underline;
+    margin-left: 4px;
+}
+
+/* ============================================================
+   TOUCH CONTROLS LAYOUT EDITOR
+   ============================================================ */
+#touchLayoutEditor {
+    position: fixed;
+    inset: 0;
+    z-index: 10005;
+    background: rgba(5, 7, 12, 0.65);
+    backdrop-filter: blur(3px);
+    pointer-events: none;
+}
+.layout-editor-topbar {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(94vw, 760px);
+    background: rgba(10, 14, 24, 0.95);
+    border: 1px solid rgba(0, 229, 255, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 229, 255, 0.2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: #e6edf3;
+    pointer-events: auto;
+    z-index: 10007;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.layout-editor-heading {
+    text-align: center;
+}
+.layout-editor-badge {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: #00f0ff;
+    font-weight: bold;
+}
+.layout-editor-heading h4 {
+    margin: 2px 0;
+    font-size: 15px;
+    color: #fff;
+    letter-spacing: 1px;
+}
+.layout-editor-heading p {
+    margin: 0;
+    font-size: 11px;
+    color: #9cb3c9;
+}
+.layout-editor-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0, 229, 255, 0.2);
+}
+.layout-slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #c0cfdb;
+}
+.layout-slider-wrap input[type="range"] {
+    width: 90px;
+    accent-color: #00f0ff;
+}
+.layout-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+@keyframes touchBtnPulse {
+    0%, 100% { border-color: rgba(0, 240, 255, 0.8); box-shadow: 0 0 12px rgba(0, 240, 255, 0.4); }
+    50% { border-color: rgba(255, 215, 0, 0.85); box-shadow: 0 0 20px rgba(255, 215, 0, 0.55); }
+}
+body.editing-touch-layout #gameView #touchUI {
+    display: block !important;
+    pointer-events: auto !important;
+    z-index: 10006;
+}
+body.editing-touch-layout #touchLayoutEditor {
+    display: block !important;
+}
+body.editing-touch-layout #gameView #stickZone,
+body.editing-touch-layout #gameView #touchBtns button {
+    pointer-events: auto !important;
+    cursor: grab !important;
+    border: 2px dashed #00f0ff !important;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.5), inset 0 0 10px rgba(0, 240, 255, 0.25) !important;
+    animation: touchBtnPulse 1.8s infinite ease-in-out;
+}
+body.editing-touch-layout #gameView #stickZone:active,
+body.editing-touch-layout #gameView #touchBtns button:active,
+body.editing-touch-layout .is-dragging {
+    cursor: grabbing !important;
+    border-color: #ffd700 !important;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.8) !important;
+}
+
+/* Custom drag badges for elements when editing */
+body.editing-touch-layout #gameView #stickZone::after {
+    content: "🕹️ JOYSTICK";
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 700;
+    color: #00f0ff;
+    background: rgba(10, 14, 24, 0.85);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    white-space: nowrap;
+    pointer-events: none;
+}
+body.editing-touch-layout #gameView #btnTouchAtk::after {
+    content: "⚔️ SERANG";
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 700;
+    color: #ffd700;
+    background: rgba(10, 14, 24, 0.85);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    white-space: nowrap;
+    pointer-events: none;
+}
+body.editing-touch-layout #gameView #btnTouchDash::after {
+    content: "💨 DASH";
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 700;
+    color: #00f0ff;
+    background: rgba(10, 14, 24, 0.85);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    white-space: nowrap;
+    pointer-events: none;
+}
+body.editing-touch-layout #gameView #btnTouchWeapon::after {
+    content: "🔄 SENJATA";
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 700;
+    color: #00f0ff;
+    background: rgba(10, 14, 24, 0.85);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    white-space: nowrap;
+    pointer-events: none;
+}
+body.editing-touch-layout #gameView #btnTouchPause::after {
+    content: "⏸️ JEDA";
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 700;
+    color: #00f0ff;
+    background: rgba(10, 14, 24, 0.85);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* ============================================================
+   COMPREHENSIVE SETTINGS DIALOG STYLING
+   ============================================================ */
+.settings-dialog-card {
+    max-width: 540px;
+    width: 95%;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 22px;
+    background: rgba(10, 12, 20, 0.97) !important;
+    border: 1px solid rgba(0, 229, 255, 0.45) !important;
+    box-shadow: 0 0 35px rgba(0, 229, 255, 0.22), 0 16px 48px rgba(0, 0, 0, 0.9) !important;
+    border-radius: 10px;
+    color: #e6edf3;
+}
+.settings-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+}
+.settings-sec-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    color: #00f0ff;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.25);
+    padding-bottom: 6px;
+}
+.settings-sec-head .btn-icon {
+    width: 16px;
+    height: 16px;
+    fill: #00f0ff;
+}
+.settings-check-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #e6edf3;
+    cursor: pointer;
+    padding: 4px 0;
+}
+.settings-check-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #00f0ff;
+}
+.settings-actions-span {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+.settings-actions-span button {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 12px;
+}
+

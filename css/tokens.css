@@ -1,0 +1,87 @@
+/* VITA Industrial Design Tokens v2.0 — single source of truth.
+   Loaded first; home.css / game.css consume these vars.
+   100% local, zero external assets. */
+:root {
+  --vita-bg: #0a0a12;
+  --vita-bg-2: #101018;
+  --vita-panel: rgba(16, 12, 18, 0.88);
+  --vita-line: rgba(255, 60, 60, 0.22);
+  --vita-line-soft: rgba(255, 255, 255, 0.08);
+  --accent: #ff3b3b;
+  --accent-2: #00e5ff;
+  --gold: #ffd700;
+  --green: #2ecc71;
+  --amber: #f39c12;
+  --text: #f2e9e4;
+  --text-dim: rgba(242, 233, 228, 0.62);
+  --text-faint: rgba(242, 233, 228, 0.38);
+  --font-display: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace;
+  --fs-display: clamp(56px, 12vw, 132px);
+  --fs-h2: clamp(20px, 3.4vw, 30px);
+  --fs-body: 15px;
+  --fs-small: 12.5px;
+  --sp-1: 6px; --sp-2: 10px; --sp-3: 16px; --sp-4: 24px; --sp-5: 36px;
+  --radius-s: 8px; --radius-m: 14px; --radius-l: 20px;
+  --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --shadow-glow-red: 0 0 24px rgba(255, 59, 59, 0.35);
+  --shadow-glow-cyan: 0 0 18px rgba(0, 229, 255, 0.25);
+  --motion-fast: 140ms; --motion-normal: 240ms; --motion-slow: 480ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base industrial button — consumed by both home & game views */
+.vita-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--vita-line);
+  background: linear-gradient(180deg, rgba(255,59,59,0.18), rgba(255,59,59,0.06));
+  color: var(--text);
+  cursor: pointer;
+  transition: transform var(--motion-fast) var(--ease-out), filter var(--motion-fast), box-shadow var(--motion-fast);
+}
+.vita-btn:hover { transform: translateY(-2px); filter: brightness(1.12); box-shadow: var(--shadow-glow-red); }
+.vita-btn:active { transform: translateY(0) scale(0.98); }
+.vita-btn:focus-visible, a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 3px;
+}
+
+/* Objective tracker + tutorial toast + damage vignette (game HUD) */
+#objectiveTracker {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 40; display: flex; gap: 10px; align-items: center;
+  padding: 8px 16px; border-radius: 999px;
+  background: rgba(8, 8, 14, 0.72); border: 1px solid var(--vita-line-soft);
+  font-family: var(--font-mono); font-size: var(--fs-small); letter-spacing: 1.5px;
+  color: var(--text); backdrop-filter: blur(6px); pointer-events: none;
+  transition: border-color var(--motion-normal), box-shadow var(--motion-normal);
+}
+#objectiveTracker.tracker-ready { border-color: rgba(46, 204, 113, 0.6); box-shadow: 0 0 18px rgba(46,204,113,0.25); }
+#objectiveTracker .tracker-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+#objectiveTracker.tracker-ready .tracker-dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
+
+#tutorialToast {
+  position: fixed; bottom: 118px; left: 50%; transform: translateX(-50%) translateY(12px);
+  z-index: 41; max-width: min(520px, 90vw); text-align: center;
+  padding: 10px 18px; border-radius: var(--radius-m);
+  background: rgba(10, 10, 18, 0.85); border: 1px solid rgba(0,229,255,0.35);
+  color: var(--text); font-size: 13.5px; letter-spacing: 0.4px;
+  opacity: 0; pointer-events: none; transition: opacity var(--motion-normal), transform var(--motion-normal);
+  box-shadow: var(--shadow-pop);
+}
+#tutorialToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+#damageVignette {
+  position: fixed; inset: 0; z-index: 35; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse at center, transparent 52%, rgba(255, 30, 30, 0.5) 100%);
+  transition: opacity 120ms linear;
+}
+#damageVignette.on { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

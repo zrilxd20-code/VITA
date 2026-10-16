@@ -1,0 +1,17 @@
+{
+  "name": "vita-forgotten-sector",
+  "version": "2.4.0",
+  "description": "VITA — Forgotten Sector. Web-only top-down survival horror maze roguelite. Zero external runtime assets.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node tools/serve.mjs",
+    "check": "node tools/check.mjs && node tools/check_html.cjs",
+    "check:html": "node tools/check_html.cjs",
+    "test": "node tests/test_web_security_qa.js",
+    "icons": "node tools/gen-icons.mjs",
+    "bump": "node tools/bump-version.mjs"
+  }
+}

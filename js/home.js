@@ -1,0 +1,2312 @@
+const GAMES = [
+  {
+    name: 'VITA',
+    subtitle: 'Maze Monster Trainer — Web Edition',
+    type: 'web',
+    badge: 'Browser',
+    desc: 'Survive 15 labyrinth sectors, salvage biomass artifacts, evade anomalies, and neutralize the Final Boss.',
+    tags: ['15 Sectors', 'Horror Roguelite', 'Boss Fights'],
+    colors: ['#ff3b3b', '#7a0c0c', '#ff8a3d']
+  }
+];
+
+const emberCanvas = document.getElementById('embers');
+const emberCtx = emberCanvas.getContext('2d');
+let EW, EH, embers = [];
+const emberMouse = { x: 0, y: 0, t: 0 };
+
+function resizeEmbers() {
+  EW = emberCanvas.width = window.innerWidth;
+  EH = emberCanvas.height = window.innerHeight;
+  const count = Math.min(90, Math.floor(EW * EH / 16000));
+  embers = Array.from({ length: count }, () => spawnEmber(true));
+}
+function spawnEmber(anywhere) {
+  return {
+    x: Math.random() * EW,
+    y: anywhere ? Math.random() * EH : EH + 20,
+    r: Math.random() * 2 + 0.6,
+    vy: -(Math.random() * 0.35 + 0.12),   // naik seperti bara / abu panas
+    vx: (Math.random() - 0.5) * 0.25,
+    life: Math.random() * 160 + 120,
+    max: 280,
+    phase: Math.random() * Math.PI * 2,
+    hue: Math.random() < 0.35 ? 18 : 0,   // kadang oranye, mayoritas merah
+    big: Math.random() < 0.08
+  };
+}
+window.addEventListener('resize', resizeEmbers);
+resizeEmbers();
+window.addEventListener('mousemove', e => { emberMouse.x = e.clientX; emberMouse.y = e.clientY; emberMouse.t = performance.now(); });
+
+function drawEmbers(now) {
+  // v2.0 perf: skip render cost when tab hidden or hub not visible.
+  const hv0 = document.getElementById('homeView');
+  if (document.hidden || (hv0 && hv0.style.display === 'none')) {
+    requestAnimationFrame(drawEmbers);
+    return;
+  }
+  emberCtx.clearRect(0, 0, EW, EH);
+  for (const p of embers) {
+    p.x += p.vx + Math.sin(p.phase += 0.02) * 0.15;
+    p.y += p.vy;
+    p.life--;
+    if (p.life <= 0 || p.y < -20 || p.x < -20 || p.x > EW + 20) {
+      Object.assign(p, spawnEmber(false));
+      continue;
+    }
+    const t = Math.min(1, p.life / (p.max * 0.6));
+    const flicker = 0.55 + Math.sin(p.phase * 2) * 0.45;
+    emberCtx.globalAlpha = t * flicker * 0.8;
+    emberCtx.fillStyle = p.hue ? 'rgba(255,138,61,1)' : 'rgba(255,54,54,1)';
+    emberCtx.beginPath();
+    emberCtx.arc(p.x, p.y, p.r * (p.big ? 2.4 : 1), 0, Math.PI * 2);
+    emberCtx.fill();
+    if (p.big) {
+      emberCtx.globalAlpha = t * 0.25;
+      emberCtx.beginPath();
+      emberCtx.arc(p.x, p.y, p.r * 9, 0, Math.PI * 2);
+      emberCtx.fill();
+    }
+  }
+  // paralaks halus ke kursor
+  const px = (emberMouse.x - EW / 2) * 0.02;
+  const py = (emberMouse.y - EH / 2) * 0.02;
+  emberCtx.save();
+  emberCtx.globalAlpha = 0.3;
+  emberCtx.translate(-px, -py);
+  emberCtx.strokeStyle = 'rgba(255,54,54,0.5)';
+  emberCtx.lineWidth = 1;
+  for (let i = 0; i < 6; i++) {
+    const x = (i * EW) / 4.2;
+    const y = (i * EH) / 6.2;
+    emberCtx.beginPath();
+    emberCtx.moveTo(x - 16, y); emberCtx.lineTo(x + 16, y);
+    emberCtx.moveTo(x, y - 16); emberCtx.lineTo(x, y + 16);
+    emberCtx.stroke();
+  }
+  emberCtx.restore();
+  emberCtx.globalAlpha = 1;
+  drawTeasers(now);
+  requestAnimationFrame(drawEmbers);
+}
+requestAnimationFrame(drawEmbers);
+
+function gameSVG(color1, color2, icon) {
+  const maze = `<path d="M12 3H4v8h4V7h4V3zm6 0h-4v4h4V3zM8 9h4v4H8V9zm0 8H4v4h4v-4zm8-8h4v4h-4V9zm-4 8h4v4h-4v-4zm4-8h-4v4h4v-4zm8-4h-4v4h4V5z" fill="none" stroke="${color1}" stroke-width="1.6" stroke-linejoin="round" opacity="0.6"/>`;
+  const tide = `M22 12c-2-3-4-3-6 0s-4 3-6 0-4-3-6 0v6a2 2 0 0 1 2 2h18a2 2 0 0 1 2-2v-6" fill="none" stroke="${color2}" stroke-width="1.8" stroke-linecap="round"/>`;
+  const sword = `<path d="M3 21l6-6M9 9l6-6m-10 1l2.5-2.5L15 3l6 6-1.5 7.5L17 19l-6-6m0 0l-6 6" fill="none" stroke="${color2}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const comp = `<rect x="3" y="5" width="18" height="13" rx="2.5" fill="none" stroke="${color2}" stroke-width="1.7"/><path d="M9 21h6M12 18v3" stroke="${color2}" stroke-width="1.7" stroke-linecap="round"/>`;
+  const iconPath = icon === 'tide' ? tide : (icon === 'sword' ? sword : comp);
+  return `<svg viewBox="0 0 24 24" fill="none">${maze}${iconPath}</svg>`;
+}
+
+function makeTilt(el) {
+  const strength = 8;
+  el.addEventListener('mousemove', e => {
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    el.style.transform =
+      `rotateX(${(0.5 - y) * strength}deg) rotateY(${(x - 0.5) * strength}deg) translateY(-4px)`;
+  });
+  el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+}
+
+function openModal(name, desc, cmd, req) {
+  document.getElementById('modalTitle').textContent = name;
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('modalCmd').textContent = cmd;
+  document.getElementById('modalReq').textContent = req;
+  document.getElementById('modal').classList.add('open');
+}
+document.getElementById('modalClose').addEventListener('click', () => {
+  document.getElementById('modal').classList.remove('open');
+});
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target.id === 'modal') e.currentTarget.classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('modal').classList.remove('open');
+});
+
+/* Teaser monster: pixel-art prosedural 2-frame, tanpa aset eksternal.
+   '.' = transparan. Digambar chunky langsung ke <canvas data-foe>. */
+const FOE_PX = 8;
+const FOES = {
+  slime: {
+    pal: { g: '#2ea89a', W: '#bff3ec', E: '#06383b' },
+    frames: [
+      [
+        '....gggg....',
+        '..gggggggg..',
+        '.gWWggggggg.',
+        '.gWgggggggg.',
+        'gggggggggggg',
+        'gEEggggggEEg',
+        'gEEggggggEEg',
+        'gggggggggggg',
+        '.gggggggggg.'
+      ],
+      [
+        '............',
+        '............',
+        '..gggggggg..',
+        '.gWWggggggg.',
+        'gggggggggggg',
+        'gEEggggggEEg',
+        'gEEggggggEEg',
+        'gggggggggggg',
+        'gggggggggggg'
+      ]
+    ]
+  },
+  bat: {
+    pal: { P: '#7a4fd0', B: '#3a2358', E: '#ff3b3b' },
+    frames: [
+      [
+        'PP.........PP',
+        'PPP.......PPP',
+        '.PPPP...PPPP.',
+        '..PPPBBBPPP..',
+        '....BEBEB....',
+        '....BBBBB....',
+        '.....B.B.....'
+      ],
+      [
+        '.............',
+        '.............',
+        '....BBBBB....',
+        '..PPBEBEBPP..',
+        '.PPPBBBBBPPP.',
+        'PPP...B...PPP',
+        'PP....B....PP'
+      ]
+    ]
+  },
+  eye: {
+    pal: { R: '#a02323', W: '#e8dcc8', P: '#200000' },
+    frames: [
+      [
+        '...RRRRR...',
+        '.RRRRRRRRR.',
+        'RRWWWWWWWRR',
+        'RWWWWWWWWWR',
+        'RWWWWPWWWWR',
+        'RWWWWWWWWWR',
+        'RRWWWWWWWRR',
+        '.RRRRRRRRR.',
+        '...RRRRR...'
+      ],
+      [
+        '...RRRRR...',
+        '.RRRRRRRRR.',
+        'RRWWWWWWWRR',
+        'RWWWWWWWWWR',
+        'RWWWPWWWWWR',
+        'RWWWWWWWWWR',
+        'RRWWWWWWWRR',
+        '.RRRRRRRRR.',
+        '...RRRRR...'
+      ]
+    ]
+  },
+  mimic: {
+    pal: { F: '#5c0a0a', M: '#e8dcc8', E: '#ff2200', D: '#1a0000', B: '#d4c5a0' },
+    frames: [
+      [
+        '...FFFFFF...',
+        '.FFFFFFFFFF.',
+        'FFMMMMMMMMFF',
+        'FMEEDDDDEEMF',
+        'FMEEDDDDEEMF',
+        'FBBBBBBBBBBF',
+        'FDDDDDDDDDDF',
+        '.FFFFFFFFFF.',
+        '...FFFFFF...'
+      ],
+      [
+        '...FFFFFF...',
+        '.FFFFFFFFFF.',
+        'FFMMMMMMMMFF',
+        'FMDEEDDDDEEM',
+        'FMDEEDDDDEEM',
+        'FBBBBBBBBBBF',
+        'FDDDDDDDDDDF',
+        '.FFFFFFFFFF.',
+        '...FFFFFF...'
+      ]
+    ]
+  }
+};
+const teasers = [];
+function initTeasers() {
+  if (typeof document.querySelectorAll !== 'function') return;
+  document.querySelectorAll('canvas[data-foe]').forEach(cv => {
+    const foe = FOES[cv.getAttribute('data-foe')];
+    if (!foe) return;
+    const cx = cv.getContext('2d');
+    cx.imageSmoothingEnabled = false;
+    teasers.push({ cv, cx, foe });
+  });
+}
+function drawTeasers(now) {
+  for (const t of teasers) {
+    const { cv, cx, foe } = t;
+    const frame = foe.frames[Math.floor(now / 450) % foe.frames.length];
+    const rows = frame.length;
+    const cols = frame[0].length;
+    const w = cols * FOE_PX;
+    const h = rows * FOE_PX;
+    const ox = Math.round((cv.width - w) / 2);
+    const oy = Math.round(cv.height - h - 8 + Math.round(Math.sin(now / 400) * 1.2));
+    cx.clearRect(0, 0, cv.width, cv.height);
+    cx.fillStyle = 'rgba(0,0,0,0.45)';
+    cx.fillRect(ox + 8, cv.height - 8, w - 16, 4);
+    for (let y = 0; y < rows; y++) {
+      const row = frame[y];
+      for (let x = 0; x < row.length; x++) {
+        const c = foe.pal[row[x]];
+        if (!c) continue;
+        cx.fillStyle = c;
+        cx.fillRect(ox + x * FOE_PX, oy + y * FOE_PX, FOE_PX, FOE_PX);
+      }
+    }
+  }
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = GAMES.map((g, i) => {
+    const icon = g.subtitle.indexOf('Tide') >= 0 ? 'tide' : (g.subtitle.indexOf('RPG') >= 0 || g.type === 'http' ? 'sword' : 'comp');
+    const cardIcon = g.type === 'web' ? (icon === 'tide' ? 'tide' : 'sword') : 'comp';
+    const [c1, c2] = g.colors;
+    const isWeb = g.type === 'web';
+    const btn = isWeb
+      ? `<button class="btn" style="--b1:${c1};--b2:${c2}" onclick="playWebGame()">▶ DEPLOY OPERATIVE</button>`
+      : `<button class="btn ghost desktop-btn" data-file="${g.file}">▶ Launch Guide</button>`;
+    const tags = g.tags.map(t => `<span class="tag ${t === 'Pygame' || t === '3 Level' ? '' : 'on'}">${esc(t)}</span>`).join('');
+    return `
+      <section class="card" data-i="${i}" style="--strip:${c1};--thumb-bg:linear-gradient(135deg, ${c1}22, ${c2}22)">
+        <div class="thumb">
+          <span class="plays-badge" style="color:${c1}">${esc(g.badge)}</span>
+          ${gameSVG(c1, c2, cardIcon)}
+        </div>
+        <h2>${esc(g.name)}</h2>
+        <p class="desc">${esc(g.desc)}</p>
+        <div class="tags">${tags}</div>
+        ${btn}
+      </section>`;
+  }).join('');
+
+  document.querySelectorAll('.card').forEach(c => makeTilt(c));
+  document.querySelectorAll('.desktop-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      const file = b.dataset.file;
+      const g = GAMES.find(x => x.file === file);
+      if (!g) return;
+      openModal(
+        g.name,
+        'This edition runs natively from your terminal using Python and Pygame.',
+        `.venv\\Scripts\\python.exe ${file}`,
+        'Ensure the .venv virtual environment is activated and pygame-ce is installed.'
+      );
+    });
+  });
+}
+
+const HOME_SETTINGS_KEY = 'vita_save';
+const HOME_DIFFS = ['easy', 'normal', 'hard'];
+const HOME_QUALS = ['smooth', 'retro', 'chunky'];
+const homeDefaults = {
+  volume: 70,
+  sfxVolume: 80,
+  bgmVolume: 70,
+  muted: false,
+  brightness: 100,
+  lang: 'en',
+  difficulty: 'normal',
+  quality: 'retro',
+  deviceMode: 'ask',
+  autoAim: true,
+  haptic: true,
+  screenShake: true,
+  showMinimap: true,
+  showFps: false,
+  touchScale: 100,
+  touchOpacity: 85
+};
+function sanitizeHomeSettings(raw) {
+  const s = (raw && typeof raw === 'object') ? raw : {};
+  let volume = Math.round(Number(s.volume));
+  if (!Number.isFinite(volume)) volume = homeDefaults.volume;
+  volume = Math.max(0, Math.min(100, volume));
+
+  let sfxVolume = Math.round(Number(s.sfxVolume));
+  if (!Number.isFinite(sfxVolume)) sfxVolume = homeDefaults.sfxVolume;
+  sfxVolume = Math.max(0, Math.min(100, sfxVolume));
+
+  let bgmVolume = Math.round(Number(s.bgmVolume));
+  if (!Number.isFinite(bgmVolume)) bgmVolume = homeDefaults.bgmVolume;
+  bgmVolume = Math.max(0, Math.min(100, bgmVolume));
+
+  const muted = !!s.muted;
+
+  let brightness = Math.round(Number(s.brightness));
+  if (!Number.isFinite(brightness)) brightness = homeDefaults.brightness;
+  brightness = Math.max(30, Math.min(180, brightness));
+
+  const lang = s.lang === 'id' ? 'id' : 'en';
+  const difficulty = HOME_DIFFS.includes(s.difficulty) ? s.difficulty : 'normal';
+  const quality = HOME_QUALS.includes(s.quality) ? s.quality : 'retro';
+
+  const deviceMode = (s.deviceMode === 'pc' || s.deviceMode === 'mobile' || s.deviceMode === 'ask') ? s.deviceMode : 'ask';
+  const autoAim = (s.autoAim !== undefined) ? !!s.autoAim : true;
+  const haptic = (s.haptic !== undefined) ? !!s.haptic : true;
+  const screenShake = (s.screenShake !== undefined) ? !!s.screenShake : true;
+  const showMinimap = (s.showMinimap !== undefined) ? !!s.showMinimap : true;
+  const showFps = (s.showFps !== undefined) ? !!s.showFps : false;
+
+  let touchScale = Math.round(Number(s.touchScale));
+  if (!Number.isFinite(touchScale)) touchScale = homeDefaults.touchScale;
+  touchScale = Math.max(70, Math.min(140, touchScale));
+
+  let touchOpacity = Math.round(Number(s.touchOpacity));
+  if (!Number.isFinite(touchOpacity)) touchOpacity = homeDefaults.touchOpacity;
+  touchOpacity = Math.max(30, Math.min(100, touchOpacity));
+
+  return {
+    volume, sfxVolume, bgmVolume, muted,
+    brightness, lang, difficulty, quality,
+    deviceMode, autoAim, haptic, screenShake, showMinimap, showFps,
+    touchScale, touchOpacity
+  };
+}
+let homeSettings;
+try {
+  homeSettings = sanitizeHomeSettings(JSON.parse(localStorage.getItem(HOME_SETTINGS_KEY) || '{}'));
+} catch (error) {
+  homeSettings = Object.assign({}, homeDefaults);
+  console.warn('Preferensi VITA tidak dapat dibaca, memakai nilai default.', error);
+}
+try { localStorage.setItem(HOME_SETTINGS_KEY, JSON.stringify(homeSettings)); } catch (e) {}
+const settingsModal = document.getElementById('settingsModal');
+const saveHomeSettings = () => { try { localStorage.setItem(HOME_SETTINGS_KEY, JSON.stringify(homeSettings)); } catch (e) {} };
+const settingsOpenBtn = document.getElementById('settingsOpen');
+if (settingsOpenBtn) settingsOpenBtn.addEventListener('click', openSettingsModal);
+const controlsOpenBtn = document.getElementById('controlsOpen');
+if (controlsOpenBtn) controlsOpenBtn.addEventListener('click', openControlsModal);
+const settingsCloseBtn = document.getElementById('settingsClose');
+if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeSettingsModal);
+if (settingsModal) {
+  settingsModal.addEventListener('click', e => {
+    if (e.target === settingsModal) closeSettingsModal();
+  });
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (typeof closeSidebar === 'function') closeSidebar();
+    if (typeof closeProfileModal === 'function') closeProfileModal();
+    if (typeof closeLeaderboardModal === 'function') closeLeaderboardModal();
+    if (typeof closeSettingsModal === 'function') closeSettingsModal();
+    if (typeof closeDatabaseModal === 'function') closeDatabaseModal();
+    if (typeof closeAuthModal === 'function') closeAuthModal();
+    const gm = document.getElementById('modal');
+    if (gm) gm.classList.remove('open');
+  }
+});// ---- Sistem Profil Operatif & PP (Photo Profile) ----
+const VITA_PROFILE_KEY = 'vita_profile';
+const VITA_ACCOUNTS_KEY = 'vita_accounts';
+
+function getLocalAccounts() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(VITA_ACCOUNTS_KEY) || '{}');
+    if (raw && typeof raw === 'object') return raw;
+  } catch (e) {}
+  return {};
+}
+
+function saveLocalAccount(prof) {
+  if (!prof || !prof.name || prof.name === 'GUEST-77' || prof.provider === 'guest') return;
+  try {
+    const accounts = getLocalAccounts();
+    const key = prof.name.toLowerCase().trim();
+    accounts[key] = {
+      name: prof.name,
+      role: prof.role || 'Field Operative',
+      avatar: prof.avatar || '',
+      presetEmoji: prof.presetEmoji || 'biohazard',
+      passcode: prof.passcode || '',
+      provider: prof.provider || 'facility',
+      status: prof.status || `${(prof.role || 'OPERATIVE').toUpperCase()} // REGISTERED`,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(VITA_ACCOUNTS_KEY, JSON.stringify(accounts));
+  } catch (e) {}
+}
+
+function findLocalAccount(username) {
+  if (!username) return null;
+  const accounts = getLocalAccounts();
+  return accounts[username.toLowerCase().trim()] || null;
+}
+
+function getProfile() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(VITA_PROFILE_KEY) || '{}');
+    if (raw && typeof raw === 'object' && typeof raw.name === 'string' && raw.name) {
+      if (raw.avatar !== undefined && typeof raw.avatar !== 'string') raw.avatar = '';
+      if (raw.presetEmoji !== undefined && typeof raw.presetEmoji !== 'string') raw.presetEmoji = 'biohazard';
+      if (raw.role !== undefined && typeof raw.role !== 'string') raw.role = 'Field Operative';
+      if (raw.provider !== undefined && typeof raw.provider !== 'string') raw.provider = 'guest';
+      if (raw.status !== undefined && typeof raw.status !== 'string') raw.status = 'GUEST // LOCAL';
+      return raw;
+    }
+  } catch (e) {}
+  return {
+    isLoggedIn: false,
+    name: 'GUEST-77',
+    role: 'Field Operative',
+    avatar: '',
+    presetEmoji: 'biohazard',
+    provider: 'guest',
+    status: 'GUEST // LOCAL'
+  };
+}
+
+const PRESET_SVGS = {
+  biohazard: '<svg class="avatar-svg" viewBox="0 0 24 24"><path d="M12 2a1 1 0 0 1 .86.5l1.6 2.76A7.5 7.5 0 0 1 18.5 7.9l2.76-1.6a1 1 0 0 1 1.37.37 1 1 0 0 1-.37 1.36l-2.76 1.6A7.5 7.5 0 0 1 20 12a7.5 7.5 0 0 1-.5 2.63l2.76 1.6a1 1 0 0 1 .37 1.36 1 1 0 0 1-1.37.37L18.5 16.36a7.5 7.5 0 0 1-4.04 2.64l-1.6 2.76A1 1 0 0 1 12 22a1 1 0 0 1-.86-.5l-1.6-2.76A7.5 7.5 0 0 1 5.5 16.36l-2.76 1.6a1 1 0 0 1-1.37-.37 1 1 0 0 1 .37-1.36l2.76-1.6A7.5 7.5 0 0 1 4 12a7.5 7.5 0 0 1 .5-2.63l-2.76-1.6a1 1 0 0 1-.37-1.36 1 1 0 0 1 1.37-.37L5.5 7.9a7.5 7.5 0 0 1 4.04-2.64l1.6-2.76A1 1 0 0 1 12 2zm0 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>',
+  shield: '<svg class="avatar-svg" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>',
+  dna: '<svg class="avatar-svg" viewBox="0 0 24 24"><path d="M4.5 3a1 1 0 0 0-.7.3 1 1 0 0 0 0 1.4l1.6 1.6A9 9 0 0 0 4 11a9 9 0 0 0 2.6 6.4L5 19a1 1 0 1 0 1.4 1.4l1.6-1.6A9 9 0 0 0 13 20a9 9 0 0 0 6.4-2.6l1.6 1.6a1 1 0 0 0 1.4-1.4l-1.6-1.6A9 9 0 0 0 22 11a9 9 0 0 0-2.6-6.4L21 3a1 1 0 1 0-1.4-1.4l-1.6 1.6A9 9 0 0 0 13 2a9 9 0 0 0-6.4 2.6L5 3a1 1 0 0 0-.5 0zm7.5 2a7 7 0 0 1 4.9 2.1l-1.4 1.4a5 5 0 0 0-7 0L7.1 7.1A7 7 0 0 1 12 5zm-3.5 4.9a3 3 0 0 1 4.2 0 3 3 0 0 1 0 4.2l-1.4 1.4a5 5 0 0 0-7 0l-1.4-1.4a7 7 0 0 1 5.6-4.2zm7 0a7 7 0 0 1 2.1 4.9 7 7 0 0 1-2.1 4.9l-1.4-1.4a5 5 0 0 0 0-7l1.4-1.4z"/></svg>',
+  eye: '<svg class="avatar-svg" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>',
+  carnis: '<svg class="avatar-svg" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
+  cyber: '<svg class="avatar-svg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 17.93V18a1 1 0 0 1-2 0v-1.07A8 8 0 0 1 4.07 13H5a1 1 0 0 1 0-2h-.93A8 8 0 0 1 11 4.07V5a1 1 0 0 1 2 0v-.93A8 8 0 0 1 19.93 11H19a1 1 0 0 1 0 2h.93A8 8 0 0 1 13 19.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"/></svg>'
+};
+
+function getPresetSvgMarkup(key) {
+  const map = {
+    '☣️': 'biohazard',
+    '🛡️': 'shield',
+    '🧬': 'dna',
+    '👁️': 'eye',
+    '🩸': 'carnis',
+    '🦾': 'cyber'
+  };
+  const normKey = map[key] || key || 'biohazard';
+  return PRESET_SVGS[normKey] || PRESET_SVGS.biohazard;
+}
+
+function setProfile(p) {
+  try { localStorage.setItem(VITA_PROFILE_KEY, JSON.stringify(p)); } catch (e) {}
+  if (p && p.isLoggedIn && p.provider !== 'guest') {
+    saveLocalAccount(p);
+  }
+  applyProfileUI();
+  if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof syncProfileToSupabase === 'function') {
+    syncProfileToSupabase(p).catch(() => {});
+  }
+}
+
+function processAvatarFile(file, callback) {
+  if (!file) return;
+  if (!file.type || !file.type.startsWith('image/')) {
+    alert('Please select an image file (JPG, PNG, WEBP).');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      // Auto-compress & crop square 128x128
+      const targetDim = 128;
+      const canvas = document.createElement('canvas');
+      canvas.width = targetDim;
+      canvas.height = targetDim;
+      const ctx = canvas.getContext('2d');
+      const size = Math.min(img.width, img.height);
+      const sx = (img.width - size) / 2;
+      const sy = (img.height - size) / 2;
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, targetDim, targetDim);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      const approxKb = Math.round((dataUrl.length * 0.75) / 1024);
+      callback(dataUrl, approxKb);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function getCurrentCallsign() {
+  const uInput = document.getElementById('profileUsernameInput');
+  const mUInput = document.getElementById('modalUsernameInput');
+  const uVal = uInput ? uInput.value.trim() : '';
+  const mVal = mUInput ? mUInput.value.trim() : '';
+  if (uVal) return uVal;
+  if (mVal) return mVal;
+  const prof = getProfile();
+  return (prof && prof.name) ? prof.name : 'OPERATIVE-CARNIS';
+}
+
+let saveIndicatorTimer = null;
+function showSaveIndicator(msg = 'Profile Saved') {
+  const btn = document.getElementById('btnSaveProfile');
+  const mBtn = document.getElementById('modalSaveProfileBtn');
+  const autoTag = document.getElementById('autoSaveIndicator');
+  const modalTag = document.getElementById('modalAutoSaveIndicator');
+
+  if (autoTag) {
+    autoTag.textContent = `● ${msg} ✓`;
+    autoTag.style.color = '#4ade80';
+  }
+  if (modalTag) {
+    modalTag.textContent = `● ${msg} ✓`;
+    modalTag.style.color = '#4ade80';
+  }
+
+  if (btn) {
+    if (!btn.dataset.origHtml) btn.dataset.origHtml = btn.innerHTML;
+    btn.innerHTML = `<svg class="btn-icon" viewBox="0 0 24 24" style="fill:#fff"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> <span>${msg} ✓</span>`;
+    btn.classList.add('save-success');
+    clearTimeout(saveIndicatorTimer);
+    saveIndicatorTimer = setTimeout(() => {
+      if (btn.dataset.origHtml) btn.innerHTML = btn.dataset.origHtml;
+      btn.classList.remove('save-success');
+    }, 2200);
+  }
+
+  if (mBtn) {
+    if (!mBtn.dataset.origHtml) mBtn.dataset.origHtml = mBtn.innerHTML;
+    mBtn.innerHTML = `<svg class="btn-icon" viewBox="0 0 24 24" style="fill:#fff"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> <span>${msg} ✓</span>`;
+    mBtn.classList.add('save-success');
+    setTimeout(() => {
+      if (mBtn.dataset.origHtml) mBtn.innerHTML = mBtn.dataset.origHtml;
+      mBtn.classList.remove('save-success');
+    }, 2200);
+  }
+}
+
+// ---- Prosedural WebAudio UI Feedback ----
+let homeAudioCtx = null;
+function getHomeAudioCtx() {
+  if (typeof audioCtx !== 'undefined' && audioCtx) {
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    return audioCtx;
+  }
+  if (!homeAudioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) homeAudioCtx = new AudioContextClass();
+  }
+  if (homeAudioCtx && homeAudioCtx.state === 'suspended') {
+    homeAudioCtx.resume().catch(() => {});
+  }
+  return homeAudioCtx;
+}
+
+function homeBeep(type) {
+  try {
+    if (typeof sCinematicUI === 'function') {
+      sCinematicUI(type);
+      return;
+    }
+    const v = Number(homeSettings && homeSettings.volume);
+    const volMul = Number.isFinite(v) ? Math.max(0, Math.min(100, v)) / 100 : 0.7;
+    if (volMul <= 0.01) return;
+
+    const ac = getHomeAudioCtx();
+    if (!ac) return;
+    const now = ac.currentTime;
+
+    if (type === 'click') {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      const flt = ac.createBiquadFilter();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(280, now);
+      osc.frequency.exponentialRampToValueAtTime(75, now + 0.045);
+      flt.type = 'lowpass';
+      flt.frequency.setValueAtTime(1400, now);
+      gain.gain.setValueAtTime(0.45 * volMul, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+      osc.connect(flt); flt.connect(gain); gain.connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.05);
+    } else if (type === 'open') {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      const flt = ac.createBiquadFilter();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.14);
+      flt.type = 'lowpass';
+      flt.frequency.setValueAtTime(800, now);
+      gain.gain.setValueAtTime(0.4 * volMul, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      osc.connect(flt); flt.connect(gain); gain.connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.15);
+    } else if (type === 'close') {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+      gain.gain.setValueAtTime(0.4 * volMul, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      osc.connect(gain); gain.connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.1);
+    } else if (type === 'save') {
+      [260, 520].forEach((f, idx) => {
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, now + idx * 0.06);
+        gain.gain.setValueAtTime(0.35 * volMul, now + idx * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.25);
+        osc.connect(gain); gain.connect(ac.destination);
+        osc.start(now + idx * 0.06); osc.stop(now + idx * 0.06 + 0.25);
+      });
+    } else if (type === 'denied') {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      const flt = ac.createBiquadFilter();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(50, now + 0.16);
+      flt.type = 'lowpass';
+      flt.frequency.setValueAtTime(380, now);
+      gain.gain.setValueAtTime(0.6 * volMul, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      osc.connect(flt); flt.connect(gain); gain.connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.16);
+    }
+  } catch (_) {}
+}
+
+function highlightActivePresetAvatar(key) {
+  const normKey = key || 'biohazard';
+  document.querySelectorAll('.btn-preset-avatar').forEach(btn => {
+    const onclickAttr = btn.getAttribute('onclick') || '';
+    if (onclickAttr.includes(`'${normKey}'`)) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
+
+function selectPresetAvatar(emoji) {
+  const prof = getProfile();
+  prof.name = getCurrentCallsign();
+  prof.avatar = '';
+  prof.presetEmoji = emoji;
+  prof.isLoggedIn = true;
+  if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
+  prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // ACTIVE`;
+  setProfile(prof);
+  showSaveIndicator('Division Insignia Saved');
+  highlightActivePresetAvatar(emoji);
+  homeBeep('click');
+}
+
+// ---- Navigasi Sidebar Drawer & Modals ----
+function openSidebar() {
+  const sb = document.getElementById('sidebarDrawer');
+  const bd = document.getElementById('sidebarBackdrop');
+  if (sb) sb.classList.add('open');
+  if (bd) bd.classList.add('open');
+  homeBeep('open');
+}
+
+function closeSidebar() {
+  const sb = document.getElementById('sidebarDrawer');
+  const bd = document.getElementById('sidebarBackdrop');
+  if (sb) sb.classList.remove('open');
+  if (bd) bd.classList.remove('open');
+  homeBeep('close');
+}
+
+function openProfileModal() {
+  closeSidebar();
+  const m = document.getElementById('profileModal');
+  if (m) m.classList.add('open');
+  applyProfileUI();
+  homeBeep('open');
+}
+
+function closeProfileModal() {
+  const m = document.getElementById('profileModal');
+  if (m) m.classList.remove('open');
+  homeBeep('close');
+}
+
+function openLeaderboardModal() {
+  closeSidebar();
+  const m = document.getElementById('leaderboardModal');
+  if (m) m.classList.add('open');
+  renderLeaderboard();
+  homeBeep('open');
+}
+
+function closeLeaderboardModal() {
+  const m = document.getElementById('leaderboardModal');
+  if (m) m.classList.remove('open');
+  homeBeep('close');
+}
+
+function openSettingsModal() {
+  closeSidebar();
+  try { homeSettings = sanitizeHomeSettings(JSON.parse(localStorage.getItem(HOME_SETTINGS_KEY) || '{}')); } catch (e) {}
+  const vEl = document.getElementById('homeVolume');
+  const bEl = document.getElementById('homeBrightness');
+  const lEl = document.getElementById('homeLanguage');
+  const dEl = document.getElementById('homeDifficulty');
+  const qEl = document.getElementById('homeQuality');
+  if (vEl) vEl.value = Math.max(0, Math.min(100, Math.round(Number(homeSettings.volume) || 70)));
+  if (bEl) bEl.value = Math.max(30, Math.min(180, Math.round(Number(homeSettings.brightness) || 100)));
+  const vVal = document.getElementById('homeVolumeVal');
+  if (vVal) vVal.textContent = (vEl ? vEl.value : '70') + '%';
+  const bVal = document.getElementById('homeBrightnessVal');
+  if (bVal) bVal.textContent = (bEl ? bEl.value : '100') + '%';
+
+  const sfxEl = document.getElementById('homeSfx');
+  const sfxVal = document.getElementById('homeSfxVal');
+  if (sfxEl) { sfxEl.value = homeSettings.sfxVolume ?? 80; if (sfxVal) sfxVal.textContent = sfxEl.value + '%'; }
+  const bgmEl = document.getElementById('homeBgm');
+  const bgmVal = document.getElementById('homeBgmVal');
+  if (bgmEl) { bgmEl.value = homeSettings.bgmVolume ?? 70; if (bgmVal) bgmVal.textContent = bgmEl.value + '%'; }
+  const muteEl = document.getElementById('homeMuted');
+  if (muteEl) muteEl.checked = !!homeSettings.muted;
+
+  const devEl = document.getElementById('homeDeviceMode');
+  if (devEl) devEl.value = homeSettings.deviceMode || 'ask';
+  const aimEl = document.getElementById('homeAutoAim');
+  if (aimEl) aimEl.checked = homeSettings.autoAim !== false;
+  const hapEl = document.getElementById('homeHaptic');
+  if (hapEl) hapEl.checked = homeSettings.haptic !== false;
+
+  const tsEl = document.getElementById('homeTouchScale');
+  const tsVal = document.getElementById('homeTouchScaleVal');
+  if (tsEl) { tsEl.value = homeSettings.touchScale || 100; if (tsVal) tsVal.textContent = tsEl.value + '%'; }
+  const toEl = document.getElementById('homeTouchOpacity');
+  const toVal = document.getElementById('homeTouchOpacityVal');
+  if (toEl) { toEl.value = homeSettings.touchOpacity || 85; if (toVal) toVal.textContent = toEl.value + '%'; }
+
+  const shakeEl = document.getElementById('homeScreenShake');
+  if (shakeEl) shakeEl.checked = homeSettings.screenShake !== false;
+  const mmEl = document.getElementById('homeMinimap');
+  if (mmEl) mmEl.checked = homeSettings.showMinimap !== false;
+  const fpsEl = document.getElementById('homeShowFps');
+  if (fpsEl) fpsEl.checked = !!homeSettings.showFps;
+
+  if (lEl) lEl.value = homeSettings.lang === 'en' ? 'en' : 'id';
+  if (dEl) dEl.value = HOME_DIFFS.includes(homeSettings.difficulty) ? homeSettings.difficulty : 'normal';
+  if (qEl) qEl.value = HOME_QUALS.includes(homeSettings.quality) ? homeSettings.quality : 'retro';
+
+  const m = document.getElementById('settingsModal');
+  if (m) m.classList.add('open');
+  homeBeep('open');
+}
+
+function closeSettingsModal() {
+  const m = document.getElementById('settingsModal');
+  if (m) m.classList.remove('open');
+  homeBeep('close');
+}
+
+function openControlsModal() {
+  closeSidebar();
+  openModal('Field Protocol', 'Maneuver your operative with WASD or Arrow Keys. Collect data chips and biomass artifacts, evade anomalies, and reach the green Sector Goal.', 'WASD / Arrows / Virtual Joystick', 'Press ESC to pause mission.');
+  homeBeep('open');
+}
+
+function openDatabaseModal() {
+  closeSidebar();
+  const m = document.getElementById('databaseModal');
+  if (m) m.classList.add('open');
+  applyProfileUI();
+  homeBeep('open');
+}
+
+function closeDatabaseModal() {
+  const m = document.getElementById('databaseModal');
+  if (m) m.classList.remove('open');
+  homeBeep('close');
+}
+
+function openDesktopModal() {
+  // v2.0: Desktop Pygame edition retired (Web-only). Redirect legacy callers to Field Manual.
+  if (typeof openControlsModal === 'function') openControlsModal();
+  else if (typeof openModal === 'function') openModal('VITA — Web Edition', 'Desktop edition retired in v2.0. Play instantly in browser.', '', '');
+}
+
+// Kompatibilitas switchDashTab jika terpanggil
+function switchDashTab(tabId) {
+  if (tabId === 'profile') openProfileModal();
+  else if (tabId === 'leaderboard') openLeaderboardModal();
+  else if (tabId === 'settings') openSettingsModal();
+  else if (tabId === 'guide') openControlsModal();
+  else if (tabId === 'database') openDatabaseModal();
+  else if (tabId === 'play') playWebGame();
+}
+function initDashTab() {}
+
+// ---- Mode Pergantian Modal Auth (Login vs Register) ----
+function switchAuthMode(mode) {
+  const isReg = mode === 'register';
+  const loginSec = document.getElementById('authLoginSection');
+  const regSec = document.getElementById('authRegisterSection');
+  const tabLoginBtn = document.getElementById('authTabLoginBtn');
+  const tabRegBtn = document.getElementById('authTabRegisterBtn');
+
+  if (loginSec) loginSec.style.display = isReg ? 'none' : 'block';
+  if (regSec) regSec.style.display = isReg ? 'block' : 'none';
+
+  if (tabLoginBtn) {
+    if (!isReg) tabLoginBtn.classList.add('active');
+    else tabLoginBtn.classList.remove('active');
+  }
+  if (tabRegBtn) {
+    if (isReg) tabRegBtn.classList.add('active');
+    else tabRegBtn.classList.remove('active');
+  }
+
+  // Bersihkan password input saat berganti tab
+  const p1 = document.getElementById('loginPasscodeInput');
+  const p2 = document.getElementById('modalPasscodeInput');
+  if (p1) p1.value = '';
+  if (p2) p2.value = '';
+
+  homeBeep('click');
+}
+
+function openAuthModal(mode = 'login') {
+  const am = document.getElementById('authModal');
+  if (am) {
+    am.classList.add('open');
+    switchAuthMode(mode);
+    const prof = getProfile();
+    const lCall = document.getElementById('loginCallsignInput');
+    const mCall = document.getElementById('modalUsernameInput');
+    const lPass = document.getElementById('loginPasscodeInput');
+    const mPass = document.getElementById('modalPasscodeInput');
+
+    if (lPass) lPass.value = '';
+    if (mPass) mPass.value = '';
+
+    if (mode === 'login') {
+      if (lCall && prof && prof.name && prof.name !== 'GUEST-77' && prof.provider !== 'guest') {
+        lCall.value = prof.name;
+        if (lPass) setTimeout(() => lPass.focus(), 150);
+      } else if (lCall) {
+        // Coba tawarkan akun lokal yang pernah disimpan
+        const localAccounts = getLocalAccounts();
+        const names = Object.keys(localAccounts);
+        if (names.length > 0 && !lCall.value) {
+          lCall.value = localAccounts[names[names.length - 1]].name;
+        }
+        setTimeout(() => lCall.focus(), 150);
+      }
+    } else {
+      if (mCall) {
+        mCall.value = '';
+        setTimeout(() => mCall.focus(), 150);
+      }
+    }
+
+    homeBeep('open');
+  }
+}
+
+function closeAuthModal() {
+  const am = document.getElementById('authModal');
+  if (am) am.classList.remove('open');
+  homeBeep('close');
+}
+
+// Operatif Login
+async function handlePerformLogin() {
+  const uInput = document.getElementById('loginCallsignInput');
+  const pInput = document.getElementById('loginPasscodeInput');
+  const btnLogin = document.getElementById('btnPerformLogin');
+  const username = (uInput ? uInput.value : '').trim();
+  const passcode = (pInput ? pInput.value : '').trim();
+
+  if (!username) {
+    homeBeep('denied');
+    alert('[LOGIN FAILED]\nPlease enter your Operative Callsign / Handle.');
+    if (uInput) uInput.focus();
+    return;
+  }
+
+  const originalBtnHtml = btnLogin ? btnLogin.innerHTML : '';
+  if (btnLogin) {
+    btnLogin.disabled = true;
+    btnLogin.innerHTML = '<span>Authenticating Identity...</span>';
+  }
+
+  const resetBtn = () => {
+    if (btnLogin) {
+      btnLogin.disabled = false;
+      btnLogin.innerHTML = originalBtnHtml;
+    }
+  };
+
+  try {
+    // 1. Cek profil di Supabase Cloud jika terhubung & online
+    if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof fetchOperativeByCallsign === 'function') {
+      try {
+        const remote = await fetchOperativeByCallsign(username);
+        if (remote) {
+          const passOk = (typeof comparePasscode === 'function')
+            ? await comparePasscode(passcode, remote.passcode, username)
+            : (remote.passcode === passcode);
+
+          if (remote.passcode && (!passcode || !passOk)) {
+            resetBtn();
+            homeBeep('denied');
+            alert('[ACCESS DENIED]\nSecurity passcode does not match operative "' + username + '".');
+            if (pInput) { pInput.value = ''; pInput.focus(); }
+            return;
+          }
+
+          const prof = {
+            isLoggedIn: true,
+            name: remote.username,
+            role: remote.role || 'Field Operative',
+            avatar: remote.avatar || '',
+            presetEmoji: remote.preset_emoji || 'biohazard',
+            passcode: remote.passcode || passcode,
+            provider: remote.provider || 'facility',
+            status: `${(remote.role || 'OPERATIVE').toUpperCase()} // CLOUD VERIFIED`
+          };
+
+          setProfile(prof);
+          resetBtn();
+          closeAuthModal();
+          homeBeep('save');
+          alert('[CLOUD AUTHORIZATION GRANTED]\nWelcome back, Operative ' + prof.name + '!\nProfile & clearance credentials synced from facility database.');
+          return;
+        }
+      } catch (err) {
+        console.warn('Pengecekan cloud gagal saat login:', err);
+      }
+    }
+
+    // 2. Cek akun lokal tersimpan (Offline / Local Database Cache)
+    const localAcc = findLocalAccount(username);
+    const activeProf = getProfile();
+    const targetProf = localAcc || ((activeProf && activeProf.name && activeProf.name.toLowerCase() === username.toLowerCase()) ? activeProf : null);
+
+    if (targetProf && targetProf.name) {
+      const localPassOk = (typeof comparePasscode === 'function')
+        ? await comparePasscode(passcode, targetProf.passcode, username)
+        : (targetProf.passcode === passcode);
+
+      if (targetProf.passcode && (!passcode || !localPassOk)) {
+        resetBtn();
+        homeBeep('denied');
+        alert('[ACCESS DENIED]\nSecurity passcode does not match local account "' + targetProf.name + '".');
+        if (pInput) { pInput.value = ''; pInput.focus(); }
+        return;
+      }
+
+      const prof = {
+        ...targetProf,
+        isLoggedIn: true,
+        passcode: targetProf.passcode || passcode,
+        status: `${(targetProf.role || 'OPERATIVE').toUpperCase()} // LOCAL VERIFIED`
+      };
+
+      setProfile(prof);
+      resetBtn();
+      closeAuthModal();
+      homeBeep('save');
+      alert('[LOCAL AUTHORIZATION GRANTED]\nWelcome back to facility terminal, Operative ' + prof.name + '!');
+      return;
+    }
+
+    // 3. Akun tidak ditemukan sama sekali di server maupun lokal
+    resetBtn();
+    homeBeep('denied');
+    alert('[ACCESS DENIED]\nCallsign / Handle "' + username + '" not found in facility database or local records.\n\nIf you do not have an account, open the "REGISTER NEW OPERATIVE" tab.');
+    if (uInput) uInput.focus();
+  } catch (e) {
+    resetBtn();
+    console.error('Error saat login:', e);
+    alert('An error occurred during authentication: ' + e.message);
+  }
+}
+
+// Operatif Registrasi Baru
+async function handleModalRegisterProfile() {
+  const uInput = document.getElementById('modalUsernameInput');
+  const pInput = document.getElementById('modalPasscodeInput');
+  const rSelect = document.getElementById('modalRoleSelect');
+  const btnReg = document.getElementById('modalSaveProfileBtn');
+
+  const username = (uInput ? uInput.value : '').trim();
+  const passcode = (pInput ? pInput.value : '').trim();
+  const role = (rSelect ? rSelect.value : 'Field Operative');
+
+  if (!username) {
+    homeBeep('denied');
+    alert('[REGISTRATION FAILED]\nPlease enter an Operative Callsign / Handle.');
+    if (uInput) uInput.focus();
+    return;
+  }
+
+  if (username.length < 3 || username.length > 24) {
+    homeBeep('denied');
+    alert('[REGISTRATION FAILED]\nCallsign length must be between 3 and 24 characters.');
+    if (uInput) uInput.focus();
+    return;
+  }
+
+  if (!/^[a-zA-Z0-9_\-\.\s]+$/.test(username)) {
+    homeBeep('denied');
+    alert('[REGISTRATION FAILED]\nCallsign may only contain letters, numbers, spaces, dots, dashes (-), or underscores (_).');
+    if (uInput) uInput.focus();
+    return;
+  }
+
+  if (!passcode || passcode.length < 4) {
+    homeBeep('denied');
+    alert('[REGISTRATION FAILED]\nSecurity passcode must be at least 4 characters/digits.');
+    if (pInput) pInput.focus();
+    return;
+  }
+
+  const originalBtnHtml = btnReg ? btnReg.innerHTML : '';
+  if (btnReg) {
+    btnReg.disabled = true;
+    btnReg.innerHTML = '<span>Checking Callsign Availability...</span>';
+  }
+
+  const resetRegBtn = () => {
+    if (btnReg) {
+      btnReg.disabled = false;
+      btnReg.innerHTML = originalBtnHtml;
+    }
+  };
+
+  try {
+    // 1. Cek apakah username sudah ada di akun lokal
+    const localExists = findLocalAccount(username);
+    if (localExists) {
+      resetRegBtn();
+      homeBeep('denied');
+      alert('[REGISTRATION REJECTED]\nCallsign "' + username + '" is already registered on this device.\nPlease log in via the "OPERATIVE LOGIN" tab.');
+      switchAuthMode('login');
+      const lCall = document.getElementById('loginCallsignInput');
+      if (lCall) lCall.value = username;
+      return;
+    }
+
+    // 2. Cek apakah username sudah dipakai di Supabase Cloud
+    if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof fetchOperativeByCallsign === 'function') {
+      try {
+        const remoteExists = await fetchOperativeByCallsign(username);
+        if (remoteExists) {
+          resetRegBtn();
+          homeBeep('denied');
+          alert('[REGISTRATION REJECTED]\nCallsign "' + username + '" is already registered in the facility database.\nPlease choose another Callsign or log in.');
+          if (uInput) uInput.focus();
+          return;
+        }
+      } catch (err) {
+        console.warn('Pengecekan duplikasi di server gagal, lanjut pendaftaran lokal:', err);
+      }
+    }
+
+    // 3. Simpan identitas baru
+    if (btnReg) btnReg.innerHTML = '<span>Registering to Facility...</span>';
+
+    const curProf = getProfile();
+    const hashedPasscode = (typeof hashPasscode === 'function')
+      ? await hashPasscode(username, passcode)
+      : passcode;
+
+    const newProf = {
+      isLoggedIn: true,
+      name: username,
+      role: role,
+      avatar: curProf.avatar || '',
+      presetEmoji: curProf.presetEmoji || 'biohazard',
+      passcode: hashedPasscode,
+      provider: 'facility',
+      status: `${role.toUpperCase()} // OFFICIAL ROSTER`
+    };
+
+    setProfile(newProf);
+    resetRegBtn();
+    closeAuthModal();
+    homeBeep('save');
+    showSaveIndicator('Operative Registered');
+    alert('[REGISTRATION SUCCESSFUL]\nOperative Dossier "' + username + '" recorded in the facility database!\nDivision: ' + role + '\nCredentials and clearance secured.');
+  } catch (e) {
+    resetRegBtn();
+    console.error('Error saat registrasi:', e);
+    alert('An error occurred during registration: ' + e.message);
+  }
+}
+
+// Akses Tamu Cepat
+function handleQuickGuest() {
+  const guestCode = Math.floor(100 + Math.random() * 900);
+  const guestProf = {
+    isLoggedIn: true,
+    name: 'GUEST-' + guestCode,
+    role: 'Field Operative',
+    avatar: '',
+    presetEmoji: 'biohazard',
+    passcode: '',
+    provider: 'guest',
+    status: 'GUEST // LOCAL'
+  };
+  setProfile(guestProf);
+  closeAuthModal();
+  homeBeep('click');
+  showSaveIndicator('Guest Mode Active');
+}
+
+function handleSaveFullProfile() {
+  const uInput = document.getElementById('profileUsernameInput');
+  const pInput = document.getElementById('profilePasscodeInput');
+  const rInput = document.getElementById('profileRoleInput');
+  const name = (uInput && uInput.value.trim()) || getCurrentCallsign() || 'OPERATIVE-CARNIS';
+  const role = (rInput && rInput.value) || 'Field Operative';
+  const passcode = (pInput && pInput.value) ? pInput.value.trim() : '';
+
+  const prof = getProfile();
+  prof.isLoggedIn = true;
+  prof.name = name;
+  prof.role = role;
+  if (passcode) prof.passcode = passcode;
+  prof.status = `${role.toUpperCase()} // VERIFIED`;
+  if (!prof.provider || prof.provider === 'guest') prof.provider = 'facility';
+  setProfile(prof);
+  homeBeep('save');
+  showSaveIndicator('Profile Saved Successfully');
+}
+
+function handleLogout() {
+  const defaultGuest = {
+    isLoggedIn: false,
+    name: 'GUEST-77',
+    role: 'Field Operative',
+    avatar: '',
+    presetEmoji: 'biohazard',
+    passcode: '',
+    provider: 'guest',
+    status: 'GUEST // LOCAL'
+  };
+  try { localStorage.setItem(VITA_PROFILE_KEY, JSON.stringify(defaultGuest)); } catch (e) {}
+  applyProfileUI();
+  homeBeep('click');
+  alert('Operative logged out. Session returned to anonymous guest mode.\n(Account data remains securely stored).');
+}
+
+function applyProfileUI() {
+  const prof = getProfile();
+
+  // Sidebar Mini User Card elements
+  const sbName = document.getElementById('sidebarUserName');
+  const sbRole = document.getElementById('sidebarUserRole');
+  const sbStatus = document.getElementById('sidebarUserStatus');
+  const sbAvatarImg = document.getElementById('sidebarAvatarImg');
+  const sbAvatarDef = document.getElementById('sidebarAvatarDef');
+
+  // Compatibility header elements
+  const bar = document.getElementById('operativeBadgeBar');
+  const btnOpen = document.getElementById('loginModalOpen');
+  const nameEl = document.getElementById('operativeName');
+  const statusEl = document.getElementById('operativeStatus');
+  const avatarEl = document.getElementById('operativeAvatar');
+  const defAvatar = document.getElementById('operativeAvatarDefault');
+
+  // Start screen elements (in gameView)
+  const startIcon = document.getElementById('startOperativeIcon');
+  const startText = document.getElementById('startOperativeText');
+  const startBadge = document.getElementById('startOperativeBadge');
+  const btnStartAuth = document.getElementById('btnStartAuth');
+
+  // Hub Profile Card elements
+  const pBadge = document.getElementById('portalBadge');
+  const pClearance = document.getElementById('portalClearance');
+  const ppPreviewImg = document.getElementById('ppPreviewImg');
+  const ppPreviewDef = document.getElementById('ppPreviewDef');
+  const uInput = document.getElementById('profileUsernameInput');
+  const passInput = document.getElementById('profilePasscodeInput');
+  const rInput = document.getElementById('profileRoleInput');
+  const pBestTime = document.getElementById('profileBestTime');
+  const pTotalKills = document.getElementById('profileTotalKills');
+  const pDbStatus = document.getElementById('profileDbStatus');
+
+  // Modal elements
+  const mPpImg = document.getElementById('modalPpImg');
+  const mPpDef = document.getElementById('modalPpDef');
+  const mUInput = document.getElementById('modalUsernameInput');
+  const mPassInput = document.getElementById('modalPasscodeInput');
+
+  // Render Avatar (custom photo vs preset emoji)
+  const hasCustomPhoto = isAvatarSafeUrl(prof.avatar) && prof.avatar.trim().toLowerCase().startsWith('data:image');
+  const currentEmoji = (typeof prof.presetEmoji === 'string' && prof.presetEmoji) ? prof.presetEmoji : 'biohazard';
+
+  // 1. Sidebar Avatar
+  if (sbAvatarImg && sbAvatarDef) {
+    if (hasCustomPhoto) {
+      sbAvatarImg.src = prof.avatar;
+      sbAvatarImg.style.display = 'block';
+      sbAvatarDef.style.display = 'none';
+    } else {
+      sbAvatarImg.style.display = 'none';
+      sbAvatarDef.style.display = 'flex';
+      sbAvatarDef.innerHTML = getPresetSvgMarkup(currentEmoji);
+    }
+  }
+
+  // 2. Hub Profile Dossier Avatar
+  if (ppPreviewImg && ppPreviewDef) {
+    if (hasCustomPhoto) {
+      ppPreviewImg.src = prof.avatar;
+      ppPreviewImg.style.display = 'block';
+      ppPreviewDef.style.display = 'none';
+    } else {
+      ppPreviewImg.style.display = 'none';
+      ppPreviewDef.style.display = 'flex';
+      ppPreviewDef.innerHTML = getPresetSvgMarkup(currentEmoji);
+    }
+  }
+
+  // 3. Modal Avatar
+  if (mPpImg && mPpDef) {
+    if (hasCustomPhoto) {
+      mPpImg.src = prof.avatar;
+      mPpImg.style.display = 'block';
+      mPpDef.style.display = 'none';
+    } else {
+      mPpImg.style.display = 'none';
+      mPpDef.style.display = 'flex';
+      mPpDef.innerHTML = getPresetSvgMarkup(currentEmoji);
+    }
+  }
+
+  // 4. Header Badge Avatar (Compat)
+  if (avatarEl && defAvatar) {
+    if (hasCustomPhoto) {
+      avatarEl.src = prof.avatar;
+      avatarEl.style.display = 'block';
+      defAvatar.style.display = 'none';
+    } else {
+      avatarEl.style.display = 'none';
+      defAvatar.style.display = 'flex';
+      defAvatar.innerHTML = getPresetSvgMarkup(currentEmoji);
+    }
+  }
+
+  // Set Sidebar Text
+  if (sbName) sbName.textContent = prof.name || 'GUEST-77';
+  if (sbRole) sbRole.textContent = prof.role || 'Field Operative';
+  if (sbStatus) sbStatus.textContent = prof.isLoggedIn ? (prof.status || 'OPERATIVE // ACTIVE') : 'GUEST // LOCAL';
+
+  // Inputs
+  const currentName = (prof.name && prof.name !== 'GUEST-77') ? prof.name : (prof.name || '');
+  if (uInput && document.activeElement !== uInput) {
+    uInput.value = currentName;
+  }
+  if (mUInput && document.activeElement !== mUInput) {
+    mUInput.value = currentName;
+  }
+  if (passInput && prof.passcode && document.activeElement !== passInput) {
+    passInput.value = prof.passcode;
+  }
+  if (mPassInput && prof.passcode && document.activeElement !== mPassInput) {
+    mPassInput.value = prof.passcode;
+  }
+  if (rInput && prof.role) {
+    rInput.value = prof.role;
+  }
+
+  // Read stats from localStorage
+  try {
+    const rawSave = JSON.parse(localStorage.getItem('vita_save') || '{}');
+    if (pBestTime) pBestTime.textContent = (rawSave && rawSave.bestTime) ? (rawSave.bestTime + 's') : '-';
+    if (pTotalKills) pTotalKills.textContent = (rawSave && rawSave.totalKills) ? rawSave.totalKills : '0';
+  } catch (e) {}
+
+  if (prof.isLoggedIn && prof.name) {
+    if (bar) bar.style.display = 'flex';
+    if (btnOpen) btnOpen.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' + escapeLbHtml(prof.name);
+    if (nameEl) nameEl.textContent = 'OPERATIVE: ' + prof.name.toUpperCase();
+    if (statusEl) statusEl.textContent = prof.status || 'OPERATIVE // ACTIVE';
+
+    if (startText) startText.textContent = 'OPERATIVE: ' + prof.name.toUpperCase();
+    if (startBadge) startBadge.textContent = prof.provider === 'guest' ? 'GUEST' : 'REGISTERED';
+    if (startIcon) startIcon.innerHTML = getPresetSvgMarkup(currentEmoji);
+    if (btnStartAuth) btnStartAuth.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>DOSSIER: ' + escapeLbHtml(prof.name).toUpperCase();
+
+    if (pBadge) {
+      pBadge.textContent = 'ACTIVE IDENTITY // ' + (prof.provider === 'guest' ? 'GUEST' : 'VERIFIED');
+      pBadge.className = 'auth-status-pill ' + (prof.provider === 'guest' ? 'guest' : 'verified');
+    }
+    if (pClearance) pClearance.textContent = prof.provider === 'guest' ? 'CLEARANCE: LEVEL-1' : 'CLEARANCE: LEVEL-2';
+    if (pDbStatus) {
+      if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
+        pDbStatus.textContent = 'Supabase Cloud (Online)';
+      } else {
+        pDbStatus.textContent = 'Encrypted Local Database';
+      }
+    }
+  } else {
+    if (bar) bar.style.display = 'none';
+    if (btnOpen) btnOpen.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Sign In / Operative Dossier';
+    if (startText) startText.textContent = 'OPERATIVE: ANONYMOUS [SIGN IN]';
+    if (startBadge) startBadge.textContent = 'GUEST';
+    if (startIcon) startIcon.innerHTML = getPresetSvgMarkup('biohazard');
+    if (btnStartAuth) btnStartAuth.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>SIGN IN / OPERATIVE DOSSIER';
+
+    if (pBadge) {
+      pBadge.textContent = 'STATUS: GUEST // LOCAL';
+      pBadge.className = 'auth-status-pill unverified';
+    }
+    if (pClearance) pClearance.textContent = 'CLEARANCE: LEVEL-1';
+    if (pDbStatus) pDbStatus.textContent = 'Encrypted Local Database (Offline)';
+  }
+
+  // Sinkronisasi status koneksi Supabase Cloud
+  const sbTag = document.getElementById('supabaseStatusTag');
+  const sbUrlIn = document.getElementById('sbUrlInput');
+  const sbKeyIn = document.getElementById('sbKeyInput');
+  if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
+    const cfg = getSupabaseConfig();
+    if (sbUrlIn && !sbUrlIn.value) sbUrlIn.value = cfg.url;
+    if (sbKeyIn && !sbKeyIn.value) sbKeyIn.value = cfg.anonKey;
+    if (sbTag) {
+      sbTag.textContent = 'CONNECTED (ONLINE)';
+      sbTag.className = 'supabase-status-tag connected';
+    }
+    if (pDbStatus) {
+      pDbStatus.textContent = 'Supabase Cloud (Online)';
+    }
+  }
+
+  // Top Bar Mini Pill Avatar & Name
+  const hName = document.getElementById('headerUserName');
+  const hAvatar = document.getElementById('headerUserAvatar');
+  const hDef = document.getElementById('headerUserDef');
+  if (hName) hName.textContent = (prof.name && prof.name !== 'GUEST-77') ? prof.name : (prof.name || 'GUEST-77');
+  if (hAvatar && hDef) {
+    if (hasCustomPhoto) {
+      hAvatar.src = prof.avatar;
+      hAvatar.style.display = 'block';
+      hDef.style.display = 'none';
+    } else {
+      hAvatar.style.display = 'none';
+      hDef.style.display = 'flex';
+      hDef.innerHTML = getPresetSvgMarkup(currentEmoji);
+    }
+  }
+
+  // Highlight simbol divisi terpilih
+  if (typeof highlightActivePresetAvatar === 'function') {
+    highlightActivePresetAvatar(hasCustomPhoto ? '' : currentEmoji);
+  }
+}
+
+async function handleConnectSupabase() {
+  const urlInput = document.getElementById('sbUrlInput');
+  const keyInput = document.getElementById('sbKeyInput');
+  const url = (urlInput ? urlInput.value : '').trim();
+  const key = (keyInput ? keyInput.value : '').trim();
+
+  if (!url || !key) {
+    alert('Please enter both Supabase Project URL and Anon Key.');
+    return;
+  }
+
+  const tag = document.getElementById('supabaseStatusTag');
+  if (tag) {
+    tag.textContent = 'CONNECTING...';
+    tag.className = 'supabase-status-tag';
+  }
+
+  if (typeof testSupabaseConnection === 'function') {
+    const res = await testSupabaseConnection(url, key);
+    if (res.ok) {
+      alert('Supabase Cloud connection ESTABLISHED!\nOperative dossier and leaderboard are now synchronized globally.');
+      if (tag) {
+        tag.textContent = 'CONNECTED (ONLINE)';
+        tag.className = 'supabase-status-tag connected';
+      }
+      const dbStatus = document.getElementById('profileDbStatus');
+      if (dbStatus) {
+        dbStatus.textContent = 'Supabase Cloud (Online)';
+      }
+      if (typeof syncProfileToSupabase === 'function') {
+        const prof = getProfile();
+        await syncProfileToSupabase(prof);
+      }
+      renderLeaderboard();
+    } else {
+      alert('Supabase connection failed:\n' + res.message);
+      if (tag) {
+        tag.textContent = 'CONNECTION FAILED';
+        tag.className = 'supabase-status-tag';
+      }
+    }
+  }
+}
+
+function handleDisconnectSupabase() {
+  if (typeof setSupabaseConfig === 'function') {
+    setSupabaseConfig('', '');
+  }
+  const urlInput = document.getElementById('sbUrlInput');
+  const keyInput = document.getElementById('sbKeyInput');
+  if (urlInput) urlInput.value = '';
+  if (keyInput) keyInput.value = '';
+
+  const tag = document.getElementById('supabaseStatusTag');
+  if (tag) {
+    tag.textContent = 'DISCONNECTED';
+    tag.className = 'supabase-status-tag';
+  }
+  const dbStatus = document.getElementById('profileDbStatus');
+  if (dbStatus) {
+    dbStatus.textContent = 'Encrypted Local Database';
+  }
+  alert('Supabase Cloud disconnected. Game data restored to local storage.');
+  renderLeaderboard();
+}
+
+function escapeLbHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[m]));
+}
+
+function isAvatarSafeUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const s = url.trim();
+  if (/^data:image\//i.test(s)) return true;
+  if (/^https:\/\//i.test(s)) return true;
+  return false;
+}
+
+function formatLbTime(sec) {
+  const s0 = Number(sec);
+  if (!Number.isFinite(s0) || s0 < 0) return '-';
+  const m = Math.floor(s0 / 60);
+  const s = Math.floor(s0 % 60);
+  return m + ':' + String(s).padStart(2, '0');
+}
+
+async function renderLeaderboard() {
+  const tbody = document.getElementById('leaderboardTbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-dim)">Fetching facility telemetry data...</td></tr>';
+
+  let entries = [];
+  let isCloud = false;
+
+  if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof fetchTopLeaderboard === 'function') {
+    entries = await fetchTopLeaderboard(20);
+    isCloud = true;
+  }
+
+  if (entries && entries.length > 0) {
+    let rowsHtml = '';
+    entries.forEach((item, index) => {
+      const rankNum = index + 1;
+      let rankBadge = `<span class="rank-badge">#${rankNum}</span>`;
+      if (rankNum === 1) rankBadge = `<span class="rank-badge rank-1">#1</span>`;
+      else if (rankNum === 2) rankBadge = `<span class="rank-badge rank-2">#2</span>`;
+      else if (rankNum === 3) rankBadge = `<span class="rank-badge rank-3">#3</span>`;
+
+      const isSafeAvatar = isAvatarSafeUrl(item.avatar);
+      const avatarHtml = isSafeAvatar
+        ? `<img class="op-avatar-mini" src="${escapeLbHtml(item.avatar)}" alt="${escapeLbHtml(item.username)}">`
+        : `<span class="op-svg-mini">${getPresetSvgMarkup(item.preset_emoji)}</span>`;
+
+      const grade = ['S', 'A', 'B', 'C'].includes(item.grade) ? item.grade : 'B';
+      rowsHtml += `
+        <tr>
+          <td>${rankBadge}</td>
+          <td>
+            <div class="op-cell">
+              ${avatarHtml}
+              <span class="op-name">${escapeLbHtml(item.username)}</span>
+            </div>
+          </td>
+          <td><span class="op-role-tag">${escapeLbHtml(item.role || 'Operative')}</span></td>
+          <td><span class="sector-tag">SECTOR ${item.highest_level || 1}</span></td>
+          <td class="time-col">
+            <svg class="tele-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            ${formatLbTime(item.best_time)}
+          </td>
+          <td class="kills-col">
+            <svg class="tele-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.03 1.35 5.75 3.5 7.6V22h13v-2.4c2.15-1.85 3.5-4.57 3.5-7.6 0-5.52-4.48-10-10-10zm-3 12c-.83 0-1.5-.67-1.5-1.5S8.17 11 9 11s1.5.67 1.5 1.5S9.83 14 9 14zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            ${item.total_kills || 0}
+          </td>
+          <td><span class="grade-pill grade-${grade}">${grade}</span></td>
+        </tr>
+      `;
+    });
+    tbody.innerHTML = rowsHtml;
+  } else {
+    let localHigh = null;
+    try {
+      localHigh = JSON.parse(localStorage.getItem('vita_high') || 'null');
+    } catch (e) {}
+
+    const prof = getProfile();
+    if (localHigh && localHigh.bestTime) {
+      const isSafeProfAvatar = isAvatarSafeUrl(prof.avatar);
+      const avatarHtml = isSafeProfAvatar
+        ? `<img class="op-avatar-mini" src="${escapeLbHtml(prof.avatar)}" alt="${escapeLbHtml(prof.name)}">`
+        : `<span class="op-svg-mini">${getPresetSvgMarkup(prof.presetEmoji)}</span>`;
+
+      tbody.innerHTML = `
+        <tr>
+          <td><span class="rank-badge rank-1">#1</span></td>
+          <td>
+            <div class="op-cell">
+              ${avatarHtml}
+              <span class="op-name">${escapeLbHtml(prof.name)}</span>
+            </div>
+          </td>
+          <td><span class="op-role-tag">${escapeLbHtml(prof.role || 'Field Operative')}</span></td>
+          <td><span class="sector-tag">SECTOR ${localHigh.highestLevel || localHigh.level || 1} (LOCAL)</span></td>
+          <td class="time-col">
+            <svg class="tele-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            ${formatLbTime(localHigh.bestTime)}
+          </td>
+          <td class="kills-col">
+            <svg class="tele-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.03 1.35 5.75 3.5 7.6V22h13v-2.4c2.15-1.85 3.5-4.57 3.5-7.6 0-5.52-4.48-10-10-10zm-3 12c-.83 0-1.5-.67-1.5-1.5S8.17 11 9 11s1.5.67 1.5 1.5S9.83 14 9 14zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            ${localHigh.bestKills || 0}
+          </td>
+          <td><span class="grade-pill grade-S">S</span></td>
+        </tr>
+        <tr>
+          <td colspan="7" style="text-align:center;padding:16px;font-size:12px;color:var(--text-dim);border-top:1px dashed rgba(255,255,255,0.1)">
+            ${isCloud ? 'No records in Supabase Cloud yet. Complete a sector to submit your first telemetry!' : 'Displaying local facility records. Open "Supabase Cloud Database Settings" to link online database.'}
+          </td>
+        </tr>
+      `;
+    } else {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center;padding:28px;color:var(--text-dim)">
+            <p style="margin-bottom:8px;font-size:14px;color:var(--accent-glow)">No mission history recorded yet.</p>
+            <p style="font-size:12px;margin:0">Purge labyrinth sectors or link Supabase Cloud to view global leaderboards.</p>
+          </td>
+        </tr>
+      `;
+    }
+  }
+}
+
+function openAdminFromHome() {
+  playWebGame();
+  setTimeout(() => {
+    if (typeof openAdminLogin === 'function') openAdminLogin();
+  }, 100);
+}
+
+const authModal = document.getElementById('authModal');
+const loginModalOpen = document.getElementById('loginModalOpen');
+const authModalClose = document.getElementById('authModalClose');
+
+if (loginModalOpen) {
+  loginModalOpen.addEventListener('click', openAuthModal);
+}
+if (authModalClose) {
+  authModalClose.addEventListener('click', closeAuthModal);
+}
+if (authModal) {
+  authModal.addEventListener('click', e => {
+    if (e.target === authModal) closeAuthModal();
+  });
+}
+
+const operativeLogoutBtn = document.getElementById('operativeLogoutBtn');
+if (operativeLogoutBtn) {
+  operativeLogoutBtn.addEventListener('click', handleLogout);
+}
+
+// File Upload Handlers (Photo Profile)
+const ppFileInput = document.getElementById('ppFileInput');
+if (ppFileInput) {
+  ppFileInput.addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    processAvatarFile(file, (dataUrl, approxKb) => {
+      const prof = getProfile();
+      prof.name = getCurrentCallsign();
+      prof.avatar = dataUrl;
+      prof.isLoggedIn = true;
+      if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
+      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // ACTIVE`;
+      setProfile(prof);
+      showSaveIndicator(`Avatar Photo Saved (${approxKb} KB)`);
+    });
+  });
+}
+
+const modalFileInput = document.getElementById('modalFileInput');
+if (modalFileInput) {
+  modalFileInput.addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    processAvatarFile(file, (dataUrl, approxKb) => {
+      const prof = getProfile();
+      prof.name = getCurrentCallsign();
+      prof.avatar = dataUrl;
+      prof.isLoggedIn = true;
+      if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
+      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // ACTIVE`;
+      setProfile(prof);
+      showSaveIndicator(`Avatar Photo Saved (${approxKb} KB)`);
+    });
+  });
+}
+
+function setupProfileLiveListeners() {
+  const uInput = document.getElementById('profileUsernameInput');
+  const mUInput = document.getElementById('modalUsernameInput');
+  const pInput = document.getElementById('profilePasscodeInput');
+  const mPassInput = document.getElementById('modalPasscodeInput');
+  const rInput = document.getElementById('profileRoleInput');
+
+  let debounceTimer = null;
+  function handleLiveNameChange(e) {
+    const val = e.target.value;
+    // Sync both inputs in real time
+    if (e.target === uInput && mUInput && document.activeElement !== mUInput) {
+      mUInput.value = val;
+    } else if (e.target === mUInput && uInput && document.activeElement !== uInput) {
+      uInput.value = val;
+    }
+
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const cleanVal = val.trim();
+      if (!cleanVal) return;
+      const prof = getProfile();
+      prof.name = cleanVal;
+      prof.isLoggedIn = true;
+      if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
+      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // ACTIVE`;
+      try { localStorage.setItem(VITA_PROFILE_KEY, JSON.stringify(prof)); } catch (err) {}
+
+      const nameEl = document.getElementById('operativeName');
+      if (nameEl) nameEl.textContent = 'OPERATIVE: ' + prof.name.toUpperCase();
+      const sbName = document.getElementById('sidebarUserName');
+      if (sbName) sbName.textContent = prof.name;
+      const hName = document.getElementById('headerUserName');
+      if (hName) hName.textContent = prof.name;
+      const startText = document.getElementById('startOperativeText');
+      if (startText) startText.textContent = 'OPERATIVE: ' + prof.name.toUpperCase();
+
+      const autoTag = document.getElementById('autoSaveIndicator');
+      if (autoTag) {
+        autoTag.textContent = '● Auto-Saved ✓';
+        autoTag.style.color = '#4ade80';
+      }
+      const modalTag = document.getElementById('modalAutoSaveIndicator');
+      if (modalTag) {
+        modalTag.textContent = '● Auto-Saved ✓';
+        modalTag.style.color = '#4ade80';
+      }
+      if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof syncProfileToSupabase === 'function') {
+        syncProfileToSupabase(prof).catch(() => {});
+      }
+    }, 350);
+  }
+
+  let passDebounceTimer = null;
+  function handleLivePassChange(e) {
+    const val = e.target.value;
+    if (e.target === pInput && mPassInput && document.activeElement !== mPassInput) {
+      mPassInput.value = val;
+    } else if (e.target === mPassInput && pInput && document.activeElement !== pInput) {
+      pInput.value = val;
+    }
+    clearTimeout(passDebounceTimer);
+    passDebounceTimer = setTimeout(() => {
+      const prof = getProfile();
+      prof.passcode = val.trim();
+      try { localStorage.setItem(VITA_PROFILE_KEY, JSON.stringify(prof)); } catch (err) {}
+      if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof syncProfileToSupabase === 'function') {
+        syncProfileToSupabase(prof).catch(() => {});
+      }
+    }, 450);
+  }
+
+  if (uInput) {
+    uInput.addEventListener('input', handleLiveNameChange);
+    uInput.addEventListener('change', handleLiveNameChange);
+  }
+  if (mUInput) {
+    mUInput.addEventListener('input', handleLiveNameChange);
+    mUInput.addEventListener('change', handleLiveNameChange);
+  }
+  if (pInput) {
+    pInput.addEventListener('input', handleLivePassChange);
+    pInput.addEventListener('change', handleLivePassChange);
+  }
+  if (mPassInput) {
+    mPassInput.addEventListener('input', handleLivePassChange);
+    mPassInput.addEventListener('change', handleLivePassChange);
+  }
+  if (rInput) {
+    rInput.addEventListener('change', () => {
+      const prof = getProfile();
+      prof.role = rInput.value;
+      prof.isLoggedIn = true;
+      prof.status = `${rInput.value.toUpperCase()} // ACTIVE`;
+      setProfile(prof);
+      showSaveIndicator('Division Saved');
+    });
+  }
+
+  const fileIn = document.getElementById('ppFileInput');
+  const mFileIn = document.getElementById('modalFileInput');
+  function handleAvatarUpload(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    processAvatarFile(file, (dataUrl, approxKb) => {
+      const prof = getProfile();
+      prof.avatar = dataUrl;
+      prof.name = getCurrentCallsign();
+      prof.isLoggedIn = true;
+      if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
+      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // PHOTO ACTIVE`;
+      setProfile(prof);
+      showSaveIndicator(`Avatar Photo Saved (${approxKb} KB)`);
+      homeBeep('save');
+    });
+  }
+  if (fileIn) fileIn.addEventListener('change', handleAvatarUpload);
+  if (mFileIn) mFileIn.addEventListener('change', handleAvatarUpload);
+}
+
+applyProfileUI();
+setupProfileLiveListeners();
+initDashTab();
+initTeasers();
+renderLeaderboard();
+// Setup listeners untuk pengaturan komplit
+['homeVolume', 'homeBrightness', 'homeSfx', 'homeBgm', 'homeTouchScale', 'homeTouchOpacity'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', e => {
+    const v = Math.round(Number(e.target.value));
+    if (!Number.isFinite(v)) return;
+    if (id === 'homeVolume') {
+      homeSettings.volume = Math.max(0, Math.min(100, v));
+      const vVal = document.getElementById('homeVolumeVal');
+      if (vVal) vVal.textContent = homeSettings.volume + '%';
+      if (typeof setMasterVolume === 'function') setMasterVolume(homeSettings.volume, true);
+    } else if (id === 'homeBrightness') {
+      homeSettings.brightness = Math.max(30, Math.min(180, v));
+      const bVal = document.getElementById('homeBrightnessVal');
+      if (bVal) bVal.textContent = homeSettings.brightness + '%';
+      if (typeof applyBrightness === 'function') applyBrightness(homeSettings.brightness);
+    } else if (id === 'homeSfx') {
+      homeSettings.sfxVolume = Math.max(0, Math.min(100, v));
+      const sVal = document.getElementById('homeSfxVal');
+      if (sVal) sVal.textContent = homeSettings.sfxVolume + '%';
+    } else if (id === 'homeBgm') {
+      homeSettings.bgmVolume = Math.max(0, Math.min(100, v));
+      const bVal = document.getElementById('homeBgmVal');
+      if (bVal) bVal.textContent = homeSettings.bgmVolume + '%';
+    } else if (id === 'homeTouchScale') {
+      homeSettings.touchScale = Math.max(70, Math.min(140, v));
+      const tsVal = document.getElementById('homeTouchScaleVal');
+      if (tsVal) tsVal.textContent = homeSettings.touchScale + '%';
+      if (typeof applyTouchStyle === 'function') applyTouchStyle();
+    } else if (id === 'homeTouchOpacity') {
+      homeSettings.touchOpacity = Math.max(30, Math.min(100, v));
+      const toVal = document.getElementById('homeTouchOpacityVal');
+      if (toVal) toVal.textContent = homeSettings.touchOpacity + '%';
+      if (typeof applyTouchStyle === 'function') applyTouchStyle();
+    }
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+});
+
+const hMuteEl = document.getElementById('homeMuted');
+if (hMuteEl) {
+  hMuteEl.addEventListener('change', e => {
+    homeSettings.muted = !!e.target.checked;
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+
+const hDevEl = document.getElementById('homeDeviceMode');
+if (hDevEl) {
+  hDevEl.addEventListener('change', e => {
+    homeSettings.deviceMode = e.target.value;
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+
+const hAimEl = document.getElementById('homeAutoAim');
+if (hAimEl) {
+  hAimEl.addEventListener('change', e => {
+    homeSettings.autoAim = !!e.target.checked;
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+
+const hHapEl = document.getElementById('homeHaptic');
+if (hHapEl) {
+  hHapEl.addEventListener('change', e => {
+    homeSettings.haptic = !!e.target.checked;
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+
+const hShakeEl = document.getElementById('homeScreenShake');
+if (hShakeEl) {
+  hShakeEl.addEventListener('change', e => {
+    homeSettings.screenShake = !!e.target.checked;
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+
+const hMmEl = document.getElementById('homeMinimap');
+if (hMmEl) {
+  hMmEl.addEventListener('change', e => {
+    homeSettings.showMinimap = !!e.target.checked;
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+
+const hFpsEl = document.getElementById('homeShowFps');
+if (hFpsEl) {
+  hFpsEl.addEventListener('change', e => {
+    homeSettings.showFps = !!e.target.checked;
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+
+const hLangEl = document.getElementById('homeLanguage');
+if (hLangEl) {
+  hLangEl.addEventListener('change', e => {
+    homeSettings.lang = e.target.value === 'en' ? 'en' : 'id';
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+const hDiffEl = document.getElementById('homeDifficulty');
+if (hDiffEl) {
+  hDiffEl.addEventListener('change', e => {
+    homeSettings.difficulty = HOME_DIFFS.includes(e.target.value) ? e.target.value : 'normal';
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+const hQualEl = document.getElementById('homeQuality');
+if (hQualEl) {
+  hQualEl.addEventListener('change', e => {
+    homeSettings.quality = HOME_QUALS.includes(e.target.value) ? e.target.value : 'retro';
+    saveHomeSettings();
+    if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  });
+}
+
+function resetAllSettingsToDefault() {
+  const confirmMsg = (homeSettings.lang === 'id')
+    ? 'Kembalikan seluruh pengaturan sistem ke default pabrik?'
+    : 'Reset all system settings to factory default?';
+  if (!confirm(confirmMsg)) return;
+  homeSettings = Object.assign({}, homeDefaults);
+  saveHomeSettings();
+  if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  if (typeof openSettingsModal === 'function') openSettingsModal();
+  if (typeof showSaveIndicator === 'function') showSaveIndicator('Settings Reset');
+  homeBeep('save');
+}
+
+// ---- DEVICE SELECTION MODAL (PC OR MOBILE) ----
+let pendingDeviceAutoStart = false;
+let pendingDeviceContinue = false;
+let pendingDeviceFromGameView = false;
+let selectedDeviceOption = 'pc';
+
+function openDeviceModeModal(fromGameView = false, autoStart = false, isContinue = false) {
+  pendingDeviceFromGameView = !!fromGameView;
+  pendingDeviceAutoStart = !!autoStart;
+  pendingDeviceContinue = !!isContinue;
+
+  // Auto-detect touchscreen vs mouse/keyboard
+  const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(pointer: coarse)').matches;
+  const currentMode = homeSettings.deviceMode;
+  if (currentMode === 'mobile' || currentMode === 'pc') {
+    selectedDeviceOption = currentMode;
+  } else {
+    selectedDeviceOption = hasTouch ? 'mobile' : 'pc';
+  }
+
+  const pcCard = document.getElementById('deviceChoicePc');
+  const mobCard = document.getElementById('deviceChoiceMobile');
+  if (pcCard) pcCard.classList.toggle('selected', selectedDeviceOption === 'pc');
+  if (mobCard) mobCard.classList.toggle('selected', selectedDeviceOption === 'mobile');
+
+  const chk = document.getElementById('chkRememberDevice');
+  if (chk) chk.checked = (homeSettings.deviceMode === 'pc' || homeSettings.deviceMode === 'mobile');
+
+  const m = document.getElementById('deviceModeModal');
+  if (m) m.style.display = 'flex';
+  homeBeep('open');
+}
+
+function closeDeviceModeModal() {
+  const m = document.getElementById('deviceModeModal');
+  if (m) m.style.display = 'none';
+  homeBeep('close');
+}
+
+function selectDeviceChoice(choice) {
+  selectedDeviceOption = (choice === 'mobile') ? 'mobile' : 'pc';
+  const pcCard = document.getElementById('deviceChoicePc');
+  const mobCard = document.getElementById('deviceChoiceMobile');
+  if (pcCard) pcCard.classList.toggle('selected', selectedDeviceOption === 'pc');
+  if (mobCard) mobCard.classList.toggle('selected', selectedDeviceOption === 'mobile');
+  homeBeep('click');
+}
+
+function confirmDeviceChoiceAndPlay() {
+  const chk = document.getElementById('chkRememberDevice');
+  const remember = chk && chk.checked;
+
+  if (remember) {
+    homeSettings.deviceMode = selectedDeviceOption;
+  } else {
+    homeSettings.deviceMode = 'ask';
+  }
+  saveHomeSettings();
+
+  // Terapkan class touch-on
+  if (selectedDeviceOption === 'mobile') {
+    document.body.classList.add('touch-on');
+    if (typeof applyTouchLayout === 'function') applyTouchLayout();
+  } else {
+    document.body.classList.remove('touch-on');
+  }
+
+  updateStartScreenDevicePill(selectedDeviceOption);
+  closeDeviceModeModal();
+
+  if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+
+  if (pendingDeviceFromGameView) {
+    // Dipanggil langsung dari start screen / in-game
+    if (pendingDeviceAutoStart && typeof startGame === 'function') {
+      startGame(true);
+    } else if (pendingDeviceContinue && typeof continueGame === 'function') {
+      continueGame(true);
+    }
+    return;
+  }
+
+  proceedToWebGame(pendingDeviceAutoStart);
+}
+
+function updateStartScreenDevicePill(mode) {
+  const isMob = (mode === 'mobile');
+  const icon = document.getElementById('startScreenDeviceIcon');
+  const txt = document.getElementById('startScreenDeviceText');
+  if (icon) icon.textContent = isMob ? '📱' : '💻';
+  if (txt) {
+    const lang = homeSettings.lang;
+    if (isMob) txt.textContent = (lang === 'id') ? 'MODE KONTROL: HP (LAYAR SENTUH)' : 'CONTROL MODE: MOBILE (TOUCH)';
+    else txt.textContent = (lang === 'id') ? 'MODE KONTROL: PC (KEYBOARD)' : 'CONTROL MODE: PC (KEYBOARD)';
+  }
+}
+
+// Pindah ke view game dalam satu halaman (dipanggil tombol MAIN SEKARANG).
+function playWebGame(autoStart = false) {
+  if (homeSettings.deviceMode === 'ask') {
+    openDeviceModeModal(false, autoStart);
+    return;
+  }
+  // Jika sudah tersimpan pc/mobile, terapkan langsung
+  if (homeSettings.deviceMode === 'mobile') {
+    document.body.classList.add('touch-on');
+    if (typeof applyTouchLayout === 'function') applyTouchLayout();
+  } else {
+    document.body.classList.remove('touch-on');
+  }
+  updateStartScreenDevicePill(homeSettings.deviceMode);
+  proceedToWebGame(autoStart);
+}
+
+function proceedToWebGame(autoStart = false) {
+  if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  document.getElementById('homeView').style.display = 'none';
+  const gv = document.getElementById('gameView');
+  if (gv) gv.style.display = '';
+  document.body.classList.add('game-on');
+  const ss = document.getElementById('startScreen');
+  if (ss) ss.style.display = 'flex';
+  if (typeof resize === 'function') resize();
+  if (typeof checkContinueBtn === 'function') checkContinueBtn();
+  if (autoStart && typeof startGame === 'function') {
+    startGame();
+  }
+}
+
+// ---- Update dalam aplikasi (ala game lain) ----
+// Cara rilis versi baru (3 langkah, jangan lupa salah satu):
+//   1) naikkan APP_VERSION di bawah,
+//   2) samakan "version" di version.json,
+//   3) naikkan CACHE di sw.js (mis. vita-v3 -> vita-v4).
+// App yang sudah ter-install otomatis menampilkan spanduk update.
+const APP_VERSION = '2.4.0';
+const UPDATE_TXT = {
+  id: { msg: 'Pembaruan tersedia!', btn: 'Update Sekarang', later: 'Nanti' },
+  en: { msg: 'Update available!', btn: 'Update Now', later: 'Later' }
+};
+let vitaSwReg = null;
+let vitaUpdateShown = false;
+let vitaReloading = false;
+let pendingVersion = '';
+
+function updateLang() {
+  try {
+    const s = JSON.parse(localStorage.getItem(HOME_SETTINGS_KEY) || '{}');
+    return s.lang === 'id' ? 'id' : 'en';
+  } catch (e) { return 'en'; }
+}
+
+function ensureUpdateBanner() {
+  let bar = document.getElementById('updateBanner');
+  if (bar) return bar;
+  bar = document.createElement('div');
+  bar.id = 'updateBanner';
+  bar.style.cssText = 'display:none;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;background:#14101c;border:1px solid #f1c40f;border-radius:12px;padding:10px 14px;font-family:inherit;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.6);max-width:min(92vw,420px);text-align:center;';
+  const msg = document.createElement('span');
+  msg.id = 'updateBannerMsg';
+  msg.style.cssText = 'font-size:14px;margin-right:10px;';
+  const go = document.createElement('button');
+  go.id = 'updateBannerGo';
+  go.style.cssText = 'background:#f1c40f;border:0;border-radius:8px;padding:8px 14px;font-weight:bold;cursor:pointer;margin-right:8px;';
+  go.addEventListener('click', applyVitaUpdate);
+  const later = document.createElement('button');
+  later.id = 'updateBannerLater';
+  later.style.cssText = 'background:transparent;border:1px solid #888;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;';
+  later.addEventListener('click', () => {
+    try { localStorage.setItem('vita_update_dismissed', pendingVersion); } catch (e) {}
+    bar.style.display = 'none';
+  });
+  bar.appendChild(msg); bar.appendChild(go); bar.appendChild(later);
+  document.body.appendChild(bar);
+  return bar;
+}
+
+function showUpdateBanner(ver) {
+  if (vitaUpdateShown) return;
+  vitaUpdateShown = true;
+  pendingVersion = ver;
+  const L = UPDATE_TXT[updateLang()] || UPDATE_TXT.id;
+  const bar = ensureUpdateBanner();
+  document.getElementById('updateBannerMsg').textContent = L.msg + ' (v' + ver + ')';
+  document.getElementById('updateBannerGo').textContent = L.btn;
+  document.getElementById('updateBannerLater').textContent = L.later;
+  bar.style.display = 'block';
+}
+
+async function checkVitaUpdate() {
+  if (vitaUpdateShown) return;
+  if (window.location.protocol.indexOf('http') !== 0) return;
+  try {
+    const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!res || !res.ok) return;
+    const data = await res.json();
+    if (!data || typeof data.version !== 'string') return;
+    if (data.version === APP_VERSION) return;
+    let dismissed = '';
+    try { dismissed = localStorage.getItem('vita_update_dismissed') || ''; } catch (e) {}
+    if (dismissed === data.version) return;
+    showUpdateBanner(data.version);
+  } catch (e) {}
+}
+
+function isApkOrWebView() {
+  try {
+    const ua = (navigator.userAgent || '').toLowerCase();
+    if (ua.includes('wv') || ua.includes('webview')) return true;
+    if (ua.includes('android') && ua.includes('version/')) return true;
+    if (window.Android || window.Capacitor || window.cordova) return true;
+    if (window.location.protocol === 'file:') return true;
+  } catch (e) {}
+  return false;
+}
+
+function safeVitaReload(reason) {
+  try {
+    const now = Date.now();
+    const lastReload = parseInt(sessionStorage.getItem('vita_last_reload') || '0', 10);
+    // Cegah refresh berulang jika baru reload dalam 15 detik terakhir
+    if (now - lastReload < 15000) {
+      console.warn('VITA: Mencegah loop reload (' + reason + ')');
+      return;
+    }
+    sessionStorage.setItem('vita_last_reload', String(now));
+  } catch (e) {}
+  window.location.reload();
+}
+
+const hadControllerOnLoad = Boolean('serviceWorker' in navigator && navigator.serviceWorker.controller);
+let vitaUpdateTriggeredByUser = false;
+
+function applyVitaUpdate() {
+  vitaUpdateTriggeredByUser = true;
+  const done = () => { setTimeout(() => safeVitaReload('user update applied'), 800); };
+  try {
+    if (vitaSwReg && typeof vitaSwReg.update === 'function') {
+      vitaSwReg.update().catch(() => {}).then(done);
+    } else if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration()
+        .then(r => { if (r) r.update().catch(() => {}); })
+        .catch(() => {});
+      done();
+    } else done();
+  } catch (e) { safeVitaReload('update catch fallback'); }
+}
+
+try {
+  if (window.location.protocol.indexOf('http') === 0 && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => {
+          if (!reg) return;
+          vitaSwReg = reg;
+          if (typeof reg.addEventListener === 'function') {
+            reg.addEventListener('updatefound', () => {
+              const inst = reg.installing;
+              if (!inst) return;
+              inst.addEventListener('statechange', () => {
+                // SW baru selesai install -> cek versi & tampilkan spanduk jika relevan.
+                if (inst.state === 'installed' && navigator.serviceWorker.controller) {
+                  checkVitaUpdate();
+                }
+              });
+            });
+          }
+        })
+        .catch(err => {
+          console.log('SW registration skipped:', err);
+        });
+    });
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      // 1. Dalam APK / WebView, jangan lakukan reload otomatis dari SW
+      if (isApkOrWebView()) return;
+      // 2. Jika halaman awalnya belum memiliki controller (instalasi pertama kali / claim awal), jangan reload
+      if (!hadControllerOnLoad) return;
+      // 3. Jangan reload otomatis jika pemain sedang di dalam game agar progres tidak hilang
+      const isPlaying = document.body.classList.contains('game-on') ||
+        (document.getElementById('gameView') && document.getElementById('gameView').style.display !== 'none');
+      if (isPlaying && !vitaUpdateTriggeredByUser) return;
+      // 4. Mencegah double reload
+      if (vitaReloading) return;
+      vitaReloading = true;
+      safeVitaReload('controllerchange update');
+    });
+  }
+} catch (e) {}
+
+function setupAuthFormListeners() {
+  const attachEnter = (inputId, callback) => {
+    const el = document.getElementById(inputId);
+    if (el) {
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          callback();
+        }
+      });
+    }
+  };
+
+  attachEnter('loginCallsignInput', handlePerformLogin);
+  attachEnter('loginPasscodeInput', handlePerformLogin);
+  attachEnter('modalUsernameInput', handleModalRegisterProfile);
+  attachEnter('modalPasscodeInput', handleModalRegisterProfile);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupAuthFormListeners);
+} else {
+  setupAuthFormListeners();
+}
+
+window.addEventListener('load', () => {
+  setTimeout(checkVitaUpdate, 2500);
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const act = params.get('action');
+    if (act === 'play') {
+      setTimeout(() => { if (typeof playWebGame === 'function') playWebGame(); }, 250);
+    } else if (act === 'leaderboard') {
+      setTimeout(() => { if (typeof openLeaderboard === 'function') openLeaderboard(); }, 180);
+    } else if (act === 'settings') {
+      setTimeout(() => { if (typeof openSettings === 'function') openSettings(); }, 180);
+    }
+  } catch (_) {}
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVitaUpdate(); });
+setInterval(checkVitaUpdate, 30 * 60 * 1000);
+
+// ============================================================
+// VITA v2.0 HUB POLISH (procedural, no new deps)
+// - ESC closes sidebar/modals (industry-standard)
+// - Bestiary canvases get living pulse animation
+// - Ember loop pauses when tab hidden (battery/perf)
+// ============================================================
+(function vita2HubPolish() {
+  document.addEventListener('keydown', (e) => {
+    if (!e || !e.key) return;
+    if (e.key === 'Escape') {
+      try {
+        const open = document.querySelector('#homeView .modal-backdrop.open');
+        if (open) { open.classList.remove('open'); return; }
+        const sb = document.getElementById('sidebarDrawer');
+        if (sb && sb.classList.contains('open')) closeSidebar();
+      } catch (_) {}
+    }
+  });
+
+  // Living bestiary: subtle breathing pulse on each foe canvas.
+  function vita2PulseFoes(t) {
+    try {
+      const foes = document.querySelectorAll('#homeView .foe-canvas-box canvas');
+      foes.forEach((cv, i) => {
+        const s = 1 + Math.sin(t / 900 + i * 1.7) * 0.04;
+        cv.style.transform = 'scale(' + s.toFixed(3) + ')';
+      });
+    } catch (_) {}
+    requestAnimationFrame(vita2PulseFoes);
+  }
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(vita2PulseFoes);
+})();
