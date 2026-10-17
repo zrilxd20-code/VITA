@@ -341,7 +341,98 @@ document.addEventListener('keydown', e => {
     const gm = document.getElementById('modal');
     if (gm) gm.classList.remove('open');
   }
-});// ---- Sistem Profil Operatif & PP (Photo Profile) ----
+});
+
+/* ---- A11y: Manajemen Fokus Dialog (modal & sidebar) ----
+   Semua dialog Hub memakai pola .modal-backdrop, sebagian dibuka lewat kelas
+   .open dan sebagian lewat style.display. Daripada menyentuh puluhan fungsi
+   buka/tutup, satu MutationObserver menjaga atribut ARIA, memindahkan fokus
+   ke dalam dialog saat dibuka, mengembalikannya saat ditutup, dan menjebak
+   tombol Tab agar tidak bocor ke konten di belakang. */
+(function initDialogA11y() {
+  const FOCUSABLE = 'a[href],area[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  const hosts = Array.from(document.querySelectorAll('.modal-backdrop, #sidebarDrawer'));
+  if (!hosts.length) return;
+  let activeHost = null;
+  let restoreTarget = null;
+  let titleSeq = 0;
+
+  const isVisible = el => !!(el && (el.offsetWidth || el.offsetHeight || el.getClientRects().length));
+  const isOpen = el => el.classList.contains('open') || (el.style.display && el.style.display !== 'none');
+  const dialogOf = host => host.querySelector('.modal, .modal-card') || host;
+
+  function focusableWithin(root) {
+    return Array.from(root.querySelectorAll(FOCUSABLE)).filter(isVisible);
+  }
+
+  function ensureSemantics(host) {
+    const dlg = dialogOf(host);
+    if (!dlg.hasAttribute('role')) dlg.setAttribute('role', 'dialog');
+    dlg.setAttribute('aria-modal', 'true');
+    if (!dlg.hasAttribute('tabindex')) dlg.setAttribute('tabindex', '-1');
+    if (!dlg.hasAttribute('aria-label') && !dlg.hasAttribute('aria-labelledby')) {
+      const title = dlg.querySelector('h3, h2, [id$="Title"]');
+      if (title) {
+        if (!title.id) title.id = 'dlg-title-' + (++titleSeq);
+        dlg.setAttribute('aria-labelledby', title.id);
+      }
+    }
+    return dlg;
+  }
+
+  function onOpen(host) {
+    if (activeHost === host) return;
+    if (!activeHost) restoreTarget = document.activeElement;
+    activeHost = host;
+    const dlg = ensureSemantics(host);
+    const target = focusableWithin(dlg)[0] || dlg;
+    // Tunggu satu frame agar transisi/display selesai sebelum memindahkan fokus.
+    // Batalkan bila dialog sudah ditutup/diganti sebelum frame berjalan.
+    requestAnimationFrame(() => {
+      if (activeHost !== host) return;
+      try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
+    });
+  }
+
+  function onClose(host) {
+    if (activeHost !== host) return;
+    activeHost = null;
+    const back = restoreTarget;
+    restoreTarget = null;
+    if (back && back.isConnected && isVisible(back)) {
+      requestAnimationFrame(() => {
+        if (activeHost) return; // dialog lain sudah terbuka, jangan rebut fokus.
+        try { back.focus({ preventScroll: true }); } catch (e) {}
+      });
+    }
+  }
+
+  const observer = new MutationObserver(records => {
+    for (const rec of records) {
+      const host = rec.target;
+      // Anggap benar-benar terbuka hanya jika dialog tampak (parent tidak display:none).
+      if (isOpen(host) && isVisible(host)) onOpen(host);
+      else onClose(host);
+    }
+  });
+  hosts.forEach(host => observer.observe(host, { attributes: true, attributeFilter: ['class', 'style'] }));
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Tab' || !activeHost) return;
+    const dlg = dialogOf(activeHost);
+    const items = focusableWithin(dlg);
+    if (!items.length) { e.preventDefault(); dlg.focus(); return; }
+    const idx = items.indexOf(document.activeElement);
+    if (e.shiftKey) {
+      if (idx <= 0) { e.preventDefault(); items[items.length - 1].focus(); }
+    } else if (idx === -1 || idx === items.length - 1) {
+      e.preventDefault();
+      items[0].focus();
+    }
+  });
+})();
+
+// ---- Sistem Profil Operatif & PP (Photo Profile) ----
 const VITA_PROFILE_KEY = 'vita_profile';
 const VITA_ACCOUNTS_KEY = 'vita_accounts';
 

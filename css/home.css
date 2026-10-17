@@ -1644,6 +1644,16 @@ body {
   border-color: var(--accent);
 }
 
+/* Target sentuh lebih besar pada perangkat berpointer kasar (layar sentuh),
+   tetap 28px di desktop agar layout tidak berubah. */
+@media (pointer: coarse) {
+  .btn-sidebar-close {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}
+
 /* Sidebar Nav Items */
 .sidebar-nav-list {
   display: flex;

@@ -2,7 +2,7 @@
  * Web Security & QA Automated Test Suite for VITA
  * Menguji keamanan sanitasi XSS, validasi input callsign, URL avatar, proteksi data localStorage rusak,
  * integritas level web, verifikasi schema Supabase RPC, konektivitas labirin anti-softlock,
- * serta regresi kontrol kecerahan (applyBrightness) Hub.
+ * regresi kontrol kecerahan (applyBrightness) Hub, serta aksesibilitas dialog (ARIA + focus trap).
  */
 
 const fs = require('fs');
@@ -221,6 +221,21 @@ assert(/\.grid-overlay\s*\{[^}]*brightness\(var\(--hub-bright, 1\)\)/.test(homeC
 
 console.log('✓ TEST 8 LULUS: Slider Kecerahan menggerakkan ambience Hub tanpa menghapus efek blur.');
 
+// TEST 9: Aksesibilitas Dialog Hub (semantik ARIA + jebakan fokus keyboard).
+// Dialog Hub dibuka lewat kelas .open ATAU style.display, beberapa tanpa role/aria-modal,
+// fokus tidak berpindah ke dalam dialog, dan tombol Tab bisa bocor ke konten di belakang.
+console.log('\n[TEST 9] Pengujian Aksesibilitas Dialog (ARIA + Focus Trap)...');
+assert(homeJs.includes("setAttribute('role', 'dialog')"), 'Dialog Hub harus memperoleh role="dialog" otomatis');
+assert(homeJs.includes("setAttribute('aria-modal', 'true')"), 'Dialog Hub harus memperoleh aria-modal="true"');
+assert(homeJs.includes("aria-labelledby"), 'Dialog Hub harus memperoleh nama aksesibel (aria-labelledby) dari judulnya');
+assert(homeJs.includes('MutationObserver'), 'Manajemen fokus dialog harus memakai MutationObserver (mendukung .open maupun style.display)');
+assert(homeJs.includes('restoreTarget'), 'Fokus harus dipulihkan ke elemen pemicu saat dialog ditutup');
+assert(homeJs.includes('focusableWithin') && /e\.key\s*!==\s*'Tab'/.test(homeJs), 'Tombol Tab harus dijebak di dalam dialog yang terbuka');
+const tokensCss = fs.readFileSync(path.join(__dirname, '../css/tokens.css'), 'utf8');
+assert(tokensCss.includes('input:focus-visible') && tokensCss.includes('select:focus-visible') && tokensCss.includes('textarea:focus-visible'),
+  ':focus-visible harus mencakup kontrol form (input/select/textarea)');
+console.log('✓ TEST 9 LULUS: Dialog Hub memiliki semantik ARIA, jebakan fokus Tab, dan pemulihan fokus.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (8/8)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (9/9)');
 console.log('=========================================');

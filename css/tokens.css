@@ -45,10 +45,14 @@
 }
 .vita-btn:hover { transform: translateY(-2px); filter: brightness(1.12); box-shadow: var(--shadow-glow-red); }
 .vita-btn:active { transform: translateY(0) scale(0.98); }
-.vita-btn:focus-visible, a:focus-visible, button:focus-visible {
+.vita-btn:focus-visible, a:focus-visible, button:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 2px solid var(--accent-2);
   outline-offset: 3px;
 }
+/* Wadah dialog difokuskan secara programatik (tabindex="-1") agar pembaca layar
+   membacanya, tetapi cincin fokus di sekujur kotak dialog justru mengganggu. */
+[role="dialog"]:focus { outline: none; }
 
 /* Objective tracker + tutorial toast + damage vignette (game HUD) */
 #objectiveTracker {
