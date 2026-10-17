@@ -20,6 +20,24 @@ let ctx = mainCtx; // konteks aktif: dialihkan ke buffer pixel saat render dunia
 const minimapCanvas = document.getElementById('minimap');
 const minimapCtx = minimapCanvas.getContext('2d');
 
+// ---- Cache elemen HUD (dipanggil tiap frame) ----
+// gameLoop()/updateUI()/renderWeaponHUD() berjalan ~60x/detik; query DOM berulang
+// membuang waktu. Referensi disimpan lalu divalidasi lewat isConnected, sehingga
+// tetap benar walau markup HUD di-render ulang (mis. daftar slot senjata).
+const _hudCache = new Map();
+function hudEl(id) {
+    const el = _hudCache.get(id);
+    if (el && el.isConnected) return el;
+    const found = document.getElementById(id) || null;
+    if (found) _hudCache.set(id, found); else _hudCache.delete(id);
+    return found;
+}
+// Tulis teks hanya saat nilainya berubah, menghindari mutasi DOM mubazir tiap frame.
+function setHudText(el, value) {
+    const str = String(value);
+    if (el && el.textContent !== str) el.textContent = str;
+}
+
 let W, H;
 // ---- Pixel-art pipeline (100% prosedural, tanpa aset eksternal) ----
 // Dunia digambar ke buffer kecil lalu di-upscale tanpa smoothing,
@@ -3909,25 +3927,33 @@ function drawEKG() {
 }
 
 function updateUI() {
-    document.getElementById('levelText').textContent = currentLevel + 1;
-    document.getElementById('modeText').textContent = currentLevel % 2 === 1 ? tt('mode_light') : tt('mode_dark');
+    setHudText(hudEl('levelText'), currentLevel + 1);
+    setHudText(hudEl('modeText'), currentLevel % 2 === 1 ? tt('mode_light') : tt('mode_dark'));
     const diffKey = settings.difficulty || 'normal';
     const diffLabel = diffKey === 'easy' ? tt('diff_easy') : (diffKey === 'hard' ? tt('diff_hard') : tt('diff_normal'));
-    if (document.getElementById('diffText')) document.getElementById('diffText').textContent = diffLabel.toUpperCase();
-    document.getElementById('hpText').textContent = Math.max(0, Math.ceil(player.hp));
-    const hpBar = document.getElementById('hpBar');
+    setHudText(hudEl('diffText'), diffLabel.toUpperCase());
+    setHudText(hudEl('hpText'), Math.max(0, Math.ceil(player.hp)));
+
     const hpPct = Math.max(0, player.hp / player.maxHp);
-    hpBar.style.width = (hpPct * 100) + '%';
-    // Warna HP bar dinamis: hijau > 60%, kuning 30-60%, merah + kedip < 30%
-    if (hpPct > 0.6) {
-        hpBar.style.setProperty('--hp-color', 'linear-gradient(90deg, #2ecc71, #27ae60)');
-        hpBar.classList.remove('hp-critical');
-    } else if (hpPct > 0.3) {
-        hpBar.style.setProperty('--hp-color', 'linear-gradient(90deg, #f39c12, #e67e22)');
-        hpBar.classList.remove('hp-critical');
-    } else {
-        hpBar.style.setProperty('--hp-color', 'linear-gradient(90deg, #e74c3c, #c0392b)');
-        hpBar.classList.add('hp-critical');
+    const hpBar = hudEl('hpBar');
+    if (hpBar) {
+        hpBar.style.width = (hpPct * 100) + '%';
+        // Warna HP bar dinamis: hijau > 60%, kuning 30-60%, merah + kedip < 30%.
+        // Hanya diperbarui saat tingkat berubah agar tidak memicu style recalc tiap frame.
+        const hpTier = hpPct > 0.6 ? 'ok' : (hpPct > 0.3 ? 'warn' : 'crit');
+        if (hpBar.dataset.hpTier !== hpTier) {
+            hpBar.dataset.hpTier = hpTier;
+            if (hpTier === 'ok') {
+                hpBar.style.setProperty('--hp-color', 'linear-gradient(90deg, #2ecc71, #27ae60)');
+                hpBar.classList.remove('hp-critical');
+            } else if (hpTier === 'warn') {
+                hpBar.style.setProperty('--hp-color', 'linear-gradient(90deg, #f39c12, #e67e22)');
+                hpBar.classList.remove('hp-critical');
+            } else {
+                hpBar.style.setProperty('--hp-color', 'linear-gradient(90deg, #e74c3c, #c0392b)');
+                hpBar.classList.add('hp-critical');
+            }
+        }
     }
 
     // Kalkulasi Biometrik BPM dinamis
@@ -3936,38 +3962,40 @@ function updateUI() {
     const targetBpm = Math.round(72 + hpLoss * 48 + danger * 54 + (player.dashing ? 20 : 0));
     playerBpm += (targetBpm - playerBpm) * 0.12;
     const bpmDisplay = Math.round(playerBpm);
-    const bpmEl = document.getElementById('bpmText');
+    const bpmEl = hudEl('bpmText');
     if (bpmEl) {
-        bpmEl.textContent = bpmDisplay + ' BPM';
-        if (bpmDisplay >= 120) bpmEl.classList.add('bpm-panic');
-        else bpmEl.classList.remove('bpm-panic');
+        setHudText(bpmEl, bpmDisplay + ' BPM');
+        bpmEl.classList.toggle('bpm-panic', bpmDisplay >= 120);
     }
 
-    document.getElementById('atkText').textContent = Math.ceil(player.atk) + ' (Lv' + (player.plevel || 1) + ')';
-    document.getElementById('monsterCount').textContent = monsters.filter(m => m.hp > 0).length;
+    setHudText(hudEl('atkText'), Math.ceil(player.atk) + ' (Lv' + (player.plevel || 1) + ')');
+    // Hitung monster hidup dengan loop; filter() akan mengalokasi array baru tiap frame.
+    let aliveMonsters = 0;
+    for (let i = 0; i < monsters.length; i++) if (monsters[i].hp > 0) aliveMonsters++;
+    setHudText(hudEl('monsterCount'), aliveMonsters);
     const unlocked = artifacts.length > 0 && coinsCollected >= artifacts.length;
-    document.getElementById('artifactText').textContent = `${coinsCollected} / ${artifacts.length}`;
-    document.getElementById('exitText').textContent = unlocked ? tt('exit_open') : tt('exit_locked');
-    document.getElementById('timeText').textContent = Math.floor((Date.now() - levelStartTime) / 1000);
+    setHudText(hudEl('artifactText'), `${coinsCollected} / ${artifacts.length}`);
+    setHudText(hudEl('exitText'), unlocked ? tt('exit_open') : tt('exit_locked'));
+    setHudText(hudEl('timeText'), Math.floor((Date.now() - levelStartTime) / 1000));
     renderWeaponHUD();
     try { vita2UpdateTracker(unlocked); } catch (e) {}
 }
 
 function renderWeaponHUD() {
-    const slotsEl = document.getElementById('weaponSlots');
-    const nameEl = document.getElementById('weaponNameDisplay');
-    const gaugeBar = document.getElementById('weaponGaugeBar');
-    const touchTag = document.getElementById('touchWeaponTag');
-    const hintEl = document.getElementById('weaponHotkeyHint');
+    const slotsEl = hudEl('weaponSlots');
+    const nameEl = hudEl('weaponNameDisplay');
+    const gaugeBar = hudEl('weaponGaugeBar');
+    const touchTag = hudEl('touchWeaponTag');
+    const hintEl = hudEl('weaponHotkeyHint');
     if (!slotsEl || !player || !player.weapons) return;
 
-    if (hintEl) hintEl.textContent = tt('weapon_switch_hint');
+    setHudText(hintEl, tt('weapon_switch_hint'));
 
     const curW = player.currentWeapon || 'knife';
     const curConf = WEAPONS[curW] || WEAPONS.knife;
 
-    if (nameEl) nameEl.textContent = tt(curConf.nameKey).toUpperCase();
-    if (touchTag) touchTag.textContent = lang === 'en' ? curConf.shortTagEn : curConf.shortTag;
+    setHudText(nameEl, tt(curConf.nameKey).toUpperCase());
+    setHudText(touchTag, lang === 'en' ? curConf.shortTagEn : curConf.shortTag);
 
     if (gaugeBar) {
         if (curW === 'minigun') {
@@ -3994,8 +4022,9 @@ function renderWeaponHUD() {
     }
 
     const wepList = player.weapons;
-    if (slotsEl.dataset.cachedList !== wepList.join(',')) {
-        slotsEl.dataset.cachedList = wepList.join(',');
+    const listKey = wepList.join(',');
+    if (slotsEl.dataset.cachedList !== listKey) {
+        slotsEl.dataset.cachedList = listKey;
         slotsEl.innerHTML = '';
         wepList.forEach((wKey, idx) => {
             const w = WEAPONS[wKey] || WEAPONS.knife;
@@ -4014,17 +4043,18 @@ function renderWeaponHUD() {
         });
     } else {
         wepList.forEach(wKey => {
-            const btn = document.getElementById('slotWep_' + wKey);
+            const btn = hudEl('slotWep_' + wKey);
             if (btn) {
                 if (wKey === curW) btn.classList.add('active');
                 else btn.classList.remove('active');
             }
-            const cdEl = document.getElementById('slotCd_' + wKey);
+            const cdEl = hudEl('slotCd_' + wKey);
             if (cdEl && player.weaponCooldowns) {
                 const w = WEAPONS[wKey] || WEAPONS.knife;
                 const cd = player.weaponCooldowns[wKey] || 0;
                 const pct = w.cooldown ? Math.min(100, Math.ceil((cd / w.cooldown) * 100)) : 0;
-                cdEl.style.height = pct + '%';
+                const heightStr = pct + '%';
+                if (cdEl.style.height !== heightStr) cdEl.style.height = heightStr;
             }
         });
     }
@@ -6174,20 +6204,23 @@ function updateMonsters() {
 
     // Update Boss HUD Status
     const activeBoss = monsters.find(m => m.hp > 0 && (m.isBoss || m.isMonolith || m.name === 'The Monolith' || m.name === 'Mother Harvester'));
-    const bossHud = document.getElementById('bossHud');
+    const bossHud = hudEl('bossHud');
     if (bossHud) {
         if (activeBoss && gameState === 'playing' && !menuDemo) {
-            bossHud.style.display = 'block';
-            const fill = document.getElementById('bossBarFill');
-            if (fill) fill.style.width = Math.max(0, Math.min(100, (activeBoss.hp / activeBoss.maxHp) * 100)) + '%';
-            const nameEl = document.getElementById('bossHudName');
-            if (nameEl) nameEl.textContent = activeBoss.name.toUpperCase();
-            const phaseEl = document.getElementById('bossHudPhase');
+            if (bossHud.style.display !== 'block') bossHud.style.display = 'block';
+            const fill = hudEl('bossBarFill');
+            if (fill) {
+                const widthStr = Math.max(0, Math.min(100, (activeBoss.hp / activeBoss.maxHp) * 100)) + '%';
+                if (fill.style.width !== widthStr) fill.style.width = widthStr;
+            }
+            const nameEl = hudEl('bossHudName');
+            setHudText(nameEl, activeBoss.name.toUpperCase());
+            const phaseEl = hudEl('bossHudPhase');
             if (phaseEl) {
                 const pct = activeBoss.hp / activeBoss.maxHp;
-                phaseEl.textContent = pct > 0.66 ? tt('boss_monolith_phase1') : (pct > 0.33 ? tt('boss_monolith_phase2') : tt('boss_monolith_phase3'));
+                setHudText(phaseEl, pct > 0.66 ? tt('boss_monolith_phase1') : (pct > 0.33 ? tt('boss_monolith_phase2') : tt('boss_monolith_phase3')));
             }
-        } else {
+        } else if (bossHud.style.display !== 'none') {
             bossHud.style.display = 'none';
         }
     }
@@ -10455,7 +10488,7 @@ function updateMonsterProximityAndHeartbeat() {
 }
 
 function gameLoop() {
-    const gv = document.getElementById('gameView');
+    const gv = hudEl('gameView');
     if (document.hidden || (gv && gv.style.display === 'none')) {
         requestAnimationFrame(gameLoop);
         return;
@@ -10526,10 +10559,10 @@ function gameLoop() {
         if (perfFrameCount % 15 === 0) {
             perfFps = Math.min(60, 1000 / Math.max(1, perfFrameTime));
             if (settings && settings.showFps) {
-                const fpsEl = document.getElementById('fpsCounter');
+                const fpsEl = hudEl('fpsCounter');
                 if (fpsEl) {
                     if (fpsEl.style.display !== 'block') fpsEl.style.display = 'block';
-                    fpsEl.textContent = 'FPS: ' + Math.round(perfFps);
+                    setHudText(fpsEl, 'FPS: ' + Math.round(perfFps));
                 }
             }
         }
@@ -12300,18 +12333,21 @@ let vita2TutStage = 0;
 let vita2LastDmgAt = 0;
 
 function vita2UpdateTracker(unlocked) {
-    const el = document.getElementById('objectiveTracker');
-    const tx = document.getElementById('objectiveTrackerText');
+    const el = hudEl('objectiveTracker');
+    const tx = hudEl('objectiveTrackerText');
     if (!el || !tx || typeof artifacts === 'undefined') return;
-    if (gameState !== 'playing') { el.style.display = 'none'; return; }
-    el.style.display = 'flex';
+    if (gameState !== 'playing') {
+        if (el.style.display !== 'none') el.style.display = 'none';
+        return;
+    }
+    if (el.style.display !== 'flex') el.style.display = 'flex';
     if (unlocked) {
-        tx.textContent = tt('obj_exit');
+        setHudText(tx, tt('obj_exit'));
         el.classList.add('tracker-ready');
     } else {
         const total = artifacts.length || 0;
         const got = (typeof coinsCollected !== 'undefined') ? coinsCollected : 0;
-        tx.textContent = tt('obj_collect') + ' ' + got + '/' + total;
+        setHudText(tx, tt('obj_collect') + ' ' + got + '/' + total);
         el.classList.remove('tracker-ready');
     }
 }
