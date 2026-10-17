@@ -1344,21 +1344,6 @@ body.hud-hidden #gameView .weapon-hud-bar {
     color: rgba(230,220,210,0.88);
 }
 
-/* Typewriter cursor */
-.prologue-cursor {
-    display: inline-block;
-    width: 8px;
-    height: 15px;
-    background: rgba(255,80,50,0.7);
-    margin-left: 2px;
-    vertical-align: text-bottom;
-    animation: prologueBlink 0.6s steps(1) infinite;
-}
-@keyframes prologueBlink {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
-}
-
 /* Section dividers */
 .prologue-divider {
     display: block;

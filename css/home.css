@@ -175,109 +175,6 @@ body {
     background: linear-gradient(90deg, transparent, var(--red), transparent);
     box-shadow: 0 0 10px rgba(255, 40, 40, 0.5);
   }
-#homeView .top-menu {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 22px;
-    padding: 0 16px;
-  }
-#homeView .top-menu .btn { width: auto; min-width: 160px; padding: 10px 18px; }
-#homeView main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px 22px 70px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    perspective: 1200px;
-  }
-#homeView .card {
-    position: relative;
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius);
-    padding: 20px;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    box-shadow: inset 0 0 30px rgba(120, 10, 10, 0.12), var(--shadow);
-    overflow: hidden;
-    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
-    transform-style: preserve-3d;
-    will-change: transform;
-  }
-#homeView .card:hover {
-    border-color: var(--red);
-    box-shadow: 0 24px 80px rgba(255, 30, 30, 0.16), var(--shadow);
-  }
-#homeView .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -45%;
-    width: 40%; height: 3px;
-    background: linear-gradient(90deg, transparent, var(--strip), transparent);
-    animation: stripRun 2.8s linear infinite;
-    opacity: 0.75;
-  }
-@keyframes stripRun { from { left: -45%; } to { left: 115%; } }
-#homeView .thumb {
-    height: 150px;
-    border-radius: 4px;
-    margin-bottom: 16px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background:
-      radial-gradient(circle at 30% 25%, rgba(255, 60, 40, 0.14), transparent 45%),
-      var(--thumb-bg);
-    border: 1px solid rgba(255, 60, 50, 0.14);
-    overflow: hidden;
-  }
-#homeView .thumb svg {
-    width: 86px; height: 86px;
-    filter: drop-shadow(0 0 8px rgba(255, 40, 40, 0.4)) drop-shadow(0 6px 18px rgba(0,0,0,0.6));
-    animation: bob 3.5s ease-in-out infinite;
-  }
-@keyframes bob { 50% { transform: translateY(-7px); } }
-#homeView .thumb .plays-badge {
-    position: absolute;
-    top: 10px; right: 10px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 5px 11px;
-    background: rgba(6, 2, 4, 0.7);
-    border: 1px solid rgba(255, 80, 60, 0.35);
-  }
-#homeView .card h2 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text);
-    letter-spacing: 3px;
-  }
-#homeView .card p.desc {
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--text-dim);
-    margin-bottom: 14px;
-    min-height: 44px;
-  }
-#homeView .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-#homeView .tag {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 80, 60, 0.18);
-    padding: 4px 10px;
-  }
-#homeView .tag.on { color: var(--green); border-color: rgba(141, 255, 176, 0.35); background: rgba(90, 200, 110, 0.08); }
 #homeView .btn {
     display: flex;
     align-items: center;
@@ -392,12 +289,11 @@ body {
   }
 #homeView footer b { color: var(--accent); text-shadow: 0 0 10px rgba(255, 40, 40, 0.5); }
 #homeView footer .cursor-box { color: var(--accent2); animation: blink 1.2s steps(1) infinite; }
-@media (max-width: 560px) {#homeView header { padding-top: 34px; }
-#homeView main { padding: 20px 14px 60px; }
+@media (max-width: 560px) {
+  #homeView header { padding-top: 34px; }
+}
 
-  }
-
-/* Teaser monster: hook visual + CTA sebelum kartu */
+/* Teaser monster: showcase visual predator + ringkasan fitur */
 #homeView .teaser {
   max-width: 1200px;
   margin: 0 auto;
@@ -458,67 +354,12 @@ body {
   margin-bottom: 18px;
 }
 #homeView .teaser-stats b { color: var(--accent); text-shadow: 0 0 10px rgba(255, 40, 40, 0.5); }
-#homeView .teaser-cta .btn { width: auto; min-width: 280px; padding: 13px 30px; }
 @media (max-width: 560px) {
   #homeView .foe { width: 140px; }
-  #homeView .teaser-cta .btn { min-width: 0; width: 100%; }
 }
 
-/* Operative Profile & Google Auth Styles */
-#homeView .top-menu .btn-auth {
-  border-color: rgba(255, 60, 40, 0.6);
-  background: rgba(40, 10, 12, 0.7);
-  box-shadow: 0 0 14px rgba(255, 40, 40, 0.25);
-}
-#homeView .top-menu .btn-auth:hover {
-  border-color: #ff5e57;
-  background: rgba(60, 14, 18, 0.85);
-  box-shadow: 0 0 20px rgba(255, 60, 40, 0.45);
-}
+/* Tombol mikro: aksi ringkas (refresh / toggle) di sidebar & leaderboard */
 
-#homeView .operative-badge-bar {
-  display: flex;
-  justify-content: center;
-  margin-top: 14px;
-}
-#homeView .operative-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(14, 4, 8, 0.88);
-  border: 1px solid rgba(255, 60, 40, 0.4);
-  border-radius: 30px;
-  padding: 6px 16px 6px 8px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(255, 40, 40, 0.15);
-}
-#homeView .operative-avatar, #homeView .operative-avatar-default {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1.5px solid #ff3b3b;
-  object-fit: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  background: #2a0808;
-}
-#homeView .operative-info {
-  text-align: left;
-  line-height: 1.2;
-}
-#homeView .operative-name {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #fff;
-}
-#homeView .operative-status {
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  color: #2ecc71;
-  text-transform: uppercase;
-}
 #homeView .btn-micro {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -555,176 +396,8 @@ body {
   margin-bottom: 12px;
   background: rgba(60, 10, 10, 0.4);
 }
-.btn-google {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: #ffffff;
-  color: #3c4043;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
-  margin-top: 16px;
-}
-.btn-google:hover {
-  background: #f8f9fa;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
-}
-.btn-google:active {
-  transform: translateY(0);
-}
-.auth-divider {
-  display: flex;
-  align-items: center;
-  margin: 20px 0 16px;
-  color: var(--text-dim);
-  font-size: 10px;
-  letter-spacing: 2px;
-}
-.auth-divider::before, .auth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: rgba(190, 40, 40, 0.3);
-}
-.auth-divider span {
-  padding: 0 10px;
-}
-.guest-auth-box {
-  text-align: left;
-  margin-bottom: 14px;
-}
-.guest-auth-box label {
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: 1px;
-  display: block;
-  margin-bottom: 6px;
-}
-.input-with-btn {
-  display: flex;
-  gap: 8px;
-}
-.input-with-btn input {
-  flex: 1;
-  background: #12060a;
-  color: #e7d6cf;
-  border: 1px solid rgba(190, 40, 40, 0.4);
-  padding: 8px 12px;
-  font-family: inherit;
-  font-size: 13px;
-  border-radius: 4px;
-}
-.input-with-btn .btn {
-  width: auto;
-  min-width: 0;
-  padding: 8px 18px;
-  font-size: 12px;
-}
-.auth-notice {
-  margin: 16px 0 14px;
-  font-size: 11px;
-  color: rgba(200, 140, 130, 0.7);
-  line-height: 1.4;
-}
-
-/* ============================================================
-   Tactical Terminal Header & Dashboard Layout System
-   ============================================================ */
-#homeView .terminal-header {
-  max-width: 1280px;
-  margin: 18px auto 0;
-  padding: 12px 20px;
-  background: rgba(18, 5, 10, 0.85);
-  border: 1px solid rgba(255, 60, 40, 0.35);
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 14px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-}
-
-#homeView .terminal-header-main {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-#homeView .terminal-sub {
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  font-weight: 600;
-}
-
-#homeView .terminal-header-meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-#homeView .btn-play-nav {
-  background: linear-gradient(135deg, #ff3b3b, #b31212) !important;
-  color: #fff !important;
-  border: 1px solid #ff7373 !important;
-  box-shadow: 0 0 16px rgba(255, 60, 40, 0.4) !important;
-  font-size: 12px !important;
-  padding: 7px 16px !important;
-  font-weight: 800 !important;
-  letter-spacing: 1.5px;
-  width: auto !important;
-}
-
-#homeView .btn-play-nav:hover {
-  filter: brightness(1.2) !important;
-  transform: translateY(-1px) !important;
-}
-
-/* ============================================================
-   Tactical Operations Dashboard & Sidebar Navigation
-   ============================================================ */
-#homeView .dashboard-wrapper {
-  max-width: 1280px;
-  margin: 18px auto 40px;
-  padding: 0 16px;
-  display: grid;
-  grid-template-columns: 270px 1fr;
-  gap: 20px;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  #homeView .dashboard-wrapper {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* Sidebar styling */
-#homeView .dash-sidebar {
-  background: linear-gradient(180deg, rgba(22, 7, 12, 0.96), rgba(10, 3, 6, 0.98));
-  border: 1px solid rgba(255, 60, 40, 0.35);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(180, 20, 20, 0.08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  position: sticky;
-  top: 16px;
-}
 
 #homeView .sidebar-user-card {
   background: rgba(14, 4, 8, 0.85);
@@ -808,219 +481,6 @@ body {
   color: #fff;
 }
 
-/* Nav tabs */
-#homeView .dash-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-@media (max-width: 900px) {
-  #homeView .dash-nav {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 6px;
-  }
-}
-
-#homeView .dash-nav-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 11px 14px;
-  background: rgba(18, 5, 10, 0.7);
-  border: 1px solid rgba(190, 40, 40, 0.25);
-  border-radius: 4px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.18s ease;
-  text-align: left;
-  white-space: nowrap;
-}
-
-#homeView .dash-nav-btn:hover {
-  background: rgba(45, 10, 16, 0.85);
-  border-color: #ff3b3b;
-  color: #fff;
-  transform: translateX(3px);
-}
-
-#homeView .dash-nav-btn.active {
-  background: linear-gradient(90deg, rgba(80, 14, 20, 0.95), rgba(35, 8, 12, 0.9));
-  border-color: #ff4d4d;
-  color: #fff;
-  box-shadow: inset 3px 0 0 #ff3b3b, 0 2px 10px rgba(255, 60, 40, 0.2);
-}
-
-#homeView .dash-nav-btn .btn-icon {
-  width: 16px;
-  height: 16px;
-  fill: #ff8a8a;
-  flex-shrink: 0;
-}
-
-#homeView .dash-nav-btn.active .btn-icon {
-  fill: #ff4d4d;
-}
-
-/* Content Area */
-#homeView .dash-main {
-  background: linear-gradient(180deg, rgba(22, 7, 12, 0.94), rgba(12, 3, 7, 0.97));
-  border: 1px solid rgba(255, 60, 40, 0.35);
-  border-radius: var(--radius);
-  padding: 24px 28px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65), inset 0 0 30px rgba(180, 20, 20, 0.08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  min-height: 520px;
-}
-
-#homeView .dash-tab-panel {
-  display: none;
-  animation: tabFade 0.22s ease-out forwards;
-}
-
-#homeView .dash-tab-panel.active {
-  display: block;
-}
-
-@keyframes tabFade {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-#homeView .panel-title-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 22px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(190, 40, 40, 0.25);
-}
-
-#homeView .panel-title {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-}
-
-#homeView .panel-badge {
-  font-size: 10px;
-  font-weight: 800;
-  color: #ff8a8a;
-  background: rgba(255, 60, 40, 0.15);
-  border: 1px solid rgba(255, 60, 40, 0.35);
-  padding: 3px 10px;
-  border-radius: 10px;
-  letter-spacing: 1.5px;
-}
-
-#homeView .panel-badges-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Mission Brief Card */
-#homeView .mission-brief-card {
-  background: rgba(14, 4, 8, 0.75);
-  border: 1px solid rgba(255, 60, 40, 0.3);
-  border-radius: 6px;
-  padding: 20px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-#homeView .mission-brief-header h3 {
-  font-size: 16px;
-  letter-spacing: 2px;
-  color: #fff;
-  margin-bottom: 8px;
-}
-
-#homeView .mission-brief-header p {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.5;
-  max-width: 620px;
-  margin: 0 auto 16px;
-}
-
-#homeView .mission-cta-box {
-  display: flex;
-  justify-content: center;
-}
-
-#homeView .btn-play-massive {
-  background: linear-gradient(135deg, #ff3b3b, #b31212) !important;
-  color: #fff !important;
-  border: 1px solid #ff7373 !important;
-  box-shadow: 0 0 24px rgba(255, 60, 40, 0.55), inset 0 0 12px rgba(255, 255, 255, 0.2) !important;
-  font-size: 16px !important;
-  font-weight: 800 !important;
-  letter-spacing: 2px;
-  padding: 14px 34px !important;
-  width: auto !important;
-  min-width: 320px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-#homeView .btn-play-massive:hover {
-  transform: translateY(-2px) scale(1.02) !important;
-  filter: brightness(1.15) !important;
-  box-shadow: 0 0 32px rgba(255, 60, 40, 0.75) !important;
-}
-
-/* Guide Cards */
-#homeView .guide-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-top: 14px;
-}
-
-#homeView .guide-card {
-  background: rgba(14, 4, 8, 0.7);
-  border: 1px solid rgba(190, 40, 40, 0.3);
-  border-radius: 6px;
-  padding: 16px;
-}
-
-#homeView .guide-card h4 {
-  font-size: 13px;
-  letter-spacing: 1px;
-  color: #ff8a8a;
-  margin-bottom: 10px;
-  border-bottom: 1px solid rgba(190, 40, 40, 0.2);
-  padding-bottom: 6px;
-}
-
-#homeView .guide-card ul {
-  list-style: none;
-  font-size: 12px;
-  color: var(--text-dim);
-  line-height: 1.6;
-}
-
-#homeView .guide-card p {
-  font-size: 12px;
-  color: var(--text-dim);
-  line-height: 1.6;
-}
-
 /* Auth Modal Tabs */
 .auth-tabs-row {
   display: flex;
@@ -1056,13 +516,6 @@ body {
 /* ============================================================
    Operative Profile Card & Photo Profile (PP) System
    ============================================================ */
-#homeView .auth-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
 #homeView .auth-clearance-stamp {
   font-size: 10px;
   font-weight: 800;
@@ -1259,26 +712,6 @@ body {
   letter-spacing: 1px;
   margin-left: 6px;
 }
-.btn-google-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: #ffffff;
-  color: #3c4043;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: transform 0.15s, background-color 0.15s;
-}
-.btn-google-pill:hover {
-  background: #f1f3f4;
-  transform: translateY(-1px);
-}
 .profile-telemetry-row {
   display: flex;
   gap: 10px;
@@ -1313,10 +746,6 @@ body {
 /* ============================================================
    Supabase Cloud Configuration & Leaderboard Styles
    ============================================================ */
-.supabase-toggle-bar {
-  margin-top: 14px;
-  text-align: left;
-}
 .supabase-config-panel {
   margin-top: 12px;
   background: rgba(14, 4, 8, 0.95);
@@ -1324,15 +753,6 @@ body {
   border-radius: 6px;
   padding: 16px;
   box-shadow: inset 0 0 20px rgba(241, 196, 15, 0.08);
-}
-.supabase-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 12px;
-  color: #f1c40f;
-  letter-spacing: 1.5px;
 }
 .supabase-status-tag {
   font-size: 9px;
@@ -1363,39 +783,6 @@ body {
 }
 
 /* Leaderboard Section */
-#homeView .leaderboard-section {
-  max-width: 960px;
-  margin: 36px auto 60px;
-  padding: 0 18px;
-}
-#homeView .leaderboard-box {
-  background: linear-gradient(180deg, rgba(22, 6, 10, 0.94), rgba(12, 3, 6, 0.98));
-  border: 1px solid rgba(255, 60, 40, 0.4);
-  border-radius: var(--radius);
-  padding: 24px 28px;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), inset 0 0 30px rgba(180, 20, 20, 0.1);
-  text-align: center;
-}
-#homeView .leaderboard-header .lb-tag {
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: #ff3b3b;
-  margin-bottom: 6px;
-  font-weight: 700;
-}
-#homeView .leaderboard-header h3 {
-  font-size: clamp(18px, 3vw, 24px);
-  letter-spacing: 2px;
-  color: #fff;
-  margin-bottom: 6px;
-}
-#homeView .leaderboard-header p {
-  font-size: 13px;
-  color: var(--text-dim);
-  margin-bottom: 20px;
-}
 #homeView .leaderboard-table-wrapper {
   overflow-x: auto;
 }
@@ -1433,28 +820,6 @@ body {
 .rank-1 { background: rgba(241, 196, 15, 0.25); color: #f1c40f; border: 1px solid #f1c40f; }
 .rank-2 { background: rgba(220, 220, 230, 0.2); color: #e2e8f0; border: 1px solid #cbd5e1; }
 .rank-3 { background: rgba(205, 127, 50, 0.25); color: #ea580c; border: 1px solid #c2410c; }
-.lb-user-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.lb-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid #ff3b3b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  overflow: hidden;
-  background: rgba(20, 5, 8, 0.8);
-}
-.lb-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.leaderboard-footer {
-  margin-top: 16px;
-  text-align: right;
-}
 
 /* Vector Graphics & Tactical SVG Icons */
 .btn-icon {
