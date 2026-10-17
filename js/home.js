@@ -3,6 +3,19 @@ const emberCtx = emberCanvas.getContext('2d');
 let EW, EH, embers = [];
 const emberMouse = { x: 0, y: 0, t: 0 };
 
+// v2.x perf: #homeView is a singleton element that never leaves the DOM — cache the lookup
+// instead of re-querying it every frame (the ember loop + bestiary pulse run at 60 Hz).
+let _hubViewEl = null;
+function hubView() {
+  if (!_hubViewEl || !_hubViewEl.isConnected) _hubViewEl = document.getElementById('homeView');
+  return _hubViewEl;
+}
+
+// prefers-reduced-motion: the global CSS rule dampens CSS transitions only, not JS-driven
+// loops, so decorative JS animation must opt out explicitly.
+const HOME_REDUCE_MOTION = (typeof window.matchMedia === 'function') &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function resizeEmbers() {
   EW = emberCanvas.width = window.innerWidth;
   EH = emberCanvas.height = window.innerHeight;
@@ -29,7 +42,7 @@ window.addEventListener('mousemove', e => { emberMouse.x = e.clientX; emberMouse
 
 function drawEmbers(now) {
   // v2.0 perf: skip render cost when tab hidden or hub not visible.
-  const hv0 = document.getElementById('homeView');
+  const hv0 = hubView();
   if (document.hidden || (hv0 && hv0.style.display === 'none')) {
     requestAnimationFrame(drawEmbers);
     return;
@@ -2374,20 +2387,26 @@ setInterval(checkVitaUpdate, 30 * 60 * 1000);
   });
 
   // Living bestiary: subtle breathing pulse on each foe canvas.
+  // Perf: the foe canvases are static DOM nodes (index.html) — cache the NodeList and skip
+  // the per-frame querySelectorAll. A11y: skip the pulse entirely under prefers-reduced-motion
+  // (the global CSS rule can't dampen a JS transform loop, which would otherwise snap 60×/sec).
+  let pulseFoes = null;
   function vita2PulseFoes(t) {
-    const hv = document.getElementById('homeView');
+    const hv = hubView();
     if (document.hidden || !hv || hv.style.display === 'none') {
       requestAnimationFrame(vita2PulseFoes);
       return;
     }
     try {
-      const foes = document.querySelectorAll('#homeView .foe-canvas-box canvas');
-      foes.forEach((cv, i) => {
+      if (!pulseFoes || pulseFoes.length === 0 || !pulseFoes[0].isConnected) {
+        pulseFoes = document.querySelectorAll('#homeView .foe-canvas-box canvas');
+      }
+      for (let i = 0; i < pulseFoes.length; i++) {
         const s = 1 + Math.sin(t / 900 + i * 1.7) * 0.04;
-        cv.style.transform = 'scale(' + s.toFixed(3) + ')';
-      });
+        pulseFoes[i].style.transform = 'scale(' + s.toFixed(3) + ')';
+      }
     } catch (_) {}
     requestAnimationFrame(vita2PulseFoes);
   }
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(vita2PulseFoes);
+  if (!HOME_REDUCE_MOTION && typeof requestAnimationFrame === 'function') requestAnimationFrame(vita2PulseFoes);
 })();
