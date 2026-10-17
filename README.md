@@ -6,7 +6,7 @@
 [![Zero External Assets](https://img.shields.io/badge/Assets-100%25%20Procedural-red)](index.html)
 [![PWA Ready](https://img.shields.io/badge/PWA-Network--First%20Offline-brightgreen)](sw.js)
 [![Database](https://img.shields.io/badge/Database-Supabase%20%2F%20PostgreSQL-3ECF8E)](supabase_schema.sql)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(7%2F7%20QA)-success)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(9%2F9%20QA)-success)](tests/)
 
 ---
 
@@ -93,7 +93,7 @@ npm run bump -- 2.1.0  # sync version.json, sw.js, index.html, APP_VERSION
 vita/
 ├── index.html              # Unified SPA: Terminal Command Hub + Game Engine Canvas
 ├── manifest.webmanifest    # Progressive Web App (PWA) manifest configuration
-├── sw.js                   # Service Worker with cache-first offline strategy
+├── sw.js                   # Service Worker (network-first with offline cache fallback)
 ├── icon.svg                # Procedural SVG vector icon
 ├── version.json            # Release version (PWA update polling)
 ├── package.json            # Node scripts (dev/check/test/icons/bump, stdlib only)
@@ -113,7 +113,7 @@ vita/
 │   └── supabase.js         # REST client for Supabase cloud leaderboards & dossiers
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # Web security audit (XSS entity sanitation, callsign regex, bounds)
+│   └── test_web_security_qa.js # 9-module QA audit (XSS, avatars, BFS anti-softlock, brightness, dialog a11y)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```
