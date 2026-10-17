@@ -4,7 +4,8 @@
  * integritas level web, verifikasi schema Supabase RPC, konektivitas labirin anti-softlock,
  * regresi kontrol kecerahan (applyBrightness) Hub, aksesibilitas dialog (ARIA + focus trap),
  * aksesibilitas keyboard kontrol non-native (role="button"),
- * serta kelengkapan i18n modal mode perangkat & pil mode layar mulai.
+ * kelengkapan i18n modal mode perangkat & pil mode layar mulai,
+ * serta kinerja loop Hub (cache DOM per frame) & penghormatan prefers-reduced-motion pada animasi JS.
  */
 
 const fs = require('fs');
@@ -278,6 +279,32 @@ assert(tokensCss.includes('[role="button"]:focus-visible'),
   'role="button" harus memperoleh cincin fokus :focus-visible');
 console.log('✓ TEST 11 LULUS: Kontrol non-native dapat difokus & diaktifkan lewat keyboard.');
 
+// TEST 12: Kinerja loop Hub (60 Hz) & penghormatan prefers-reduced-motion pada animasi JS.
+// Regresi: loop ember & pulse bestiary memanggil getElementById('homeView') dan
+// querySelectorAll('#homeView .foe-canvas-box canvas') SETIAP frame; animasi transform JS
+// juga tetap berdenyut walau pengguna memilih reduced-motion (aturan CSS global hanya
+// meredam transisi CSS, bukan loop JS, sehingga nilai berubah 60x/detik).
+console.log('\n[TEST 12] Pengujian Kinerja Loop Hub & prefers-reduced-motion (animasi JS)...');
+const hubBody = (homeJs.match(/function hubView\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+assert(hubBody.includes("getElementById('homeView')") && hubBody.includes('isConnected'),
+  'Helper hubView() harus meng-cache #homeView dan memvalidasi isConnected');
+const emberBody = (homeJs.match(/function drawEmbers\([\s\S]*?\n\}/) || [''])[0];
+assert(emberBody.includes('hubView()'), 'drawEmbers harus memakai hubView() yang di-cache, bukan query per frame');
+assert(!/getElementById\(\s*['"]homeView['"]\s*\)/.test(emberBody),
+  'Regresi: drawEmbers kembali melakukan getElementById("homeView") tiap frame');
+const pulseIdx = homeJs.indexOf('function vita2PulseFoes');
+assert(pulseIdx !== -1, 'Fungsi vita2PulseFoes tidak ditemukan di js/home.js');
+const pulseBody = homeJs.slice(pulseIdx, pulseIdx + 1000);
+assert(/if \(!pulseFoes \|\| pulseFoes\.length === 0 \|\| !pulseFoes\[0\]\.isConnected\)/.test(pulseBody),
+  'NodeList bestiary harus di-cache (guard isConnected), bukan querySelectorAll tiap frame');
+assert(/for \(let i = 0; i < pulseFoes\.length; i\+\+\)/.test(pulseBody),
+  'Loop pulse harus iterasi indeks (tanpa alokasi iterator forEach tiap frame)');
+assert(/matchMedia\(\s*['"]\(prefers-reduced-motion: reduce\)['"]\s*\)/.test(homeJs) && /HOME_REDUCE_MOTION/.test(homeJs),
+  'Hub harus mendeteksi prefers-reduced-motion untuk animasi JS dekoratif');
+assert(/!HOME_REDUCE_MOTION[\s\S]{0,120}requestAnimationFrame\(vita2PulseFoes\)/.test(homeJs),
+  'Pulse bestiary harus dilewati saat prefers-reduced-motion aktif');
+console.log('✓ TEST 12 LULUS: Loop Hub tidak query DOM tiap frame & menghormati prefers-reduced-motion.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (11/11)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (12/12)');
 console.log('=========================================');
