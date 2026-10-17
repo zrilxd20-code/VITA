@@ -1,7 +1,7 @@
 // VITA unified check — pure Node.js stdlib, no dependencies.
 // 1) syntax check (node --check) for all JS entry points
 // 2) global scope collision: home.js + prologue.js + game.js share window scope
-// 3) i18n parity: every T.en key must exist in T.id
+// 3) i18n: EN<->ID parity + coverage (HTML data-i18n attrs and tt() calls must resolve in both)
 // 4) secret scan: no hardcoded supabase keys/URLs in source
 // Run: npm run check
 import { execFileSync } from 'node:child_process';
@@ -28,18 +28,41 @@ try {
   ok('combined global scope (supabase+home+prologue+game)');
 } catch (e) { fail('global scope collision: ' + e.message); }
 
-// 3) i18n parity via lightweight parse of T blocks
+// 3) i18n parity + coverage via lightweight parse of T blocks
 try {
   const src = readFileSync('js/game.js', 'utf8');
   const idBlock = src.match(/const T = \{\s*id:\s*\{([\s\S]*?)\},\s*en:/);
   const enBlock = src.match(/,\s*en:\s*\{([\s\S]*?)\n    \}\n\};/);
   if (!idBlock || !enBlock) throw new Error('T blocks not found');
-  const keys = (b) => [...b.matchAll(/^\s*([a-z0-9_]+):/gmi)].map((m) => m[1]);
-  const id = new Set(keys(idBlock[1]));
+  // Strip quoted values / line comments first so strings like 'Mode:' or URLs never
+  // register as keys, then capture EVERY `key:` (dictionaries pack several per line).
+  const keys = (b) => new Set([...b
+    .replace(/'(?:[^'\\]|\\.)*'/g, "''")
+    .replace(/"(?:[^"\\]|\\.)*"/g, '""')
+    .replace(/\/\/[^\n]*/g, '')
+    .matchAll(/([a-z0-9_]+)\s*:/g)].map((m) => m[1]));
+  const id = keys(idBlock[1]);
   const en = keys(enBlock[1]);
-  const missing = en.filter((k) => !id.has(k));
-  if (missing.length) fail('i18n missing in T.id: ' + missing.join(', '));
-  else ok(`i18n parity (${en.length} keys EN↔ID)`);
+  const onlyEn = [...en].filter((k) => !id.has(k));
+  const onlyId = [...id].filter((k) => !en.has(k));
+  // Coverage: every HTML data-i18n attribute and every static tt('key') call must resolve.
+  const html = readFileSync('index.html', 'utf8');
+  const attrs = [...new Set([...html.matchAll(/data-i18n(?:-[\w-]+)?\s*=\s*"([^"]+)"/g)].map((m) => m[1]))];
+  const badAttrs = attrs.filter((k) => !id.has(k) || !en.has(k));
+  const badCalls = [];
+  for (const f of ['js/home.js', 'js/game.js', 'js/supabase.js', 'js/prologue.js']) {
+    const js = readFileSync(f, 'utf8');
+    const calls = [...new Set([...js.matchAll(/\btt\(\s*['"]([A-Za-z0-9_]+)['"]\s*[,)]/g)].map((m) => m[1]))];
+    calls.filter((k) => !id.has(k) || !en.has(k)).forEach((k) => badCalls.push(f + ':' + k));
+  }
+  const problems = [
+    ...(onlyEn.length ? ['EN-only keys: ' + onlyEn.join(', ')] : []),
+    ...(onlyId.length ? ['ID-only keys: ' + onlyId.join(', ')] : []),
+    ...(badAttrs.length ? ['data-i18n unresolved: ' + badAttrs.join(', ')] : []),
+    ...(badCalls.length ? ['tt() unresolved: ' + badCalls.join(', ')] : []),
+  ];
+  if (problems.length) fail('i18n: ' + problems.join(' | '));
+  else ok(`i18n parity+coverage (${en.size} keys/locale, ${attrs.length} data-i18n, all tt() resolved)`);
 } catch (e) { fail('i18n check: ' + e.message); }
 
 // 4) secret scan

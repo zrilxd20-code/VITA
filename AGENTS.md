@@ -24,7 +24,7 @@ vita/
 ├── package.json        # Script Node stdlib: dev/check/test/icons/bump
 ├── tools/              # Tooling Node tanpa dependency (serve/check/gen-icons/bump)
 │   ├── serve.mjs       # Dev server statis http (wajib untuk SW/PWA)
-│   ├── check.mjs       # Cek sintaks + scope global + parity i18n + secret scan
+│   ├── check.mjs       # Cek sintaks + scope global + parity & cakupan i18n + secret scan
 │   ├── gen-icons.mjs   # Generator ikon PWA reproducible (fs+zlib saja)
 │   └── bump-version.mjs# Sinkron versi rilis satu perintah
 ├── css/
@@ -133,5 +133,5 @@ vita/
   npm run check
   npm test
   ```
-  (`check.mjs`: sintaks + scope global gabungan + parity i18n + secret scan; `test_web_security_qa.js`: 9 modul audit QA/security/BFS/a11y).
+  (`check.mjs`: sintaks + scope global gabungan + parity & cakupan i18n + secret scan; `test_web_security_qa.js`: 10 modul audit QA/security/BFS/a11y).
 

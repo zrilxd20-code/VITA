@@ -79,7 +79,7 @@ Or any static server (`npx serve .`, `python -m http.server 8000`).
 ### Node Tooling (stdlib only, zero install)
 
 ```powershell
-npm run check   # syntax + global-scope + i18n parity + secret scan
+npm run check   # syntax + global-scope + i18n parity & coverage + secret scan
 npm test        # web security & input validation audit
 npm run icons   # regenerate PWA icons (pure Node, reproducible)
 npm run bump -- 2.1.0  # sync version.json, sw.js, index.html, APP_VERSION
@@ -99,7 +99,7 @@ vita/
 ├── package.json            # Node scripts (dev/check/test/icons/bump, stdlib only)
 ├── tools/                  # Node stdlib tooling (serve, check, gen-icons, bump-version)
 │   ├── serve.mjs           # Static dev server (http, no-store version.json)
-│   ├── check.mjs           # Syntax + scope + i18n parity + secret scan
+│   ├── check.mjs           # Syntax + scope + i18n parity & coverage + secret scan
 │   ├── gen-icons.mjs       # Reproducible PWA icon generator (fs+zlib only)
 │   └── bump-version.mjs    # Single-command release version sync
 ├── css/
