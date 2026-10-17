@@ -1068,8 +1068,11 @@ function applyBrightness(val) {
     if (canvas) canvas.style.filter = `brightness(${factor})`;
     const minimap = document.getElementById('minimap');
     if (minimap) minimap.style.filter = `brightness(${factor})`;
-    const emberCanvas = document.getElementById('emberCanvas');
-    if (emberCanvas) emberCanvas.style.filter = `brightness(${factor})`;
+    // Ambience Hub (homeView) ikut meredup/terang lewat satu CSS custom property,
+    // supaya lapisan latar tetap mempertahankan filter blur()-nya masing-masing.
+    // (Dulu baris ini menargetkan id '#emberCanvas' yang tidak pernah ada.)
+    const homeView = document.getElementById('homeView');
+    if (homeView) homeView.style.setProperty('--hub-bright', factor);
 
     const gBri = document.getElementById('gBrightness');
     if (gBri && Number(gBri.value) !== settings.brightness) gBri.value = settings.brightness;

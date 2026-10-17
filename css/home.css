@@ -30,7 +30,9 @@ body {
     position: fixed;
     inset: 0;
     z-index: -3;
-    filter: blur(90px);
+    /* brightness() dirantai setelah blur() supaya slider Kecerahan Hub
+       tidak menghapus efek blur. Nilai --hub-bright di-set dari applyBrightness(). */
+    filter: blur(90px) brightness(var(--hub-bright, 1));
     opacity: 0.5;
   }
 #homeView .blob {
@@ -56,7 +58,7 @@ body {
       radial-gradient(ellipse 60% 45% at 25% 40%, rgba(120, 40, 30, 0.22), transparent 70%),
       radial-gradient(ellipse 55% 40% at 75% 65%, rgba(90, 25, 35, 0.18), transparent 70%);
     animation: fogDrift 26s ease-in-out infinite alternate;
-    filter: blur(28px);
+    filter: blur(28px) brightness(var(--hub-bright, 1));
   }
 @keyframes fogDrift {
     from { transform: translate(-6%, -2%) scale(1.05); opacity: 0.55; }
@@ -67,6 +69,7 @@ body {
     position: fixed;
     inset: 0;
     z-index: -1;
+    filter: brightness(var(--hub-bright, 1));
   }
 #homeView /* Jejak kisi terminal tua */
   .grid-overlay {
@@ -79,6 +82,7 @@ body {
     background-size: 48px 48px;
     mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.9), rgba(0,0,0,0.25));
     -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.9), rgba(0,0,0,0.25));
+    filter: brightness(var(--hub-bright, 1));
   }
 #homeView /* Lapisan CRT */
   .scanlines {

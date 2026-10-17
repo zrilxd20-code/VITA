@@ -1,7 +1,8 @@
 /**
  * Web Security & QA Automated Test Suite for VITA
  * Menguji keamanan sanitasi XSS, validasi input callsign, URL avatar, proteksi data localStorage rusak,
- * integritas level web, verifikasi schema Supabase RPC, dan konektivitas labirin anti-softlock.
+ * integritas level web, verifikasi schema Supabase RPC, konektivitas labirin anti-softlock,
+ * serta regresi kontrol kecerahan (applyBrightness) Hub.
  */
 
 const fs = require('fs');
@@ -196,6 +197,30 @@ assert(reachesBoss, 'Sektor 15 harus memiliki jalur terbuka dari spawn ke arena 
 
 console.log('✓ TEST 7 LULUS: Konektivitas labirin terverifikasi bebas softlock melalui pencarian jalur BFS.');
 
+// TEST 8: Regresi Kecerahan Hub (bug: applyBrightness menarget id hantu #emberCanvas,
+// sehingga slider Kecerahan tidak berefek di Hub). Ambience Hub kini digerakkan lewat
+// CSS custom property --hub-bright tanpa menghapus filter blur() milik tiap lapisan.
+console.log('\n[TEST 8] Pengujian Regresi Kecerahan Hub (applyBrightness)...');
+const homeCss = fs.readFileSync(path.join(__dirname, '../css/home.css'), 'utf8');
+const briMatch = gameJs.match(/function applyBrightness\([^)]*\)\s*\{[\s\S]*?\n\}/);
+assert(briMatch, 'CRITICAL: Fungsi applyBrightness tidak ditemukan di js/game.js');
+const briBody = briMatch[0];
+
+assert(!/getElementById\(\s*['"]emberCanvas['"]\s*\)/.test(briBody), 'Regresi: applyBrightness kembali menarget id hantu #emberCanvas');
+assert(!/getElementById\(\s*['"]emberCanvas['"]\s*\)/.test(gameJs), 'Referensi id hantu #emberCanvas masih tersisa di js/game.js');
+assert(/setProperty\(\s*['"]--hub-bright['"]/.test(briBody), 'applyBrightness harus menyetel CSS variable --hub-bright untuk ambience Hub');
+
+assert(/\.bg-blobs\s*\{[^}]*blur\(90px\)\s*brightness\(var\(--hub-bright, 1\)\)/.test(homeCss),
+  '.bg-blobs harus merantai blur(90px) dengan brightness(var(--hub-bright)) agar blur tidak hilang');
+assert(/\.fog\s*\{[^}]*blur\(28px\)\s*brightness\(var\(--hub-bright, 1\)\)/.test(homeCss),
+  '.fog harus merantai blur(28px) dengan brightness(var(--hub-bright)) agar blur tidak hilang');
+assert(/#embers\s*\{[^}]*filter:\s*brightness\(var\(--hub-bright, 1\)\)/.test(homeCss),
+  '#embers harus memakai brightness(var(--hub-bright))');
+assert(/\.grid-overlay\s*\{[^}]*brightness\(var\(--hub-bright, 1\)\)/.test(homeCss),
+  '.grid-overlay harus memakai brightness(var(--hub-bright))');
+
+console.log('✓ TEST 8 LULUS: Slider Kecerahan menggerakkan ambience Hub tanpa menghapus efek blur.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (7/7)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (8/8)');
 console.log('=========================================');

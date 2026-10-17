@@ -1,15 +1,3 @@
-const GAMES = [
-  {
-    name: 'VITA',
-    subtitle: 'Forgotten Sector — Web Edition',
-    type: 'web',
-    badge: 'Browser',
-    desc: 'Survive 15 labyrinth sectors, salvage biomass artifacts, evade anomalies, and neutralize the Final Boss.',
-    tags: ['15 Sectors', 'Horror Roguelite', 'Boss Fights'],
-    colors: ['#ff3b3b', '#7a0c0c', '#ff8a3d']
-  }
-];
-
 const emberCanvas = document.getElementById('embers');
 const emberCtx = emberCanvas.getContext('2d');
 let EW, EH, embers = [];
@@ -91,27 +79,6 @@ function drawEmbers(now) {
   requestAnimationFrame(drawEmbers);
 }
 requestAnimationFrame(drawEmbers);
-
-function gameSVG(color1, color2, icon) {
-  const maze = `<path d="M12 3H4v8h4V7h4V3zm6 0h-4v4h4V3zM8 9h4v4H8V9zm0 8H4v4h4v-4zm8-8h4v4h-4V9zm-4 8h4v4h-4v-4zm4-8h-4v4h4v-4zm8-4h-4v4h4V5z" fill="none" stroke="${color1}" stroke-width="1.6" stroke-linejoin="round" opacity="0.6"/>`;
-  const tide = `M22 12c-2-3-4-3-6 0s-4 3-6 0-4-3-6 0v6a2 2 0 0 1 2 2h18a2 2 0 0 1 2-2v-6" fill="none" stroke="${color2}" stroke-width="1.8" stroke-linecap="round"/>`;
-  const sword = `<path d="M3 21l6-6M9 9l6-6m-10 1l2.5-2.5L15 3l6 6-1.5 7.5L17 19l-6-6m0 0l-6 6" fill="none" stroke="${color2}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
-  const comp = `<rect x="3" y="5" width="18" height="13" rx="2.5" fill="none" stroke="${color2}" stroke-width="1.7"/><path d="M9 21h6M12 18v3" stroke="${color2}" stroke-width="1.7" stroke-linecap="round"/>`;
-  const iconPath = icon === 'tide' ? tide : (icon === 'sword' ? sword : comp);
-  return `<svg viewBox="0 0 24 24" fill="none">${maze}${iconPath}</svg>`;
-}
-
-function makeTilt(el) {
-  const strength = 8;
-  el.addEventListener('mousemove', e => {
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width;
-    const y = (e.clientY - r.top) / r.height;
-    el.style.transform =
-      `rotateX(${(0.5 - y) * strength}deg) rotateY(${(x - 0.5) * strength}deg) translateY(-4px)`;
-  });
-  el.addEventListener('mouseleave', () => { el.style.transform = ''; });
-}
 
 function openModal(name, desc, cmd, req) {
   document.getElementById('modalTitle').textContent = name;
@@ -273,51 +240,6 @@ function drawTeasers(now) {
       }
     }
   }
-}
-
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, c => (
-    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-function buildGrid() {
-  const grid = document.getElementById('grid');
-  grid.innerHTML = GAMES.map((g, i) => {
-    const icon = g.subtitle.indexOf('Tide') >= 0 ? 'tide' : (g.subtitle.indexOf('RPG') >= 0 || g.type === 'http' ? 'sword' : 'comp');
-    const cardIcon = g.type === 'web' ? (icon === 'tide' ? 'tide' : 'sword') : 'comp';
-    const [c1, c2] = g.colors;
-    const isWeb = g.type === 'web';
-    const btn = isWeb
-      ? `<button class="btn" style="--b1:${c1};--b2:${c2}" onclick="playWebGame()">▶ DEPLOY OPERATIVE</button>`
-      : `<button class="btn ghost desktop-btn" data-file="${g.file}">▶ Launch Guide</button>`;
-    const tags = g.tags.map(t => `<span class="tag ${t === 'Pygame' || t === '3 Level' ? '' : 'on'}">${esc(t)}</span>`).join('');
-    return `
-      <section class="card" data-i="${i}" style="--strip:${c1};--thumb-bg:linear-gradient(135deg, ${c1}22, ${c2}22)">
-        <div class="thumb">
-          <span class="plays-badge" style="color:${c1}">${esc(g.badge)}</span>
-          ${gameSVG(c1, c2, cardIcon)}
-        </div>
-        <h2>${esc(g.name)}</h2>
-        <p class="desc">${esc(g.desc)}</p>
-        <div class="tags">${tags}</div>
-        ${btn}
-      </section>`;
-  }).join('');
-
-  document.querySelectorAll('.card').forEach(c => makeTilt(c));
-  document.querySelectorAll('.desktop-btn').forEach(b => {
-    b.addEventListener('click', () => {
-      const file = b.dataset.file;
-      const g = GAMES.find(x => x.file === file);
-      if (!g) return;
-      openModal(
-        g.name,
-        'This edition runs natively from your terminal using Python and Pygame.',
-        `.venv\\Scripts\\python.exe ${file}`,
-        'Ensure the .venv virtual environment is activated and pygame-ce is installed.'
-      );
-    });
-  });
 }
 
 const HOME_SETTINGS_KEY = 'vita_save';
@@ -2244,7 +2166,7 @@ try {
           }
         })
         .catch(err => {
-          console.log('SW registration skipped:', err);
+          console.warn('SW registration skipped:', err);
         });
     });
 

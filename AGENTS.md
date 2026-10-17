@@ -37,7 +37,7 @@ vita/
 │   ├── supabase.js     # REST client Supabase (tanpa hardcoded key; config di localStorage)
 │   ├── game.js         # Logika game (10.000+ baris: canvas render, BFS AI, WebAudio, sentuh)
 │   └── modules/        # [Eksperimental/Roadmap] Modul TypeScript terpisah (persiapan refactoring)
-├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: XSS, avatar, BFS anti-softlock, RPC)
+├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: XSS, avatar, BFS anti-softlock, RPC, regresi kecerahan Hub)
 ├── AGENTS.md           # [Berkas Ini] Panduan sistem & aturan khusus untuk AI Agent
 └── README.md           # Dokumentasi proyek untuk pengembang & pemain
 ```
