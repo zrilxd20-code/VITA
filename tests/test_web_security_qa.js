@@ -5,7 +5,8 @@
  * regresi kontrol kecerahan (applyBrightness) Hub, aksesibilitas dialog (ARIA + focus trap),
  * aksesibilitas keyboard kontrol non-native (role="button"),
  * kelengkapan i18n modal mode perangkat & pil mode layar mulai,
- * serta kinerja loop Hub (cache DOM per frame) & penghormatan prefers-reduced-motion pada animasi JS.
+ * kinerja loop Hub (cache DOM per frame) & penghormatan prefers-reduced-motion pada animasi JS,
+ * serta live region status async Hub (role="status", WCAG 4.1.3).
  */
 
 const fs = require('fs');
@@ -305,6 +306,21 @@ assert(/!HOME_REDUCE_MOTION[\s\S]{0,120}requestAnimationFrame\(vita2PulseFoes\)/
   'Pulse bestiary harus dilewati saat prefers-reduced-motion aktif');
 console.log('✓ TEST 12 LULUS: Loop Hub tidak query DOM tiap frame & menghormati prefers-reduced-motion.');
 
+// TEST 13: Status async Hub diumumkan ke pembaca layar (WCAG 4.1.3 Status Messages).
+// Regresi: tag uplink Supabase (#supabaseStatusTag) dan status DB profil (#profileDbStatus)
+// berubah teks secara dinamis (STANDBY → LINKING... → UPLINK ACTIVE / LINK FAILED) tanpa
+// aria-live, sehingga pembaca layar tidak mengumumkan hasil operasi jaringan.
+console.log('\n[TEST 13] Pengujian Live Region Status Async Hub (WCAG 4.1.3)...');
+['supabaseStatusTag', 'profileDbStatus'].forEach(function (id) {
+  const re = new RegExp(`id="${id}"[^>]*\\brole="status"`);
+  assert(re.test(indexHtml), `#${id} harus ber-role="status" agar perubahan status diumumkan pembaca layar`);
+});
+assert(/getElementById\(\s*['"]supabaseStatusTag['"]\s*\)/.test(homeJs) && /textContent\s*=\s*['"]LINKING\.\.\.['"]/.test(homeJs),
+  'Alur uplink harus memperbarui teks #supabaseStatusTag (target live region)');
+assert(/getElementById\(\s*['"]profileDbStatus['"]\s*\)/.test(homeJs),
+  'Status DB profil harus diperbarui JS (target live region)');
+console.log('✓ TEST 13 LULUS: Status async Hub memiliki live region (role="status").');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (12/12)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (13/13)');
 console.log('=========================================');

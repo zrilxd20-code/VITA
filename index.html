@@ -315,7 +315,7 @@
               <svg class="tele-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.03 1.35 5.75 3.5 7.6V22h13v-2.4c2.15-1.85 3.5-4.57 3.5-7.6 0-5.52-4.48-10-10-10zm-3 12c-.83 0-1.5-.67-1.5-1.5S8.17 11 9 11s1.5.67 1.5 1.5S9.83 14 9 14zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
               DB:
             </span>
-            <span class="tele-val" id="profileDbStatus">Local Encrypted</span>
+            <span class="tele-val" id="profileDbStatus" role="status">Local Encrypted</span>
           </div>
         </div>
       </div>
@@ -541,7 +541,7 @@
         <input type="password" id="sbKeyInput" value="" placeholder="Paste access key — stored only in this terminal" autocomplete="off" spellcheck="false">
       </div>
       <div style="margin-top:12px">
-        <span class="supabase-status-tag" id="supabaseStatusTag">STANDBY</span>
+        <span class="supabase-status-tag" id="supabaseStatusTag" role="status">STANDBY</span>
       </div>
       <div class="profile-actions-row" style="margin-top:16px">
         <button class="btn" type="button" onclick="handleConnectSupabase()">

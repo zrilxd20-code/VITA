@@ -41,7 +41,7 @@ vita/
 │   └── modules/        # [Eksperimental/Roadmap] Modul TypeScript terpisah (persiapan refactoring)
 ├── script.md           # Naskah cerita, karakter, dan dialog (kanon narasi — jangan diubah tanpa izin)
 ├── supabase_schema.sql # Skema PostgreSQL, check constraint, dan kebijakan RLS
-├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 12 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion)
+├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 13 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion, live region status async)
 ├── AGENTS.md           # [Berkas Ini] Panduan sistem & aturan khusus untuk AI Agent
 └── README.md           # Dokumentasi proyek untuk pengembang & pemain
 ```
@@ -144,5 +144,5 @@ vita/
   npm run check
   npm test
   ```
-  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 12 modul audit QA/security/BFS/a11y/perf).
+  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 13 modul audit QA/security/BFS/a11y/perf).
 
