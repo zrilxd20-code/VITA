@@ -64,25 +64,39 @@
 
   <div class="logo">BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; TIDE LABYRINTH SECTOR</div>
   <h1 class="title">VITA</h1>
-  <p class="tagline">MAZE OF THE TIDE // <b>FORGOTTEN SECTOR</b></p>
-  <p class="ambient">BIOLOGICAL SENSOR ANOMALY: UNSTABLE // PROCEED WITH CAUTION</p>
+  <p class="tagline">MAZE OF THE TIDE &bull; <b>FORGOTTEN SECTOR</b></p>
+  <p class="ambient">BIOLOGICAL SENSOR ANOMALY: UNSTABLE &bull; PROCEED WITH CAUTION</p>
   <div class="divider"></div>
 
   <!-- Big Play Button Area -->
   <div class="hero-play-box">
-    <button class="btn btn-hero-play" id="btnHeroPlay" type="button" onclick="playWebGame()">
+    <button class="btn btn-hero-play" id="btnHeroPlay" type="button" onclick="playWebGame(false)">
       <svg class="btn-icon play-icon-lg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       <span>ENTER THE LABYRINTH &mdash; PLAY NOW</span>
     </button>
-    <button class="btn btn-hero-sub" type="button" onclick="openControlsModal()">
-      <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 3.79 2 6v12c0 2.21 4.48 4 10 4s10-1.79 10-4V6c0-2.21-4.48-4-10-4zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-      <span>Field Manual — How to Play</span>
-    </button>
+    <div class="hero-quick-row">
+      <button class="btn btn-hero-sub" type="button" onclick="openProfileModal()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span>Profil Operatif</span>
+      </button>
+      <button class="btn btn-hero-sub" type="button" onclick="openSettingsModal()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <span>Pengaturan</span>
+      </button>
+      <button class="btn btn-hero-sub" type="button" onclick="openLeaderboardModal()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H8v2h8v-2h-3v-3.1c1.94-.37 3.51-1.84 4.09-3.96C19.38 11.63 21 9.55 21 7V5c0-1.1-.9-2-2-2z"/></svg>
+        <span>Papan Peringkat</span>
+      </button>
+      <button class="btn btn-hero-sub" type="button" onclick="openControlsModal()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 3.79 2 6v12c0 2.21 4.48 4 10 4s10-1.79 10-4V6c0-2.21-4.48-4-10-4zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span>Panduan</span>
+      </button>
+    </div>
   </div>
 
   <!-- Monster & Maze Bestiary Showcase -->
   <section class="teaser">
-    <p class="teaser-eyebrow">// predator sensor archive &mdash; labyrinth motion tracking</p>
+    <p class="teaser-eyebrow">PREDATOR SENSOR ARCHIVE &mdash; LABYRINTH MOTION TRACKING</p>
     <div class="teaser-row">
       <figure class="foe">
         <div class="foe-header">
@@ -125,7 +139,7 @@
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 <aside class="sidebar-drawer" id="sidebarDrawer">
   <div class="sidebar-drawer-header">
-    <span class="sidebar-drawer-title">OPERATIVE TERMINAL // MENU</span>
+    <span class="sidebar-drawer-title">OPERATIVE TERMINAL &bull; MENU</span>
     <button class="btn-sidebar-close" type="button" onclick="closeSidebar()" title="Close Menu">✕</button>
   </div>
 
@@ -138,7 +152,7 @@
     <div class="sidebar-user-meta">
       <div class="sidebar-user-name" id="sidebarUserName">OPERATIVE-77</div>
       <div class="sidebar-user-role" id="sidebarUserRole">Field Operative</div>
-      <span class="sidebar-user-status" id="sidebarUserStatus">GUEST // LOCAL</span>
+      <span class="sidebar-user-status" id="sidebarUserStatus">GUEST &bull; LOCAL</span>
     </div>
     <div class="sidebar-user-actions">
       <button class="btn-micro" id="btnSwitchAccount" type="button" onclick="openAuthModal('login')" title="Log in or create a new operative account">LOGIN / REGISTER</button>
@@ -167,16 +181,6 @@
       <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 3.79 2 6v12c0 2.21 4.48 4 10 4s10-1.79 10-4V6c0-2.21-4.48-4-10-4zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
       <span>Field Manual &amp; Info</span>
     </button>
-
-    <button class="sidebar-nav-item" id="tabBtnDatabase" type="button" onclick="openDatabaseModal()">
-      <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 3.79 2 6v12c0 2.21 4.48 4 10 4s10-1.79 10-4V6c0-2.21-4.48-4-10-4zm0 2c4.97 0 8 1.43 8 2s-3.03 2-8 2-8-1.43-8-2 3.03-2 8-2zm8 14c0 .57-3.03 2-8 2s-8-1.43-8-2v-2.23c1.89 1.37 5.03 2.23 8 2.23s6.11-.86 8-2.23V18zm0-4c0 .57-3.03 2-8 2s-8-1.43-8-2v-2.23c1.89 1.37 5.03 2.23 8 2.23s6.11-.86 8-2.23V14z"/></svg>
-      <span>Supabase Cloud DB</span>
-    </button>
-
-    <button class="sidebar-nav-item" id="tabBtnAdmin" type="button" onclick="openAdminFromHome()">
-      <svg class="btn-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 12H5v-2h6v2zm-3.5-3.5L4 9l1.5-1.5L8.5 10l-1 2.5z"/></svg>
-      <span style="color:#00f0ff;font-weight:600;">Admin &amp; Chapter Select</span>
-    </button>
   </nav>
 
   <div class="sidebar-drawer-footer">
@@ -184,11 +188,13 @@
       <span>FACILITY STATUS</span>
       <span class="system-status-dot">&bull; ONLINE</span>
     </div>
-    <div class="sidebar-system-sub">VITA CORE ENGINE v2.4 // LABYRINTH PROTOCOL</div>
+    <div class="sidebar-system-sub">VITA CORE ENGINE v2.4 &bull; LABYRINTH PROTOCOL</div>
   </div>
 
   <!-- Compatibility elements for global JS references -->
   <div id="grid" style="display:none"></div>
+  <button id="tabBtnDatabase" style="display:none"></button>
+  <button id="tabBtnAdmin" style="display:none"></button>
   <div id="tabBtnPlay" style="display:none"></div>
   <div id="operativeBadgeBar" style="display:none">
     <div id="operativeName"></div>
@@ -212,7 +218,7 @@
         <span>OPERATIVE PROFILE DOSSIER</span>
       </h3>
       <div style="display:flex;align-items:center;gap:8px">
-        <span class="auth-status-pill unverified" id="portalBadge">STATUS: GUEST // LOCAL</span>
+        <span class="auth-status-pill unverified" id="portalBadge">STATUS: GUEST &bull; LOCAL</span>
         <span class="auth-clearance-stamp" id="portalClearance">CLEARANCE: LEVEL-1</span>
         <button class="btn-sidebar-close" type="button" onclick="closeProfileModal()">✕</button>
       </div>
@@ -323,7 +329,7 @@
     <div class="modal-header-row">
       <h3>
         <svg class="btn-icon" viewBox="0 0 24 24" style="fill:#ffd700"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H8v2h8v-2h-3v-3.1c1.94-.37 3.51-1.84 4.09-3.96C19.38 11.63 21 9.55 21 7V5c0-1.1-.9-2-2-2z"/></svg>
-        <span>GLOBAL OPERATIVE LEADERBOARD // SUPABASE CLOUD</span>
+        <span>GLOBAL OPERATIVE LEADERBOARD &bull; FACILITY NETWORK</span>
       </h3>
       <div style="display:flex;align-items:center;gap:10px">
         <button class="btn-micro" type="button" onclick="renderLeaderboard()">↻ Refresh</button>
@@ -370,48 +376,48 @@
       <!-- SUARA & AUDIO -->
       <div class="settings-sec-head">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-        <span id="lblSecAudio">SUARA &amp; AUDIO</span>
+        <span id="lblSecAudio" data-i18n="settings_sec_audio">SUARA &amp; AUDIO</span>
       </div>
       <div class="settings-grid">
-        <label for="homeVolume">Master Volume <span id="homeVolumeVal" style="float:right;color:#00e5ff;font-weight:bold;">70%</span><input id="homeVolume" type="range" min="0" max="100"></label>
-        <label for="homeSfx">Efek Suara (SFX) <span id="homeSfxVal" style="float:right;color:#00e5ff;font-weight:bold;">80%</span><input id="homeSfx" type="range" min="0" max="100"></label>
-        <label for="homeBgm">Musik &amp; Ambience <span id="homeBgmVal" style="float:right;color:#00e5ff;font-weight:bold;">70%</span><input id="homeBgm" type="range" min="0" max="100"></label>
+        <label for="homeVolume"><span data-i18n="settings_master_vol">Master Volume</span> <span id="homeVolumeVal" style="float:right;color:#00e5ff;font-weight:bold;">70%</span><input id="homeVolume" type="range" min="0" max="100"></label>
+        <label for="homeSfx"><span data-i18n="settings_sfx_vol">Efek Suara (SFX)</span> <span id="homeSfxVal" style="float:right;color:#00e5ff;font-weight:bold;">80%</span><input id="homeSfx" type="range" min="0" max="100"></label>
+        <label for="homeBgm"><span data-i18n="settings_bgm_vol">Musik &amp; Suasana</span> <span id="homeBgmVal" style="float:right;color:#00e5ff;font-weight:bold;">70%</span><input id="homeBgm" type="range" min="0" max="100"></label>
         <label class="settings-check-row" for="homeMuted">
           <input type="checkbox" id="homeMuted">
-          <span id="lblHomeMute">Bisukan Semua Suara (Mute)</span>
+          <span id="lblHomeMute" data-i18n="settings_mute">Bisukan Semua Suara</span>
         </label>
       </div>
 
       <!-- KONTROL & TATA LETAK -->
       <div class="settings-sec-head">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S20.17 9 21 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-        <span id="lblSecControls">KONTROL &amp; TATA LETAK</span>
+        <span id="lblSecControls" data-i18n="settings_sec_controls">KONTROL &amp; TATA LETAK</span>
       </div>
       <div class="settings-grid">
-        <label for="homeDeviceMode">Mode Perangkat
+        <label for="homeDeviceMode"><span data-i18n="settings_device_mode">Mode Perangkat</span>
           <select id="homeDeviceMode">
-            <option value="ask">Tanyakan Setiap Masuk</option>
-            <option value="pc">PC / Desktop (Keyboard &amp; Mouse)</option>
-            <option value="mobile">HP / Tablet (Layar Sentuh)</option>
+            <option value="ask" data-i18n="settings_dev_ask">Tanyakan Setiap Masuk</option>
+            <option value="pc" data-i18n="settings_dev_pc">PC / Desktop (Keyboard &amp; Mouse)</option>
+            <option value="mobile" data-i18n="settings_dev_mobile">HP / Tablet (Layar Sentuh)</option>
           </select>
         </label>
         <label class="settings-check-row" for="homeAutoAim">
           <input type="checkbox" id="homeAutoAim" checked>
-          <span id="lblHomeAutoAim">Bantuan Bidik Sentuh (Auto-Aim)</span>
+          <span id="lblHomeAutoAim" data-i18n="settings_auto_aim">Bantuan Bidik Sentuh (Auto-Aim)</span>
         </label>
         <label class="settings-check-row" for="homeHaptic">
           <input type="checkbox" id="homeHaptic" checked>
-          <span id="lblHomeHaptic">Getaran Haptik HP (Vibration)</span>
+          <span id="lblHomeHaptic" data-i18n="settings_haptic">Getaran Haptik HP (Vibration)</span>
         </label>
-        <label for="homeTouchScale">Ukuran Tombol HP <span id="homeTouchScaleVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="homeTouchScale" type="range" min="70" max="140" step="5" value="100"></label>
-        <label for="homeTouchOpacity">Transparansi Tombol <span id="homeTouchOpacityVal" style="float:right;color:#00e5ff;font-weight:bold;">85%</span><input id="homeTouchOpacity" type="range" min="30" max="100" step="5" value="85"></label>
+        <label for="homeTouchScale"><span data-i18n="settings_touch_scale">Ukuran Tombol HP</span> <span id="homeTouchScaleVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="homeTouchScale" type="range" min="70" max="140" step="5" value="100"></label>
+        <label for="homeTouchOpacity"><span data-i18n="settings_touch_opacity">Transparansi Tombol</span> <span id="homeTouchOpacityVal" style="float:right;color:#00e5ff;font-weight:bold;">85%</span><input id="homeTouchOpacity" type="range" min="30" max="100" step="5" value="85"></label>
         <div class="settings-actions-span">
           <button class="btn secondary" type="button" onclick="openTouchLayoutEditor()">
             <svg class="btn-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
-            <span id="lblBtnEditLayout">📐 Atur Letak Tombol HP</span>
+            <span id="lblBtnEditLayout" data-i18n="settings_btn_edit_layout">Atur Letak Tombol HP</span>
           </button>
           <button class="btn secondary" type="button" onclick="resetTouchLayout()">
-            <span id="lblBtnResetLayout">🔄 Reset Tombol Default</span>
+            <span id="lblBtnResetLayout" data-i18n="settings_btn_reset_layout">Kembalikan Tombol Bawaan</span>
           </button>
         </div>
       </div>
@@ -419,42 +425,42 @@
       <!-- TAMPILAN & GRAFIS -->
       <div class="settings-sec-head">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>
-        <span id="lblSecDisplay">TAMPILAN &amp; GRAFIS</span>
+        <span id="lblSecDisplay" data-i18n="settings_sec_display">TAMPILAN &amp; GRAFIS</span>
       </div>
       <div class="settings-grid">
-        <label for="homeBrightness">Kecerahan Obor (Torch) <span id="homeBrightnessVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="homeBrightness" type="range" min="30" max="180"></label>
-        <label for="homeQuality">Gaya Visual Pixel
+        <label for="homeBrightness"><span data-i18n="settings_torch_bright">Kecerahan Obor (Torch)</span> <span id="homeBrightnessVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="homeBrightness" type="range" min="30" max="180"></label>
+        <label for="homeQuality"><span data-i18n="settings_visual_style">Gaya Visual Pixel</span>
           <select id="homeQuality"><option value="smooth">Smooth</option><option value="retro">Retro CRT</option><option value="chunky">Chunky Pixel</option></select>
         </label>
         <label class="settings-check-row" for="homeScreenShake">
           <input type="checkbox" id="homeScreenShake" checked>
-          <span id="lblHomeScreenShake">Goyangan Layar (Screen Shake)</span>
+          <span id="lblHomeScreenShake" data-i18n="settings_screen_shake">Goyangan Layar (Screen Shake)</span>
         </label>
         <label class="settings-check-row" for="homeMinimap">
           <input type="checkbox" id="homeMinimap" checked>
-          <span id="lblHomeMinimap">Tampilkan Radar Mini-map</span>
+          <span id="lblHomeMinimap" data-i18n="settings_minimap">Tampilkan Radar Mini-map</span>
         </label>
         <label class="settings-check-row" for="homeShowFps">
           <input type="checkbox" id="homeShowFps">
-          <span id="lblHomeShowFps">Tampilkan Indikator FPS</span>
+          <span id="lblHomeShowFps" data-i18n="settings_show_fps">Tampilkan Indikator FPS</span>
         </label>
       </div>
 
       <!-- GAMEPLAY & SISTEM -->
       <div class="settings-sec-head">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        <span id="lblSecGameplay">GAMEPLAY &amp; SISTEM</span>
+        <span id="lblSecGameplay" data-i18n="settings_sec_gameplay">GAMEPLAY &amp; SISTEM</span>
       </div>
       <div class="settings-grid">
-        <label for="homeLanguage">Interface Language
+        <label for="homeLanguage"><span data-i18n="settings_interface_lang">Interface Language</span>
           <select id="homeLanguage"><option value="en">English</option><option value="id">Indonesia</option></select>
         </label>
-        <label for="homeDifficulty">Difficulty Level
+        <label for="homeDifficulty"><span data-i18n="settings_diff_level">Difficulty Level</span>
           <select id="homeDifficulty"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hardcore</option></select>
         </label>
         <div style="grid-column:1/-1;margin-top:6px;">
           <button class="btn-micro danger" type="button" onclick="resetAllSettingsToDefault()" style="width:100%;padding:8px 12px;font-size:12px;cursor:pointer;">
-            ⚠️ RESET SEMUA PENGATURAN KE DEFAULT
+            <span data-i18n="settings_reset_default">KEMBALIKAN PENGATURAN KE BAWAAN</span>
           </button>
         </div>
       </div>
@@ -476,7 +482,7 @@
     <div class="device-choices-grid">
       <!-- Card PC -->
       <div class="device-choice-card" id="deviceChoicePc" onclick="selectDeviceChoice('pc')">
-        <div class="device-choice-icon">💻</div>
+        <div class="device-choice-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg></div>
         <div class="device-choice-body">
           <div class="device-choice-head">
             <h4 id="devicePcTitle">PC / DESKTOP (KEYBOARD &amp; MOUSE)</h4>
@@ -488,7 +494,7 @@
       </div>
       <!-- Card Mobile -->
       <div class="device-choice-card" id="deviceChoiceMobile" onclick="selectDeviceChoice('mobile')">
-        <div class="device-choice-icon">📱</div>
+        <div class="device-choice-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg></div>
         <div class="device-choice-body">
           <div class="device-choice-head">
             <h4 id="deviceMobileTitle">HP / TABLET (LAYAR SENTUH)</h4>
@@ -506,44 +512,44 @@
       </label>
       <div class="device-action-row">
         <button class="btn" id="btnLaunchWithDevice" type="button" onclick="confirmDeviceChoiceAndPlay()">
-          <span id="deviceBtnEnter">MASUK KE MISI ➔</span>
+          <span id="deviceBtnEnter">MASUK KE MISI</span>
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL 4: SUPABASE CLOUD DATABASE CONFIG -->
+<!-- MODAL 4: FACILITY NETWORK UPLINK CONFIG -->
 <div class="modal-backdrop" id="databaseModal">
   <div class="modal">
     <div class="modal-header-row">
       <h3>
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 3.79 2 6v12c0 2.21 4.48 4 10 4s10-1.79 10-4V6c0-2.21-4.48-4-10-4zm0 2c4.97 0 8 1.43 8 2s-3.03 2-8 2-8-1.43-8-2 3.03-2 8-2zm8 14c0 .57-3.03 2-8 2s-8-1.43-8-2v-2.23c1.89 1.37 5.03 2.23 8 2.23s6.11-.86 8-2.23V18zm0-4c0 .57-3.03 2-8 2s-8-1.43-8-2v-2.23c1.89 1.37 5.03 2.23 8 2.23s6.11-.86 8-2.23V14z"/></svg>
-        <span>SUPABASE CLOUD DATABASE</span>
+        <span>FACILITY NETWORK UPLINK</span>
       </h3>
       <button class="btn-sidebar-close" type="button" onclick="closeDatabaseModal()">✕</button>
     </div>
     <div class="supabase-config-panel" style="padding:0">
-      <p class="supabase-hint" style="margin-top:0">Connect this game to your Supabase PostgreSQL cloud database to synchronize global leaderboards and operative accounts.</p>
+      <p class="supabase-hint" style="margin-top:0">Link this terminal to the facility network to synchronize global leaderboards and operative dossiers across all sectors.</p>
 
       <div class="profile-form-group">
-        <label for="sbUrlInput">Supabase Project URL:</label>
-        <input type="text" id="sbUrlInput" value="" placeholder="https://your-project.supabase.co" autocomplete="off" spellcheck="false">
+        <label for="sbUrlInput">Facility Uplink URL:</label>
+        <input type="text" id="sbUrlInput" value="" placeholder="https://your-facility-uplink.local" autocomplete="off" spellcheck="false">
       </div>
       <div class="profile-form-group" style="margin-top:10px">
-        <label for="sbKeyInput">Supabase Public Anon Key:</label>
-        <input type="password" id="sbKeyInput" value="" placeholder="Paste anon key — stored only in this browser" autocomplete="off" spellcheck="false">
+        <label for="sbKeyInput">Uplink Access Key:</label>
+        <input type="password" id="sbKeyInput" value="" placeholder="Paste access key — stored only in this terminal" autocomplete="off" spellcheck="false">
       </div>
       <div style="margin-top:12px">
-        <span class="supabase-status-tag" id="supabaseStatusTag">NOT CONNECTED</span>
+        <span class="supabase-status-tag" id="supabaseStatusTag">STANDBY</span>
       </div>
       <div class="profile-actions-row" style="margin-top:16px">
         <button class="btn" type="button" onclick="handleConnectSupabase()">
           <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span>Connect Database</span>
+          <span>Establish Uplink</span>
         </button>
         <button class="btn secondary" type="button" onclick="handleDisconnectSupabase()">
-          Disconnect
+          Cut Uplink
         </button>
       </div>
     </div>
@@ -562,7 +568,7 @@
 </div>
 
 <footer>
-  <b>VITA</b> &mdash; TIDE LABYRINTH BIOLOGICAL RESEARCH FACILITY &bull; WEB EDITION v2.0 &bull; 100% STANDALONE OFFLINE READY
+  <b>VITA</b> &mdash; TIDE LABYRINTH BIOLOGICAL RESEARCH FACILITY &bull; WEB EDITION v2.4 &bull; 100% STANDALONE OFFLINE READY
 </footer>
 </div>
 <div id="gameView" style="display:none">
@@ -597,7 +603,7 @@
 <!-- CINEMATIC BOSS HUD (TOP CENTER) -->
 <div id="bossHud" class="boss-hud" style="display:none">
     <div class="boss-hud-header">
-        <span class="boss-hud-threat" id="bossHudThreat">⚠️ APEX PREDATOR DETECTED</span>
+        <span class="boss-hud-threat" id="bossHudThreat" data-i18n="boss_threat">PREDATOR PUNCAK TERDETEKSI</span>
         <span class="boss-hud-name" id="bossHudName">THE MONOLITH</span>
         <span class="boss-hud-phase" id="bossHudPhase">PHASE I // CORE ONLINE</span>
     </div>
@@ -628,24 +634,24 @@
   <div class="layout-editor-topbar">
     <div class="layout-editor-heading">
       <span class="layout-editor-badge">MOBILE HUD CUSTOMIZER</span>
-      <h4 id="layoutEditorTitle">📐 ATUR LETAK TOMBOL SENTUH</h4>
-      <p id="layoutEditorHint">Sentuh dan geser tombol di layar ke posisi yang paling nyaman untuk Anda.</p>
+      <h4 id="layoutEditorTitle" data-i18n="layout_editor_title">ATUR LETAK TOMBOL SENTUH</h4>
+      <p id="layoutEditorHint" data-i18n="layout_editor_hint">Geser tombol di layar ke posisi yang paling nyaman.</p>
     </div>
     <div class="layout-editor-controls">
       <div class="layout-slider-wrap">
-        <span id="lblEditorScale">Ukuran:</span>
+        <span id="lblEditorScale" data-i18n="settings_editor_scale">Ukuran:</span>
         <input type="range" id="editorScaleRange" min="70" max="140" step="5" value="100" oninput="onEditorScaleInput(this.value)">
         <span id="editorScaleVal">100%</span>
       </div>
       <div class="layout-slider-wrap">
-        <span id="lblEditorOpacity">Transparansi:</span>
+        <span id="lblEditorOpacity" data-i18n="settings_editor_opacity">Transparansi:</span>
         <input type="range" id="editorOpacityRange" min="30" max="100" step="5" value="85" oninput="onEditorOpacityInput(this.value)">
         <span id="editorOpacityVal">85%</span>
       </div>
       <div class="layout-btn-group">
-        <button class="btn-micro" type="button" onclick="resetTouchLayout(true)">🔄 DEFAULT</button>
-        <button class="btn-micro danger" type="button" onclick="cancelTouchLayoutEditor()">✕ BATAL</button>
-        <button class="btn-micro primary" type="button" onclick="saveTouchLayout()">💾 SIMPAN</button>
+        <button class="btn-micro" type="button" onclick="resetTouchLayout(true)"><span data-i18n="settings_editor_default">BAWAAN</span></button>
+        <button class="btn-micro danger" type="button" onclick="cancelTouchLayoutEditor()"><span data-i18n="settings_editor_cancel">BATAL</span></button>
+        <button class="btn-micro primary" type="button" onclick="saveTouchLayout()"><span data-i18n="settings_editor_save">SIMPAN</span></button>
       </div>
     </div>
   </div>
@@ -729,7 +735,7 @@
             <button class="tutorial-skip-btn" type="button" onclick="skipTutorial()" title="Skip tutorial">LEWATI [ESC]</button>
         </div>
         <div class="tutorial-instruction-row">
-            <div class="tutorial-icon-pulse" id="tutIcon">🕹️</div>
+            <div class="tutorial-icon-pulse" id="tutIcon">✥</div>
             <div class="tutorial-text-block">
                 <div class="tutorial-msg" id="tutMsg">Gunakan WASD / Tombol Panah / Joystick sentuh untuk menggerakkan drone BMPT</div>
                 <div class="tutorial-sub" id="tutSub">Kalibrasi roda &amp; track...</div>
@@ -761,34 +767,36 @@
         <div class="pause-stat"><span class="pause-stat-lbl">KILLS</span><span id="pauseKillsVal" class="pause-stat-val">0</span></div>
         <div class="pause-stat"><span class="pause-stat-lbl">WEAPON</span><span id="pauseLoadoutVal" class="pause-stat-val text-cyan">BLADE</span></div>
     </div>
-    <button class="btn" id="pauseResume" onclick="togglePause(false)">
-      <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      <span>RESUME</span>
-    </button>
-    <button class="btn secondary" id="pauseCodex" onclick="openCodexModal()">
-      <svg class="btn-icon" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-      <span id="pauseCodexText">CLASSIFIED ARCHIVES</span>
-    </button>
-    <button class="btn secondary" id="pauseSettings" onclick="openPauseSettings()">
-      <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-      <span id="pauseSettingsText">FACILITY SETTINGS</span>
-    </button>
-    <button class="btn secondary" id="pauseCustomizeTouchBtn" onclick="openTouchLayoutEditor()">
-      <svg class="btn-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
-      <span id="pauseCustomizeTouchText">📐 UBAH POSISI TOMBOL HP</span>
-    </button>
-    <button class="btn secondary" id="pauseAdminArsenal" onclick="openAdminArsenalModal()" style="border-color:rgba(0,229,255,0.4);color:#00e5ff;">
-      <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.14 7.25L16.75 4.86a1.996 1.996 0 0 0-2.83 0L3.29 15.5a1.996 1.996 0 0 0 0 2.83l2.39 2.39c.78.78 2.05.78 2.83 0L19.14 10.08a1.996 1.996 0 0 0 0-2.83z"/></svg>
-      <span id="pauseAdminArsenalText">⚙️ ADMIN &amp; CHAPTER JUMP [~]</span>
-    </button>
-    <button class="btn" id="pauseRestart" onclick="restartFromPause()">
-      <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-      <span>RESTART LEVEL</span>
-    </button>
-    <button class="btn" id="pauseMenu" onclick="backToMenu()">
-      <svg class="btn-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      <span>MAIN MENU</span>
-    </button>
+    <div class="pause-actions-list">
+      <button class="btn" id="pauseResume" onclick="togglePause(false)">
+        <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>RESUME</span>
+      </button>
+      <button class="btn secondary" id="pauseCodex" onclick="openCodexModal()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+        <span id="pauseCodexText">CLASSIFIED ARCHIVES</span>
+      </button>
+      <button class="btn secondary" id="pauseSettings" onclick="openPauseSettings()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <span id="pauseSettingsText">FACILITY SETTINGS</span>
+      </button>
+      <button class="btn secondary" id="pauseCustomizeTouchBtn" onclick="openTouchLayoutEditor()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+        <span id="pauseCustomizeTouchText">UBAH POSISI TOMBOL HP</span>
+      </button>
+      <button class="btn secondary" id="pauseAdminArsenal" onclick="openAdminArsenalModal()" style="border-color:rgba(0,229,255,0.4);color:#00e5ff;">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.14 7.25L16.75 4.86a1.996 1.996 0 0 0-2.83 0L3.29 15.5a1.996 1.996 0 0 0 0 2.83l2.39 2.39c.78.78 2.05.78 2.83 0L19.14 10.08a1.996 1.996 0 0 0 0-2.83z"/></svg>
+        <span id="pauseAdminArsenalText">ADMIN &amp; CHAPTER JUMP [~]</span>
+      </button>
+      <button class="btn secondary" id="pauseRestart" onclick="restartFromPause()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        <span>RESTART LEVEL</span>
+      </button>
+      <button class="btn secondary" id="pauseMenu" onclick="backToMenu()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>MAIN MENU</span>
+      </button>
+    </div>
 </div>
 
 <!-- INTER-LEVEL WEAPON SELECTION MODAL -->
@@ -811,40 +819,40 @@
 <div id="adminArsenalModal" class="modal-backdrop" style="display:none;z-index:10002;position:fixed;inset:0;background:rgba(5,7,12,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
   <div class="modal-card" style="max-width:540px;width:100%;border:1px solid rgba(0,229,255,0.45);background:rgba(10,12,20,0.96);box-shadow:0 0 35px rgba(0,229,255,0.25);border-radius:8px;padding:20px;color:#e6edf3;">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.25);padding-bottom:10px;margin-bottom:12px;">
-      <h3 style="color:#00f0ff;margin:0;font-size:16px;letter-spacing:1px;" id="adminModalTitle">⚙️ ADMIN TACTICAL ARSENAL</h3>
+      <h3 style="color:#00f0ff;margin:0;font-size:16px;letter-spacing:1px;" id="adminModalTitle" data-i18n="admin_modal_title">ADMIN TACTICAL ARSENAL</h3>
       <button class="btn-micro danger" type="button" onclick="closeAdminArsenalModal()" style="padding:4px 10px;font-size:14px;">✕</button>
     </div>
-    <p style="font-size:12px;opacity:0.8;margin-bottom:12px;" id="adminModalSub">Pilih chapter/sektor atau perlengkapan untuk langsung diuji coba:</p>
+    <p style="font-size:12px;opacity:0.8;margin-bottom:12px;" id="adminModalSub" data-i18n="admin_modal_sub">Jump to any sector or requisition test equipment:</p>
 
-    <div style="color:#00f0ff;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;" id="adminModalJumpTitle">LOMPAT SEKTOR / CHAPTER (1-15)</div>
+    <div style="color:#00f0ff;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;" id="adminModalJumpTitle" data-i18n="admin_modal_jump">JUMP TO SECTOR / CHAPTER (1-15)</div>
     <div id="adminModalLevels" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px;"></div>
     
-    <div style="color:#00f0ff;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;">PERSENJATAAN (WEAPONS)</div>
+    <div style="color:#00f0ff;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;" data-i18n="admin_modal_weapons">WEAPONS</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
-      <button class="btn-micro" type="button" onclick="adminEquipWeapon('knife')">🗡️ PISAU</button>
-      <button class="btn-micro" type="button" onclick="adminEquipWeapon('rifle')">⚡ RIFLE</button>
-      <button class="btn-micro" type="button" onclick="adminEquipWeapon('grenade')">💣 GRANAT</button>
-      <button class="btn-micro" type="button" onclick="adminEquipWeapon('bazooka')">🚀 BAZOOKA</button>
-      <button class="btn-micro" type="button" onclick="adminEquipWeapon('shield')">🛡️ PERISAI</button>
-      <button class="btn-micro" type="button" onclick="adminEquipWeapon('minigun')">💥 MINIGUN</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_knife" onclick="adminEquipWeapon('knife')">Tactical Knife</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_rifle" onclick="adminEquipWeapon('rifle')">Tactical Rifle</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_grenade" onclick="adminEquipWeapon('grenade')">EMP Grenade</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_bazooka" onclick="adminEquipWeapon('bazooka')">Rocket Launcher</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_shield" onclick="adminEquipWeapon('shield')">Kinetic Shield</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_minigun" onclick="adminEquipWeapon('minigun')">Minigun</button>
     </div>
 
-    <div style="color:#ffd700;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;">SKILL & PERK OPERATIF</div>
-    <button class="btn secondary" style="width:100%;margin-bottom:8px;border-color:rgba(255,215,0,0.5);color:#ffd700;font-weight:bold;" onclick="adminUnlockAllPerks()">⚡ AKTIFKAN SEMUA SKILL (MAX)</button>
+    <div style="color:#ffd700;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;" data-i18n="admin_modal_perks">OPERATIVE SKILLS &amp; PERKS</div>
+    <button class="btn secondary" style="width:100%;margin-bottom:8px;border-color:rgba(255,215,0,0.5);color:#ffd700;font-weight:bold;" data-i18n="admin_unlock_all_perks" onclick="adminUnlockAllPerks()">UNLOCK ALL SKILLS (MAX)</button>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:16px;">
-      <button class="btn-micro" type="button" onclick="adminAddPerk('nano_plating')">🛡️ NANO PLATING</button>
-      <button class="btn-micro" type="button" onclick="adminAddPerk('adrenaline')">⚡ ADRENALINE</button>
-      <button class="btn-micro" type="button" onclick="adminAddPerk('plasma')">🔥 PLASMA CORE</button>
-      <button class="btn-micro" type="button" onclick="adminAddPerk('cryo_vent')">❄️ CRYO VENT</button>
-      <button class="btn-micro" type="button" onclick="adminAddPerk('vampiric')">🩸 VAMPIRIC</button>
-      <button class="btn-micro" type="button" onclick="adminAddPerk('ricochet')">💫 RICOCHET</button>
-      <button class="btn-micro" type="button" onclick="adminAddPerk('kinetic_emp')">⚡ KINETIC EMP</button>
-      <button class="btn-micro" type="button" onclick="adminAddPerk('thermal_trail')">🌋 THERMAL TRAIL</button>
+      <button class="btn-micro" type="button" data-i18n="perk_nano_name" onclick="adminAddPerk('nano_plating')">Nanite Armor Plating</button>
+      <button class="btn-micro" type="button" data-i18n="perk_adren_name" onclick="adminAddPerk('adrenaline')">Adrenaline Servo Injector</button>
+      <button class="btn-micro" type="button" data-i18n="perk_plasma_name" onclick="adminAddPerk('plasma')">Hyper-Charge Plasma Munitions</button>
+      <button class="btn-micro" type="button" data-i18n="perk_cryo_name" onclick="adminAddPerk('cryo_vent')">Cryo-Vent Heat Sinks</button>
+      <button class="btn-micro" type="button" data-i18n="perk_vamp_name" onclick="adminAddPerk('vampiric')">Nanite Bio-Siphon</button>
+      <button class="btn-micro" type="button" data-i18n="perk_rico_name" onclick="adminAddPerk('ricochet')">Plasma Deflection Matrix</button>
+      <button class="btn-micro" type="button" data-i18n="perk_emp_name" onclick="adminAddPerk('kinetic_emp')">Kinetic EMP Discharge</button>
+      <button class="btn-micro" type="button" data-i18n="perk_therm_name" onclick="adminAddPerk('thermal_trail')">Thermal Exhaust Trail</button>
     </div>
 
     <div style="display:flex;gap:8px;justify-content:flex-end;">
-      <button class="btn secondary" type="button" onclick="adminToggleGod()" id="adminModalGodBtn">KEBAL: OFF</button>
-      <button class="btn" type="button" onclick="closeAdminArsenalModal()">TUTUP [ESC]</button>
+      <button class="btn secondary" type="button" onclick="adminToggleGod()" id="adminModalGodBtn">INVULNERABLE: OFF</button>
+      <button class="btn" type="button" data-i18n="admin_modal_close" onclick="closeAdminArsenalModal()">CLOSE [ESC]</button>
     </div>
   </div>
 </div>
@@ -853,55 +861,55 @@
 <div id="inGameSettingsModal" class="modal-backdrop" style="display:none;z-index:10003;position:fixed;inset:0;background:rgba(5,7,12,0.88);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;overflow-y:auto;">
   <div class="modal-card settings-dialog-card" style="max-width:520px;width:100%;border:1px solid rgba(0,229,255,0.45);background:rgba(10,12,20,0.97);box-shadow:0 0 35px rgba(0,229,255,0.25);border-radius:10px;padding:20px;color:#e6edf3;max-height:90vh;overflow-y:auto;">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.25);padding-bottom:10px;margin-bottom:14px;">
-      <h3 style="color:#00f0ff;margin:0;font-size:16px;letter-spacing:1px;" id="pauseSettingsModalTitle">⚙️ PENGATURAN FASILITAS</h3>
+      <h3 style="color:#00f0ff;margin:0;font-size:16px;letter-spacing:1px;" id="pauseSettingsModalTitle" data-i18n="pause_settings_title">PENGATURAN FASILITAS</h3>
       <button class="btn-micro danger" type="button" onclick="closePauseSettings()" style="padding:4px 10px;font-size:14px;">✕</button>
     </div>
     <div class="settings-sections">
       <!-- SUARA & AUDIO -->
       <div class="settings-sec-head">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-        <span id="lblPauseSecAudio">SUARA &amp; AUDIO</span>
+        <span id="lblPauseSecAudio" data-i18n="settings_sec_audio">SUARA &amp; AUDIO</span>
       </div>
       <div class="settings-grid">
-        <label for="pauseVolume">Master Volume <span id="pauseVolumeVal" style="float:right;color:#00e5ff;font-weight:bold;">70%</span><input id="pauseVolume" type="range" min="0" max="100"></label>
-        <label for="pauseSfx">Efek Suara (SFX) <span id="pauseSfxVal" style="float:right;color:#00e5ff;font-weight:bold;">80%</span><input id="pauseSfx" type="range" min="0" max="100"></label>
-        <label for="pauseBgm">Musik &amp; Ambience <span id="pauseBgmVal" style="float:right;color:#00e5ff;font-weight:bold;">70%</span><input id="pauseBgm" type="range" min="0" max="100"></label>
+        <label for="pauseVolume"><span data-i18n="settings_master_vol">Master Volume</span> <span id="pauseVolumeVal" style="float:right;color:#00e5ff;font-weight:bold;">70%</span><input id="pauseVolume" type="range" min="0" max="100"></label>
+        <label for="pauseSfx"><span data-i18n="settings_sfx_vol">Efek Suara (SFX)</span> <span id="pauseSfxVal" style="float:right;color:#00e5ff;font-weight:bold;">80%</span><input id="pauseSfx" type="range" min="0" max="100"></label>
+        <label for="pauseBgm"><span data-i18n="settings_bgm_vol">Musik &amp; Suasana</span> <span id="pauseBgmVal" style="float:right;color:#00e5ff;font-weight:bold;">70%</span><input id="pauseBgm" type="range" min="0" max="100"></label>
         <label class="settings-check-row" for="pauseMuted">
           <input type="checkbox" id="pauseMuted">
-          <span id="lblPauseMute">Bisukan Semua Suara (Mute)</span>
+          <span id="lblPauseMute" data-i18n="settings_mute">Bisukan Semua Suara</span>
         </label>
       </div>
 
       <!-- KONTROL & TATA LETAK -->
       <div class="settings-sec-head">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S20.17 9 21 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-        <span id="lblPauseSecControls">KONTROL &amp; TATA LETAK</span>
+        <span id="lblPauseSecControls" data-i18n="settings_sec_controls">KONTROL &amp; TATA LETAK</span>
       </div>
       <div class="settings-grid">
-        <label for="pauseDeviceMode">Mode Perangkat
+        <label for="pauseDeviceMode"><span data-i18n="settings_device_mode">Mode Perangkat</span>
           <select id="pauseDeviceMode">
-            <option value="ask">Tanyakan Setiap Masuk</option>
-            <option value="pc">PC / Desktop (Keyboard &amp; Mouse)</option>
-            <option value="mobile">HP / Tablet (Layar Sentuh)</option>
+            <option value="ask" data-i18n="settings_dev_ask">Tanyakan Setiap Masuk</option>
+            <option value="pc" data-i18n="settings_dev_pc">PC / Desktop (Keyboard &amp; Mouse)</option>
+            <option value="mobile" data-i18n="settings_dev_mobile">HP / Tablet (Layar Sentuh)</option>
           </select>
         </label>
         <label class="settings-check-row" for="pauseAutoAim">
           <input type="checkbox" id="pauseAutoAim" checked>
-          <span id="lblPauseAutoAim">Bantuan Bidik Sentuh (Auto-Aim)</span>
+          <span id="lblPauseAutoAim" data-i18n="settings_auto_aim">Bantuan Bidik Sentuh (Auto-Aim)</span>
         </label>
         <label class="settings-check-row" for="pauseHaptic">
           <input type="checkbox" id="pauseHaptic" checked>
-          <span id="lblPauseHaptic">Getaran Haptik HP (Vibration)</span>
+          <span id="lblPauseHaptic" data-i18n="settings_haptic">Getaran Haptik HP (Vibration)</span>
         </label>
-        <label for="pauseTouchScale">Ukuran Tombol HP <span id="pauseTouchScaleVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="pauseTouchScale" type="range" min="70" max="140" step="5" value="100"></label>
-        <label for="pauseTouchOpacity">Transparansi Tombol <span id="pauseTouchOpacityVal" style="float:right;color:#00e5ff;font-weight:bold;">85%</span><input id="pauseTouchOpacity" type="range" min="30" max="100" step="5" value="85"></label>
+        <label for="pauseTouchScale"><span data-i18n="settings_touch_scale">Ukuran Tombol HP</span> <span id="pauseTouchScaleVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="pauseTouchScale" type="range" min="70" max="140" step="5" value="100"></label>
+        <label for="pauseTouchOpacity"><span data-i18n="settings_touch_opacity">Transparansi Tombol</span> <span id="pauseTouchOpacityVal" style="float:right;color:#00e5ff;font-weight:bold;">85%</span><input id="pauseTouchOpacity" type="range" min="30" max="100" step="5" value="85"></label>
         <div class="settings-actions-span">
           <button class="btn secondary" type="button" onclick="closePauseSettings();openTouchLayoutEditor();">
             <svg class="btn-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
-            <span id="lblPauseBtnEditLayout">📐 Atur Letak Tombol HP</span>
+            <span id="lblPauseBtnEditLayout" data-i18n="settings_btn_edit_layout">Atur Letak Tombol HP</span>
           </button>
           <button class="btn secondary" type="button" onclick="resetTouchLayout()">
-            <span id="lblPauseBtnResetLayout">🔄 Reset Tombol Default</span>
+            <span id="lblPauseBtnResetLayout" data-i18n="settings_btn_reset_layout">Kembalikan Tombol Bawaan</span>
           </button>
         </div>
       </div>
@@ -909,48 +917,48 @@
       <!-- TAMPILAN & GRAFIS -->
       <div class="settings-sec-head">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>
-        <span id="lblPauseSecDisplay">TAMPILAN &amp; GRAFIS</span>
+        <span id="lblPauseSecDisplay" data-i18n="settings_sec_display">TAMPILAN &amp; GRAFIS</span>
       </div>
       <div class="settings-grid">
-        <label for="pauseBrightness">Kecerahan Obor (Torch) <span id="pauseBrightnessVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="pauseBrightness" type="range" min="30" max="180"></label>
-        <label for="pauseQuality">Gaya Visual Pixel
+        <label for="pauseBrightness"><span data-i18n="settings_torch_bright">Kecerahan Obor (Torch)</span> <span id="pauseBrightnessVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="pauseBrightness" type="range" min="30" max="180"></label>
+        <label for="pauseQuality"><span data-i18n="settings_visual_style">Gaya Visual Pixel</span>
           <select id="pauseQuality"><option value="smooth">Smooth (Halus)</option><option value="retro">Retro CRT (Klasik)</option><option value="chunky">Chunky Pixel (Ekstra Kasar)</option></select>
         </label>
         <label class="settings-check-row" for="pauseScreenShake">
           <input type="checkbox" id="pauseScreenShake" checked>
-          <span id="lblPauseScreenShake">Goyangan Layar (Screen Shake)</span>
+          <span id="lblPauseScreenShake" data-i18n="settings_screen_shake">Goyangan Layar (Screen Shake)</span>
         </label>
         <label class="settings-check-row" for="pauseMinimap">
           <input type="checkbox" id="pauseMinimap" checked>
-          <span id="lblPauseMinimap">Tampilkan Radar Mini-map</span>
+          <span id="lblPauseMinimap" data-i18n="settings_minimap">Tampilkan Radar Mini-map</span>
         </label>
         <label class="settings-check-row" for="pauseShowFps">
           <input type="checkbox" id="pauseShowFps">
-          <span id="lblPauseShowFps">Tampilkan Indikator FPS</span>
+          <span id="lblPauseShowFps" data-i18n="settings_show_fps">Tampilkan Indikator FPS</span>
         </label>
       </div>
 
       <!-- GAMEPLAY & SISTEM -->
       <div class="settings-sec-head">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        <span id="lblPauseSecGameplay">GAMEPLAY &amp; SISTEM</span>
+        <span id="lblPauseSecGameplay" data-i18n="settings_sec_gameplay">GAMEPLAY &amp; SISTEM</span>
       </div>
       <div class="settings-grid">
-        <label for="pauseLanguage">Bahasa / Language
+        <label for="pauseLanguage"><span data-i18n="settings_interface_lang">Interface Language</span>
           <select id="pauseLanguage"><option value="en">English</option><option value="id">Bahasa Indonesia</option></select>
         </label>
-        <label for="pauseDifficulty">Tingkat Kesulitan
+        <label for="pauseDifficulty"><span data-i18n="settings_diff_level">Difficulty Level</span>
           <select id="pauseDifficulty"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hardcore</option></select>
         </label>
         <div style="grid-column:1/-1;margin-top:6px;">
           <button class="btn-micro danger" type="button" onclick="resetAllSettingsToDefault()" style="width:100%;padding:8px 12px;font-size:12px;cursor:pointer;">
-            ⚠️ RESET SEMUA PENGATURAN KE DEFAULT
+            <span data-i18n="settings_reset_default">KEMBALIKAN PENGATURAN KE BAWAAN</span>
           </button>
         </div>
       </div>
     </div>
     <div style="margin-top:16px;text-align:right;">
-      <button class="btn" type="button" onclick="closePauseSettings()">SIMPAN &amp; TUTUP</button>
+      <button class="btn" type="button" onclick="closePauseSettings()"><span data-i18n="settings_save_close">SIMPAN &amp; TUTUP</span></button>
     </div>
   </div>
 </div>
@@ -958,14 +966,14 @@
 <div id="startScreen">
 <div class="eyebrow" id="startEyebrow" title="Classified Archive Repository">CLASSIFIED&nbsp;ARCHIVES</div>
     <h1>VITA</h1>
-    <p class="subtitle" id="startSubtitle">Maze Monster Trainer &mdash; 15 Sectors</p>
+    <p class="subtitle" id="startSubtitle">Forgotten Sector &mdash; 15 Roguelite Sectors</p>
     <div class="start-operative-banner" id="startOperativeBanner" onclick="openAuthModal()" title="Click to Login / Switch Operative Identity">
         <span class="start-operative-icon" id="startOperativeIcon"></span>
         <span class="start-operative-text" id="startOperativeText">OPERATIVE: ANONYMOUS [CLICK TO LOGIN]</span>
         <span class="start-operative-badge" id="startOperativeBadge">GUEST</span>
     </div>
     <div class="start-device-pill" id="startScreenDevicePill" onclick="openDeviceModeModal(true)" title="Klik untuk ganti mode PC / HP">
-        <span id="startScreenDeviceIcon">💻</span>
+        <span id="startScreenDeviceIcon"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg></span>
         <span id="startScreenDeviceText">MODE: PC (KEYBOARD)</span>
         <span class="device-pill-btn">[GANTI]</span>
     </div>
@@ -973,7 +981,7 @@
     <div class="menu-actions">
         <button class="btn" id="btnStart" onclick="startGame()">
           <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span>PLAY NOW</span>
+          <span id="btnStartText">PLAY NOW</span>
         </button>
         <button class="btn secondary" id="btnContinue" onclick="continueGame()" style="display:none">
           <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 13 12 5 21 5 3"/><polygon points="11 3 19 12 11 21 11 3"/></svg>
@@ -985,7 +993,7 @@
         </button>
         <button class="btn secondary" id="btnSettings" onclick="toggleHomePanel('homeSettings')">
           <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-          <span>SETTINGS</span>
+          <span id="btnSettingsText">SETTINGS</span>
         </button>
         <button class="btn secondary" id="btnCodex" onclick="openCodexModal()">
           <svg class="btn-icon" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
@@ -1004,8 +1012,8 @@
     <div id="adminLogin" style="display:none">
         <h3 id="adminLoginTitle" style="margin-bottom:10px">ADMIN &amp; CHAPTER ACCESS</h3>
         <p id="adminLoginDesc" style="font-size:13px;opacity:.8;margin-bottom:10px">
-          Enter facility console code (Default: <b>123</b>) to jump to any chapter/sector.
-          <button class="btn-micro" type="button" onclick="document.getElementById('adminCode').value='123';submitAdminLogin();" style="margin-left:8px;padding:2px 8px;cursor:pointer;">[Auto-Fill 123 &amp; Masuk]</button>
+          <span id="adminLoginDescText">Enter the facility console code to unlock sector jump and test tools.</span>
+          <button class="btn-micro" type="button" id="adminAutoFillBtn" onclick="document.getElementById('adminCode').value='123';submitAdminLogin();" style="margin-left:8px;padding:2px 8px;cursor:pointer;">AUTO-FILL</button>
         </p>
         <label style="display:block;text-align:left;margin:10px 0"><span id="adminCodeLbl">Code</span>
             <input id="adminCode" type="password" inputmode="numeric" maxlength="16" placeholder="123"
@@ -1024,26 +1032,26 @@
         <!-- WEAPON ARSENAL TESTING -->
         <div style="margin-top:14px;color:#00f0ff;font-size:12px;font-weight:bold;letter-spacing:1px;text-align:left;" id="adminWeaponsTitle">UJI PERSENJATAAN (ARSENAL)</div>
         <div id="adminWeaponsGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;">
-            <button class="btn-micro" type="button" onclick="adminEquipWeapon('knife')">🗡️ PISAU</button>
-            <button class="btn-micro" type="button" onclick="adminEquipWeapon('rifle')">⚡ RIFLE</button>
-            <button class="btn-micro" type="button" onclick="adminEquipWeapon('grenade')">💣 GRENADE</button>
-            <button class="btn-micro" type="button" onclick="adminEquipWeapon('bazooka')">🚀 BAZOOKA</button>
-            <button class="btn-micro" type="button" onclick="adminEquipWeapon('shield')">🛡️ SHIELD</button>
-            <button class="btn-micro" type="button" onclick="adminEquipWeapon('minigun')">💥 MINIGUN</button>
+            <button class="btn-micro" type="button" data-i18n="weapon_knife" onclick="adminEquipWeapon('knife')">Tactical Knife</button>
+            <button class="btn-micro" type="button" data-i18n="weapon_rifle" onclick="adminEquipWeapon('rifle')">Tactical Rifle</button>
+            <button class="btn-micro" type="button" data-i18n="weapon_grenade" onclick="adminEquipWeapon('grenade')">EMP Grenade</button>
+            <button class="btn-micro" type="button" data-i18n="weapon_bazooka" onclick="adminEquipWeapon('bazooka')">Rocket Launcher</button>
+            <button class="btn-micro" type="button" data-i18n="weapon_shield" onclick="adminEquipWeapon('shield')">Kinetic Shield</button>
+            <button class="btn-micro" type="button" data-i18n="weapon_minigun" onclick="adminEquipWeapon('minigun')">Minigun</button>
         </div>
 
         <!-- PERK / SKILL TESTING -->
-        <div style="margin-top:14px;color:#ffd700;font-size:12px;font-weight:bold;letter-spacing:1px;text-align:left;" id="adminPerksTitle">UJI SKILL & PERK OPERATIF</div>
-        <button class="btn secondary" style="width:100%;margin-top:6px;border-color:rgba(255,215,0,0.5);color:#ffd700;" id="adminUnlockAllBtn" onclick="adminUnlockAllPerks()">⚡ AKTIFKAN SEMUA SKILL (MAX)</button>
+        <div style="margin-top:14px;color:#ffd700;font-size:12px;font-weight:bold;letter-spacing:1px;text-align:left;" id="adminPerksTitle">UJI SKILL &amp; PERK OPERATIF</div>
+        <button class="btn secondary" style="width:100%;margin-top:6px;border-color:rgba(255,215,0,0.5);color:#ffd700;" id="adminUnlockAllBtn" onclick="adminUnlockAllPerks()">UNLOCK ALL SKILLS (MAX)</button>
         <div id="adminPerksGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px;">
-            <button class="btn-micro" type="button" onclick="adminAddPerk('nano_plating')">🛡️ NANO PLATING</button>
-            <button class="btn-micro" type="button" onclick="adminAddPerk('adrenaline')">⚡ ADRENALINE</button>
-            <button class="btn-micro" type="button" onclick="adminAddPerk('plasma')">🔥 PLASMA CORE</button>
-            <button class="btn-micro" type="button" onclick="adminAddPerk('cryo_vent')">❄️ CRYO VENT</button>
-            <button class="btn-micro" type="button" onclick="adminAddPerk('vampiric')">🩸 VAMPIRIC</button>
-            <button class="btn-micro" type="button" onclick="adminAddPerk('ricochet')">💫 RICOCHET</button>
-            <button class="btn-micro" type="button" onclick="adminAddPerk('kinetic_emp')">⚡ KINETIC EMP</button>
-            <button class="btn-micro" type="button" onclick="adminAddPerk('thermal_trail')">🌋 THERMAL TRAIL</button>
+            <button class="btn-micro" type="button" data-i18n="perk_nano_name" onclick="adminAddPerk('nano_plating')">Nanite Armor Plating</button>
+            <button class="btn-micro" type="button" data-i18n="perk_adren_name" onclick="adminAddPerk('adrenaline')">Adrenaline Servo Injector</button>
+            <button class="btn-micro" type="button" data-i18n="perk_plasma_name" onclick="adminAddPerk('plasma')">Hyper-Charge Plasma Munitions</button>
+            <button class="btn-micro" type="button" data-i18n="perk_cryo_name" onclick="adminAddPerk('cryo_vent')">Cryo-Vent Heat Sinks</button>
+            <button class="btn-micro" type="button" data-i18n="perk_vamp_name" onclick="adminAddPerk('vampiric')">Nanite Bio-Siphon</button>
+            <button class="btn-micro" type="button" data-i18n="perk_rico_name" onclick="adminAddPerk('ricochet')">Plasma Deflection Matrix</button>
+            <button class="btn-micro" type="button" data-i18n="perk_emp_name" onclick="adminAddPerk('kinetic_emp')">Kinetic EMP Discharge</button>
+            <button class="btn-micro" type="button" data-i18n="perk_therm_name" onclick="adminAddPerk('thermal_trail')">Thermal Exhaust Trail</button>
         </div>
 
         <div style="display:grid;gap:8px;margin-top:14px">
@@ -1185,7 +1193,7 @@
         <div class="dossier-actions">
             <button class="btn" id="btnAgain" onclick="restartGame()">
               <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              <span>PLAY AGAIN</span>
+              <span id="btnAgainText">PLAY AGAIN</span>
             </button>
         </div>
     </div>

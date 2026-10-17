@@ -40,7 +40,7 @@ function isSupabaseConfigured() {
 async function supabaseFetch(endpoint, options = {}) {
   const cfg = getSupabaseConfig();
   if (!isSupabaseConfigured()) {
-    throw new Error('Supabase belum dikonfigurasi.');
+    throw new Error('Facility uplink belum dikonfigurasi.');
   }
 
   const url = `${cfg.url}/rest/v1/${endpoint.replace(/^\/+/, '')}`;
@@ -65,7 +65,7 @@ async function supabaseFetch(endpoint, options = {}) {
     } catch (e) {
       errText = await response.text();
     }
-    throw new Error(`Supabase Error (${response.status}): ${errText}`);
+    throw new Error(`Uplink Error (${response.status}): ${errText}`);
   }
 
   try {
@@ -219,7 +219,7 @@ async function syncProfileToSupabase(prof) {
     } catch (err) {
       // Fallback jika server Supabase belum memiliki kolom passcode (PGRST204)
       if (err.message && (err.message.includes('passcode') || err.message.includes('PGRST204'))) {
-        console.warn('[SUPABASE FALLBACK] Kolom passcode belum ada di database remote. Mengirim tanpa passcode...');
+        console.warn('[UPLINK FALLBACK] Kolom passcode belum ada di database remote. Mengirim tanpa passcode...');
         delete payload.passcode;
         return await supabaseFetch(targetEndpoint, {
           method,
@@ -229,7 +229,7 @@ async function syncProfileToSupabase(prof) {
       throw err;
     }
   } catch (err) {
-    console.warn('Gagal sinkron profil ke Supabase:', err.message);
+    console.warn('Gagal sinkron profil ke facility network:', err.message);
     return null;
   }
 }
@@ -243,7 +243,7 @@ async function fetchOperativeByCallsign(username) {
     });
     return (Array.isArray(data) && data.length > 0) ? data[0] : null;
   } catch (err) {
-    console.warn('Gagal mencari profil di Supabase:', err.message);
+    console.warn('Gagal mencari profil di facility network:', err.message);
     return null;
   }
 }
@@ -275,7 +275,7 @@ async function submitScoreToSupabase(data) {
       body: JSON.stringify(payload)
     });
   } catch (err) {
-    console.warn('Gagal kirim skor ke Supabase:', err.message);
+    console.warn('Gagal kirim skor ke facility network:', err.message);
     return null;
   }
 }
@@ -290,7 +290,7 @@ async function fetchTopLeaderboard(limit = 10) {
     });
     return Array.isArray(data) ? data : [];
   } catch (err) {
-    console.warn('Gagal memuat leaderboard dari Supabase:', err.message);
+    console.warn('Gagal memuat leaderboard dari facility network:', err.message);
     return [];
   }
 }
@@ -338,13 +338,13 @@ async function testSupabaseConnection(url, anonKey) {
     } catch (e) {}
 
     setSupabaseConfig(cleanUrl, cleanKey);
-    let msg = 'Koneksi ke Supabase Cloud Berhasil! ';
+    let msg = 'Uplink fasilitas berhasil tersambung! ';
     if (hasRpc) {
-      msg += '(Database Siap Penuh dengan Secure RPC Anti-Hijack & Sanitasi Backend)';
+      msg += '(Jaringan siap penuh dengan verifikasi aman & sanitasi backend)';
     } else if (hasPasscodeCol) {
-      msg += '(Database Siap. Tips: Jalankan query update SQL terbaru untuk mengaktifkan Secure RPC).';
+      msg += '(Jaringan siap. Tips: jalankan query update SQL terbaru untuk mengaktifkan verifikasi aman).';
     } else {
-      msg += '(Catatan: Jalankan migrasi SQL untuk kolom passcode agar sinkronisasi sandi cloud aktif).';
+      msg += '(Catatan: jalankan migrasi SQL agar sinkronisasi sandi network aktif).';
     }
 
     return {

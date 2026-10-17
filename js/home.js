@@ -1,7 +1,7 @@
 const GAMES = [
   {
     name: 'VITA',
-    subtitle: 'Maze Monster Trainer — Web Edition',
+    subtitle: 'Forgotten Sector — Web Edition',
     type: 'web',
     badge: 'Browser',
     desc: 'Survive 15 labyrinth sectors, salvage biomass artifacts, evade anomalies, and neutralize the Final Boss.',
@@ -1031,8 +1031,18 @@ async function handlePerformLogin() {
     // 3. Akun tidak ditemukan sama sekali di server maupun lokal
     resetBtn();
     homeBeep('denied');
-    alert('[ACCESS DENIED]\nCallsign / Handle "' + username + '" not found in facility database or local records.\n\nIf you do not have an account, open the "REGISTER NEW OPERATIVE" tab.');
-    if (uInput) uInput.focus();
+    const goToReg = confirm('[CALLSIGN NOT FOUND]\n"' + username + '" is not registered in facility records.\n\nWould you like to register this Callsign now?');
+    if (goToReg) {
+      switchAuthMode('register');
+      const regInput = document.getElementById('modalUsernameInput');
+      if (regInput) {
+        regInput.value = username;
+        const regPass = document.getElementById('modalPasscodeInput');
+        if (regPass) setTimeout(() => regPass.focus(), 100);
+      }
+    } else if (uInput) {
+      uInput.focus();
+    }
   } catch (e) {
     resetBtn();
     console.error('Error saat login:', e);
@@ -1355,9 +1365,9 @@ function applyProfileUI() {
     if (pClearance) pClearance.textContent = prof.provider === 'guest' ? 'CLEARANCE: LEVEL-1' : 'CLEARANCE: LEVEL-2';
     if (pDbStatus) {
       if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
-        pDbStatus.textContent = 'Supabase Cloud (Online)';
+        pDbStatus.textContent = 'UPLINK ACTIVE';
       } else {
-        pDbStatus.textContent = 'Encrypted Local Database';
+        pDbStatus.textContent = 'LOCAL ARCHIVE';
       }
     }
   } else {
@@ -1373,7 +1383,7 @@ function applyProfileUI() {
       pBadge.className = 'auth-status-pill unverified';
     }
     if (pClearance) pClearance.textContent = 'CLEARANCE: LEVEL-1';
-    if (pDbStatus) pDbStatus.textContent = 'Encrypted Local Database (Offline)';
+    if (pDbStatus) pDbStatus.textContent = 'LOCAL ARCHIVE // STANDBY';
   }
 
   // Sinkronisasi status koneksi Supabase Cloud
@@ -1385,11 +1395,11 @@ function applyProfileUI() {
     if (sbUrlIn && !sbUrlIn.value) sbUrlIn.value = cfg.url;
     if (sbKeyIn && !sbKeyIn.value) sbKeyIn.value = cfg.anonKey;
     if (sbTag) {
-      sbTag.textContent = 'CONNECTED (ONLINE)';
+      sbTag.textContent = 'UPLINK ACTIVE';
       sbTag.className = 'supabase-status-tag connected';
     }
     if (pDbStatus) {
-      pDbStatus.textContent = 'Supabase Cloud (Online)';
+      pDbStatus.textContent = 'UPLINK ACTIVE';
     }
   }
 
@@ -1423,27 +1433,27 @@ async function handleConnectSupabase() {
   const key = (keyInput ? keyInput.value : '').trim();
 
   if (!url || !key) {
-    alert('Please enter both Supabase Project URL and Anon Key.');
+    alert('Enter Facility Uplink URL and Access Key first.');
     return;
   }
 
   const tag = document.getElementById('supabaseStatusTag');
   if (tag) {
-    tag.textContent = 'CONNECTING...';
+    tag.textContent = 'LINKING...';
     tag.className = 'supabase-status-tag';
   }
 
   if (typeof testSupabaseConnection === 'function') {
     const res = await testSupabaseConnection(url, key);
     if (res.ok) {
-      alert('Supabase Cloud connection ESTABLISHED!\nOperative dossier and leaderboard are now synchronized globally.');
+      alert('[UPLINK ESTABLISHED]\nOperative dossier and leaderboard are now synchronized across the facility network.');
       if (tag) {
-        tag.textContent = 'CONNECTED (ONLINE)';
+        tag.textContent = 'UPLINK ACTIVE';
         tag.className = 'supabase-status-tag connected';
       }
       const dbStatus = document.getElementById('profileDbStatus');
       if (dbStatus) {
-        dbStatus.textContent = 'Supabase Cloud (Online)';
+        dbStatus.textContent = 'UPLINK ACTIVE';
       }
       if (typeof syncProfileToSupabase === 'function') {
         const prof = getProfile();
@@ -1451,9 +1461,9 @@ async function handleConnectSupabase() {
       }
       renderLeaderboard();
     } else {
-      alert('Supabase connection failed:\n' + res.message);
+      alert('[UPLINK FAILED]\n' + res.message);
       if (tag) {
-        tag.textContent = 'CONNECTION FAILED';
+        tag.textContent = 'LINK FAILED';
         tag.className = 'supabase-status-tag';
       }
     }
@@ -1471,14 +1481,14 @@ function handleDisconnectSupabase() {
 
   const tag = document.getElementById('supabaseStatusTag');
   if (tag) {
-    tag.textContent = 'DISCONNECTED';
+    tag.textContent = 'STANDBY';
     tag.className = 'supabase-status-tag';
   }
   const dbStatus = document.getElementById('profileDbStatus');
   if (dbStatus) {
-    dbStatus.textContent = 'Encrypted Local Database';
+    dbStatus.textContent = 'LOCAL ARCHIVE';
   }
-  alert('Supabase Cloud disconnected. Game data restored to local storage.');
+  alert('[UPLINK CUT] Facility network link closed. Dossier restored to local archive.');
   renderLeaderboard();
 }
 
@@ -1597,7 +1607,7 @@ async function renderLeaderboard() {
         </tr>
         <tr>
           <td colspan="7" style="text-align:center;padding:16px;font-size:12px;color:var(--text-dim);border-top:1px dashed rgba(255,255,255,0.1)">
-            ${isCloud ? 'No records in Supabase Cloud yet. Complete a sector to submit your first telemetry!' : 'Displaying local facility records. Open "Supabase Cloud Database Settings" to link online database.'}
+            ${isCloud ? 'No facility records yet. Complete a sector to submit your first telemetry!' : 'Displaying local facility records. Open "Facility Uplink" to link the facility network.'}
           </td>
         </tr>
       `;
@@ -1606,7 +1616,7 @@ async function renderLeaderboard() {
         <tr>
           <td colspan="7" style="text-align:center;padding:28px;color:var(--text-dim)">
             <p style="margin-bottom:8px;font-size:14px;color:var(--accent-glow)">No mission history recorded yet.</p>
-            <p style="font-size:12px;margin:0">Purge labyrinth sectors or link Supabase Cloud to view global leaderboards.</p>
+            <p style="font-size:12px;margin:0">Purge labyrinth sectors or link the facility network to view global leaderboards.</p>
           </td>
         </tr>
       `;
@@ -1975,13 +1985,13 @@ function openDeviceModeModal(fromGameView = false, autoStart = false, isContinue
   if (chk) chk.checked = (homeSettings.deviceMode === 'pc' || homeSettings.deviceMode === 'mobile');
 
   const m = document.getElementById('deviceModeModal');
-  if (m) m.style.display = 'flex';
+  if (m) { m.style.display = 'flex'; m.classList.add('open'); }
   homeBeep('open');
 }
 
 function closeDeviceModeModal() {
   const m = document.getElementById('deviceModeModal');
-  if (m) m.style.display = 'none';
+  if (m) { m.classList.remove('open'); m.style.display = 'none'; }
   homeBeep('close');
 }
 
@@ -2031,11 +2041,14 @@ function confirmDeviceChoiceAndPlay() {
   proceedToWebGame(pendingDeviceAutoStart);
 }
 
+const VITA_DESKTOP_SVG = '<svg class="device-pill-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg>';
+const VITA_PHONE_SVG = '<svg class="device-pill-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>';
+
 function updateStartScreenDevicePill(mode) {
   const isMob = (mode === 'mobile');
   const icon = document.getElementById('startScreenDeviceIcon');
   const txt = document.getElementById('startScreenDeviceText');
-  if (icon) icon.textContent = isMob ? '📱' : '💻';
+  if (icon) icon.innerHTML = isMob ? VITA_PHONE_SVG : VITA_DESKTOP_SVG;
   if (txt) {
     const lang = homeSettings.lang;
     if (isMob) txt.textContent = (lang === 'id') ? 'MODE KONTROL: HP (LAYAR SENTUH)' : 'CONTROL MODE: MOBILE (TOUCH)';
@@ -2045,33 +2058,49 @@ function updateStartScreenDevicePill(mode) {
 
 // Pindah ke view game dalam satu halaman (dipanggil tombol MAIN SEKARANG).
 function playWebGame(autoStart = false) {
-  if (homeSettings.deviceMode === 'ask') {
-    openDeviceModeModal(false, autoStart);
-    return;
+  if (typeof ensureAudio === 'function') {
+    try { ensureAudio(); } catch (_) {}
   }
-  // Jika sudah tersimpan pc/mobile, terapkan langsung
-  if (homeSettings.deviceMode === 'mobile') {
+
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || (window.innerWidth <= 820);
+
+  // Jika masih default ('ask'), langsung auto-detect agar pemain tidak terhalang modal
+  if (homeSettings.deviceMode === 'ask') {
+    homeSettings.deviceMode = isTouch ? 'mobile' : 'pc';
+    saveHomeSettings();
+  }
+
+  // Terapkan class touch-on
+  if (homeSettings.deviceMode === 'mobile' || (isTouch && homeSettings.deviceMode !== 'pc')) {
     document.body.classList.add('touch-on');
     if (typeof applyTouchLayout === 'function') applyTouchLayout();
   } else {
     document.body.classList.remove('touch-on');
   }
+
   updateStartScreenDevicePill(homeSettings.deviceMode);
   proceedToWebGame(autoStart);
 }
 
 function proceedToWebGame(autoStart = false) {
   if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
-  document.getElementById('homeView').style.display = 'none';
+  const hv = document.getElementById('homeView');
+  if (hv) hv.style.display = 'none';
+  const dm = document.getElementById('deviceModeModal');
+  if (dm) { dm.classList.remove('open'); dm.style.display = 'none'; }
   const gv = document.getElementById('gameView');
   if (gv) gv.style.display = '';
   document.body.classList.add('game-on');
   const ss = document.getElementById('startScreen');
-  if (ss) ss.style.display = 'flex';
+  if (autoStart) {
+    if (ss) ss.style.display = 'none';
+  } else {
+    if (ss) ss.style.display = 'flex';
+  }
   if (typeof resize === 'function') resize();
   if (typeof checkContinueBtn === 'function') checkContinueBtn();
   if (autoStart && typeof startGame === 'function') {
-    startGame();
+    startGame(true);
   }
 }
 
@@ -2299,6 +2328,11 @@ setInterval(checkVitaUpdate, 30 * 60 * 1000);
 
   // Living bestiary: subtle breathing pulse on each foe canvas.
   function vita2PulseFoes(t) {
+    const hv = document.getElementById('homeView');
+    if (document.hidden || !hv || hv.style.display === 'none') {
+      requestAnimationFrame(vita2PulseFoes);
+      return;
+    }
     try {
       const foes = document.querySelectorAll('#homeView .foe-canvas-box canvas');
       foes.forEach((cv, i) => {

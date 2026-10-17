@@ -251,7 +251,7 @@ const T = {
         exit_open: 'TERBUKA', exit_locked: 'TERKUNCI',
         ctrl_bar: 'WASD / Panah / Joystick: Gerak | SPACE / KLIK: Serang | SHIFT: Dash | ESC: Jeda | M: Bisukan',
         pause_title: 'JEDA OPERASI', resume: 'LANJUT', restart: 'ULANGI DARI AWAL', main_menu: 'MENU UTAMA',
-        start_subtitle: 'Maze Monster Trainer — 15 Level', play_now: 'MAIN SEKARANG',
+        start_subtitle: 'Sektor Terlupakan — 15 Sektor Roguelite', play_now: 'MAIN SEKARANG',
         settings: 'PENGATURAN', how_to_play: 'CARA MAIN',
         volume: 'Volume', brightness: 'Kecerahan', language: 'Bahasa', close: 'Tutup',
         diff_label: 'Kesulitan', diff_easy: 'Mudah', diff_normal: 'Normal', diff_hard: 'Sulit',
@@ -272,8 +272,8 @@ const T = {
         trap_hit: 'Jebakan Duri! -{n} HP', level_up: 'NAIK TINGKAT! HP+{h} ATK+{a}',
         death_time_lbl: 'Waktu bermain:', ui_bpm: 'BIOMETRIK:', death_cause_lbl: 'Penyebab Kematian:',
         death_stamp: 'SUBJEK: DIMANGSA', win_stamp: 'SEKTOR DIBERSIHKAN',
-        admin_btn: 'ADMIN', admin_login_title: 'LOGIN ADMIN',
-        admin_login_desc: 'Masukkan kode admin untuk mode testing.',
+        admin_btn: 'ADMIN & PILIH SEKTOR', admin_login_title: 'LOGIN ADMIN',
+        admin_login_desc: 'Masukkan kode konsol fasilitas untuk membuka akses admin.',
         admin_code_lbl: 'Kode', admin_enter: 'MASUK', admin_cancel: 'Batal',
         admin_wrong: 'Kode salah! Akses ditolak.',
         admin_panel_title: 'PANEL ADMIN // FASILITAS',
@@ -284,15 +284,57 @@ const T = {
         admin_jump_msg: 'Lompat ke Sektor ', admin_welcome: 'Konsol admin aktif.',
         admin_weapons_title: 'UJI PERSENJATAAN (ARSENAL)',
         admin_perks_title: 'UJI SKILL & PERK OPERATIF',
-        admin_unlock_all_perks: '⚡ AKTIFKAN SEMUA SKILL (MAX)',
-        admin_all_perks_msg: 'SEMUA 8 SKILL TAKTIS DIAKTIFKAN!',
+        admin_unlock_all_perks: 'AKTIFKAN SEMUA SKILL (MAKS)',
+        admin_all_perks_msg: 'SEMUA 8 SKILL TAKTIS DIAKTIFKAN',
         admin_arsenal_modal_btn: 'ARSENAL ADMIN [~]',
         admin_weapon_equipped: 'SENJATA DIPASANG: {w}',
         admin_perk_added: 'SKILL DITAMBAHKAN: {p}',
+        admin_autofill: 'ISI OTOMATIS',
+        admin_modal_title: 'ARSENAL TAKTIS ADMIN',
+        admin_modal_sub: 'Lompat ke sektor mana pun atau langsung uji perlengkapan tempur.',
+        admin_modal_jump: 'LOMPAT KE SEKTOR / CHAPTER (1-15)',
+        admin_modal_weapons: 'PERSENJATAAN',
+        admin_modal_perks: 'SKILL & PERK OPERATIF',
+        admin_modal_close: 'TUTUP [ESC]',
+        admin_chapter_fmt: 'Sektor {n}',
+        settings_reset_default: 'KEMBALIKAN PENGATURAN KE BAWAAN',
+        boss_threat: 'PREDATOR PUNCAK TERDETEKSI',
+        settings_sec_audio: 'SUARA & AUDIO',
+        settings_master_vol: 'Volume Utama',
+        settings_sfx_vol: 'Efek Suara (SFX)',
+        settings_bgm_vol: 'Musik & Suasana',
+        settings_mute: 'Bisukan Semua Suara',
+        settings_sec_controls: 'KONTROL & TATA LETAK',
+        settings_device_mode: 'Mode Perangkat',
+        settings_dev_ask: 'Tanyakan Setiap Masuk',
+        settings_dev_pc: 'PC / Desktop (Keyboard & Mouse)',
+        settings_dev_mobile: 'HP / Tablet (Layar Sentuh)',
+        settings_auto_aim: 'Bantuan Bidik Sentuh (Auto-Aim)',
+        settings_haptic: 'Getaran Haptik HP (Vibration)',
+        settings_touch_scale: 'Ukuran Tombol HP',
+        settings_touch_opacity: 'Transparansi Tombol',
+        settings_btn_edit_layout: 'Atur Letak Tombol HP',
+        settings_btn_reset_layout: 'Kembalikan Tombol Bawaan',
+        settings_sec_display: 'TAMPILAN & GRAFIS',
+        settings_torch_bright: 'Kecerahan Obor (Torch)',
+        settings_visual_style: 'Gaya Visual Pixel',
+        settings_screen_shake: 'Goyangan Layar (Screen Shake)',
+        settings_minimap: 'Tampilkan Radar Mini-map',
+        settings_show_fps: 'Tampilkan Indikator FPS',
+        settings_sec_gameplay: 'GAMEPLAY & SISTEM',
+        settings_interface_lang: 'Bahasa Antarmuka',
+        settings_diff_level: 'Tingkat Kesulitan',
+        settings_save_close: 'SIMPAN & TUTUP',
+        settings_editor_scale: 'Ukuran:',
+        settings_editor_opacity: 'Transparansi:',
+        settings_editor_default: 'BAWAAN',
+        settings_editor_cancel: 'BATAL',
+        settings_editor_save: 'SIMPAN',
+        pause_settings_title: 'PENGATURAN FASILITAS',
         // Arsenal & Sistem Senjata Antar-Level
         armory_title: 'PILIH PASOKAN SENJATA BARU',
         armory_eyebrow: 'ARSENAL OPERATIF // PROTOKOL PENAHANAN ANOMALI',
-        armory_sub: 'Tingkat anomali sektor meningkat! Ambil 1 persenjataan taktis untuk melanjutkan misi:',
+        armory_sub: 'Tingkat anomali sektor meningkat. Ambil satu persenjataan taktis untuk melanjutkan misi:',
         armory_choose: 'PILIH SENJATA INI',
         armory_owned: 'SUDAH DIMILIKI',
         armory_claim: 'PASOKAN DITERIMA: {w}!',
@@ -349,7 +391,7 @@ const T = {
         combo_carnage: 'BANTAIAN // CARNAGE',
         combo_godlike: 'TAK TERBENDUNG // OVERKILL',
         lore_disc_found: 'DATA DISC DITEMUKAN',
-        barrel_detonated: '💥 BIOHAZARD MELEDAK 💥',
+        barrel_detonated: 'BIOHAZARD MELEDAK',
         boss_monolith_phase1: 'FASE I // INTI RUNIK',
         boss_monolith_phase2: 'FASE II // MATA KOSMIK',
         boss_monolith_phase3: 'FASE III // AMUKAN NOVA',
@@ -378,8 +420,8 @@ const T = {
         status_frozen: 'MEMBEKU',
         status_stunned: 'LUMPUH',
         weak_point_hit: 'TITIK LEMAH TERKENA! 2.5x',
-        monolith_weak_exposed: '⚠️ INTI KOSMIK MONOLITH TERBUKA! SERANG SEKARANG! ⚠️',
-        mimic_ambush: '⚠️ PENYAMARAN TERBONGKAR! MIMIC MENYERGAP! ⚠️',
+        monolith_weak_exposed: 'INTI KOSMIK MONOLITH TERBUKA — SERANG SEKARANG',
+        mimic_ambush: 'PENYAMARAN TERBONGKAR — MIMIC MENYERGAP',
         dark_knight_riposte: 'PERTAHANAN BALASAN!',
         dragon_firestorm: 'SEMBURAN API NAGA!',
         lich_summon: 'PEMANGGILAN ARWAH GELAP!',
@@ -410,11 +452,11 @@ const T = {
         device_mobile_desc: 'Virtual Analog Joystick di kiri & Tombol Aksi di kanan. Posisi tombol di layar bisa dipindah-pindah sesuka hati.',
         device_mobile_rec: 'Layar Sentuh',
         device_remember: 'Ingat pilihan ini (dapat diubah kapan saja di Pengaturan)',
-        device_btn_enter: 'MASUK KE MISI ➔',
-        pause_edit_layout_btn: '📐 UBAH POSISI TOMBOL HP',
+        device_btn_enter: 'MASUK KE MISI',
+        pause_edit_layout_btn: 'UBAH POSISI TOMBOL HP',
         layout_editor_title: 'ATUR LETAK TOMBOL SENTUH',
-        layout_editor_hint: 'Sentuh dan geser tombol di layar ke posisi yang paling nyaman untuk Anda.',
-        layout_saved_toast: 'Tata letak tombol HP berhasil disimpan!',
+        layout_editor_hint: 'Geser tombol di layar ke posisi yang paling nyaman.',
+        layout_saved_toast: 'Tata letak tombol HP disimpan.',
         layout_reset_toast: 'Tata letak tombol HP dikembalikan ke posisi default.'
     },
     en: {
@@ -424,7 +466,7 @@ const T = {
         exit_open: 'OPEN', exit_locked: 'LOCKED',
         ctrl_bar: 'WASD / Arrows / Joystick: Move | SPACE / CLICK: Attack | SHIFT: Dash | ESC: Pause | M: Mute',
         pause_title: 'OPERATION PAUSED', resume: 'RESUME', restart: 'RESTART LEVEL', main_menu: 'MAIN MENU',
-        start_subtitle: 'Maze Monster Trainer — 15 Levels', play_now: 'PLAY NOW',
+        start_subtitle: 'Forgotten Sector — 15 Roguelite Sectors', play_now: 'PLAY NOW',
         settings: 'SETTINGS', how_to_play: 'HOW TO PLAY',
         volume: 'Volume', brightness: 'Brightness', language: 'Language', close: 'Close',
         diff_label: 'Difficulty', diff_easy: 'Easy', diff_normal: 'Normal', diff_hard: 'Hard',
@@ -445,8 +487,8 @@ const T = {
         trap_hit: 'Spike Trap! -{n} HP', level_up: 'LEVEL UP! HP+{h} ATK+{a}',
         death_time_lbl: 'Play time:', ui_bpm: 'BIOMETRIC:', death_cause_lbl: 'Cause of Death:',
         death_stamp: 'SUBJECT: TERMINATED', win_stamp: 'SECTOR PURGED',
-        admin_btn: 'ADMIN', admin_login_title: 'ADMIN LOGIN',
-        admin_login_desc: 'Enter the admin code for testing mode.',
+        admin_btn: 'ADMIN & CHAPTER SELECT', admin_login_title: 'ADMIN LOGIN',
+        admin_login_desc: 'Enter the facility console code to unlock admin access.',
         admin_code_lbl: 'Code', admin_enter: 'ENTER', admin_cancel: 'Cancel',
         admin_wrong: 'Wrong code! Access denied.',
         admin_panel_title: 'ADMIN PANEL // FACILITY',
@@ -457,15 +499,57 @@ const T = {
         admin_jump_msg: 'Jumped to Sector ', admin_welcome: 'Admin mode active.',
         admin_weapons_title: 'TEST WEAPON ARSENAL',
         admin_perks_title: 'TEST OPERATIVE PERKS & SKILLS',
-        admin_unlock_all_perks: '⚡ UNLOCK ALL SKILLS (MAX)',
-        admin_all_perks_msg: 'ALL 8 TACTICAL SKILLS ACTIVATED!',
+        admin_unlock_all_perks: 'UNLOCK ALL SKILLS (MAX)',
+        admin_all_perks_msg: 'ALL 8 TACTICAL SKILLS ACTIVATED',
         admin_arsenal_modal_btn: 'ADMIN ARSENAL [~]',
         admin_weapon_equipped: 'WEAPON EQUIPPED: {w}',
         admin_perk_added: 'SKILL ADDED: {p}',
+        admin_autofill: 'AUTO-FILL',
+        admin_modal_title: 'ADMIN TACTICAL ARSENAL',
+        admin_modal_sub: 'Jump to any sector or field-test combat equipment directly.',
+        admin_modal_jump: 'JUMP TO SECTOR / CHAPTER (1-15)',
+        admin_modal_weapons: 'WEAPONS',
+        admin_modal_perks: 'OPERATIVE SKILLS & PERKS',
+        admin_modal_close: 'CLOSE [ESC]',
+        admin_chapter_fmt: 'Sector {n}',
+        settings_reset_default: 'RESET ALL SETTINGS TO DEFAULT',
+        boss_threat: 'APEX PREDATOR DETECTED',
+        settings_sec_audio: 'AUDIO & SOUND',
+        settings_master_vol: 'Master Volume',
+        settings_sfx_vol: 'Sound Effects (SFX)',
+        settings_bgm_vol: 'Music & Atmosphere',
+        settings_mute: 'Mute All Audio',
+        settings_sec_controls: 'CONTROLS & LAYOUT',
+        settings_device_mode: 'Device Mode',
+        settings_dev_ask: 'Ask on Every Launch',
+        settings_dev_pc: 'PC / Desktop (Keyboard & Mouse)',
+        settings_dev_mobile: 'Mobile / Tablet (Touchscreen)',
+        settings_auto_aim: 'Touch Aim Assist (Auto-Aim)',
+        settings_haptic: 'Haptic Feedback (Vibration)',
+        settings_touch_scale: 'Touch Button Size',
+        settings_touch_opacity: 'Button Opacity',
+        settings_btn_edit_layout: 'Customize Touch Buttons',
+        settings_btn_reset_layout: 'Reset Button Layout',
+        settings_sec_display: 'DISPLAY & GRAPHICS',
+        settings_torch_bright: 'Torch Brightness',
+        settings_visual_style: 'Pixel Visual Style',
+        settings_screen_shake: 'Screen Shake',
+        settings_minimap: 'Minimap Radar',
+        settings_show_fps: 'Show FPS Indicator',
+        settings_sec_gameplay: 'GAMEPLAY & SYSTEM',
+        settings_interface_lang: 'Interface Language',
+        settings_diff_level: 'Difficulty Level',
+        settings_save_close: 'SAVE & CLOSE',
+        settings_editor_scale: 'Size:',
+        settings_editor_opacity: 'Opacity:',
+        settings_editor_default: 'DEFAULT',
+        settings_editor_cancel: 'CANCEL',
+        settings_editor_save: 'SAVE',
+        pause_settings_title: 'FACILITY SETTINGS',
         // Arsenal & Inter-Level Weapon System
         armory_title: 'SELECT NEW WEAPON SUPPLY',
         armory_eyebrow: 'OPERATIVE ARSENAL // ANOMALY CONTAINMENT PROTOCOL',
-        armory_sub: 'Sector anomaly level rising! Requisition 1 tactical armament to proceed with the mission:',
+        armory_sub: 'Sector anomaly level rising. Requisition one tactical armament to proceed:',
         armory_choose: 'SELECT THIS WEAPON',
         armory_owned: 'ALREADY OWNED',
         armory_claim: 'SUPPLY ACQUIRED: {w}!',
@@ -522,7 +606,7 @@ const T = {
         combo_carnage: 'CARNAGE',
         combo_godlike: 'UNSTOPPABLE // OVERKILL',
         lore_disc_found: 'DATA DISC RECOVERED',
-        barrel_detonated: '💥 BIOHAZARD DETONATION 💥',
+        barrel_detonated: 'BIOHAZARD DETONATION',
         boss_monolith_phase1: 'PHASE I // RUNIC CORE',
         boss_monolith_phase2: 'PHASE II // COSMIC EYE',
         boss_monolith_phase3: 'PHASE III // BERSERK NOVA',
@@ -551,8 +635,8 @@ const T = {
         status_frozen: 'FROZEN',
         status_stunned: 'STUNNED',
         weak_point_hit: 'WEAK POINT HIT! 2.5x',
-        monolith_weak_exposed: '⚠️ MONOLITH CORE EXPOSED! STRIKE NOW! ⚠️',
-        mimic_ambush: '⚠️ DISGUISE BROKEN! MIMIC AMBUSH! ⚠️',
+        monolith_weak_exposed: 'MONOLITH CORE EXPOSED — STRIKE NOW',
+        mimic_ambush: 'DISGUISE BROKEN — MIMIC AMBUSH',
         dark_knight_riposte: 'RIPOSTE COUNTER-ATTACK!',
         dragon_firestorm: 'DRAGON FIRESTORM!',
         lich_summon: 'DARK SPIRIT SUMMON!',
@@ -583,11 +667,11 @@ const T = {
         device_mobile_desc: 'Virtual Analog Joystick on left & Action Buttons on right. Button positions can be freely customized.',
         device_mobile_rec: 'Touchscreen',
         device_remember: 'Remember this choice (can be changed anytime in Settings)',
-        device_btn_enter: 'ENTER MISSION ➔',
-        pause_edit_layout_btn: '📐 CUSTOMIZE TOUCH BUTTONS',
-        layout_editor_title: 'CUSTOMIZE TOUCH CONTROLS',
-        layout_editor_hint: 'Touch and drag buttons on screen to your preferred layout positions.',
-        layout_saved_toast: 'Mobile button layout successfully saved!',
+        device_btn_enter: 'ENTER MISSION',
+        pause_edit_layout_btn: 'CUSTOMIZE TOUCH BUTTONS',
+        layout_editor_title: 'TOUCH BUTTON LAYOUT',
+        layout_editor_hint: 'Drag the on-screen buttons to the positions you prefer.',
+        layout_saved_toast: 'Mobile button layout saved.',
         layout_reset_toast: 'Mobile button layout restored to default.'
     }
 };
@@ -761,7 +845,15 @@ const TACTICAL_PERKS = {
         specsEn: { dmg: 'Scorching Fire Trail', rate: '2s Duration', range: 'Choke Points', special: 'Ignite Pursuing Enemies' }
     }
 };
-function tt(key) { return (T[lang] && T[lang][key]) || T.id[key] || key; }
+function tt(key, params) {
+    let str = (T[lang] && T[lang][key]) || T.id[key] || key;
+    if (params && typeof params === 'object') {
+        for (const k in params) {
+            str = str.replace(new RegExp('\\{' + k + '\\}', 'g'), params[k]);
+        }
+    }
+    return str;
+}
 function aTypeName(type) { return lang === 'en' ? (type.nameEn || type.name) : type.name; }
 function setLang(value) {
     lang = value === 'en' ? 'en' : 'id';
@@ -777,6 +869,10 @@ function setLang(value) {
 }
 function applyLang() {
     document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+        const v = tt(el.getAttribute('data-i18n'));
+        if (v) el.textContent = v;
+    });
     document.getElementById('lblLevel').textContent = tt('ui_level');
     document.getElementById('lblMode').textContent = tt('ui_mode');
     if (document.getElementById('lblDiff')) document.getElementById('lblDiff').textContent = tt('ui_diff');
@@ -792,8 +888,10 @@ function applyLang() {
     document.getElementById('pauseRestart').textContent = tt('restart');
     document.getElementById('pauseMenu').textContent = tt('main_menu');
     document.getElementById('startSubtitle').textContent = tt('start_subtitle');
-    document.getElementById('btnStart').textContent = tt('play_now');
-    document.getElementById('btnSettings').textContent = tt('settings');
+    const bStart = document.getElementById('btnStartText') || document.getElementById('btnStart');
+    if (bStart) bStart.textContent = tt('play_now');
+    const bSet = document.getElementById('btnSettingsText') || document.getElementById('btnSettings');
+    if (bSet) bSet.textContent = tt('settings');
     document.getElementById('btnControls').textContent = tt('how_to_play');
     document.getElementById('sVol').textContent = tt('volume');
     document.getElementById('sBright').textContent = tt('brightness');
@@ -846,13 +944,16 @@ function applyLang() {
     if (winGradeLbl) winGradeLbl.textContent = tt('win_grade_lbl');
     const newBestBadge = document.getElementById('newBestBadge');
     if (newBestBadge) newBestBadge.textContent = tt('new_best');
-    document.getElementById('btnAgain').textContent = tt('play_again');
-    const bAdmin = document.getElementById('btnAdmin');
+    const bAgain = document.getElementById('btnAgainText') || document.getElementById('btnAgain');
+    if (bAgain) bAgain.textContent = tt('play_again');
+    const bAdmin = document.getElementById('btnAdminText') || document.getElementById('btnAdmin');
     if (bAdmin) bAdmin.textContent = tt('admin_btn');
     const aLT = document.getElementById('adminLoginTitle');
     if (aLT) aLT.textContent = tt('admin_login_title');
-    const aLD = document.getElementById('adminLoginDesc');
+    const aLD = document.getElementById('adminLoginDescText') || document.getElementById('adminLoginDesc');
     if (aLD) aLD.textContent = tt('admin_login_desc');
+    const aAF = document.getElementById('adminAutoFillBtn');
+    if (aAF) aAF.textContent = tt('admin_autofill');
     const aCL = document.getElementById('adminCodeLbl');
     if (aCL) aCL.textContent = tt('admin_code_lbl');
     const aLG = document.getElementById('adminLoginGo');
@@ -883,6 +984,10 @@ function applyLang() {
     if (aLO) aLO.textContent = tt('admin_logout');
     const pCT = document.getElementById('pauseCustomizeTouchText');
     if (pCT) pCT.textContent = tt('pause_edit_layout_btn');
+    const bThreat = document.getElementById('bossHudThreat');
+    if (bThreat) bThreat.textContent = tt('boss_threat');
+    const dBtn = document.getElementById('deviceBtnEnter');
+    if (dBtn) dBtn.textContent = tt('device_btn_enter');
     if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(settings.deviceMode);
     if (typeof updateUI === 'function' && typeof player !== 'undefined' && player) updateUI();
 }
@@ -1536,7 +1641,7 @@ function updateTutorialUI() {
         if (badge) badge.textContent = tt('tut_step1_badge');
         if (msg) msg.textContent = tt('tut_step1_msg');
         if (sub) sub.textContent = `${lang === 'id' ? 'Kalibrasi roda & track' : 'Calibrating tracks'}: ${Math.min(50, Math.floor(tutorialMoveDist))}/50px`;
-        if (icon) icon.textContent = '🕹️';
+        if (icon) icon.textContent = '✥';
         if (status) {
             status.textContent = `${Math.min(50, Math.floor(tutorialMoveDist))}/50px`;
             status.className = 'tutorial-status-indicator';
@@ -1545,7 +1650,7 @@ function updateTutorialUI() {
         if (badge) badge.textContent = tt('tut_step2_badge');
         if (msg) msg.textContent = tt('tut_step2_msg');
         if (sub) sub.textContent = tt('tut_step2_sub');
-        if (icon) icon.textContent = '⚡';
+        if (icon) icon.textContent = '◎';
         if (status) {
             status.textContent = 'READY';
             status.className = 'tutorial-status-indicator';
@@ -1554,7 +1659,7 @@ function updateTutorialUI() {
         if (badge) badge.textContent = tt('tut_step3_badge');
         if (msg) msg.textContent = tt('tut_step3_msg');
         if (sub) sub.textContent = tt('tut_step3_sub');
-        if (icon) icon.textContent = '⚔️';
+        if (icon) icon.textContent = '✧';
         if (status) {
             status.textContent = 'ARMED';
             status.className = 'tutorial-status-indicator';
@@ -1564,7 +1669,7 @@ function updateTutorialUI() {
         if (msg) msg.textContent = tt('tut_step4_msg');
         const rem = artifacts ? artifacts.filter(a => !a.collected).length : 0;
         if (sub) sub.textContent = (lang === 'id' ? `Anomali artefak tersisa: ${rem}` : `Remaining artifacts: ${rem}`);
-        if (icon) icon.textContent = '💎';
+        if (icon) icon.textContent = '◆';
         if (status) {
             status.textContent = 'ACTIVE';
             status.className = 'tutorial-status-indicator';
@@ -10329,6 +10434,11 @@ function updateMonsterProximityAndHeartbeat() {
 }
 
 function gameLoop() {
+    const gv = document.getElementById('gameView');
+    if (document.hidden || (gv && gv.style.display === 'none')) {
+        requestAnimationFrame(gameLoop);
+        return;
+    }
     if (gameState === 'playing') {
         if (hitStop > 0) {
             // Hit-stop: dunia beku sesaat, tapi tetap render + goyangan meluruh.
@@ -11176,7 +11286,7 @@ function renderAdminLevels() {
         b.type = 'button';
         const isBoss = (i === LEVELS - 1);
         b.textContent = isBoss ? ('CH 15 (APEX)') : ('CH ' + (i + 1));
-        b.title = isBoss ? tt('admin_boss') : ('Chapter / Sektor ' + (i + 1));
+        b.title = isBoss ? tt('admin_boss') : tt('admin_chapter_fmt', { n: i + 1 });
         b.addEventListener('click', () => adminJump(i));
         wrap.appendChild(b);
     }
@@ -11363,6 +11473,7 @@ function renderAdminModalLevels() {
         b.type = 'button';
         const isBoss = (i === LEVELS - 1);
         b.textContent = isBoss ? 'CH 15 (BOSS)' : ('CH ' + (i + 1));
+        b.title = isBoss ? tt('admin_boss') : tt('admin_chapter_fmt', { n: i + 1 });
         b.style.fontSize = '11px';
         b.style.padding = '5px 2px';
         if (i === currentLevel) {
@@ -11480,9 +11591,10 @@ function checkContinueBtn() {
 }
 
 function continueGame(bypassDeviceCheck = false) {
-    if (!bypassDeviceCheck && settings && settings.deviceMode === 'ask' && typeof openDeviceModeModal === 'function') {
-        openDeviceModeModal(true, false, true);
-        return;
+    if (!bypassDeviceCheck && settings && settings.deviceMode === 'ask') {
+        const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || (window.innerWidth <= 820);
+        settings.deviceMode = hasTouch ? 'mobile' : 'pc';
+        if (typeof persistSettings === 'function') persistSettings();
     }
     if (settings && settings.deviceMode === 'mobile') {
         document.body.classList.add('touch-on');
@@ -11714,9 +11826,10 @@ function playPrologueCutscene(onComplete) {
 }
 
 function startGame(bypassDeviceCheck = false) {
-    if (!bypassDeviceCheck && settings && settings.deviceMode === 'ask' && typeof openDeviceModeModal === 'function') {
-        openDeviceModeModal(true, true);
-        return;
+    if (!bypassDeviceCheck && settings && settings.deviceMode === 'ask') {
+        const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || (window.innerWidth <= 820);
+        settings.deviceMode = hasTouch ? 'mobile' : 'pc';
+        if (typeof persistSettings === 'function') persistSettings();
     }
     if (settings && settings.deviceMode === 'mobile') {
         document.body.classList.add('touch-on');
@@ -12245,7 +12358,7 @@ function drawDebugDiagnostics() {
     ctx.fillStyle = '#00f0ff';
     ctx.font = "bold 11px 'Courier New', monospace";
     ctx.textAlign = 'left';
-    ctx.fillText('⚡ VITA ENGINE DIAGNOSTICS [F3]', boxX + 10, boxY + 20);
+    ctx.fillText('VITA ENGINE DIAGNOSTICS [F3]', boxX + 10, boxY + 20);
 
     ctx.fillStyle = perfFps >= 55 ? '#22c55e' : (perfFps >= 30 ? '#eab308' : '#ef4444');
     ctx.fillText(`FPS: ${perfFps.toFixed(1)} (${perfFrameTime.toFixed(1)}ms frame budget)`, boxX + 10, boxY + 42);
