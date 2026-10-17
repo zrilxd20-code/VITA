@@ -37,7 +37,7 @@ vita/
 │   ├── supabase.js     # REST client Supabase (tanpa hardcoded key; config di localStorage)
 │   ├── game.js         # Logika game (10.000+ baris: canvas render, BFS AI, WebAudio, sentuh)
 │   └── modules/        # [Eksperimental/Roadmap] Modul TypeScript terpisah (persiapan refactoring)
-├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: XSS, avatar, BFS anti-softlock, RPC, regresi kecerahan Hub, aksesibilitas dialog, kelengkapan i18n)
+├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: XSS, avatar, BFS anti-softlock, RPC, regresi kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n)
 ├── AGENTS.md           # [Berkas Ini] Panduan sistem & aturan khusus untuk AI Agent
 └── README.md           # Dokumentasi proyek untuk pengembang & pemain
 ```
@@ -133,5 +133,5 @@ vita/
   npm run check
   npm test
   ```
-  (`check.mjs`: sintaks + scope global gabungan + parity & cakupan i18n + secret scan; `test_web_security_qa.js`: 10 modul audit QA/security/BFS/a11y).
+  (`check.mjs`: sintaks + scope global gabungan + parity & cakupan i18n + secret scan; `test_web_security_qa.js`: 11 modul audit QA/security/BFS/a11y).
 

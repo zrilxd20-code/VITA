@@ -45,7 +45,10 @@
 }
 .vita-btn:hover { transform: translateY(-2px); filter: brightness(1.12); box-shadow: var(--shadow-glow-red); }
 .vita-btn:active { transform: translateY(0) scale(0.98); }
+/* Elemen non-native yang diberi role="button" (kartu pilihan perangkat, pil,
+   banner) juga butuh cincin fokus yang terlihat saat dijelajahi via keyboard. */
 .vita-btn:focus-visible, a:focus-visible, button:focus-visible,
+[role="button"]:focus-visible,
 input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 2px solid var(--accent-2);
   outline-offset: 3px;

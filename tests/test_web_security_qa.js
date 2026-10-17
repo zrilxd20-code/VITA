@@ -3,6 +3,7 @@
  * Menguji keamanan sanitasi XSS, validasi input callsign, URL avatar, proteksi data localStorage rusak,
  * integritas level web, verifikasi schema Supabase RPC, konektivitas labirin anti-softlock,
  * regresi kontrol kecerahan (applyBrightness) Hub, aksesibilitas dialog (ARIA + focus trap),
+ * aksesibilitas keyboard kontrol non-native (role="button"),
  * serta kelengkapan i18n modal mode perangkat & pil mode layar mulai.
  */
 
@@ -257,6 +258,26 @@ assert(/updateStartScreenDevicePill\(settings\.deviceMode,\s*settings\.lang\)/.t
   'applyLang() harus meneruskan bahasa aktif ke updateStartScreenDevicePill()');
 console.log('✓ TEST 10 LULUS: Modal mode perangkat & pil mode mengikuti bahasa aktif tanpa sisa teks ID.');
 
+// TEST 11: Kontrol non-native (role="button") dapat dijangkau & diaktifkan keyboard.
+// Regresi: kartu pilihan perangkat, pil mode, dan banner operatif adalah <div>
+// ber-onclick tanpa role/tabindex, sehingga tidak bisa difokus maupun ditekan
+// pengguna keyboard (dan tidak punya cincin fokus yang terlihat).
+console.log('\n[TEST 11] Pengujian Aksesibilitas Kontrol Non-Native (role="button")...');
+const nativeButtonIds = ['deviceChoicePc', 'deviceChoiceMobile', 'startOperativeBanner', 'startScreenDevicePill'];
+nativeButtonIds.forEach(function (id) {
+  const re = new RegExp(`id="${id}"[^>]*\\brole="button"[^>]*\\btabindex="0"`);
+  assert(re.test(indexHtml), `#${id} harus ber-role="button" dan tabindex="0" agar dapat difokus keyboard`);
+});
+assert(/id="sidebarBackdrop"[^>]*aria-hidden="true"/.test(indexHtml),
+  'Backdrop klik-untuk-tutup harus aria-hidden (murni penunjuk, bukan kontrol)');
+assert(/getAttribute\('role'\)\s*!==\s*'button'/.test(homeJs) && /el\.click\(\)/.test(homeJs),
+  'Enter/Space pada role="button" non-native harus memicu klik (aktivasi keyboard)');
+assert(/setAttribute\('aria-pressed'/.test(homeJs),
+  'Kartu pilihan perangkat harus mencerminkan status terpilih lewat aria-pressed');
+assert(tokensCss.includes('[role="button"]:focus-visible'),
+  'role="button" harus memperoleh cincin fokus :focus-visible');
+console.log('✓ TEST 11 LULUS: Kontrol non-native dapat difokus & diaktifkan lewat keyboard.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (10/10)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (11/11)');
 console.log('=========================================');

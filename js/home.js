@@ -432,6 +432,25 @@ document.addEventListener('keydown', e => {
   });
 })();
 
+/* ---- A11y: Kontrol Non-Native (role="button") Dapat Diaktifkan Keyboard ----
+   Kartu pilihan perangkat, pil mode, dan banner operatif adalah <div> agar
+   tata letaknya fleksibel, tetapi tetap harus bisa dipakai tanpa mouse.
+   Satu listener terdelegasi menerjemahkan Enter/Space menjadi klik, sehingga
+   tidak ada handler per-elemen yang perlu dirawat. Elemen native (button, a,
+   input) dikecualikan karena sudah menangani kedua tombol itu sendiri. */
+(function initKeyboardButtonActivation() {
+  const NATIVE = { BUTTON: 1, A: 1, INPUT: 1, SELECT: 1, TEXTAREA: 1, SUMMARY: 1 };
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+    if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+    const el = e.target;
+    if (!el || el.nodeType !== 1 || NATIVE[el.tagName]) return;
+    if (el.getAttribute('role') !== 'button') return;
+    e.preventDefault(); // Space menggulir halaman bila tidak dicegah
+    el.click();
+  });
+})();
+
 // ---- Sistem Profil Operatif & PP (Photo Profile) ----
 const VITA_PROFILE_KEY = 'vita_profile';
 const VITA_ACCOUNTS_KEY = 'vita_accounts';
@@ -1975,6 +1994,22 @@ let pendingDeviceContinue = false;
 let pendingDeviceFromGameView = false;
 let selectedDeviceOption = 'pc';
 
+/* Sinkronkan kelas visual + status ARIA kedua kartu pilihan perangkat.
+   Dipakai bersama oleh openDeviceModeModal() dan selectDeviceChoice(). */
+function syncDeviceChoiceSelection() {
+  const isPc = selectedDeviceOption === 'pc';
+  const pcCard = document.getElementById('deviceChoicePc');
+  const mobCard = document.getElementById('deviceChoiceMobile');
+  if (pcCard) {
+    pcCard.classList.toggle('selected', isPc);
+    pcCard.setAttribute('aria-pressed', isPc ? 'true' : 'false');
+  }
+  if (mobCard) {
+    mobCard.classList.toggle('selected', !isPc);
+    mobCard.setAttribute('aria-pressed', !isPc ? 'true' : 'false');
+  }
+}
+
 function openDeviceModeModal(fromGameView = false, autoStart = false, isContinue = false) {
   pendingDeviceFromGameView = !!fromGameView;
   pendingDeviceAutoStart = !!autoStart;
@@ -1989,10 +2024,7 @@ function openDeviceModeModal(fromGameView = false, autoStart = false, isContinue
     selectedDeviceOption = hasTouch ? 'mobile' : 'pc';
   }
 
-  const pcCard = document.getElementById('deviceChoicePc');
-  const mobCard = document.getElementById('deviceChoiceMobile');
-  if (pcCard) pcCard.classList.toggle('selected', selectedDeviceOption === 'pc');
-  if (mobCard) mobCard.classList.toggle('selected', selectedDeviceOption === 'mobile');
+  syncDeviceChoiceSelection();
 
   const chk = document.getElementById('chkRememberDevice');
   if (chk) chk.checked = (homeSettings.deviceMode === 'pc' || homeSettings.deviceMode === 'mobile');
@@ -2010,10 +2042,7 @@ function closeDeviceModeModal() {
 
 function selectDeviceChoice(choice) {
   selectedDeviceOption = (choice === 'mobile') ? 'mobile' : 'pc';
-  const pcCard = document.getElementById('deviceChoicePc');
-  const mobCard = document.getElementById('deviceChoiceMobile');
-  if (pcCard) pcCard.classList.toggle('selected', selectedDeviceOption === 'pc');
-  if (mobCard) mobCard.classList.toggle('selected', selectedDeviceOption === 'mobile');
+  syncDeviceChoiceSelection();
   homeBeep('click');
 }
 
