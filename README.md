@@ -6,7 +6,7 @@
 [![Zero External Assets](https://img.shields.io/badge/Assets-100%25%20Procedural-red)](index.html)
 [![PWA Ready](https://img.shields.io/badge/PWA-Network--First%20Offline-brightgreen)](sw.js)
 [![Database](https://img.shields.io/badge/Database-Supabase%20%2F%20PostgreSQL-3ECF8E)](supabase_schema.sql)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(9%2F9%20QA)-success)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(10%2F10%20QA)-success)](tests/)
 
 ---
 
@@ -113,7 +113,7 @@ vita/
 │   └── supabase.js         # REST client for Supabase cloud leaderboards & dossiers
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # 9-module QA audit (XSS, avatars, BFS anti-softlock, brightness, dialog a11y)
+│   └── test_web_security_qa.js # 10-module QA audit (XSS, avatars, BFS anti-softlock, brightness, dialog a11y, i18n)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```

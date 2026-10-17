@@ -2,7 +2,8 @@
  * Web Security & QA Automated Test Suite for VITA
  * Menguji keamanan sanitasi XSS, validasi input callsign, URL avatar, proteksi data localStorage rusak,
  * integritas level web, verifikasi schema Supabase RPC, konektivitas labirin anti-softlock,
- * regresi kontrol kecerahan (applyBrightness) Hub, serta aksesibilitas dialog (ARIA + focus trap).
+ * regresi kontrol kecerahan (applyBrightness) Hub, aksesibilitas dialog (ARIA + focus trap),
+ * serta kelengkapan i18n modal mode perangkat & pil mode layar mulai.
  */
 
 const fs = require('fs');
@@ -16,6 +17,7 @@ const homeJs = fs.readFileSync(path.join(__dirname, '../js/home.js'), 'utf8');
 const supabaseJs = fs.readFileSync(path.join(__dirname, '../js/supabase.js'), 'utf8');
 const gameJs = fs.readFileSync(path.join(__dirname, '../js/game.js'), 'utf8');
 const schemaSql = fs.readFileSync(path.join(__dirname, '../supabase_schema.sql'), 'utf8');
+const indexHtml = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
 
 // Ekstraksi fungsi escapeLbHtml secara dinamis dari js/home.js (Anti False-Positive)
 const escapeMatch = homeJs.match(/function escapeLbHtml\([^)]*\)\s*\{[\s\S]*?\n\}/);
@@ -236,6 +238,25 @@ assert(tokensCss.includes('input:focus-visible') && tokensCss.includes('select:f
   ':focus-visible harus mencakup kontrol form (input/select/textarea)');
 console.log('✓ TEST 9 LULUS: Dialog Hub memiliki semantik ARIA, jebakan fokus Tab, dan pemulihan fokus.');
 
+// TEST 10: Kelengkapan i18n modal mode perangkat + pil mode pada layar mulai.
+// Regresi: teks statis dulu berbahasa Indonesia padahal bahasa default EN, dan sebagian
+// elemen modal tidak pernah disetel applyLang() sehingga tetap ID walau antarmuka berbahasa EN.
+console.log('\n[TEST 10] Pengujian Kelengkapan i18n (Modal Mode Perangkat & Pil Mode)...');
+const deviceModalIds = ['deviceModalTitle', 'deviceModalDesc', 'devicePcTitle', 'devicePcRec', 'devicePcDesc',
+  'deviceMobileTitle', 'deviceMobileRec', 'deviceMobileDesc', 'deviceRememberText', 'deviceBtnEnter'];
+deviceModalIds.forEach(function (id) {
+  assert(gameJs.includes(`getElementById('${id}')`), `applyLang() harus menyetel teks #${id}`);
+});
+['SELECT CONTROL MODE', 'ENTER MISSION', 'MOBILE / TABLET (TOUCHSCREEN)', 'CONTROL MODE: PC (KEYBOARD)'].forEach(function (en) {
+  assert(indexHtml.includes(en), `Teks statis default EN "${en}" harus ada di index.html`);
+});
+assert(!/PILIH MODE KONTROL|MASUK KE MISI|\[GANTI\]/.test(indexHtml), 'Teks statis modal/pil mode perangkat tidak boleh tertinggal dalam Bahasa Indonesia');
+assert(/\.device-pill-btn/.test(homeJs) && indexHtml.includes('[SWITCH]'), 'Label [SWITCH]/[GANTI] pil mode harus dilokalkan');
+assert(/pill\.title\s*=/.test(homeJs), 'Tooltip pil mode harus mengikuti bahasa aktif');
+assert(/updateStartScreenDevicePill\(settings\.deviceMode,\s*settings\.lang\)/.test(gameJs),
+  'applyLang() harus meneruskan bahasa aktif ke updateStartScreenDevicePill()');
+console.log('✓ TEST 10 LULUS: Modal mode perangkat & pil mode mengikuti bahasa aktif tanpa sisa teks ID.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (9/9)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (10/10)');
 console.log('=========================================');

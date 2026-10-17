@@ -1006,7 +1006,7 @@ function applyLang() {
     if (dMtD) dMtD.textContent = tt('device_mobile_desc');
     const dRem = document.getElementById('deviceRememberText');
     if (dRem) dRem.textContent = tt('device_remember');
-    if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(settings.deviceMode);
+    if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(settings.deviceMode, settings.lang);
     if (typeof updateUI === 'function' && typeof player !== 'undefined' && player) updateUI();
 }
 
@@ -12110,7 +12110,7 @@ function setupPauseSettingsListeners() {
         } else if (mode === 'pc') {
             document.body.classList.remove('touch-on');
         }
-        if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(mode);
+        if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(mode, settings.lang);
     });
 
     onChange('pauseAutoAim', e => {
@@ -12235,7 +12235,7 @@ function syncSettingsFromStorage() {
     applyTouchLayout();
     applyTouchStyle();
     syncPauseSettingsInputs();
-    if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(settings.deviceMode);
+    if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(settings.deviceMode, settings.lang);
 
     checkContinueBtn();
     if (typeof player !== 'undefined' && player) updateUI();

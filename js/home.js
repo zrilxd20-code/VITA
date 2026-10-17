@@ -2057,16 +2057,21 @@ function confirmDeviceChoiceAndPlay() {
 const VITA_DESKTOP_SVG = '<svg class="device-pill-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg>';
 const VITA_PHONE_SVG = '<svg class="device-pill-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>';
 
-function updateStartScreenDevicePill(mode) {
+function updateStartScreenDevicePill(mode, langOverride) {
   const isMob = (mode === 'mobile');
+  // applyLang() meneruskan bahasa otoritatif dari pengaturan game; tanpa itu pakai pengaturan Hub.
+  const lang = (langOverride === 'id' || langOverride === 'en') ? langOverride : homeSettings.lang;
   const icon = document.getElementById('startScreenDeviceIcon');
   const txt = document.getElementById('startScreenDeviceText');
   if (icon) icon.innerHTML = isMob ? VITA_PHONE_SVG : VITA_DESKTOP_SVG;
   if (txt) {
-    const lang = homeSettings.lang;
     if (isMob) txt.textContent = (lang === 'id') ? 'MODE KONTROL: HP (LAYAR SENTUH)' : 'CONTROL MODE: MOBILE (TOUCH)';
     else txt.textContent = (lang === 'id') ? 'MODE KONTROL: PC (KEYBOARD)' : 'CONTROL MODE: PC (KEYBOARD)';
   }
+  const pill = document.getElementById('startScreenDevicePill');
+  if (pill) pill.title = (lang === 'id') ? 'Klik untuk mengganti mode PC / HP' : 'Click to switch PC / mobile mode';
+  const swBtn = document.querySelector('#startScreenDevicePill .device-pill-btn');
+  if (swBtn) swBtn.textContent = (lang === 'id') ? '[GANTI]' : '[SWITCH]';
 }
 
 // Pindah ke view game dalam satu halaman (dipanggil tombol MAIN SEKARANG).
