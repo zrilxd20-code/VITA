@@ -988,6 +988,24 @@ function applyLang() {
     if (bThreat) bThreat.textContent = tt('boss_threat');
     const dBtn = document.getElementById('deviceBtnEnter');
     if (dBtn) dBtn.textContent = tt('device_btn_enter');
+    const dMT = document.getElementById('deviceModalTitle');
+    if (dMT) dMT.textContent = tt('device_modal_title');
+    const dMD = document.getElementById('deviceModalDesc');
+    if (dMD) dMD.textContent = tt('device_modal_desc');
+    const dPT = document.getElementById('devicePcTitle');
+    if (dPT) dPT.textContent = tt('device_pc_title');
+    const dPR = document.getElementById('devicePcRec');
+    if (dPR) dPR.textContent = tt('device_pc_rec');
+    const dPD = document.getElementById('devicePcDesc');
+    if (dPD) dPD.textContent = tt('device_pc_desc');
+    const dMtT = document.getElementById('deviceMobileTitle');
+    if (dMtT) dMtT.textContent = tt('device_mobile_title');
+    const dMtR = document.getElementById('deviceMobileRec');
+    if (dMtR) dMtR.textContent = tt('device_mobile_rec');
+    const dMtD = document.getElementById('deviceMobileDesc');
+    if (dMtD) dMtD.textContent = tt('device_mobile_desc');
+    const dRem = document.getElementById('deviceRememberText');
+    if (dRem) dRem.textContent = tt('device_remember');
     if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(settings.deviceMode);
     if (typeof updateUI === 'function' && typeof player !== 'undefined' && player) updateUI();
 }
