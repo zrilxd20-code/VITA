@@ -25,8 +25,10 @@ vita/
 ├── tools/              # Tooling Node tanpa dependency (serve/check/gen-icons/bump)
 │   ├── serve.mjs       # Dev server statis http (wajib untuk SW/PWA)
 │   ├── check.mjs       # Cek sintaks + scope global + parity & cakupan i18n + secret scan
+│   ├── check_html.cjs  # Verifikasi HTML well-formed (deteksi tag belum tertutup)
 │   ├── gen-icons.mjs   # Generator ikon PWA reproducible (fs+zlib saja)
 │   └── bump-version.mjs# Sinkron versi rilis satu perintah
+├── .github/workflows/  # CI: jalankan npm run check + npm test pada push/PR
 ├── css/
 │   ├── tokens.css      # Design tokens industri (dimuat pertama, global :root)
 │   ├── home.css        # Gaya Hub, di-scope #homeView (kecuali :root/* global)
@@ -37,7 +39,9 @@ vita/
 │   ├── supabase.js     # REST client Supabase (tanpa hardcoded key; config di localStorage)
 │   ├── game.js         # Logika game (10.000+ baris: canvas render, BFS AI, WebAudio, sentuh)
 │   └── modules/        # [Eksperimental/Roadmap] Modul TypeScript terpisah (persiapan refactoring)
-├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: XSS, avatar, BFS anti-softlock, RPC, regresi kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n)
+├── script.md           # Naskah cerita, karakter, dan dialog (kanon narasi — jangan diubah tanpa izin)
+├── supabase_schema.sql # Skema PostgreSQL, check constraint, dan kebijakan RLS
+├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 11 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n)
 ├── AGENTS.md           # [Berkas Ini] Panduan sistem & aturan khusus untuk AI Agent
 └── README.md           # Dokumentasi proyek untuk pengembang & pemain
 ```
@@ -66,6 +70,13 @@ vita/
      }
      ```
    - Rekor skor/waktu tersimpan di `localStorage` dengan key `'vita_high'`.
+4. **Kinerja HUD (frame budget)**:
+   - Semua akses elemen HUD per-frame wajib lewat `hudEl(id)` (cache referensi + validasi `isConnected`); tulisan teks lewat `setHudText()` yang meniadakan mutasi DOM bila nilainya tidak berubah.
+   - Warna tier HP bar, lebar bar boss, dan fill cooldown senjata bersifat *change-detected* (dilacak via `dataset`/nilai terakhir). Jangan menulis `style`/`classList` tiap frame tanpa cek perubahan.
+   - Hindari `Array.prototype.filter()/map()` yang mengalokasi array baru di jalur per-frame bila ada alternatif loop penghitung.
+5. **Aksesibilitas**:
+   - Semua modal non-native terdaftar pada *focus manager* (`js/home.js`, MutationObserver): otomatis mendapat `role="dialog"`, `aria-modal`, focus trap, dan pengembalian fokus saat ditutup.
+   - Kontrol non-native (kartu device, blok start screen) wajib memiliki `role="button"` + `tabindex="0"` (dan `aria-pressed` bila bersifat toggle) serta dapat diaktifkan lewat **Enter/Space**.
 
 ### B. Persistence Web (`localStorage`)
 1. **Pengaturan**: key `'vita_save'` (volume, brightness, lang, difficulty, quality).
@@ -133,5 +144,5 @@ vita/
   npm run check
   npm test
   ```
-  (`check.mjs`: sintaks + scope global gabungan + parity & cakupan i18n + secret scan; `test_web_security_qa.js`: 11 modul audit QA/security/BFS/a11y).
+  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 11 modul audit QA/security/BFS/a11y).
 

@@ -14,12 +14,12 @@
 
 **VITA** is a web game engine showcase demonstrating cutting-edge browser game engineering without any external assets (v2.0 Web-only; Desktop Pygame retired):
 
-1. **Web Edition ([index.html](file:///c:/Users/user/Desktop/pengenal%20web/vita/index.html) + [js/game.js](file:///c:/Users/user/Desktop/pengenal%20web/vita/js/game.js))**:
+1. **Web Edition** ([index.html](index.html) + [js/game.js](js/game.js) + [css/game.css](css/game.css)):
    - 15 labyrinth sectors running on a hardware-accelerated HTML5 Canvas 2D engine.
    - High-performance **Breadth-First Search (BFS) Pathfinding** with pre-allocated shared typed array buffers (zero garbage collection stuttering).
    - Real-time procedural sound synthesizer using the **WebAudio API** (`OscillatorNode`, `BiquadFilterNode`, `GainNode`).
    - Modular weapon arsenal (Tactical Knife, AP Combat Rifle, EMP Bio-Grenade, Heavy Bazooka, Kinetic Shield, Vulcan Minigun) and post-sector cybernetic augmentations.
-2. **Command Operations Hub ([index.html](file:///c:/Users/user/Desktop/pengenal%20web/vita/index.html) + [js/home.js](file:///c:/Users/user/Desktop/pengenal%20web/vita/js/home.js))**:
+2. **Command Operations Hub** ([index.html](index.html) + [js/home.js](js/home.js) + [css/home.css](css/home.css)):
    - Single-Page Application (SPA) CRT terminal hub featuring floating ember particle physics, scanlines, responsive 3D tilt cards, operative dossier registration, and live cloud telemetry.
 
 ---
@@ -41,7 +41,7 @@
 
 ### 1. 100% Zero External Asset Dependencies
 Every visual element and sound effect is synthesized at runtime:
-- **Procedural Bestiary**: All 12 creature classes (*Slime, Bat, Crawl, Ghost, Harvester, Dark Knight, Dragon, Lich, Beholder, Mimic, Apex Stalker, and The Monolith*) feature procedural Canvas geometry, pulsating cores, dynamic wing flapping cycles, and particle emitters.
+- **Procedural Bestiary**: All 12 creature classes (*Slime, Bat, Crawl, Ghost, Harvester, Dark Knight, Dragon, Lich, Beholder, Mimic, Final Boss, and The Monolith*) — plus the Sektor 10 apex boss *Mother Harvester* — feature procedural Canvas geometry, pulsating cores, dynamic wing flapping cycles, and particle emitters.
 - **Synthesized Audio**: Sound effects (footsteps, knife slashes, rifle recoils, bazooka detonations, kinetic shield hums, monster shrieks, heartbeat alerts) are programmatically generated via mathematical sine/sawtooth frequency modulation in the WebAudio API (`OscillatorNode`, `BiquadFilterNode`, `GainNode`).
 
 ### 2. High-Performance BFS AI & Boids Separation
@@ -60,6 +60,17 @@ Every visual element and sound effect is synthesized at runtime:
 
 ### 5. Bilingual System (i18n)
 - Native bilingual support for **English** and **Bahasa Indonesia** with real-time switching across the web hub, in-game HUD, and operational modals.
+- Enforced at build-check time: `tools/check.mjs` asserts **two-way key parity** between the `id`/`en` dictionaries and verifies every `tt()` / `data-i18n` token resolves, so a missing translation fails CI before it can ship.
+
+### 6. Performance-First HUD (60 Hz Frame Budget)
+- The render loop treats DOM work as the expensive operation it is: a memoized element cache (`hudEl()` — validated via `isConnected`) removes repeated `getElementById` lookups from `gameLoop()` / `updateUI()` / `renderWeaponHUD()`.
+- `setHudText()` elides redundant text writes, and HP-bar tiers, boss-bar widths, and weapon-cooldown fills are **change-detected**, keeping layout/style recalculation off the per-frame critical path.
+- Hot AI counters use simple count loops instead of allocating a fresh array every frame, complementing the shared BFS buffers.
+
+### 7. Accessibility & Keyboard Operability
+- Operational dialogs (device mode, lore, codex, settings) expose **ARIA** `role="dialog"` / `aria-modal` semantics, a Tab focus trap, and focus restoration on close.
+- Non-native interactive controls (device cards, start-screen blocks) are keyboard-reachable via `role="button"` + `tabindex="0"` (with `aria-pressed` state) and activate on **Enter/Space**.
+- Visible `:focus-visible` rings are provided for both the hub (orange) and in-game HUD (cyan) themes.
 
 ---
 
@@ -79,10 +90,10 @@ Or any static server (`npx serve .`, `python -m http.server 8000`).
 ### Node Tooling (stdlib only, zero install)
 
 ```powershell
-npm run check   # syntax + global-scope + i18n parity & coverage + secret scan
+npm run check   # syntax + global-scope + i18n parity & coverage + secret scan + manifest & HTML checks
 npm test        # web security & input validation audit
 npm run icons   # regenerate PWA icons (pure Node, reproducible)
-npm run bump -- 2.1.0  # sync version.json, sw.js, index.html, APP_VERSION
+npm run bump -- 2.5.0  # sync version.json, sw.js, index.html, APP_VERSION
 ```
 
 ---
@@ -100,8 +111,10 @@ vita/
 ├── tools/                  # Node stdlib tooling (serve, check, gen-icons, bump-version)
 │   ├── serve.mjs           # Static dev server (http, no-store version.json)
 │   ├── check.mjs           # Syntax + scope + i18n parity & coverage + secret scan
+│   ├── check_html.cjs      # HTML well-formedness (unclosed-tag) verification
 │   ├── gen-icons.mjs       # Reproducible PWA icon generator (fs+zlib only)
 │   └── bump-version.mjs    # Single-command release version sync
+├── .github/workflows/ci.yml# CI pipeline: npm run check + npm test on push/PR
 ├── css/
 │   ├── tokens.css          # Industrial design tokens (colors, type, motion)
 │   ├── home.css            # Cyberpunk hub terminal styling (scoped #homeView)
@@ -110,10 +123,12 @@ vita/
 │   ├── home.js             # Hub logic: particle embers, operative dossiers, auth
 │   ├── game.js             # Core game engine (Canvas renderer, BFS AI, WebAudio, touch)
 │   ├── prologue.js         # Narrative compendium (prologue/transmissions/lore/epilogue)
-│   └── supabase.js         # REST client for Supabase cloud leaderboards & dossiers
+│   ├── supabase.js         # REST client for Supabase cloud leaderboards & dossiers
+│   └── modules/            # [Experimental/Roadmap] Standalone TypeScript modules (refactor prep)
+├── script.md               # Narrative script, characters, and dialogue canon
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # 11-module QA audit (XSS, avatars, BFS anti-softlock, brightness, dialog & keyboard a11y, i18n)
+│   └── test_web_security_qa.js # 11-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```
