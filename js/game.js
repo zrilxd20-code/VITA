@@ -10924,6 +10924,105 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+// ---- Fase 1 co-op: pemisahan SIMULASI vs RENDER (fondasi host-authoritative) ----
+// Untuk jaringan lanjutan, host harus bisa memajukan state dunia TANPA menyentuh
+// canvas/DOM (lalu menyiarkan snapshot), sementara klien cukup menggambar hasilnya.
+// Helper di bawah membuat pemisahan itu eksplisit:
+//
+//   stepSimulation()    → state otoritatif: posisi, HP, damage, timer gameplay.
+//   stepLocalVisuals()  → efek kosmetik (partikel, spora, selongsong, teks) yang
+//                         boleh berbeda antar pemain tanpa memengaruhi hasil game.
+//   stepCamera()        → interpolasi kamera; murni pandangan tiap pemain.
+//   updatePerfCounters()→ statistik FPS untuk overlay debug.
+//   renderFrame()       → seluruh pass gambar + HUD; tidak mengubah state simulasi.
+//
+// Urutan pemanggilan di gameLoopFrame() sama dengan loop lama, jadi perilaku
+// single-player tidak berubah. updateMonsterProximityAndHeartbeat() tetap dipanggil
+// di jalur klien karena sifatnya feedback audio/getaran milik tiap pemain.
+
+function stepSimulation() {
+    // Inti state otoritatif — host menjalankan ini setiap tick.
+    updatePlayer();
+    updateMonsters();
+    updateProjectiles();
+    updateThermalTrails();
+    updateShockwaves();
+    updateGasClouds();
+    updateTraps();
+
+    // Peluruhan timer combo Adrenaline
+    if (comboTimer > 0) {
+        comboTimer--;
+        if (comboTimer === 0) {
+            comboCount = 0;
+            hideComboBanner();
+        }
+    }
+}
+
+function stepLocalVisuals() {
+    // Kosmetik murni: aman bila visualnya berbeda antar pemain.
+    updateBrassCasings();
+    updateParticles();
+    updateSpores();
+
+    // Teks damage melayang: umur + naik + batas 40 entri (tanpa alokasi array).
+    let ftWrite = 0;
+    for (let i = 0; i < floatingTexts.length; i++) {
+        const t = floatingTexts[i];
+        t.life--;
+        t.y -= 0.5;
+        if (t.life > 0 && ftWrite < 40) {
+            floatingTexts[ftWrite++] = t;
+        }
+    }
+    floatingTexts.length = ftWrite;
+}
+
+// Kamera adaptif dengan Dynamic Look-Ahead menuju arah bidikan crosshair.
+function stepCamera() {
+    let targetCamX = player.x;
+    let targetCamY = player.y;
+    if (mouseActive && !menuDemo) {
+        const aimDist = 65;
+        targetCamX += Math.cos(player.facing) * aimDist;
+        targetCamY += Math.sin(player.facing) * aimDist;
+    }
+    const camDist = Math.hypot(targetCamX - cameraX, targetCamY - cameraY);
+    const camLerp = camDist > 200 ? 0.15 : 0.08;
+    cameraX += (targetCamX - cameraX) * camLerp;
+    cameraY += (targetCamY - cameraY) * camLerp;
+}
+
+// Statistik FPS untuk HUD/overlay debug (change-detected, tiap 15 frame).
+function updatePerfCounters() {
+    const loopNow = performance.now();
+    perfFrameTime = loopNow - perfLastTime;
+    perfLastTime = loopNow;
+    perfFrameCount++;
+    if (perfFrameCount % 15 === 0) {
+        perfFps = Math.min(60, 1000 / Math.max(1, perfFrameTime));
+        if (settings && settings.showFps) {
+            const fpsEl = hudEl('fpsCounter');
+            if (fpsEl) {
+                if (fpsEl.style.display !== 'block') fpsEl.style.display = 'block';
+                setHudText(fpsEl, 'FPS: ' + Math.round(perfFps));
+            }
+        }
+    }
+}
+
+// Sisi render murni: tidak mengubah state simulasi.
+function renderFrame() {
+    culledCount = 0;
+    renderedCount = 0;
+    renderGame();
+    drawCrosshair();
+    drawMinimap();
+    if (debugOverlayOpen) drawDebugDiagnostics();
+    updateUI();
+}
+
 function gameLoopFrame() {
     const gv = hudEl('gameView');
     if (document.hidden || (gv && gv.style.display === 'none')) {
@@ -10934,81 +11033,17 @@ function gameLoopFrame() {
             // Hit-stop: dunia beku sesaat, tapi tetap render + goyangan meluruh.
             hitStop--;
             if (screenShake > 0) screenShake--;
-            renderGame();
-            drawCrosshair();
-            drawMinimap();
-            updateUI();
+            renderFrame();
             return;
         }
         playAmbientDrone();
         startProceduralOST();
-        updatePlayer();
-        updateMonsters();
-        updateProjectiles();
-        updateThermalTrails();
-        updateShockwaves();
-        updateGasClouds();
-        updateBrassCasings();
-        updateTraps();
-        updateParticles();
-        updateSpores();
+        stepSimulation();
+        stepLocalVisuals();
         updateMonsterProximityAndHeartbeat();
-
-        // Adrenaline combo timer decay
-        if (comboTimer > 0) {
-            comboTimer--;
-            if (comboTimer === 0) {
-                comboCount = 0;
-                hideComboBanner();
-            }
-        }
-
-        let ftWrite = 0;
-        for (let i = 0; i < floatingTexts.length; i++) {
-            const t = floatingTexts[i];
-            t.life--;
-            t.y -= 0.5;
-            if (t.life > 0 && ftWrite < 40) {
-                floatingTexts[ftWrite++] = t;
-            }
-        }
-        floatingTexts.length = ftWrite;
-
-        // Kamera adaptif dengan Dynamic Look-Ahead menuju arah bidikan crosshair
-        let targetCamX = player.x;
-        let targetCamY = player.y;
-        if (mouseActive && !menuDemo) {
-            const aimDist = 65;
-            targetCamX += Math.cos(player.facing) * aimDist;
-            targetCamY += Math.sin(player.facing) * aimDist;
-        }
-        const camDist = Math.hypot(targetCamX - cameraX, targetCamY - cameraY);
-        const camLerp = camDist > 200 ? 0.15 : 0.08;
-        cameraX += (targetCamX - cameraX) * camLerp;
-        cameraY += (targetCamY - cameraY) * camLerp;
-
-        const loopNow = performance.now();
-        perfFrameTime = loopNow - perfLastTime;
-        perfLastTime = loopNow;
-        perfFrameCount++;
-        if (perfFrameCount % 15 === 0) {
-            perfFps = Math.min(60, 1000 / Math.max(1, perfFrameTime));
-            if (settings && settings.showFps) {
-                const fpsEl = hudEl('fpsCounter');
-                if (fpsEl) {
-                    if (fpsEl.style.display !== 'block') fpsEl.style.display = 'block';
-                    setHudText(fpsEl, 'FPS: ' + Math.round(perfFps));
-                }
-            }
-        }
-        culledCount = 0;
-        renderedCount = 0;
-
-        renderGame();
-        drawCrosshair();
-        drawMinimap();
-        if (debugOverlayOpen) drawDebugDiagnostics();
-        updateUI();
+        stepCamera();
+        updatePerfCounters();
+        renderFrame();
         if (mouseTime > 0) { mouseTime--; if (mouseTime <= 0) mouseActive = false; }
     } else if (gameState === 'menu' && player) {
         demoUpdate();

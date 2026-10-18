@@ -9,7 +9,8 @@
  * live region status async Hub (role="status", WCAG 4.1.3),
  * ketahanan loop game terhadap exception (error boundary anti-freeze),
  * interaksi modal Memori Robot (jeda game, i18n, guard kabut, focus trap),
- * serta dunia deterministik ber-seed (fondasi co-op online: PRNG mulberry32).
+ * dunia deterministik ber-seed (fondasi co-op online: PRNG mulberry32),
+ * serta pemisahan simulasi vs render (fondasi arsitektur host-authoritative).
  */
 
 const fs = require('fs');
@@ -410,6 +411,49 @@ assert(/Math\.random\s*=\s*originalRandom/.test(gameJs),
   'PRNG global (Math.random) harus dikembalikan setelah konstruksi dunia selesai');
 console.log('✓ TEST 16 LULUS: Dunia deterministik dari seed — labirin/monster/loot identik antar-peer.');
 
+// TEST 17: Pemisahan simulasi vs render (prasyarat arsitektur host-authoritative).
+// Regresi: dulu seluruh update gameplay + render HUD bercampur dalam satu blok
+// gameLoopFrame(), sehingga host tidak bisa memajukan state dunia tanpa menyentuh
+// canvas/DOM. Sekarang state otoritatif dipisah ke stepSimulation() dan sisi gambar
+// ke renderFrame(), sehingga klien dapat menggambar tanpa ikut menyimulasikan dunia.
+console.log('\n[TEST 17] Pengujian Pemisahan Simulasi vs Render (fondasi host-authoritative)...');
+const fnBody = (name, params) => (gameJs.match(new RegExp('function ' + name + '\\(' + (params || '') + '\\)\\s*\\{[\\s\\S]*?\\n\\}')) || [''])[0];
+const simBody = fnBody('stepSimulation');
+const visualsBody = fnBody('stepLocalVisuals');
+const camBody = fnBody('stepCamera');
+const perfBody = fnBody('updatePerfCounters');
+const renderBody = fnBody('renderFrame');
+const frameBody = fnBody('gameLoopFrame');
+// 17a. Semua helper pemisah harus ada.
+[['stepSimulation', simBody], ['stepLocalVisuals', visualsBody], ['stepCamera', camBody],
+ ['updatePerfCounters', perfBody], ['renderFrame', renderBody], ['gameLoopFrame', frameBody]]
+  .forEach(([name, body]) => assert(body.length > 0, 'Fungsi pemisah ' + name + '() tidak ditemukan'));
+// 17b. Simulasi otoritatif: seluruh update gameplay yang mengubah state dunia.
+['updatePlayer()', 'updateMonsters()', 'updateProjectiles()', 'updateThermalTrails()',
+ 'updateShockwaves()', 'updateGasClouds()', 'updateTraps()']
+  .forEach(call => assert(simBody.includes(call), 'stepSimulation() harus menjalankan ' + call));
+// 17c. Simulasi TIDAK boleh menyentuh render/DOM (syarat host tanpa canvas).
+['renderGame', 'updateUI', 'drawCrosshair', 'drawMinimap', 'drawDebugDiagnostics', 'hudEl(']
+  .forEach(bad => assert(!simBody.includes(bad), 'stepSimulation() tidak boleh memanggil ' + bad + ' (harus murni state)'));
+// 17d. Kosmetik lokal dipisah dari simulasi (boleh berbeda antar pemain).
+['updateBrassCasings()', 'updateParticles()', 'updateSpores()', 'floatingTexts']
+  .forEach(call => assert(visualsBody.includes(call), 'stepLocalVisuals() harus menangani ' + call));
+['updatePlayer()', 'updateMonsters()', 'updateTraps()']
+  .forEach(bad => assert(!visualsBody.includes(bad), 'stepLocalVisuals() tidak boleh menjalankan logika gameplay ' + bad));
+// 17e. Render murni: menggambar, bukan menyimulasikan.
+['renderGame()', 'drawCrosshair()', 'drawMinimap()', 'updateUI()']
+  .forEach(call => assert(renderBody.includes(call), 'renderFrame() harus memanggil ' + call));
+['updatePlayer()', 'updateMonsters()', 'updateProjectiles()']
+  .forEach(bad => assert(!renderBody.includes(bad), 'renderFrame() tidak boleh memajukan simulasi ' + bad));
+// 17f. Loop utama: sim dulu, lalu render — dan hit-stop tetap merender (dunia beku).
+assert(frameBody.includes('stepSimulation()') && frameBody.includes('renderFrame()'),
+  'gameLoopFrame() harus memanggil stepSimulation() dan renderFrame()');
+assert(frameBody.indexOf('stepSimulation()') < frameBody.lastIndexOf('renderFrame()'),
+  'Urutan loop harus menjalankan simulasi sebelum render');
+assert(/hitStop\s*--[\s\S]*?renderFrame\(\);[\s\S]*?return;/.test(frameBody),
+  'Jalur hit-stop harus membekukan simulasi namun tetap memanggil renderFrame()');
+console.log('✓ TEST 17 LULUS: Simulasi (state) terpisah dari render (canvas/HUD) — siap host-authoritative.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (16/16)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (17/17)');
 console.log('=========================================');
