@@ -63,7 +63,28 @@
   <div class="hero-hud-bracket bottom-right"></div>
 
   <div class="logo">BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR</div>
-  <h1 class="title">VITA</h1>
+
+  <!-- LOCKUP LOGO VITA: emblem prosedural (inline SVG, tanpa aset eksternal) + wordmark berlapis.
+       Seluruh elemen dekoratif ditandai aria-hidden agar nama aksesibel tetap satu (h1 "VITA"). -->
+  <div class="vita-lockup">
+    <svg class="vita-emblem" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      <polygon class="em-ring" points="50,4 89.8,27 89.8,73 50,96 10.2,73 10.2,27"/>
+      <polygon class="em-ring-inner" points="50,16 79.4,33 79.4,67 50,84 20.6,67 20.6,33"/>
+      <g class="em-ticks">
+        <path d="M50 4 L50 11"/>
+        <path d="M89.8 27 L83.7 30.5"/>
+        <path d="M89.8 73 L83.7 69.5"/>
+        <path d="M50 96 L50 89"/>
+        <path d="M10.2 73 L16.3 69.5"/>
+        <path d="M10.2 27 L16.3 30.5"/>
+      </g>
+      <path class="em-v" d="M32 37 L50 69 L68 37"/>
+      <circle class="em-core" cx="50" cy="53" r="2.8"/>
+    </svg>
+    <h1 class="title">VITA</h1>
+    <span class="vita-sweep" aria-hidden="true"></span>
+  </div>
+
   <p class="tagline"><b>FORGOTTEN SECTOR</b></p>
   <p class="ambient">BIOLOGICAL SENSOR ANOMALY: UNSTABLE &bull; PROCEED WITH CAUTION</p>
   <div class="divider"></div>
