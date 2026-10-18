@@ -2633,3 +2633,141 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   transform: translateY(-2px) !important;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 50, 50, 0.6) !important;
 }
+
+/* ===== CO-OP MULTIPLAYER LOBBY (FASE 2) ===== */
+.coop-modal {
+  max-width: 680px;
+  background: radial-gradient(circle at top, rgba(14, 24, 38, 0.98), rgba(6, 10, 16, 0.98)) !important;
+  border: 1px solid rgba(0, 240, 255, 0.35) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 28px rgba(0, 240, 255, 0.15) !important;
+}
+.coop-tabs-bar {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 18px 0;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  padding-bottom: 10px;
+}
+.btn-coop-tab {
+  flex: 1;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  color: #94a3b8;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.btn-coop-tab:hover {
+  background: rgba(30, 41, 59, 0.85);
+  color: #00f0ff;
+  border-color: rgba(0, 240, 255, 0.5);
+}
+.btn-coop-tab.active {
+  background: rgba(0, 240, 255, 0.12);
+  color: #00f0ff;
+  border-color: #00f0ff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
+}
+.coop-code-box {
+  background: rgba(3, 7, 18, 0.85);
+  border: 1px dashed rgba(0, 240, 255, 0.4);
+  border-radius: 6px;
+  padding: 14px;
+  text-align: center;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.coop-code-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.coop-code-display {
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: #38bdf8;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+}
+.coop-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.coop-slot-card {
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 4px;
+  border-left: 3px solid #64748b;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+.coop-slot-num {
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 13px;
+  opacity: 0.8;
+}
+.coop-slot-name {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  flex: 1;
+}
+.coop-slot-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+.coop-action-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+.coop-join-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 12px;
+}
+.coop-input-code {
+  width: 220px;
+  text-align: center;
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 22px;
+  letter-spacing: 6px;
+  padding: 10px;
+  background: #090d16;
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  color: #00f0ff;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.coop-input-code:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+}
+.coop-error-msg {
+  color: #f87171;
+  font-size: 12px;
+  letter-spacing: 1px;
+}

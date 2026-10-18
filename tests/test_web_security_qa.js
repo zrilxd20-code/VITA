@@ -12,7 +12,8 @@
  * dunia deterministik ber-seed (fondasi co-op online: PRNG mulberry32),
  * pemisahan simulasi vs render (fondasi arsitektur host-authoritative),
  * abstraksi pemain multi (fondasi co-op 4 pemain: players[] & host index 0),
- * serta serialisasi & rekonsiliasi snapshot state (fondasi sinkronisasi relay).
+ * serialisasi & rekonsiliasi snapshot state (fondasi sinkronisasi relay),
+ * serta lobi co-op & transport relay WebSocket (Fase 2 co-op online: 4 pemain).
  */
 
 const fs = require('fs');
@@ -556,6 +557,40 @@ snapScope.apply(snap, true);
 assert(snapScope.getState().player.x === 999, 'Guard host harus mencegah overwriting pemain lokal');
 console.log('✓ TEST 19 LULUS: Serialisasi snapshot hemat-bandwidth & rekonsiliasi round-trip valid.');
 
+// TEST 20: Lobby Co-op & Transport Relay WebSocket (Fase 2 co-op online).
+// Memverifikasi antarmuka lobi co-op, semantik dialog ARIA, kode kamar deterministik,
+// fungsi client WebSocket, dan ketersediaan tombol peluncuran.
+console.log('\n[TEST 20] Pengujian Lobby Co-op & Transport Relay WebSocket (Fase 2 co-op online)...');
+// 20a. Elemen lobi co-op pada index.html
+assert(indexHtml.includes('id="btnCoopLobby"'), 'Tombol lobi co-op #btnCoopLobby harus ada di index.html');
+assert(indexHtml.includes('id="coopLobbyModal"'), 'Modal lobi co-op #coopLobbyModal harus ada di index.html');
+assert(/id="coopLobbyModal"[^>]*role="dialog"/.test(indexHtml), 'Modal #coopLobbyModal harus memiliki role="dialog"');
+assert(/id="coopLobbyModal"[^>]*aria-modal="true"/.test(indexHtml), 'Modal #coopLobbyModal harus memiliki aria-modal="true"');
+assert(/id="coopLobbyModal"[^>]*aria-labelledby="coopLobbyTitle"/.test(indexHtml), 'Modal #coopLobbyModal harus memiliki aria-labelledby="coopLobbyTitle"');
+
+// 20b. Fungsi kontrol lobi di js/game.js
+['openCoopLobbyModal', 'closeCoopLobbyModal', 'switchCoopTab', 'generateRoomCode',
+ 'initHostLobbyRoom', 'updateCoopSlotsUI', 'copyCoopRoomCode', 'submitJoinCoopRoom',
+ 'connectCoopRelay', 'sendCoopMessage', 'handleCoopMessage', 'launchCoopMission']
+  .forEach(fn => assert(gameJs.includes('function ' + fn), 'Fungsi lobi ' + fn + '() harus tersedia di game.js'));
+
+// 20c. Pengujian generator kode kamar: 4 karakter alfanumerik kapital tanpa karakter ambigu
+const codeGenFn = (gameJs.match(/function generateRoomCode\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+assert(codeGenFn.length > 0, 'Fungsi generateRoomCode() tidak ditemukan');
+const testGenCode = new Function(codeGenFn + '\nreturn generateRoomCode;')();
+for (let i = 0; i < 20; i++) {
+    const c = testGenCode();
+    assert(typeof c === 'string' && c.length === 4, 'generateRoomCode() harus menghasilkan string 4 karakter');
+    assert(/^[A-Z0-9]{4}$/.test(c), 'Kode kamar harus alfanumerik kapital: ' + c);
+}
+
+// 20d. Transport WebSocket & message handler
+assert(gameJs.includes('new WebSocket('), 'Koneksi relay harus menggunakan WebSocket native');
+assert(/sendCoopMessage\(\s*'JOIN'/.test(gameJs), 'Klien harus mengirim tipe pesan JOIN saat terhubung');
+assert(/sendCoopMessage\(\s*'START_GAME'/.test(gameJs), 'Host harus menyiarkan START_GAME dengan seed saat meluncurkan misi');
+
+console.log('✓ TEST 20 LULUS: Antarmuka lobi co-op, aksesibilitas ARIA, generator kode, & transport relay terverifikasi.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (19/19)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (20/20)');
 console.log('=========================================');

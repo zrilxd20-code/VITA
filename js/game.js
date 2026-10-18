@@ -502,7 +502,23 @@ const T = {
         layout_editor_hint: 'Geser tombol di layar ke posisi yang paling nyaman.',
         layout_saved_toast: 'Tata letak tombol HP disimpan.',
         layout_reset_toast: 'Tata letak tombol HP dikembalikan ke posisi default.',
-        robot_continue: 'LANJUTKAN MISI ▸'
+        robot_continue: 'LANJUTKAN MISI ▸',
+        coop_lobby_btn: 'OPERASI CO-OP (4 PEMAIN)',
+        coop_modal_title: 'TERMINAL MULTIPLAYER CO-OP',
+        coop_tab_host: 'BUAT KAMAR (HOST)',
+        coop_tab_join: 'GABUNG KAMAR',
+        coop_room_code_label: 'KODE KAMAR TAKTIS',
+        coop_copy_code_btn: 'SALIN KODE',
+        coop_code_copied: 'KODE DISALIN KE PAPAN KLIP!',
+        coop_enter_code_label: 'MASUKKAN KODE KAMAR (4 DIGIT)',
+        coop_connect_btn: 'HUBUNGKAN KE REGU ▸',
+        coop_launch_btn: 'LUNCURKAN OPERASI TIM ▸',
+        coop_waiting_client: 'MENUNGGU KEPUTUSAN HOST...',
+        coop_relay_status: 'STATUS JARINGAN RELAY:',
+        coop_status_offline: 'LOKAL / DISCONNECTED',
+        coop_status_connected: 'TERHUBUNG KE RELAY',
+        coop_status_error: 'GAGAL TERHUBUNG KE RELAY',
+        coop_waiting_agent: 'MENUNGGU OPERATIF...'
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
@@ -718,7 +734,23 @@ const T = {
         layout_editor_hint: 'Drag the on-screen buttons to the positions you prefer.',
         layout_saved_toast: 'Mobile button layout saved.',
         layout_reset_toast: 'Mobile button layout restored to default.',
-        robot_continue: 'CONTINUE MISSION ▸'
+        robot_continue: 'CONTINUE MISSION ▸',
+        coop_lobby_btn: 'CO-OP ONLINE (4 PLAYERS)',
+        coop_modal_title: 'CO-OP MULTIPLAYER TERMINAL',
+        coop_tab_host: 'CREATE ROOM (HOST)',
+        coop_tab_join: 'JOIN ROOM',
+        coop_room_code_label: 'TACTICAL ROOM CODE',
+        coop_copy_code_btn: 'COPY CODE',
+        coop_code_copied: 'CODE COPIED TO CLIPBOARD!',
+        coop_enter_code_label: 'ENTER ROOM CODE (4 DIGITS)',
+        coop_connect_btn: 'CONNECT TO SQUAD ▸',
+        coop_launch_btn: 'LAUNCH SQUAD OPERATION ▸',
+        coop_waiting_client: 'WAITING FOR HOST TO LAUNCH...',
+        coop_relay_status: 'RELAY NETWORK STATUS:',
+        coop_status_offline: 'LOCAL / DISCONNECTED',
+        coop_status_connected: 'CONNECTED TO RELAY',
+        coop_status_error: 'FAILED TO CONNECT TO RELAY',
+        coop_waiting_agent: 'WAITING FOR OPERATIVE...'
     }
 };
 
@@ -13095,3 +13127,226 @@ function drawDebugDiagnostics() {
 
     ctx.restore();
 }
+
+// ============================================================
+// FASE 2 CO-OP ONLINE: LOBBY & TRANSPORT RELAY WEBSOCKET
+// ============================================================
+let coopWs = null;
+let coopRoomId = null;
+let isCoopHost = false;
+let coopPeers = [];
+let coopRelayUrl = 'ws://localhost:8080';
+
+function generateRoomCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 4; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+}
+
+function openCoopLobbyModal() {
+    const m = document.getElementById('coopLobbyModal');
+    if (!m) return;
+    m.style.display = 'flex';
+    switchCoopTab('host');
+    if (!coopRoomId) {
+        initHostLobbyRoom();
+    }
+    updateCoopSlotsUI();
+}
+
+function closeCoopLobbyModal() {
+    const m = document.getElementById('coopLobbyModal');
+    if (m) m.style.display = 'none';
+}
+
+function switchCoopTab(tab) {
+    const hostPanel = document.getElementById('coopHostPanel');
+    const joinPanel = document.getElementById('coopJoinPanel');
+    const tabHost = document.getElementById('coopTabHost');
+    const tabJoin = document.getElementById('coopTabJoin');
+
+    if (tab === 'host') {
+        if (hostPanel) hostPanel.style.display = 'block';
+        if (joinPanel) joinPanel.style.display = 'none';
+        if (tabHost) tabHost.classList.add('active');
+        if (tabJoin) tabJoin.classList.remove('active');
+    } else {
+        if (hostPanel) hostPanel.style.display = 'none';
+        if (joinPanel) joinPanel.style.display = 'block';
+        if (tabHost) tabHost.classList.remove('active');
+        if (tabJoin) tabJoin.classList.add('active');
+    }
+}
+
+function initHostLobbyRoom() {
+    isCoopHost = true;
+    coopRoomId = generateRoomCode();
+    localPlayerIndex = 0;
+    const myCallsign = (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'PROTOTYPE-19';
+    coopPeers = [
+        { idx: 0, callsign: myCallsign, isHost: true }
+    ];
+    const codeEl = document.getElementById('coopRoomCodeDisplay');
+    if (codeEl) codeEl.textContent = coopRoomId;
+    connectCoopRelay();
+}
+
+function updateCoopSlotsUI() {
+    const slotsEl = document.getElementById('coopPlayerSlots');
+    if (!slotsEl) return;
+    let html = '';
+    for (let i = 0; i < MAX_PLAYERS; i++) {
+        const peer = coopPeers.find(p => p.idx === i);
+        const color = PLAYER_COLORS[i] || PLAYER_COLORS[0];
+        if (peer) {
+            html += '<div class="coop-slot-card" style="border-left-color:' + color.hex + ';">' +
+                '<span class="coop-slot-num" style="color:' + color.hex + ';">[' + (i + 1) + ']</span>' +
+                '<span class="coop-slot-name">' + sanitizeHtml(peer.callsign) + '</span>' +
+                '<span class="coop-slot-badge" style="background:' + color.hex + ';color:#000;">' + (peer.isHost ? 'HOST' : 'READY') + '</span>' +
+                '</div>';
+        } else {
+            html += '<div class="coop-slot-card" style="border-left-color:#334155;opacity:0.6;">' +
+                '<span class="coop-slot-num" style="color:#64748b;">[' + (i + 1) + ']</span>' +
+                '<span class="coop-slot-name" style="color:#64748b;">' + tt('coop_waiting_agent') + '</span>' +
+                '<span class="coop-slot-badge" style="background:#1e293b;color:#64748b;">EMPTY</span>' +
+                '</div>';
+        }
+    }
+    slotsEl.innerHTML = html;
+}
+
+function copyCoopRoomCode() {
+    if (!coopRoomId) return;
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(coopRoomId);
+        }
+    } catch (_) {}
+    const btn = document.getElementById('coopCopyCodeBtn');
+    if (btn) {
+        btn.textContent = tt('coop_code_copied');
+        setTimeout(() => { if (btn) btn.textContent = tt('coop_copy_code_btn'); }, 2000);
+    }
+}
+
+function submitJoinCoopRoom() {
+    const input = document.getElementById('coopJoinInput');
+    const errEl = document.getElementById('coopJoinError');
+    if (!input) return;
+    const code = input.value.trim().toUpperCase();
+    if (code.length < 3) {
+        if (errEl) { errEl.textContent = 'Kode kamar tidak valid.'; errEl.style.display = 'block'; }
+        return;
+    }
+    if (errEl) errEl.style.display = 'none';
+
+    coopRoomId = code;
+    isCoopHost = false;
+    localPlayerIndex = 1; // Default join peer index
+    const myCallsign = (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'AGENT-GUEST';
+    coopPeers = [
+        { idx: 0, callsign: 'HOST_OPERATIVE', isHost: true },
+        { idx: 1, callsign: myCallsign, isHost: false }
+    ];
+
+    switchCoopTab('host');
+    const codeEl = document.getElementById('coopRoomCodeDisplay');
+    if (codeEl) codeEl.textContent = coopRoomId;
+    const launchBtn = document.getElementById('coopLaunchBtn');
+    if (launchBtn) {
+        launchBtn.disabled = true;
+        launchBtn.textContent = tt('coop_waiting_client');
+    }
+    updateCoopSlotsUI();
+    connectCoopRelay();
+}
+
+function connectCoopRelay() {
+    try {
+        const savedUrl = localStorage.getItem('vita_relay_url');
+        const url = savedUrl || coopRelayUrl;
+        const badge = document.getElementById('coopRelayBadge');
+
+        // Buka WebSocket native
+        if (typeof WebSocket !== 'undefined') {
+            if (coopWs) {
+                try { coopWs.close(); } catch (_) {}
+            }
+            coopWs = new WebSocket(url);
+            coopWs.onopen = () => {
+                if (badge) {
+                    badge.textContent = 'RELAY: CONNECTED';
+                    badge.classList.remove('unverified');
+                    badge.classList.add('verified');
+                }
+                sendCoopMessage('JOIN', { roomId: coopRoomId, peerIndex: localPlayerIndex, isHost: isCoopHost });
+            };
+            coopWs.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    handleCoopMessage(msg);
+                } catch (_) {}
+            };
+            coopWs.onerror = () => {
+                if (badge) {
+                    badge.textContent = 'RELAY: LOCAL (OFFLINE)';
+                    badge.classList.remove('verified');
+                    badge.classList.add('unverified');
+                }
+            };
+            coopWs.onclose = () => {
+                if (badge) {
+                    badge.textContent = 'RELAY: DISCONNECTED';
+                    badge.classList.remove('verified');
+                    badge.classList.add('unverified');
+                }
+            };
+        }
+    } catch (_) {}
+}
+
+function sendCoopMessage(type, payload) {
+    if (coopWs && coopWs.readyState === WebSocket.OPEN) {
+        try {
+            coopWs.send(JSON.stringify({ type, roomId: coopRoomId, ...payload }));
+        } catch (_) {}
+    }
+}
+
+function handleCoopMessage(msg) {
+    if (!msg || typeof msg !== 'object') return;
+    if (msg.type === 'START_GAME') {
+        if (msg.seed) netSessionSeed = msg.seed;
+        closeCoopLobbyModal();
+        startGame();
+    } else if (msg.type === 'SNAPSHOT' && !isCoopHost) {
+        if (typeof applySnapshot === 'function') {
+            applySnapshot(msg, false);
+        }
+    } else if (msg.type === 'PEER_JOIN') {
+        if (!coopPeers.find(p => p.idx === msg.peerIndex)) {
+            coopPeers.push({ idx: msg.peerIndex, callsign: msg.callsign || ('P' + (msg.peerIndex + 1)), isHost: false });
+            updateCoopSlotsUI();
+        }
+    }
+}
+
+function launchCoopMission() {
+    if (!isCoopHost) return;
+    // Broadcast START_GAME with session seed
+    const sessionSeed = coopRoomId ? hashSeedToUint32(coopRoomId) : Math.floor(Math.random() * 1000000);
+    netSessionSeed = sessionSeed;
+    sendCoopMessage('START_GAME', { seed: sessionSeed });
+    closeCoopLobbyModal();
+    startGame();
+}
+
+window.openCoopLobbyModal = openCoopLobbyModal;
+window.closeCoopLobbyModal = closeCoopLobbyModal;
+window.switchCoopTab = switchCoopTab;
+window.copyCoopRoomCode = copyCoopRoomCode;
+window.submitJoinCoopRoom = submitJoinCoopRoom;
+window.launchCoopMission = launchCoopMission;
