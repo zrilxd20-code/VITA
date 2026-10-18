@@ -6,7 +6,8 @@
  * aksesibilitas keyboard kontrol non-native (role="button"),
  * kelengkapan i18n modal mode perangkat & pil mode layar mulai,
  * kinerja loop Hub (cache DOM per frame) & penghormatan prefers-reduced-motion pada animasi JS,
- * serta live region status async Hub (role="status", WCAG 4.1.3).
+ * live region status async Hub (role="status", WCAG 4.1.3),
+ * serta ketahanan loop game terhadap exception (error boundary anti-freeze).
  */
 
 const fs = require('fs');
@@ -321,6 +322,25 @@ assert(/getElementById\(\s*['"]profileDbStatus['"]\s*\)/.test(homeJs),
   'Status DB profil harus diperbarui JS (target live region)');
 console.log('✓ TEST 13 LULUS: Status async Hub memiliki live region (role="status").');
 
+// TEST 14: Ketahanan loop game terhadap exception (error boundary / anti-freeze).
+// Regresi: gameLoop() lama HANYA menjadwalkan requestAnimationFrame di baris terakhir,
+// sehingga SATU exception di jalur update/render membuat frame berikutnya tidak pernah
+// dijadwalkan → layar membeku permanen (persis gejala "crash saat bermain"). Wrapper
+// sekarang wajib membungkus gameLoopFrame() dalam try/catch dan tetap menjadwalkan rAF.
+console.log('\n[TEST 14] Pengujian Ketahanan Loop Game (error boundary anti-freeze)...');
+const loopWrapBody = (gameJs.match(/function gameLoop\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+assert(loopWrapBody.includes('try') && loopWrapBody.includes('gameLoopFrame()') && loopWrapBody.includes('reportLoopError(err)'),
+  'gameLoop() harus membungkus gameLoopFrame() dalam try/catch yang melaporkan error');
+assert(/catch\s*\(err\)\s*\{[\s\S]*?\}[\s\S]*?requestAnimationFrame\(gameLoop\)/.test(loopWrapBody),
+  'requestAnimationFrame(gameLoop) harus dipanggil SETELAH try/catch agar frame tidak pernah putus');
+assert(gameJs.includes('function reportLoopError'), 'Fungsi reportLoopError (pencatat error loop) tidak ditemukan');
+const loopFrameBody = (gameJs.match(/function gameLoopFrame\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+assert(loopFrameBody.length > 0 && !loopFrameBody.includes('requestAnimationFrame(gameLoop)'),
+  'Regresi: gameLoopFrame() menjadwalkan rAF sendiri (frame bisa putus saat exception)');
+assert(/addEventListener\(\s*'error'/.test(gameJs) && /addEventListener\(\s*'unhandledrejection'/.test(gameJs),
+  'Diagnostik global (window "error" & "unhandledrejection") harus terpasang di js/game.js');
+console.log('✓ TEST 14 LULUS: Loop game tetap berjalan walau terjadi exception (anti-freeze).');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (13/13)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (14/14)');
 console.log('=========================================');

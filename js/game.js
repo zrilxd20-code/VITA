@@ -10487,10 +10487,36 @@ function updateMonsterProximityAndHeartbeat() {
     }
 }
 
+// ---- Loop game dengan "error boundary" ----
+// Tanpa penjaga ini, satu exception di jalur update/render membuat baris
+// requestAnimationFrame(gameLoop) di akhir tidak pernah tercapai → layar membeku
+// permanen (persis gejala "crash" yang dilaporkan pemain). Wrapper memastikan
+// frame berikutnya SELALU dijadwalkan, sekaligus mencatat error aslinya ke konsol
+// agar akar masalah bisa dilacak dengan cepat.
+let _loopErrCount = 0;
+let _loopErrLastMsg = '';
+function reportLoopError(err) {
+    _loopErrCount++;
+    const msg = (err && err.message) ? err.message : String(err);
+    // Cegah banjir konsol bila error yang sama berulang tiap frame.
+    if (msg !== _loopErrLastMsg || _loopErrCount % 120 === 1) {
+        console.error('[VITA] Error di frame game — loop tetap berjalan (kemunculan #' + _loopErrCount + '):', err);
+    }
+    _loopErrLastMsg = msg;
+}
+
 function gameLoop() {
+    try {
+        gameLoopFrame();
+    } catch (err) {
+        reportLoopError(err);
+    }
+    requestAnimationFrame(gameLoop);
+}
+
+function gameLoopFrame() {
     const gv = hudEl('gameView');
     if (document.hidden || (gv && gv.style.display === 'none')) {
-        requestAnimationFrame(gameLoop);
         return;
     }
     if (gameState === 'playing') {
@@ -10502,7 +10528,6 @@ function gameLoop() {
             drawCrosshair();
             drawMinimap();
             updateUI();
-            requestAnimationFrame(gameLoop);
             return;
         }
         playAmbientDrone();
@@ -10582,8 +10607,6 @@ function gameLoop() {
         renderGame();
     }
     // 'paused' → frame terakhir dibekukan, overlay JEDA tampil di atasnya.
-
-    requestAnimationFrame(gameLoop);
 }
 
 document.addEventListener('keydown', e => {
@@ -12320,6 +12343,15 @@ window.addEventListener('storage', (e) => {
     if (e && e.key === VITA_SAVE_KEY) syncSettingsFromStorage();
 });
 if (typeof applyProfileUI === 'function') applyProfileUI();
+// Diagnostik global: catat error tak tertangkap (termasuk dari event handler &
+// promise) dengan penanda [VITA] agar akar masalah mudah dilacak saat dilaporkan.
+// Murni logging — tidak mengubah alur permainan.
+window.addEventListener('error', (e) => {
+    console.error('[VITA] Error tak tertangkap:', (e && (e.error || e.message)) || e);
+});
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('[VITA] Promise ditolak tanpa penanganan:', e && e.reason);
+});
 initLevel(0);
 gameLoop();
 

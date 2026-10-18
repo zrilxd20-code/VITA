@@ -6,7 +6,7 @@
 [![Zero External Assets](https://img.shields.io/badge/Assets-100%25%20Procedural-red)](index.html)
 [![PWA Ready](https://img.shields.io/badge/PWA-Network--First%20Offline-brightgreen)](sw.js)
 [![Database](https://img.shields.io/badge/Database-Supabase%20%2F%20PostgreSQL-3ECF8E)](supabase_schema.sql)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(13%2F13%20QA)-success)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(14%2F14%20QA)-success)](tests/)
 
 ---
 
@@ -128,7 +128,7 @@ vita/
 ├── script.md               # Narrative script, characters, and dialogue canon
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # 13-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions)
+│   └── test_web_security_qa.js # 14-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```
