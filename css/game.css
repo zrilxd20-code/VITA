@@ -340,6 +340,9 @@ body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opaci
 @media (prefers-reduced-motion: reduce) {
             #gameView #newBestBadge { animation: none; }
             #gameView #startScreen h1 { animation: none; }
+            #gameView #pauseScreen h2,
+            #gameView #deathScreen h2,
+            #gameView #winScreen h2 { animation: none; }
         }
 #gameView #startScreen {
             /* Bisa di-scroll: menu + panel admin kadang lebih tinggi dari layar,
@@ -605,6 +608,28 @@ body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opaci
             text-transform: uppercase;
         }
 #gameView #pauseScreen .btn { margin-top: 10px; }
+/* Konsistensi lockup: seluruh judul menu layar penuh (jeda, gugur, menang) memakai
+   perlakuan yang sama dengan judul layar mulai — rim light + ramp kroma merah-tua
+   yang diklip ke glyph, ekstrusi drop-shadow bertingkat (bukan text-shadow, agar
+   tidak tembus lewat glyph transparan), plus kilau halus vitaStartFlicker. */
+#gameView #pauseScreen h2,
+#gameView #deathScreen h2,
+#gameView #winScreen h2 {
+            background:
+                linear-gradient(180deg, rgba(255, 228, 216, 0.85) 0%, rgba(255, 122, 102, 0.25) 14%, rgba(255, 255, 255, 0) 30%),
+                linear-gradient(180deg, #ff4a44 0%, #e01515 30%, #9c0c0c 55%, #400000 80%, #0a0000 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: none;
+            filter:
+                drop-shadow(0 1px 0 rgba(104, 0, 0, 0.95))
+                drop-shadow(0 3px 0 rgba(38, 0, 0, 0.9))
+                drop-shadow(0 7px 2px rgba(0, 0, 0, 0.85))
+                drop-shadow(0 0 22px rgba(255, 40, 40, 0.55))
+                drop-shadow(0 18px 44px rgba(0, 0, 0, 0.85));
+            animation: vitaStartFlicker 9s steps(1, end) infinite;
+        }
 /* Layar kecil: HUD ringkas, minimap menyusut, judul tak meluap */
 @media (max-width: 640px) {
     #gameView #ui { top: 10px; left: 10px; font-size: 12px; min-width: 0; padding: 8px 10px; }
@@ -612,7 +637,7 @@ body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opaci
     #gameView #controls { display: none; }
     #gameView #startScreen h1 { letter-spacing: 8px; }
     #gameView #levelAnnounce { font-size: 44px; letter-spacing: 6px; }
-    #gameView #startScreen h1, #gameView #deathScreen h2, #gameView #winScreen h2 { font-size: 34px; }
+    #gameView #startScreen h1, #gameView #deathScreen h2, #gameView #winScreen h2, #gameView #pauseScreen h2 { font-size: 34px; }
 }
 /* Layar sangat kecil (<380px): joystick & tombol sentuh mengecil agar tak tumpang tindih */
 @media (max-width: 380px) {
