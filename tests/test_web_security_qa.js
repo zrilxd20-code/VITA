@@ -591,6 +591,77 @@ assert(/sendCoopMessage\(\s*'START_GAME'/.test(gameJs), 'Host harus menyiarkan S
 
 console.log('✓ TEST 20 LULUS: Antarmuka lobi co-op, aksesibilitas ARIA, generator kode, & transport relay terverifikasi.');
 
+// TEST 21: Sinkronisasi Input, Snapshot 20Hz, dan Client Prediction (Fase 3 co-op online).
+// Memverifikasi transmisi input peer, pemrosesan gerak remote peer di host,
+// rekonsiliasi client prediction berbasis threshold (28px), dan badge latency network.
+console.log('\n[TEST 21] Pengujian Sinkronisasi Input, Snapshot 20Hz, & Client Prediction (Fase 3 co-op online)...');
+
+// 21a. HUD network latency badge di index.html
+assert(indexHtml.includes('id="coopNetBadge"'), 'Badge jaringan #coopNetBadge harus ada di index.html');
+
+// 21b. Ketersediaan fungsi sinkronisasi input & jaringan di js/game.js
+['sampleAndSendPeerInput', 'updateRemotePeers', 'updateNetPing', 'updateNetBadgeUI']
+  .forEach(fn => assert(gameJs.includes('function ' + fn), 'Fungsi sinkronisasi ' + fn + '() harus tersedia di game.js'));
+
+// 21c. Pengujian pemrosesan input remote peer di host
+const syncScope = new Function(`
+    let isWall = () => false;
+    let isMonster = () => false;
+    ${(gameJs.match(/function moveEntity[\s\S]*?\n\}/) || [''])[0]}
+    ${(gameJs.match(/function updateRemotePeers[\s\S]*?\n\}/) || [''])[0]}
+    ${(gameJs.match(/function applySnapshot[\s\S]*?\n\}/) || [''])[0]}
+
+    let isCoopHost = true;
+    let localPlayerIndex = 0;
+    let players = [
+        { id: 'p0', peerIndex: 0, x: 100, y: 100, hp: 100, maxHp: 100, speed: 2.4, facing: 0 },
+        { id: 'p1', peerIndex: 1, x: 200, y: 200, hp: 100, maxHp: 100, speed: 2.4, facing: 0, dashCooldown: 0 }
+    ];
+    let peerInputs = {
+        1: { dx: 1, dy: 0, facing: 0, dashing: false, tick: 1 }
+    };
+    let monsters = [];
+
+    return {
+        updatePeers: updateRemotePeers,
+        applySnap: applySnapshot,
+        getPlayers: () => players,
+        setLocalIndex: (idx) => { localPlayerIndex = idx; },
+        setCoopHost: (val) => { isCoopHost = val; }
+    };
+`)();
+
+const pBefore = syncScope.getPlayers()[1].x;
+syncScope.updatePeers();
+const pAfter = syncScope.getPlayers()[1].x;
+assert(pAfter > pBefore, 'Host harus menggerakkan peer remote berdasarkan peerInputs (pAfter=' + pAfter + ' > pBefore=' + pBefore + ')');
+
+// 21d. Pengujian rekonsiliasi client prediction (isHost = false)
+// Simulasi deviasi kecil (< 28px): posisi prediksi pemain lokal tidak boleh melonjak
+syncScope.setCoopHost(false);
+syncScope.setLocalIndex(1);
+const localP = syncScope.getPlayers()[1];
+localP.x = 210; localP.y = 200; // deviasi 10px dari snapshot host
+const snapClient = {
+    seq: 10,
+    players: [{ idx: 1, id: 'p1', x: 200, y: 200, hp: 95, maxHp: 100, facing: 0, dashing: false, curW: 'knife', size: 10 }]
+};
+syncScope.applySnap(snapClient, false);
+assert(localP.x === 210, 'Deviasi kecil (<28px) tidak boleh menghentak posisi lokal pemain');
+assert(localP.hp === 95, 'HP otoritatif server harus tersinkronisasi');
+
+// Simulasi deviasi besar (> 28px): pemain lokal ditarik secara halus menuju posisi otoritatif
+localP.x = 250; localP.y = 200; // deviasi 50px
+syncScope.applySnap(snapClient, false);
+assert(localP.x < 250, 'Deviasi besar (>28px) harus merekonsiliasi posisi pemain lokal menuju server');
+
+// 21e. Pengujian penanganan pesan input & ping/pong
+assert(/sendCoopMessage\(\s*'INPUT'/.test(gameJs), 'Klien harus mengirim tipe pesan INPUT ke host');
+assert(/sendCoopMessage\(\s*'PING'/.test(gameJs), 'Koneksi relay harus mendukung pengiriman PING');
+assert(/sendCoopMessage\(\s*'PONG'/.test(gameJs), 'Relay handler harus membalas dengan PONG');
+
+console.log('✓ TEST 21 LULUS: Sinkronisasi input peer, rekonsiliasi client prediction & HUD badge terverifikasi.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (20/20)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (21/21)');
 console.log('=========================================');

@@ -518,7 +518,9 @@ const T = {
         coop_status_offline: 'LOKAL / DISCONNECTED',
         coop_status_connected: 'TERHUBUNG KE RELAY',
         coop_status_error: 'GAGAL TERHUBUNG KE RELAY',
-        coop_waiting_agent: 'MENUNGGU OPERATIF...'
+        coop_waiting_agent: 'MENUNGGU OPERATIF...',
+        coop_net_host: 'HOST',
+        coop_peer_disconnected: 'OPERATIF TERPUTUS'
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
@@ -750,7 +752,9 @@ const T = {
         coop_status_offline: 'LOCAL / DISCONNECTED',
         coop_status_connected: 'CONNECTED TO RELAY',
         coop_status_error: 'FAILED TO CONNECT TO RELAY',
-        coop_waiting_agent: 'WAITING FOR OPERATIVE...'
+        coop_waiting_agent: 'WAITING FOR OPERATIVE...',
+        coop_net_host: 'HOST',
+        coop_peer_disconnected: 'OPERATIVE DISCONNECTED'
     }
 };
 
@@ -11113,9 +11117,27 @@ function applySnapshot(snap, isHost = false) {
                     afterimages: []
                 };
                 players[pIdx] = targetP;
+            } else if (pIdx === localPlayerIndex && !isHost) {
+                // Client prediction reconciliation untuk pemain lokal non-host:
+                // Hanya koreksi posisi bila deviasi > 28px untuk mencegah jitter
+                const errDist = Math.hypot(sp.x - targetP.x, sp.y - targetP.y);
+                if (errDist > 28) {
+                    targetP.x += (sp.x - targetP.x) * 0.35;
+                    targetP.y += (sp.y - targetP.y) * 0.35;
+                }
+                targetP.hp = sp.hp;
+                targetP.maxHp = sp.maxHp;
             } else {
-                targetP.x = sp.x;
-                targetP.y = sp.y;
+                // Remote peer di klien: interpolasi posisi secara halus
+                targetP.targetX = sp.x;
+                targetP.targetY = sp.y;
+                if (typeof targetP.x !== 'number' || Math.hypot(sp.x - targetP.x, sp.y - targetP.y) > 32) {
+                    targetP.x = sp.x;
+                    targetP.y = sp.y;
+                } else {
+                    targetP.x += (sp.x - targetP.x) * 0.45;
+                    targetP.y += (sp.y - targetP.y) * 0.45;
+                }
                 targetP.hp = sp.hp;
                 targetP.maxHp = sp.maxHp;
                 targetP.facing = sp.facing;
@@ -11132,8 +11154,15 @@ function applySnapshot(snap, isHost = false) {
             const sm = snap.monsters[i];
             const m = monsters[sm.idx];
             if (m) {
-                m.x = sm.x;
-                m.y = sm.y;
+                m.targetX = sm.x;
+                m.targetY = sm.y;
+                if (typeof m.x !== 'number' || Math.hypot(sm.x - m.x, sm.y - m.y) > 32) {
+                    m.x = sm.x;
+                    m.y = sm.y;
+                } else {
+                    m.x += (sm.x - m.x) * 0.45;
+                    m.y += (sm.y - m.y) * 0.45;
+                }
                 m.hp = sm.hp;
                 m.maxHp = sm.maxHp;
                 if (typeof sm.state !== 'undefined') m.state = sm.state;
@@ -11148,6 +11177,11 @@ function applySnapshot(snap, isHost = false) {
 function stepSimulation() {
     // Inti state otoritatif — host menjalankan ini setiap tick.
     updatePlayer();
+    if (isCoopHost && players && players.length > 1) {
+        updateRemotePeers();
+    } else if (!isCoopHost && coopWs && coopWs.readyState === WebSocket.OPEN) {
+        sampleAndSendPeerInput();
+    }
     updateMonsters();
     updateProjectiles();
     updateThermalTrails();
@@ -11252,6 +11286,17 @@ function gameLoopFrame() {
         updatePerfCounters();
         renderFrame();
         if (mouseTime > 0) { mouseTime--; if (mouseTime <= 0) mouseActive = false; }
+
+        // Co-op 20Hz Snapshot Broadcast (Host -> Peers)
+        if (isCoopHost && coopWs && coopWs.readyState === WebSocket.OPEN && coopPeers.length > 1) {
+            const loopNow = performance.now();
+            if (loopNow - netLastSnapshotTime >= netSnapshotInterval) {
+                netLastSnapshotTime = loopNow;
+                sendCoopMessage('SNAPSHOT', { snap: serializeSnapshot(), t: Date.now() });
+            }
+        }
+        updateNetPing();
+        updateNetBadgeUI();
     } else if (gameState === 'menu' && player) {
         demoUpdate();
         cameraX += (player.x - cameraX) * 0.1;
@@ -13316,6 +13361,144 @@ function sendCoopMessage(type, payload) {
     }
 }
 
+// ---- Fase 3 co-op: Sinkronisasi Input, Snapshot 20Hz, dan Client Prediction ----
+let netSnapshotInterval = 50; // ms (20Hz)
+let netLastSnapshotTime = 0;
+let netPing = 0;
+let netLastPingTime = 0;
+let netPingInterval = 1500; // ms
+let netInputSeq = 0;
+let peerInputs = {}; // { [peerIndex]: { dx, dy, facing, dashing, firing, tick, time } }
+
+function sampleAndSendPeerInput() {
+    if (isCoopHost || !coopWs || coopWs.readyState !== WebSocket.OPEN) return;
+    const lp = getLocalPlayer();
+    if (!lp) return;
+
+    let dx = 0, dy = 0;
+    if (keys['w'] || keys['arrowup']) dy = -1;
+    if (keys['s'] || keys['arrowdown']) dy = 1;
+    if (keys['a'] || keys['arrowleft']) dx = -1;
+    if (keys['d'] || keys['arrowright']) dx = 1;
+    if (touchMove.active && (touchMove.dx !== 0 || touchMove.dy !== 0)) {
+        dx += touchMove.dx;
+        dy += touchMove.dy;
+    }
+    if (dx !== 0 || dy !== 0) {
+        const len = Math.hypot(dx, dy);
+        dx /= len;
+        dy /= len;
+        lp.facing = Math.atan2(dy, dx);
+    }
+    if (mouseActive) {
+        const zoom = getGameZoom();
+        const wx = cameraX + (mouseX - W / 2) / zoom;
+        const wy = cameraY + (mouseY - H / 2) / zoom;
+        lp.facing = Math.atan2(wy - lp.y, wx - lp.x);
+    }
+
+    const isDashing = !!(keys['shift'] || (typeof isDashPressed !== 'undefined' && isDashPressed));
+    const isFiring = !!(keys[' '] || isMouseDown || (typeof isFirePressed !== 'undefined' && isFirePressed));
+
+    // Client prediction: gerak seketika secara responsif di klien
+    let speed = lp.speed || 2.4;
+    if (isDashing && (!lp.dashCooldown || lp.dashCooldown <= 0)) {
+        lp.dashing = true;
+        lp.dashTimer = 10;
+        lp.dashCooldown = 40;
+    }
+    if (lp.dashing && lp.dashTimer > 0) {
+        speed = lp.dashSpeed || 6.5;
+        lp.dashTimer--;
+    } else {
+        lp.dashing = false;
+    }
+    if (lp.dashCooldown > 0) lp.dashCooldown--;
+    if (dx !== 0 || dy !== 0) {
+        moveEntity(lp, dx * speed, dy * speed);
+    }
+
+    netInputSeq++;
+    sendCoopMessage('INPUT', {
+        peerIndex: localPlayerIndex,
+        seq: netInputSeq,
+        dx: Math.round(dx * 100) / 100,
+        dy: Math.round(dy * 100) / 100,
+        facing: Math.round(lp.facing * 100) / 100,
+        dashing: lp.dashing,
+        firing: isFiring
+    });
+}
+
+function updateRemotePeers() {
+    if (!isCoopHost || !players) return;
+    for (let i = 1; i < players.length; i++) {
+        const p = players[i];
+        if (!p) continue;
+        const input = peerInputs[i];
+        if (input) {
+            let speed = p.speed || 2.4;
+            if (input.dashing && (!p.dashCooldown || p.dashCooldown <= 0)) {
+                p.dashing = true;
+                p.dashTimer = 10;
+                p.dashCooldown = 40;
+            }
+            if (p.dashing && p.dashTimer > 0) {
+                speed = p.dashSpeed || 6.5;
+                p.dashTimer--;
+            } else {
+                p.dashing = false;
+            }
+            if (p.dashCooldown > 0) p.dashCooldown--;
+            if (input.dx !== 0 || input.dy !== 0) {
+                moveEntity(p, input.dx * speed, input.dy * speed);
+            }
+            if (typeof input.facing === 'number') {
+                p.facing = input.facing;
+            }
+            if (p.invincible > 0) p.invincible--;
+            if (p.attackAnim > 0) p.attackAnim--;
+        }
+    }
+}
+
+function updateNetPing() {
+    if (!coopWs || coopWs.readyState !== WebSocket.OPEN) return;
+    const now = performance.now();
+    if (now - netLastPingTime >= netPingInterval) {
+        netLastPingTime = now;
+        sendCoopMessage('PING', { t: Date.now(), from: localPlayerIndex });
+    }
+}
+
+function updateNetBadgeUI() {
+    const badge = hudEl('coopNetBadge');
+    if (!badge) return;
+    if (coopWs && coopRoomId && gameState === 'playing') {
+        badge.style.display = 'block';
+        if (isCoopHost) {
+            const count = coopPeers ? coopPeers.length : 1;
+            badge.textContent = 'HOST • ' + count + 'P';
+            badge.style.color = '#00f0ff';
+            badge.style.borderColor = 'rgba(0, 240, 255, 0.4)';
+        } else {
+            badge.textContent = 'NET: ' + netPing + 'ms';
+            if (netPing < 80) {
+                badge.style.color = '#10b981';
+                badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            } else if (netPing < 160) {
+                badge.style.color = '#f59e0b';
+                badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+            } else {
+                badge.style.color = '#ef4444';
+                badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+            }
+        }
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
 function handleCoopMessage(msg) {
     if (!msg || typeof msg !== 'object') return;
     if (msg.type === 'START_GAME') {
@@ -13324,7 +13507,26 @@ function handleCoopMessage(msg) {
         startGame();
     } else if (msg.type === 'SNAPSHOT' && !isCoopHost) {
         if (typeof applySnapshot === 'function') {
-            applySnapshot(msg, false);
+            applySnapshot(msg.snap || msg, false);
+        }
+    } else if (msg.type === 'INPUT' && isCoopHost) {
+        if (typeof msg.peerIndex === 'number' && msg.peerIndex > 0) {
+            peerInputs[msg.peerIndex] = {
+                dx: msg.dx || 0,
+                dy: msg.dy || 0,
+                facing: msg.facing || 0,
+                dashing: !!msg.dashing,
+                firing: !!msg.firing,
+                tick: msg.seq || msg.tick || 0,
+                time: performance.now()
+            };
+        }
+    } else if (msg.type === 'PING') {
+        sendCoopMessage('PONG', { t: msg.t, to: msg.from });
+    } else if (msg.type === 'PONG') {
+        if (typeof msg.t === 'number') {
+            netPing = Math.max(1, Math.round(Date.now() - msg.t));
+            updateNetBadgeUI();
         }
     } else if (msg.type === 'PEER_JOIN') {
         if (!coopPeers.find(p => p.idx === msg.peerIndex)) {

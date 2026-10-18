@@ -41,7 +41,7 @@ vita/
 │   └── modules/        # [Eksperimental/Roadmap] Modul TypeScript terpisah (persiapan refactoring)
 ├── script.md           # Naskah cerita, karakter, dan dialog (kanon narasi — jangan diubah tanpa izin)
 ├── supabase_schema.sql # Skema PostgreSQL, check constraint, dan kebijakan RLS
-├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 20 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion, live region status async, ketahanan loop game/anti-freeze, interaksi modal memori robot, dunia deterministik ber-seed untuk co-op online, pemisahan simulasi vs render untuk arsitektur host-authoritative, abstraksi pemain multi via players[] & host index 0, serialisasi snapshot & rekonsiliasi state, lobi co-op & transport relay WebSocket)
+├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 21 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion, live region status async, ketahanan loop game/anti-freeze, interaksi modal memori robot, dunia deterministik ber-seed untuk co-op online, pemisahan simulasi vs render untuk arsitektur host-authoritative, abstraksi pemain multi via players[] & host index 0, serialisasi snapshot & rekonsiliasi state, lobi co-op & transport relay WebSocket)
 ├── AGENTS.md           # [Berkas Ini] Panduan sistem & aturan khusus untuk AI Agent
 └── README.md           # Dokumentasi proyek untuk pengembang & pemain
 ```
@@ -144,5 +144,5 @@ vita/
   npm run check
   npm test
   ```
-  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 20 modul audit QA/security/BFS/a11y/perf/determinisme/sim-render/players-abstraction/snapshot-relay/coop-lobby).
+  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 21 modul audit QA/security/BFS/a11y/perf/determinisme/sim-render/players-abstraction/snapshot-relay/coop-lobby).
 
