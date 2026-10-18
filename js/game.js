@@ -75,6 +75,31 @@ let currentLevel = 0;
 let maze = [];
 let mazeW, mazeH;
 let player, monsters, particles, projectiles;
+// ---- Fase 1 co-op: abstraksi pemain multi (players[] & host index 0) ----
+let players = [];
+let localPlayerIndex = 0;
+const MAX_PLAYERS = 4;
+const PLAYER_COLORS = [
+    { name: 'cyan', hex: '#00f0ff', glow: 'rgba(0, 240, 255, 0.4)' },
+    { name: 'amber', hex: '#f59e0b', glow: 'rgba(245, 158, 11, 0.4)' },
+    { name: 'emerald', hex: '#10b981', glow: 'rgba(16, 185, 129, 0.4)' },
+    { name: 'rose', hex: '#f43f5e', glow: 'rgba(244, 63, 94, 0.4)' }
+];
+
+function getLocalPlayer() {
+    return (players && players[localPlayerIndex]) ? players[localPlayerIndex] : player;
+}
+
+function setLocalPlayerIndex(idx) {
+    localPlayerIndex = Math.max(0, Math.min(MAX_PLAYERS - 1, idx | 0));
+    if (players && players[localPlayerIndex]) {
+        player = players[localPlayerIndex];
+    }
+}
+
+function getPlayerByPeer(peerIndex) {
+    return (players && players[peerIndex]) ? players[peerIndex] : null;
+}
 let keys = {};
 let totalKills = 0;
 let totalTime = 0;
@@ -3775,8 +3800,13 @@ function buildLevelWorld(level) {
         minigunHeat: 0,
         minigunOverheat: 0,
         weaponCooldowns: {},
-        afterimages: []
+        afterimages: [],
+        id: 'p0',
+        peerIndex: 0,
+        callsign: (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'PROTOTYPE-19'
     };
+    players = [player];
+    localPlayerIndex = 0;
 
     // Save run progress & equipment state
     if (!menuDemo) {
@@ -7467,19 +7497,21 @@ if (isLight) {
     }
 }
 
-function drawPlayer() {
-    if (!player) return;
-    const sx = player.x - cameraX + W / 2;
-    const sy = player.y - cameraY + H / 2;
+function drawPlayer(targetPlayer) {
+    const p = targetPlayer || getLocalPlayer();
+    if (!p) return;
+    const isLocal = (p === getLocalPlayer());
+    const sx = p.x - cameraX + W / 2;
+    const sy = p.y - cameraY + H / 2;
 
     // Phase Dash After-Images (Holographic Cyan Ghosting Trail)
-    if (player.afterimages && player.afterimages.length) {
-        player.afterimages.forEach(ai => {
+    if (p.afterimages && p.afterimages.length) {
+        p.afterimages.forEach(ai => {
             const asx = ai.x - cameraX + W / 2;
             const asy = ai.y - cameraY + H / 2;
             ctx.save();
             ctx.translate(asx, asy);
-            ctx.rotate(ai.facing || player.facing);
+            ctx.rotate(ai.facing || p.facing);
             ctx.globalAlpha = (ai.life / ai.maxLife) * 0.38;
             ctx.fillStyle = '#00f0ff';
             ctx.shadowColor = '#00f0ff';
@@ -7490,7 +7522,7 @@ function drawPlayer() {
         });
     }
 
-    if (player.invincible > 0 && Math.floor(player.invincible / 3) % 2 === 0) return;
+    if (p.invincible > 0 && Math.floor(p.invincible / 3) % 2 === 0) return;
 
     ctx.save();
     ctx.translate(sx, sy);
@@ -7499,13 +7531,13 @@ function drawPlayer() {
     const dashMax = 45;
     const dashRatio = dashCooldown > 0 ? (dashCooldown / dashMax) : 0;
     ctx.beginPath();
-    ctx.arc(0, 0, player.size + 6, -Math.PI / 2, -Math.PI / 2 + (1 - dashRatio) * Math.PI * 2);
+    ctx.arc(0, 0, p.size + 6, -Math.PI / 2, -Math.PI / 2 + (1 - dashRatio) * Math.PI * 2);
     ctx.strokeStyle = dashCooldown <= 0 ? 'rgba(0, 240, 255, 0.75)' : 'rgba(255, 71, 87, 0.45)';
     ctx.lineWidth = 1.6;
     ctx.stroke();
 
-    const isMoving = (typeof keys !== 'undefined' && (keys['w'] || keys['s'] || keys['a'] || keys['d'] || keys['arrowup'] || keys['arrowdown'] || keys['arrowleft'] || keys['arrowright'])) || (typeof touchMove !== 'undefined' && touchMove.active) || player.dashing;
-    const isLowHp = player.hp < (player.maxHp * 0.3);
+    const isMoving = (typeof keys !== 'undefined' && (keys['w'] || keys['s'] || keys['a'] || keys['d'] || keys['arrowup'] || keys['arrowdown'] || keys['arrowleft'] || keys['arrowright'])) || (typeof touchMove !== 'undefined' && touchMove.active) || p.dashing;
+    const isLowHp = p.hp < (p.maxHp * 0.3);
     const flashFlicker = (isLowHp && Math.random() < 0.22) ? (0.25 + Math.random() * 0.5) : 1.0;
 
     // ============================================================
@@ -7516,7 +7548,7 @@ function drawPlayer() {
 
     for (const side of [-1, 1]) {
         ctx.save();
-        ctx.rotate(player.facing);
+        ctx.rotate(p.facing);
         const lgtY = side * 8.5; // Left & Right headlight emitters on front fenders
         const lgtX = 13;
         const fg = ctx.createRadialGradient(lgtX, lgtY, 4, lgtX + flashLen * 0.7, lgtY, flashLen);
@@ -7538,7 +7570,7 @@ function drawPlayer() {
     // ============================================================
     // Rotate entire robot body to player facing direction
     ctx.save();
-    ctx.rotate(player.facing);
+    ctx.rotate(p.facing);
 
     // Track ground shadow
     ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
@@ -7561,12 +7593,12 @@ function drawPlayer() {
         ctx.beginPath();
         ctx.roundRect(-trackLength / 2, topY, trackLength, trackWidth, 3);
         ctx.fill();
-        ctx.strokeStyle = player.dashing ? '#00f0ff' : '#334155';
+        ctx.strokeStyle = p.dashing ? '#00f0ff' : '#334155';
         ctx.lineWidth = 1;
         ctx.stroke();
 
         // Animated Tread Cleats (Gigi Roda Track yang Berputar Saat Jalan)
-        ctx.strokeStyle = player.dashing ? '#38bdf8' : '#64748b';
+        ctx.strokeStyle = p.dashing ? '#38bdf8' : '#64748b';
         ctx.lineWidth = 1.2;
         const numCleats = 5;
         for (let c = 0; c < numCleats; c++) {
@@ -7585,7 +7617,7 @@ function drawPlayer() {
             ctx.arc(wx, ty, 2.2, 0, Math.PI * 2);
             ctx.fill();
             // Wheel neon hub center
-            ctx.fillStyle = player.dashing ? '#00f0ff' : '#475569';
+            ctx.fillStyle = p.dashing ? '#00f0ff' : '#475569';
             ctx.beginPath();
             ctx.arc(wx, ty, 1.0, 0, Math.PI * 2);
             ctx.fill();
@@ -7598,9 +7630,9 @@ function drawPlayer() {
     }
 
     // 2B. SLOPED ARMORED HULL / MAIN CHASSIS (Bodi Baja BMPT Robot)
-    const hullColor = player.dashing ? '#0f172a' : (isLowHp ? '#2a1215' : '#1e293b');
-    const plateColor = player.dashing ? '#1e293b' : (isLowHp ? '#3b1c20' : '#334155');
-    const armorAccent = player.dashing ? '#00f0ff' : (isLowHp ? '#ef4444' : '#38bdf8');
+    const hullColor = p.dashing ? '#0f172a' : (isLowHp ? '#2a1215' : '#1e293b');
+    const plateColor = p.dashing ? '#1e293b' : (isLowHp ? '#3b1c20' : '#334155');
+    const armorAccent = p.dashing ? '#00f0ff' : (isLowHp ? '#ef4444' : '#38bdf8');
 
     // Lower Hull Bed
     ctx.fillStyle = hullColor;
@@ -7655,10 +7687,10 @@ function drawPlayer() {
         ctx.strokeRect(-14, exY - 1.5, 2.5, 3);
 
         if (isMoving) {
-            const flameLen = player.dashing ? (9 + Math.random() * 8) : (3 + Math.random() * 4);
+            const flameLen = p.dashing ? (9 + Math.random() * 8) : (3 + Math.random() * 4);
             ctx.save();
-            ctx.fillStyle = player.dashing ? 'rgba(0, 240, 255, 0.95)' : 'rgba(249, 115, 22, 0.85)';
-            ctx.shadowColor = player.dashing ? '#00f0ff' : '#f97316';
+            ctx.fillStyle = p.dashing ? 'rgba(0, 240, 255, 0.95)' : 'rgba(249, 115, 22, 0.85)';
+            ctx.shadowColor = p.dashing ? '#00f0ff' : '#f97316';
             ctx.shadowBlur = 8;
             ctx.beginPath();
             ctx.moveTo(-14, exY - 1.2);
@@ -7726,8 +7758,8 @@ function drawPlayer() {
     // ============================================================
     // 4. TOP-MOUNTED DEPLOYABLE WEAPON PLATFORM (Senjata Muncul di Atas)
     // ============================================================
-    const curW = player.currentWeapon || 'knife';
-    const recoil = (player.attackAnim > 0) ? Math.min(4, player.attackAnim * 0.4) : 0;
+    const curW = p.currentWeapon || 'knife';
+    const recoil = (p.attackAnim > 0) ? Math.min(4, p.attackAnim * 0.4) : 0;
 
     if (curW === 'knife') {
         // [MELEE] Hydraulic Deployable Arm with Thermal Rotary Saw
@@ -7770,8 +7802,8 @@ function drawPlayer() {
         ctx.fillRect(16 - recoil, 0.4, 2.5, 3.4);
     } else if (curW === 'minigun') {
         // [MINIGUN] 6-Barrel Vulcan Rotary Gatling Turret
-        const heatProg = Math.min(1, (player.minigunHeat || 0) / 100);
-        const spinSpeed = (player.attackAnim > 0 || isMouseDown || keys[' ']) ? Date.now() * 0.04 : 0;
+        const heatProg = Math.min(1, (p.minigunHeat || 0) / 100);
+        const spinSpeed = (p.attackAnim > 0 || isMouseDown || keys[' ']) ? Date.now() * 0.04 : 0;
         const barrelColor = heatProg > 0.65 ? '#ef4444' : (heatProg > 0.35 ? '#f97316' : '#334155');
 
         ctx.fillStyle = '#1e293b';
@@ -7843,9 +7875,9 @@ function drawPlayer() {
     // ============================================================
     // 5. KINETIC SHIELD DOME OVERLAY (If Shield Active)
     // ============================================================
-    if (player.shieldTimer > 0) {
-        const sProg = Math.min(1, player.shieldTimer / 150);
-        const sRad = player.size + 18 + Math.sin(Date.now() * 0.01) * 2;
+    if (p.shieldTimer > 0) {
+        const sProg = Math.min(1, p.shieldTimer / 150);
+        const sRad = p.size + 18 + Math.sin(Date.now() * 0.01) * 2;
         ctx.save();
         ctx.strokeStyle = `rgba(0, 240, 255, ${0.4 + 0.5 * sProg})`;
         ctx.lineWidth = 2.4;
@@ -7869,25 +7901,25 @@ function drawPlayer() {
     // ============================================================
     // 6. FIRING MUZZLE FLASHES & WEAPON IMPACT ANIMATION
     // ============================================================
-    if (player.attackAnim > 0) {
-        const prog = player.attackAnim / 15;
+    if (p.attackAnim > 0) {
+        const prog = p.attackAnim / 15;
         if (curW === 'knife') {
             // High-frequency circular saw slash arc
             ctx.strokeStyle = `rgba(249, 115, 22, ${prog})`;
             ctx.lineWidth = 4.5;
             const range = 48 * prog;
             ctx.beginPath();
-            ctx.arc(0, 0, range, player.facing - 0.9, player.facing + 0.9);
+            ctx.arc(0, 0, range, p.facing - 0.9, p.facing + 0.9);
             ctx.stroke();
             ctx.strokeStyle = `rgba(255, 255, 255, ${prog})`;
             ctx.lineWidth = 2.0;
             ctx.beginPath();
-            ctx.arc(0, 0, range * 0.85, player.facing - 0.75, player.facing + 0.75);
+            ctx.arc(0, 0, range * 0.85, p.facing - 0.75, p.facing + 0.75);
             ctx.stroke();
         } else if (curW === 'rifle' || curW === 'minigun') {
             // Muzzle flash at barrel tip
-            const mx = Math.cos(player.facing) * (player.size + 16);
-            const my = Math.sin(player.facing) * (player.size + 16);
+            const mx = Math.cos(p.facing) * (p.size + 16);
+            const my = Math.sin(p.facing) * (p.size + 16);
             ctx.fillStyle = '#fef08a';
             ctx.shadowColor = '#f59e0b';
             ctx.shadowBlur = 12;
@@ -7897,8 +7929,8 @@ function drawPlayer() {
             ctx.shadowBlur = 0;
         } else if (curW === 'bazooka') {
             // Heavy Rocket Ignition Backblast
-            const bx = -Math.cos(player.facing) * (player.size + 10);
-            const by = -Math.sin(player.facing) * (player.size + 10);
+            const bx = -Math.cos(p.facing) * (p.size + 10);
+            const by = -Math.sin(p.facing) * (p.size + 10);
             ctx.fillStyle = `rgba(249, 115, 22, ${prog * 0.8})`;
             ctx.beginPath();
             ctx.arc(bx, by, 9 * prog, 0, Math.PI * 2);
@@ -7906,7 +7938,21 @@ function drawPlayer() {
         }
     }
 
-    ctx.restore();
+        ctx.restore();
+
+    // Diegetic Teammate Callsign Tag & Operative Dot (Co-op Peers)
+    if (!isLocal) {
+        ctx.save();
+        const pCol = (PLAYER_COLORS[p.peerIndex % 4] || PLAYER_COLORS[1]).hex;
+        ctx.fillStyle = pCol;
+        ctx.font = 'bold 9px monospace';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = pCol;
+        ctx.shadowBlur = 6;
+        const tagText = p.callsign || ('P' + ((p.peerIndex || 0) + 1));
+        ctx.fillText(tagText, sx, sy - p.size - 14);
+        ctx.restore();
+    }
 }
 
 // Pixel-art monster 1:1 dengan teaser homepage (maps & palet FOES di home.js).
@@ -10734,7 +10780,15 @@ function renderGame() {
     drawExit();
     drawWreckedRobot();
     drawTraps();
-    drawPlayer();
+    if (players && players.length > 1) {
+        for (let pi = 0; pi < players.length; pi++) {
+            if (players[pi] && players[pi].hp > 0) {
+                drawPlayer(players[pi]);
+            }
+        }
+    } else {
+        drawPlayer();
+    }
     drawMotionTracker();
     drawParticles();
     drawSpores();
@@ -10982,8 +11036,10 @@ function stepLocalVisuals() {
 
 // Kamera adaptif dengan Dynamic Look-Ahead menuju arah bidikan crosshair.
 function stepCamera() {
-    let targetCamX = player.x;
-    let targetCamY = player.y;
+    const lp = getLocalPlayer();
+    if (!lp) return;
+    let targetCamX = lp.x;
+    let targetCamY = lp.y;
     if (mouseActive && !menuDemo) {
         const aimDist = 65;
         targetCamX += Math.cos(player.facing) * aimDist;

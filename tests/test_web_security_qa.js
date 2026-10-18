@@ -10,7 +10,8 @@
  * ketahanan loop game terhadap exception (error boundary anti-freeze),
  * interaksi modal Memori Robot (jeda game, i18n, guard kabut, focus trap),
  * dunia deterministik ber-seed (fondasi co-op online: PRNG mulberry32),
- * serta pemisahan simulasi vs render (fondasi arsitektur host-authoritative).
+ * pemisahan simulasi vs render (fondasi arsitektur host-authoritative),
+ * serta abstraksi pemain multi (fondasi co-op 4 pemain: players[] & host index 0).
  */
 
 const fs = require('fs');
@@ -457,6 +458,41 @@ assert(/screenShake\s*--;[\s\S]*?if\s*\(\s*hurtFlash\s*>\s*0\s*\)\s*hurtFlash\s*
   'updatePlayer() harus meluruhkan hurtFlash agar vignette damage merah tidak menetap permanen');
 console.log('✓ TEST 17 LULUS: Simulasi (state) terpisah dari render (canvas/HUD) — siap host-authoritative.');
 
+// TEST 18: Abstraksi pemain multi (players[] & host index 0).
+// Prasyarat co-op 4 pemain: seluruh state pemain diwadahi dalam array players[],
+// dengan pemain lokal dipetakan lewat localPlayerIndex (default 0 untuk host).
+console.log('\n[TEST 18] Pengujian Abstraksi Pemain Multi (players[] & localPlayerIndex)...');
+// 18a. Deklarasi struktur multi-pemain
+assert(/let\s+players\s*=\s*\[\];/.test(gameJs), 'players[] harus dideklarasikan di scope global');
+assert(/let\s+localPlayerIndex\s*=\s*0;/.test(gameJs), 'localPlayerIndex harus dideklarasikan di scope global');
+assert(/const\s+MAX_PLAYERS\s*=\s*4;/.test(gameJs), 'MAX_PLAYERS harus dibatasi maksimal 4');
+assert(/const\s+PLAYER_COLORS\s*=\s*\[/.test(gameJs), 'PLAYER_COLORS harus mendefinisikan palet unik antar pemain');
+
+// 18b. Helper getter & setter pemain lokal
+assert(/function\s+getLocalPlayer\(\)/.test(gameJs), 'getLocalPlayer() harus tersedia');
+assert(/function\s+setLocalPlayerIndex\(/.test(gameJs), 'setLocalPlayerIndex() harus tersedia');
+assert(/function\s+getPlayerByPeer\(/.test(gameJs), 'getPlayerByPeer() harus tersedia');
+
+// 18c. Inisialisasi dunia mengaitkan players = [player] dan localPlayerIndex = 0
+assert(/players\s*=\s*\[player\];[\s\S]*?localPlayerIndex\s*=\s*0;/.test(gameJs),
+  'buildLevelWorld() harus menginisialisasi players[] dengan entitas player di index 0');
+
+// 18d. Fungsi render player mendukung entitas target (p = targetPlayer || getLocalPlayer())
+assert(/function\s+drawPlayer\(\s*targetPlayer\s*\)/.test(gameJs),
+  'drawPlayer() harus menerima parameter targetPlayer');
+assert(/const\s+p\s*=\s*targetPlayer\s*\|\|\s*getLocalPlayer\(\);/.test(gameJs),
+  'drawPlayer() harus fallback ke getLocalPlayer() bila tanpa argumen');
+
+// 18e. Render loop menggambar seluruh pemain aktif dalam players[]
+assert(/for\s*\(\s*let\s+pi\s*=\s*0;\s*pi\s*<\s*players\.length;\s*pi\+\+\s*\)/.test(gameJs),
+  'renderGame() harus melakukan iterasi menggambar seluruh pemain di players[]');
+
+// 18f. Kamera memusatkan pandangan pada pemain lokal (getLocalPlayer())
+assert(/const\s+lp\s*=\s*getLocalPlayer\(\);/.test(gameJs),
+  'stepCamera() harus melacak posisi pemain lokal');
+
+console.log('✓ TEST 18 LULUS: Abstraksi players[] & localPlayerIndex siap untuk co-op 4 pemain.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (17/17)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (18/18)');
 console.log('=========================================');
