@@ -13,7 +13,8 @@
  * pemisahan simulasi vs render (fondasi arsitektur host-authoritative),
  * abstraksi pemain multi (fondasi co-op 4 pemain: players[] & host index 0),
  * serialisasi & rekonsiliasi snapshot state (fondasi sinkronisasi relay),
- * serta lobi co-op & transport relay WebSocket (Fase 2 co-op online: 4 pemain).
+ * serta lobi co-op & transport relay WebSocket (Fase 2 co-op online: 4 pemain),
+ * dan lockup logo Hub (emblem inline SVG prosedural + wordmark berlapis) beserta guard prefers-reduced-motion.
  */
 
 const fs = require('fs');
@@ -754,6 +755,65 @@ assert(projs[0].ownerIndex === 1, 'Proyektil harus mencatat ownerIndex pemilikny
 
 console.log('✓ TEST 22 LULUS: Multi-target monster AI, mekanik Downed/Revive, & tembakan remote peer terverifikasi.');
 
+// TEST 23: Lockup logo Hub (emblem prosedural + wordmark berlapis) & kepatuhan hemat gerak.
+// Memverifikasi: (a) lockup membungkus satu-satunya nama aksesibel (h1 "VITA"),
+// (b) emblem inline SVG murni prosedural tanpa aset eksternal & ditandai aria-hidden,
+// (c) overlay sapuan cahaya dekoratif disembunyikan dari screen reader,
+// (d) gaya wordmark memakai background-clip + ekstrusi drop-shadow berlapis (bukan text-shadow),
+// (e) seluruh animasi dekoratif baru memiliki guard prefers-reduced-motion (Hub & layar mulai).
+console.log('\n[TEST 23] Pengujian Lockup Logo Hub, Emblem Prosedural, & Guard Hemat Gerak...');
+
+const gameCss = fs.readFileSync(path.join(__dirname, '../css/game.css'), 'utf8');
+
+// 23a. Struktur lockup: satu pembungkus, satu h1, tanpa nama aksesibel ganda.
+assert(/<div class="vita-lockup">/.test(indexHtml), 'Wrapper .vita-lockup harus ada di index.html');
+const lockupMatch = indexHtml.match(/<div class="vita-lockup">([\s\S]*?)<\/div>/);
+assert(lockupMatch, 'Blok .vita-lockup harus dapat diekstrak dari index.html');
+const lockupHtml = lockupMatch[1];
+assert((lockupHtml.match(/<h1\b/g) || []).length === 1, 'Lockup harus memuat tepat satu <h1> (nama aksesibel tunggal)');
+assert(/<h1 class="title">VITA<\/h1>/.test(lockupHtml), 'Wordmark harus tetap berupa h1.title berisi teks "VITA"');
+
+// 23b. Emblem: inline SVG prosedural (tanpa <img>/rujukan gambar), non-fokus, aria-hidden.
+const emblemMatch = indexHtml.match(/<svg class="vita-emblem"[\s\S]*?<\/svg>/);
+assert(emblemMatch, 'Emblem inline SVG .vita-emblem harus ada di index.html');
+const emblemSvg = emblemMatch[0];
+assert(/aria-hidden="true"/.test(emblemSvg), 'Emblem dekoratif wajib aria-hidden="true" (nama aksesibel tetap satu)');
+assert(/focusable="false"/.test(emblemSvg), 'Emblem wajib focusable="false" (hindari tab stop kosong)');
+assert(!/<text[\s>]/.test(emblemSvg), 'Emblem tidak boleh memuat <text> (mencegah nama aksesibel ganda)');
+assert(!/<image[\s>]|<img\b|xlink:href|\bhref=/.test(emblemSvg), 'Emblem harus murni prosedural (tanpa aset/rujukan gambar eksternal)');
+
+// 23c. Sapuan cahaya dekoratif tidak boleh terbaca screen reader.
+assert(/<span class="vita-sweep" aria-hidden="true"><\/span>/.test(indexHtml), 'Overlay .vita-sweep wajib aria-hidden="true"');
+
+// 23d. Gaya wordmark: klip gradien + ekstrusi drop-shadow berlapis.
+assert(/#homeView \.vita-lockup\s*\{/.test(homeCss), 'home.css harus mendefinisikan .vita-lockup');
+const hubTitleCss = (homeCss.match(/#homeView h1\.title\s*\{[\s\S]*?\}/g) || [])
+  .find(b => /background-clip:\s*text/.test(b));
+assert(hubTitleCss, 'Aturan #homeView h1.title dengan background-clip: text harus ada di home.css');
+assert((hubTitleCss.match(/drop-shadow\(/g) || []).length >= 3, 'Wordmark Hub harus memakai ekstrusi drop-shadow berlapis (>=3)');
+['vitaBacklight', 'vitaEmblem', 'vitaSweep', 'vitaTitleGlitch'].forEach(kf =>
+  assert(new RegExp('@keyframes\\s+' + kf + '\\b').test(homeCss), 'Keyframes ' + kf + ' harus tersedia di home.css'));
+
+// 23e. Guard prefers-reduced-motion untuk seluruh animasi dekoratif logo (Hub + layar mulai).
+const homeRm = homeCss.match(/@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*?\n\}/);
+assert(homeRm, 'home.css wajib memiliki guard @media (prefers-reduced-motion: reduce) untuk logo');
+['.vita-emblem', '.vita-lockup::before', 'h1.title', '.vita-sweep'].forEach(sel =>
+  assert(homeRm[0].includes(sel), 'Guard reduced-motion Hub harus menangani ' + sel));
+
+const gameRm = gameCss.match(/@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*?\n\s*\}/);
+assert(gameRm && /#gameView #startScreen h1\s*\{\s*animation:\s*none/.test(gameRm[0]),
+  'Guard reduced-motion game.css harus menonaktifkan animasi judul layar mulai');
+
+// 23f. Judul layar mulai ikut dipoles secara konsisten (rim light + ekstrusi + kilau).
+const startTitleCss = (gameCss.match(/#gameView #startScreen h1\s*\{[\s\S]*?\}/g) || [])
+  .find(b => /font-size:\s*clamp\(64px/.test(b));
+assert(startTitleCss, 'Aturan #gameView #startScreen h1 dengan font-size clamp(64px, ...) harus ada');
+assert((startTitleCss.match(/drop-shadow\(/g) || []).length >= 3, 'Judul layar mulai harus memakai ekstrusi drop-shadow berlapis (>=3)');
+assert(/animation:\s*vitaStartFlicker\b/.test(startTitleCss), 'Judul layar mulai harus memakai animasi kilau vitaStartFlicker');
+assert(new RegExp('@keyframes\\s+vitaStartFlicker\\b').test(gameCss), 'Keyframes vitaStartFlicker harus tersedia di game.css');
+
+console.log('✓ TEST 23 LULUS: Lockup logo Hub (emblem prosedural + wordmark berlapis) & guard hemat gerak terverifikasi.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (22/22)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (23/23)');
 console.log('=========================================');

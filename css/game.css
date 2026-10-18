@@ -339,6 +339,7 @@ body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opaci
         }
 @media (prefers-reduced-motion: reduce) {
             #gameView #newBestBadge { animation: none; }
+            #gameView #startScreen h1 { animation: none; }
         }
 #gameView #startScreen {
             /* Bisa di-scroll: menu + panel admin kadang lebih tinggi dari layar,
@@ -354,12 +355,31 @@ body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opaci
 #gameView #startScreen h1 {
             font-size: clamp(64px, 11vw, 116px);
             letter-spacing: 16px;
-            background: linear-gradient(180deg, #ff2b2b, #a00d0d 55%, #2a0000 100%);
+            /* Lapisan 1 = rim light atas, lapisan 2 = ramp kroma merah-tua (senada wordmark Hub). */
+            background:
+                linear-gradient(180deg, rgba(255, 228, 216, 0.85) 0%, rgba(255, 122, 102, 0.25) 14%, rgba(255, 255, 255, 0) 30%),
+                linear-gradient(180deg, #ff4a44 0%, #e01515 30%, #9c0c0c 55%, #400000 80%, #0a0000 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             text-shadow: none;
-            filter: drop-shadow(0 0 18px rgba(255, 40, 40, 0.55));
+            /* Ekstrusi bertingkat (bukan text-shadow, agar tidak tembus lewat glyph transparan). */
+            filter:
+                drop-shadow(0 1px 0 rgba(104, 0, 0, 0.95))
+                drop-shadow(0 3px 0 rgba(38, 0, 0, 0.9))
+                drop-shadow(0 7px 2px rgba(0, 0, 0, 0.85))
+                drop-shadow(0 0 22px rgba(255, 40, 40, 0.55))
+                drop-shadow(0 18px 44px rgba(0, 0, 0, 0.85));
+            animation: vitaStartFlicker 9s steps(1, end) infinite;
+        }
+@keyframes vitaStartFlicker {
+            0%, 100% { opacity: 1; }
+            38%      { opacity: 1; }
+            39%      { opacity: 0.62; }
+            40%      { opacity: 1; }
+            71%      { opacity: 1; }
+            72%      { opacity: 0.5; }
+            73%      { opacity: 1; }
         }
 #gameView #startScreen .eyebrow {
             color: rgba(214, 128, 114, 0.8);
