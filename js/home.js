@@ -357,14 +357,15 @@ document.addEventListener('keydown', e => {
 });
 
 /* ---- A11y: Manajemen Fokus Dialog (modal & sidebar) ----
-   Semua dialog Hub memakai pola .modal-backdrop, sebagian dibuka lewat kelas
-   .open dan sebagian lewat style.display. Daripada menyentuh puluhan fungsi
-   buka/tutup, satu MutationObserver menjaga atribut ARIA, memindahkan fokus
-   ke dalam dialog saat dibuka, mengembalikannya saat ditutup, dan menjebak
-   tombol Tab agar tidak bocor ke konten di belakang. */
+   Semua dialog memakai pola .modal-backdrop (plus .robot-memory-backdrop untuk
+   dialog temuan in-game), sebagian dibuka lewat kelas .open dan sebagian lewat
+   style.display. Daripada menyentuh puluhan fungsi buka/tutup, satu
+   MutationObserver menjaga atribut ARIA, memindahkan fokus ke dalam dialog saat
+   dibuka, mengembalikannya saat ditutup, dan menjebak tombol Tab agar tidak
+   bocor ke konten di belakang. */
 (function initDialogA11y() {
   const FOCUSABLE = 'a[href],area[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
-  const hosts = Array.from(document.querySelectorAll('.modal-backdrop, #sidebarDrawer'));
+  const hosts = Array.from(document.querySelectorAll('.modal-backdrop, .robot-memory-backdrop, #sidebarDrawer'));
   if (!hosts.length) return;
   let activeHost = null;
   let restoreTarget = null;

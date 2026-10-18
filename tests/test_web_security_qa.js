@@ -7,7 +7,8 @@
  * kelengkapan i18n modal mode perangkat & pil mode layar mulai,
  * kinerja loop Hub (cache DOM per frame) & penghormatan prefers-reduced-motion pada animasi JS,
  * live region status async Hub (role="status", WCAG 4.1.3),
- * serta ketahanan loop game terhadap exception (error boundary anti-freeze).
+ * ketahanan loop game terhadap exception (error boundary anti-freeze),
+ * serta interaksi modal Memori Robot (jeda game, i18n, guard kabut, focus trap).
  */
 
 const fs = require('fs');
@@ -341,6 +342,28 @@ assert(/addEventListener\(\s*'error'/.test(gameJs) && /addEventListener\(\s*'unh
   'Diagnostik global (window "error" & "unhandledrejection") harus terpasang di js/game.js');
 console.log('✓ TEST 14 LULUS: Loop game tetap berjalan walau terjadi exception (anti-freeze).');
 
+// TEST 15: Regresi interaksi modal Memori Robot (temuan in-game Sektor 10).
+// Regresi: modal temuan dibuka tanpa menjeda game (monster tetap bergerak di balik dialog),
+// tanpa melepas kunci kursor; guard kabut salah indeks (fogOfWar[gy][gx] vs fogOfWar[gx]);
+// label tombol hardcoded (bocor ke EN); referensi rongsokan basi antar-level; dan modal
+// tidak terdaftar pada focus manager sehingga tombol Tab bocor ke konten di belakang.
+console.log('\n[TEST 15] Pengujian Interaksi Modal Memori Robot (Sektor 10)...');
+const openRobotBody = (gameJs.match(/function openRobotMemoryModal\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+const closeRobotBody = (gameJs.match(/function closeRobotMemoryModal\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+assert(openRobotBody.length > 0 && /gameState\s*=\s*'paused'/.test(openRobotBody),
+  'openRobotMemoryModal() harus menjeda game (gameState = "paused") selama dialog terbuka');
+assert(closeRobotBody.length > 0 && /gameState\s*=\s*'playing'/.test(closeRobotBody),
+  'closeRobotMemoryModal() harus melanjutkan game (gameState = "playing") saat dialog ditutup');
+assert(/!fogOfWar\[wreckedRobot\.gy\]\s*\|\|\s*!fogOfWar\[wreckedRobot\.gy\]\[wreckedRobot\.gx\]/.test(gameJs),
+  'Guard kabut drawWreckedRobot() harus mengindeks fogOfWar[gy][gx] (bukan fogOfWar[gx])');
+assert(/wreckedRobot = null;\s*\n\s*exitPos = findFarSpot\(/.test(gameJs),
+  'initLevel() harus mereset wreckedRobot = null sebelum penempatan exit (cegah referensi basi antar-level)');
+assert(indexHtml.includes('data-i18n="robot_continue"') && (gameJs.match(/robot_continue:/g) || []).length === 2,
+  'Label tombol robot harus ter-lokalisasi (data-i18n="robot_continue" + kunci di T.id & T.en)');
+assert(homeJs.includes('.robot-memory-backdrop'),
+  'Modal robot harus terdaftar pada focus manager agar Tab tidak bocor ke belakang dialog');
+console.log('✓ TEST 15 LULUS: Modal Memori Robot menjeda game, ter-lokalisasi, dan aksesibel.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (14/14)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (15/15)');
 console.log('=========================================');

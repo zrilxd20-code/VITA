@@ -103,6 +103,7 @@ const touchMove = { active: false, id: -1, dx: 0, dy: 0 };
 let levelTransition = false;
 let artifacts = [];
 let exitPos = null;
+let wreckedRobot = null;
 let coinsCollected = 0;
 let floatingTexts = [];
 let lockMsgCooldown = 0;
@@ -475,7 +476,8 @@ const T = {
         layout_editor_title: 'ATUR LETAK TOMBOL SENTUH',
         layout_editor_hint: 'Geser tombol di layar ke posisi yang paling nyaman.',
         layout_saved_toast: 'Tata letak tombol HP disimpan.',
-        layout_reset_toast: 'Tata letak tombol HP dikembalikan ke posisi default.'
+        layout_reset_toast: 'Tata letak tombol HP dikembalikan ke posisi default.',
+        robot_continue: 'LANJUTKAN MISI ▸'
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
@@ -690,7 +692,8 @@ const T = {
         layout_editor_title: 'TOUCH BUTTON LAYOUT',
         layout_editor_hint: 'Drag the on-screen buttons to the positions you prefer.',
         layout_saved_toast: 'Mobile button layout saved.',
-        layout_reset_toast: 'Mobile button layout restored to default.'
+        layout_reset_toast: 'Mobile button layout restored to default.',
+        robot_continue: 'CONTINUE MISSION ▸'
     }
 };
 
@@ -3549,7 +3552,30 @@ function initLevel(level) {
             });
         }
 
+        wreckedRobot = null;
         exitPos = findFarSpot(Math.min(8 + level, mazeW * 0.5), taken);
+        if (level === 9 && exitPos) {
+            // Sektor 10: Rongsokan robot BMPT di samping gerbang keluar
+            let rx = exitPos.gx + 1, ry = exitPos.gy;
+            if (maze[ry] && maze[ry][rx] === 0) {
+                // open spot to the right
+            } else if (maze[ry] && maze[ry][exitPos.gx - 1] === 0) {
+                rx = exitPos.gx - 1;
+            } else if (maze[exitPos.gy + 1] && maze[exitPos.gy + 1][exitPos.gx] === 0) {
+                rx = exitPos.gx; ry = exitPos.gy + 1;
+            } else if (maze[exitPos.gy - 1] && maze[exitPos.gy - 1][exitPos.gx] === 0) {
+                rx = exitPos.gx; ry = exitPos.gy - 1;
+            } else {
+                rx = exitPos.gx; ry = exitPos.gy;
+            }
+            wreckedRobot = {
+                gx: rx,
+                gy: ry,
+                x: rx * CELL + CELL / 2,
+                y: ry * CELL + CELL / 2,
+                inspected: false
+            };
+        }
     }
 
     // Spawn Classified Lore Data Discs & Volatile Biohazard Barrels
@@ -5876,6 +5902,12 @@ function updatePlayer() {
                 openLoreModal(d.log);
             }
         });
+    }
+
+    // Check Wrecked BMPT Prototype Robot Inspection (Sector 10)
+    if (wreckedRobot && currentLevel === 9 && !wreckedRobot.inspected && dist(player, wreckedRobot) < 28) {
+        wreckedRobot.inspected = true;
+        openRobotMemoryModal();
     }
 
     // Check Nanite Medical Chamber Interaction
@@ -9709,6 +9741,312 @@ function drawArtifacts() {
     }
 }
 
+
+function drawWreckedRobot() {
+    if (!wreckedRobot || currentLevel !== 9) return;
+    const sx = wreckedRobot.x - cameraX + W / 2;
+    const sy = wreckedRobot.y - cameraY + H / 2;
+
+    if (sx < -80 || sx > W + 80 || sy < -80 || sy > H + 80) return;
+    if (!fogOfWar[wreckedRobot.gy] || !fogOfWar[wreckedRobot.gy][wreckedRobot.gx]) return;
+
+    const t = Date.now() / 1000;
+
+    ctx.save();
+    ctx.translate(sx, sy);
+
+    // ============================================================
+    // 1. GROUND SCORCH & HEAVY HYDRAULIC OIL SLICK
+    // ============================================================
+    ctx.fillStyle = 'rgba(10, 6, 8, 0.82)';
+    ctx.beginPath();
+    ctx.ellipse(0, 3, 24, 16, 0.25, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Iridescent chemical oil rainbow sheen spots
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.18)';
+    ctx.beginPath();
+    ctx.ellipse(5, 7, 10, 5, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(236, 72, 153, 0.12)';
+    ctx.beginPath();
+    ctx.ellipse(-6, 6, 8, 4, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Slumped Russian BMPT Terminator chassis angle
+    ctx.rotate(0.48);
+
+    // ============================================================
+    // 2. RUSSIAN BMPT CATERPILLAR TRACKS & ROAD WHEELS (DAMAGED)
+    // ============================================================
+    const trackWidth = 5.5;
+    const trackLength = 29;
+    const trackYOffset = 8.5;
+
+    // 2A. LEFT TRACK (Still mounted on road wheels, scarred & soot-covered)
+    const leftTopY = -trackYOffset - trackWidth / 2;
+    ctx.fillStyle = '#0b0f19';
+    ctx.beginPath();
+    ctx.roundRect(-trackLength / 2, leftTopY, trackLength, trackWidth, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Static worn tread cleats
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.1;
+    for (let c = 0; c < 5; c++) {
+        const cleatX = -trackLength / 2 + 4 + c * 5.2;
+        ctx.beginPath();
+        ctx.moveTo(cleatX, leftTopY);
+        ctx.lineTo(cleatX, leftTopY + trackWidth);
+        ctx.stroke();
+    }
+
+    // Road wheels on left track
+    for (let w = -1; w <= 2; w++) {
+        const wx = -10 + (w + 1) * 6.5;
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(wx, -trackYOffset, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.arc(wx, -trackYOffset, 1.0, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // 2B. RIGHT TRACK (SEVERED & DERAILED - Blown open across floor)
+    const rightTy = trackYOffset;
+    // Exposed & distorted road wheels
+    for (let w = -1; w <= 2; w++) {
+        const wx = -10 + (w + 1) * 6.5;
+        ctx.fillStyle = (w === 1) ? '#0f172a' : '#1e293b'; // One wheel cracked/charred
+        ctx.beginPath();
+        ctx.arc(wx + (w === 1 ? 1 : 0), rightTy + (w === 0 ? 1 : 0), 2.2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Broken track ribbon peeling backwards into wreckage
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(8, rightTy);
+    ctx.lineTo(-4, rightTy + 2);
+    ctx.lineTo(-14, rightTy + 6);
+    ctx.lineTo(-22, rightTy + 10);
+    ctx.stroke();
+    // Broken track links & metallic highlights
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    // Loose sheared track link pins
+    ctx.fillStyle = '#64748b';
+    ctx.fillRect(-18, rightTy + 8, 3, 2);
+    ctx.fillRect(-23, rightTy + 11, 2, 2.5);
+
+    // ============================================================
+    // 3. SLOPED ARMORED HULL / MAIN CHASSIS (CHARRED BMPT)
+    // ============================================================
+    // Lower Hull Bed (Charred steel)
+    ctx.fillStyle = '#131924';
+    ctx.beginPath();
+    ctx.roundRect(-12, -7.5, 24, 15, 2.5);
+    ctx.fill();
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Front Glacis Sloped Armor Plate (BMPT Anti-Ballistic Wedge)
+    ctx.fillStyle = '#1e2738';
+    ctx.beginPath();
+    ctx.moveTo(3, -7);
+    ctx.lineTo(13, -4.5);
+    ctx.lineTo(13, 4.5);
+    ctx.lineTo(3, 7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Scratched tactical hazard chevron on glacis
+    ctx.strokeStyle = '#a16207';
+    ctx.lineWidth = 1.1;
+    ctx.beginPath();
+    ctx.moveTo(8, -2.5);
+    ctx.lineTo(11, 0);
+    ctx.lineTo(9.5, 1.2); // broken/interrupted stroke
+    ctx.stroke();
+
+    // Deep plasma / shell impact crater on armor
+    ctx.fillStyle = '#05070a';
+    ctx.beginPath();
+    ctx.arc(6, -2, 3.8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#b91c1c';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Rear Engine Deck & Radiator Louvers (Crumpled)
+    ctx.fillStyle = '#080c14';
+    ctx.fillRect(-11, -5.5, 5, 11);
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 0.8;
+    for (let r = -4; r <= 4; r += 2) {
+        ctx.beginPath();
+        ctx.moveTo(-11, r);
+        ctx.lineTo(-7, r + ((r === 0) ? 1.5 : 0)); // distorted slit
+        ctx.stroke();
+    }
+
+    // Rear exhaust nozzles (One crushed, one soot-blackened)
+    ctx.fillStyle = '#090d16';
+    ctx.fillRect(-14, -6, 2.5, 2.2);
+    ctx.fillRect(-14, 3.5, 2.0, 1.8);
+
+    // Snapped comms antenna (bent backwards with exposed copper strands)
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-9, -6);
+    ctx.lineTo(-14, -8.5);
+    ctx.lineTo(-17, -7);
+    ctx.stroke();
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(-17, -7);
+    ctx.lineTo(-19, -6.5);
+    ctx.stroke();
+
+    // ============================================================
+    // 4. BMPT DUAL 30MM 2A42 AUTOCANNON WEAPON MOUNT (TWIN BARRELS)
+    // ============================================================
+    // Armored Mantlet (Tilted weapon cradle)
+    ctx.fillStyle = '#182030';
+    ctx.fillRect(-2, -4.5, 6, 9);
+    ctx.strokeStyle = '#2d3748';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-2, -4.5, 6, 9);
+
+    // Barrel 1 (Upper 30mm Autocannon - Intact but drooping slightly)
+    ctx.fillStyle = '#0b0f19';
+    ctx.fillRect(4, -3.2, 13, 2.0);
+    // Upper muzzle brake
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(16, -3.7, 2.4, 3.0);
+
+    // Barrel 2 (Lower 30mm Autocannon - Blown open / ruptured barrel)
+    ctx.fillStyle = '#0b0f19';
+    ctx.fillRect(4, 1.0, 7, 2.2);
+    // Jagged burst barrel petals
+    ctx.fillStyle = '#7f1d1d';
+    ctx.beginPath();
+    ctx.moveTo(11, 0.8);
+    ctx.lineTo(13.5, 0.2);
+    ctx.lineTo(12, 2.2);
+    ctx.lineTo(13.8, 3.4);
+    ctx.lineTo(10.5, 3.2);
+    ctx.closePath();
+    ctx.fill();
+
+    // ============================================================
+    // 5. TOP TURRET & DYING CYCLOPS OPTICAL SENSOR
+    // ============================================================
+    // Tilted Turret Ring
+    ctx.save();
+    ctx.rotate(0.18);
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(0, 0, 7.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Severed colored wire bundle spilling out of turret ring
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(4, 3);
+    ctx.lineTo(8, 6.5);
+    ctx.lineTo(11, 9);
+    ctx.stroke();
+    ctx.strokeStyle = '#0284c7';
+    ctx.beginPath();
+    ctx.moveTo(2, -3);
+    ctx.lineTo(6, -6);
+    ctx.stroke();
+
+    // Dying cracked optical sensor (Cyclops "Mata Robot" - Faint Crimson Flicker)
+    const dyingFlicker = (Math.sin(t * 3.5) > 0.1) ? (0.25 + Math.random() * 0.45) : 0.08;
+    ctx.fillStyle = 'rgba(239, 68, 68, ' + dyingFlicker + ')';
+    ctx.shadowColor = '#ef4444';
+    ctx.shadowBlur = 9 * dyingFlicker;
+    ctx.beginPath();
+    ctx.arc(3.2, 0, 2.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Diagonal fracture crack across cyclops lens
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(2.2, -1.5);
+    ctx.lineTo(4.2, 1.5);
+    ctx.stroke();
+
+    ctx.restore();
+    ctx.restore();
+
+    // Random electrical spark emission from exposed circuits
+    if (Math.random() < 0.06 && typeof addParticle === 'function') {
+        addParticle(wreckedRobot.x + (Math.random() - 0.5) * 18, wreckedRobot.y + (Math.random() - 0.5) * 18, '#00e5ff', 3, 2, 10);
+    }
+
+    // Floating interaction prompt when player is nearby
+    if (player && dist(player, wreckedRobot) < 55) {
+        ctx.save();
+        ctx.fillStyle = '#00f0ff';
+        ctx.font = 'bold 11px monospace';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur = 8;
+        const bob = Math.sin(t * 4) * 2;
+        const promptText = (typeof lang !== 'undefined' && lang === 'en')
+            ? '[ E / TAP : INSPECT WRECKAGE ]'
+            : '[ E / TAP : PERIKSA RONGSOKAN ]';
+        ctx.fillText(promptText, sx, sy - 26 + bob);
+        ctx.shadowBlur = 0;
+        ctx.restore();
+    }
+}
+
+function openRobotMemoryModal() {
+    const modal = document.getElementById('robotMemoryModal');
+    if (!modal) return;
+    try {
+        if (typeof sOccultTone === 'function') sOccultTone(60, 45, 1.8, 0.4, 'sine');
+    } catch (_) {}
+    modal.style.display = 'flex';
+    if (typeof hideHUD === 'function') hideHUD();
+    if (typeof showCursor === 'function') showCursor();
+    if (gameState === 'playing') gameState = 'paused';
+}
+
+function closeRobotMemoryModal() {
+    const modal = document.getElementById('robotMemoryModal');
+    if (modal) modal.style.display = 'none';
+    if (typeof showHUD === 'function') showHUD();
+    if (typeof hideCursor === 'function') hideCursor();
+    if (wreckedRobot) wreckedRobot.inspected = true;
+    if (gameState === 'paused') gameState = 'playing';
+}
+window.openRobotMemoryModal = openRobotMemoryModal;
+window.closeRobotMemoryModal = closeRobotMemoryModal;
+
 function drawExit() {
     if (!exitPos) return;
     const sx = exitPos.x - cameraX + W / 2;
@@ -10322,6 +10660,7 @@ function renderGame() {
     drawArtifacts();
     drawMedPods();
     drawExit();
+    drawWreckedRobot();
     drawTraps();
     drawPlayer();
     drawMotionTracker();
@@ -10644,6 +10983,14 @@ document.addEventListener('keydown', e => {
     }
 
     // Dismiss lore or codex modal with Escape, Space, or Enter
+    const robotM = document.getElementById('robotMemoryModal');
+    const isRobotMOpen = robotM && robotM.style.display === 'flex';
+    if (isRobotMOpen && (e.key === 'Escape' || e.key === 'Esc' || e.key === ' ' || e.key === 'Enter')) {
+        e.preventDefault();
+        closeRobotMemoryModal();
+        return;
+    }
+
     const loreM = document.getElementById('loreModal');
     const isLoreOpen = loreM && (loreM.classList.contains('open') || loreM.style.display === 'flex');
     const codexM = document.getElementById('codexModal');
@@ -10678,6 +11025,10 @@ document.addEventListener('keydown', e => {
         } else if (e.key === 'q' || e.key === 'Q') {
             cycleWeapon(true);
         } else if (e.key === 'e' || e.key === 'E') {
+            if (wreckedRobot && currentLevel === 9 && player && dist(player, wreckedRobot) < 55) {
+                openRobotMemoryModal();
+                return;
+            }
             cycleWeapon(false);
         }
     }
