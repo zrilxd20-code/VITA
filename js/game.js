@@ -3477,7 +3477,78 @@ function spawnMonsters(level) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Fase 1 (fondasi co-op online) — konstruksi dunia deterministik.
+// Saat sesi punya seed (multiplayer), seluruh rantai pembangunan level
+// (applyAdaptation → generateMaze → spawnMonsters → penempatan jebakan/artefak)
+// berjalan di atas PRNG ber-seed, sehingga setiap peer menurunkan labirin,
+// daftar monster, dan loot yang identik dari pasangan (netSessionSeed, level).
+// Single-player tidak berubah: netSessionSeed tetap null → Math.random() polos.
+// ---------------------------------------------------------------------------
+let netSessionSeed = null;
+
+// FNV-1a 32-bit: teks seed → uint32 (stabil lintas platform & peer).
+function hashSeedToUint32(str) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+}
+
+// PRNG mulberry32: cepat, tanpa dependensi, dan deterministik lintas mesin.
+function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function () {
+        a = (a + 0x6D2B79F5) >>> 0;
+        let t = a;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+// Seed per-sektor: campuran seed sesi + nomor level (agar tiap level berbeda).
+function getLevelSeed(level) {
+    if (netSessionSeed == null) return null;
+    return (netSessionSeed ^ hashSeedToUint32('vita:level:' + level)) >>> 0;
+}
+
+// Dukungan `?seed=KODE` untuk uji determinisme (2 tab dengan seed sama → dunia sama).
+function readSeedFromUrl() {
+    try {
+        const raw = new URLSearchParams(window.location.search).get('seed');
+        if (!raw) return null;
+        const trimmed = String(raw).trim().slice(0, 32);
+        return trimmed ? hashSeedToUint32(trimmed) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+netSessionSeed = readSeedFromUrl();
+
+// Pembungkus publik: memasang PRNG ber-seed HANYA selama konstruksi dunia
+// berlangsung, lalu mengembalikan Math.random asli agar partikel/audio/combat
+// milik tiap klien tetap non-deterministik (perilaku single-player tak berubah).
 function initLevel(level) {
+    const clamped = Math.max(0, Math.min(LEVELS - 1, Math.floor(Number(level) || 0)));
+    const seed = getLevelSeed(clamped);
+    if (seed == null) {
+        buildLevelWorld(level);
+        return;
+    }
+    const originalRandom = Math.random;
+    Math.random = mulberry32(seed);
+    try {
+        buildLevelWorld(level);
+    } finally {
+        Math.random = originalRandom;
+    }
+}
+
+function buildLevelWorld(level) {
     level = Math.max(0, Math.min(LEVELS - 1, Math.floor(Number(level) || 0)));
     currentLevel = level;
     applyAdaptation(level);

@@ -8,7 +8,8 @@
  * kinerja loop Hub (cache DOM per frame) & penghormatan prefers-reduced-motion pada animasi JS,
  * live region status async Hub (role="status", WCAG 4.1.3),
  * ketahanan loop game terhadap exception (error boundary anti-freeze),
- * serta interaksi modal Memori Robot (jeda game, i18n, guard kabut, focus trap).
+ * interaksi modal Memori Robot (jeda game, i18n, guard kabut, focus trap),
+ * serta dunia deterministik ber-seed (fondasi co-op online: PRNG mulberry32).
  */
 
 const fs = require('fs');
@@ -364,6 +365,51 @@ assert(homeJs.includes('.robot-memory-backdrop'),
   'Modal robot harus terdaftar pada focus manager agar Tab tidak bocor ke belakang dialog');
 console.log('✓ TEST 15 LULUS: Modal Memori Robot menjeda game, ter-lokalisasi, dan aksesibel.');
 
+// TEST 16: Fondasi dunia deterministik untuk co-op online (PRNG ber-seed).
+// Regresi: dulu seluruh konstruksi level memakai Math.random() langsung, sehingga
+// dua peer tidak mungkin membangun labirin/monster/loot yang sama. Sekarang
+// initLevel() memasang PRNG ber-seed (mulberry32) HANYA selama pembangunan dunia,
+// lalu mengembalikan Math.random asli (single-player tetap tak berubah).
+console.log('\n[TEST 16] Pengujian Dunia Deterministik (fondasi co-op online)...');
+const hashFnSrc = (gameJs.match(/function hashSeedToUint32\([\s\S]*?\n\}/) || [''])[0];
+const rngFnSrc = (gameJs.match(/function mulberry32\([\s\S]*?\n\}/) || [''])[0];
+assert(hashFnSrc.length > 0, 'Fungsi hashSeedToUint32 (teks seed → uint32) tidak ditemukan');
+assert(rngFnSrc.length > 0, 'Fungsi mulberry32 (PRNG ber-seed) tidak ditemukan');
+const rngHelpers = new Function(hashFnSrc + '\n' + rngFnSrc + '\nreturn { hashSeedToUint32, mulberry32 };')();
+// 16a. Fungsi hash stabil & deterministik (input sama → nilai sama).
+assert(rngHelpers.hashSeedToUint32('ABC-123') === rngHelpers.hashSeedToUint32('ABC-123'),
+  'hashSeedToUint32 harus deterministik untuk input yang sama');
+assert(rngHelpers.hashSeedToUint32('ABC-123') !== rngHelpers.hashSeedToUint32('ABC-124'),
+  'hashSeedToUint32 harus berbeda untuk input berbeda');
+// 16b. PRNG: seed sama → urutan identik; seed beda → urutan beda; nilai di [0,1).
+const seqA = Array.from({ length: 8 }, ((r) => () => r())(rngHelpers.mulberry32(20261018)));
+const seqA2 = Array.from({ length: 8 }, ((r) => () => r())(rngHelpers.mulberry32(20261018)));
+const seqB = Array.from({ length: 8 }, ((r) => () => r())(rngHelpers.mulberry32(20261019)));
+assert(seqA.every((v, i) => v === seqA2[i]),
+  'mulberry32(seed) harus menghasilkan urutan deterministik untuk seed yang sama');
+assert(seqA.some((v, i) => v !== seqB[i]),
+  'mulberry32 harus menghasilkan urutan berbeda untuk seed berbeda');
+assert(seqA.every((v) => v >= 0 && v < 1),
+  'Nilai mulberry32 harus berada pada rentang [0, 1)');
+// 16c. initLevel() memasang PRNG lalu memulihkan Math.random (single-player utuh).
+const initLevelBody = (gameJs.match(/function initLevel\(level\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+assert(initLevelBody.includes('mulberry32(seed)') && /Math\.random\s*=\s*mulberry32\(seed\)/.test(initLevelBody),
+  'initLevel() harus memasang PRNG ber-seed selama konstruksi dunia');
+assert(/finally\s*\{[\s\S]*?Math\.random\s*=\s*originalRandom/.test(initLevelBody),
+  'initLevel() harus memulihkan Math.random asli (finally) agar non-generasi tetap acak');
+assert(/seed == null[\s\S]*?buildLevelWorld\(level\);[\s\S]*?return;/.test(initLevelBody),
+  'Tanpa seed (single-player) initLevel() harus langsung membangun dunia tanpa menambal Math.random');
+assert(gameJs.includes('function buildLevelWorld') && /buildLevelWorld\(level\);/.test(initLevelBody),
+  'Konstruksi dunia harus dipisah ke buildLevelWorld() agar dapat dijalankan di bawah PRNG');
+const buildBody = (gameJs.match(/function buildLevelWorld\(level\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+assert(buildBody.includes('generateMaze(level)') && buildBody.includes('spawnMonsters(level)'),
+  'buildLevelWorld() harus memuat rantai generateMaze() + spawnMonsters()');
+assert(/get\('seed'\)/.test(gameJs) && gameJs.includes('netSessionSeed'),
+  'Seed sesi harus dapat diambil dari parameter URL ?seed= (netSessionSeed)');
+assert(/Math\.random\s*=\s*originalRandom/.test(gameJs),
+  'PRNG global (Math.random) harus dikembalikan setelah konstruksi dunia selesai');
+console.log('✓ TEST 16 LULUS: Dunia deterministik dari seed — labirin/monster/loot identik antar-peer.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (15/15)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (16/16)');
 console.log('=========================================');
