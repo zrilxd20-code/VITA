@@ -5854,6 +5854,7 @@ function updatePlayer() {
     if (dashCooldown > 0) dashCooldown--;
     if (attackCooldown > 0) attackCooldown--;
     if (screenShake > 0) screenShake--;
+    if (hurtFlash > 0) hurtFlash--;
 
     // Update weapon cooldowns
     if (player.weaponCooldowns) {

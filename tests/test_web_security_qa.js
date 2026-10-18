@@ -452,6 +452,9 @@ assert(frameBody.indexOf('stepSimulation()') < frameBody.lastIndexOf('renderFram
   'Urutan loop harus menjalankan simulasi sebelum render');
 assert(/hitStop\s*--[\s\S]*?renderFrame\(\);[\s\S]*?return;/.test(frameBody),
   'Jalur hit-stop harus membekukan simulasi namun tetap memanggil renderFrame()');
+// 17g. Peluruhan efek kerusakan gameplay: hurtFlash harus meluruh di updatePlayer() saat playing.
+assert(/screenShake\s*--;[\s\S]*?if\s*\(\s*hurtFlash\s*>\s*0\s*\)\s*hurtFlash\s*--;/.test(gameJs),
+  'updatePlayer() harus meluruhkan hurtFlash agar vignette damage merah tidak menetap permanen');
 console.log('✓ TEST 17 LULUS: Simulasi (state) terpisah dari render (canvas/HUD) — siap host-authoritative.');
 
 console.log('\n=========================================');
