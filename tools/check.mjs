@@ -7,7 +7,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 
-const FILES = ['js/supabase.js', 'js/home.js', 'js/prologue.js', 'js/game.js', 'sw.js'];
+const FILES = ['js/supabase.js', 'js/home.js', 'js/prologue.js', 'js/game.js', 'sw.js', 'tools/relay.mjs'];
 let failed = false;
 const fail = (m) => { failed = true; console.error('FAIL:', m); };
 const ok = (m) => console.log('OK:', m);

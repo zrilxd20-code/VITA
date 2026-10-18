@@ -6,7 +6,7 @@
 [![Zero External Assets](https://img.shields.io/badge/Assets-100%25%20Procedural-red)](index.html)
 [![PWA Ready](https://img.shields.io/badge/PWA-Network--First%20Offline-brightgreen)](sw.js)
 [![Database](https://img.shields.io/badge/Database-Supabase%20%2F%20PostgreSQL-3ECF8E)](supabase_schema.sql)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(23%2F23%20QA)-success)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(24%2F24%20QA)-success)](tests/)
 
 ---
 
@@ -87,11 +87,41 @@ npm run dev
 Or any static server (`npx serve .`, `python -m http.server 8000`).
 `version.json` is served `no-store` so in-app update polling never sees stale cache.
 
+### Online Co-op (Host-Authoritative, up to 4 Players)
+
+The campaign supports online co-op over a relay. The relay is a **zero-dependency Node
+stdlib WebSocket server** (`tools/relay.mjs`, RFC 6455 handshake + frame codec) — no
+`ws` package, no install. Peer 0 (the host) is authoritative: it owns the simulation and
+streams 20 Hz snapshots; joiners send inputs and reconcile with client prediction.
+
+```powershell
+# Terminal 1 — static game server
+npm run dev      # → http://localhost:8000
+
+# Terminal 2 — co-op relay (default ws://localhost:8080)
+npm run relay    # or: npm run relay -- --port 8080
+```
+
+Then, with the game open in **two or more browser tabs/devices**:
+
+1. **Host:** open the Co-op lobby → **Host Room** → note the generated 4-character code → wait for peers → **Start Mission**.
+2. **Joiner(s):** open the Co-op lobby → **Join** tab → type the code (e.g. `7X49`) → **Connect to Squad**.
+
+Notes & troubleshooting:
+
+- The relay URL defaults to `ws://localhost:8080`. Override it with
+  `localStorage.setItem('vita_relay_url', 'ws://<host>:<port>')` (or `wss://…`) in the browser console.
+- Browsers block `ws://` from an `https://` page (mixed content). Serve both the game and
+  relay over `http://` for local play, or put the relay behind TLS (`wss://`) for production.
+- Co-op **requires the relay process to be running** — without it the lobby shows a
+  connection error and no peers can join.
+
 ### Node Tooling (stdlib only, zero install)
 
 ```powershell
 npm run check   # syntax + global-scope + i18n parity & coverage + secret scan + manifest & HTML checks
 npm test        # web security & input validation audit
+npm run relay   # zero-dependency WebSocket co-op relay server
 npm run icons   # regenerate PWA icons (pure Node, reproducible)
 npm run bump -- 2.5.0  # sync version.json, sw.js, index.html, APP_VERSION
 ```
@@ -107,9 +137,10 @@ vita/
 ├── sw.js                   # Service Worker (network-first with offline cache fallback)
 ├── icon.svg                # Procedural SVG vector icon
 ├── version.json            # Release version (PWA update polling)
-├── package.json            # Node scripts (dev/check/test/icons/bump, stdlib only)
-├── tools/                  # Node stdlib tooling (serve, check, gen-icons, bump-version)
+├── package.json            # Node scripts (dev/relay/check/test/icons/bump, stdlib only)
+├── tools/                  # Node stdlib tooling (serve, relay, check, gen-icons, bump-version)
 │   ├── serve.mjs           # Static dev server (http, no-store version.json)
+│   ├── relay.mjs           # Zero-dependency WebSocket co-op relay (RFC 6455 handshake + frame codec)
 │   ├── check.mjs           # Syntax + scope + i18n parity & coverage + secret scan
 │   ├── check_html.cjs      # HTML well-formedness (unclosed-tag) verification
 │   ├── gen-icons.mjs       # Reproducible PWA icon generator (fs+zlib only)
@@ -128,7 +159,7 @@ vita/
 ├── script.md               # Narrative script, characters, and dialogue canon
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # 23-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup & reduced-motion guard)
+│   └── test_web_security_qa.js # 24-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup with consistent in-game menu titles (start/pause/death/win) & reduced-motion guard, zero-dependency relay protocol contract & client wiring)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```

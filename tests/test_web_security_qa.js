@@ -14,7 +14,8 @@
  * abstraksi pemain multi (fondasi co-op 4 pemain: players[] & host index 0),
  * serialisasi & rekonsiliasi snapshot state (fondasi sinkronisasi relay),
  * serta lobi co-op & transport relay WebSocket (Fase 2 co-op online: 4 pemain),
- * dan lockup logo Hub (emblem inline SVG prosedural + wordmark berlapis) beserta guard prefers-reduced-motion.
+ * dan lockup logo Hub (emblem inline SVG prosedural + wordmark berlapis) yang diterapkan
+ * konsisten ke seluruh judul menu in-game (mulai/jeda/gugur/menang) beserta guard prefers-reduced-motion.
  */
 
 const fs = require('fs');
@@ -476,9 +477,13 @@ assert(/function\s+getLocalPlayer\(\)/.test(gameJs), 'getLocalPlayer() harus ter
 assert(/function\s+setLocalPlayerIndex\(/.test(gameJs), 'setLocalPlayerIndex() harus tersedia');
 assert(/function\s+getPlayerByPeer\(/.test(gameJs), 'getPlayerByPeer() harus tersedia');
 
-// 18c. Inisialisasi dunia mengaitkan players = [player] dan localPlayerIndex = 0
-assert(/players\s*=\s*\[player\];[\s\S]*?localPlayerIndex\s*=\s*0;/.test(gameJs),
-  'buildLevelWorld() harus menginisialisasi players[] dengan entitas player di index 0');
+// 18c. Inisialisasi dunia menempatkan entitas player pada players[coopLocalIdx] dan
+// menyetel localPlayerIndex ke indeks itu. Single-player/host default ke indeks 0,
+// sedangkan tamu co-op mempertahankan indeks (1..3) yang diberikan relay.
+assert(/players\s*=\s*\[\];[\s\S]*?players\[coopLocalIdx\]\s*=\s*player;[\s\S]*?localPlayerIndex\s*=\s*coopLocalIdx;/.test(gameJs),
+  'buildLevelWorld() harus menempatkan player di players[coopLocalIdx] & menyetel localPlayerIndex');
+assert(/const\s+coopLocalIdx\s*=\s*\(coopRoomId\s*&&\s*!isCoopHost\s*&&\s*localPlayerIndex\s*>\s*0\)\s*\?\s*localPlayerIndex\s*:\s*0;/.test(gameJs),
+  'Single-player/host harus default ke indeks 0 (hanya tamu co-op yang memakai indeks relay)');
 
 // 18d. Fungsi render player mendukung entitas target (p = targetPlayer || getLocalPlayer())
 assert(/function\s+drawPlayer\(\s*targetPlayer\s*\)/.test(gameJs),
@@ -760,7 +765,9 @@ console.log('✓ TEST 22 LULUS: Multi-target monster AI, mekanik Downed/Revive, 
 // (b) emblem inline SVG murni prosedural tanpa aset eksternal & ditandai aria-hidden,
 // (c) overlay sapuan cahaya dekoratif disembunyikan dari screen reader,
 // (d) gaya wordmark memakai background-clip + ekstrusi drop-shadow berlapis (bukan text-shadow),
-// (e) seluruh animasi dekoratif baru memiliki guard prefers-reduced-motion (Hub & layar mulai).
+// (e) seluruh animasi dekoratif baru memiliki guard prefers-reduced-motion (Hub & layar mulai),
+// (f) judul layar mulai ikut dipoles, dan (g) judul menu in-game lain (jeda/gugur/menang)
+//     memakai perlakuan lockup yang sama agar tampilan tiap menu konsisten.
 console.log('\n[TEST 23] Pengujian Lockup Logo Hub, Emblem Prosedural, & Guard Hemat Gerak...');
 
 const gameCss = fs.readFileSync(path.join(__dirname, '../css/game.css'), 'utf8');
@@ -812,8 +819,216 @@ assert((startTitleCss.match(/drop-shadow\(/g) || []).length >= 3, 'Judul layar m
 assert(/animation:\s*vitaStartFlicker\b/.test(startTitleCss), 'Judul layar mulai harus memakai animasi kilau vitaStartFlicker');
 assert(new RegExp('@keyframes\\s+vitaStartFlicker\\b').test(gameCss), 'Keyframes vitaStartFlicker harus tersedia di game.css');
 
-console.log('✓ TEST 23 LULUS: Lockup logo Hub (emblem prosedural + wordmark berlapis) & guard hemat gerak terverifikasi.');
+// 23g. Judul menu layar penuh lain (jeda, gugur, menang) memakai perlakuan lockup yang konsisten.
+const menuTitlesCss = (gameCss.match(/#gameView #pauseScreen h2[\s\S]*?\n\s*\}/g) || [])
+  .find(b => /background-clip:\s*text/.test(b));
+assert(menuTitlesCss, 'Judul menu in-game (jeda/gugur/menang) harus memakai background-clip: text (lockup konsisten)');
+['#gameView #pauseScreen h2', '#gameView #deathScreen h2', '#gameView #winScreen h2'].forEach(sel =>
+  assert(menuTitlesCss.includes(sel), 'Blok lockup judul menu harus mencakup ' + sel));
+assert((menuTitlesCss.match(/drop-shadow\(/g) || []).length >= 3, 'Judul menu in-game harus memakai ekstrusi drop-shadow berlapis (>=3)');
+assert(/animation:\s*vitaStartFlicker\b/.test(menuTitlesCss), 'Judul menu in-game harus memakai animasi kilau vitaStartFlicker');
+assert(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?#gameView #pauseScreen h2[\s\S]*?#gameView #winScreen h2\s*\{\s*animation:\s*none/.test(gameCss),
+  'Guard reduced-motion harus menonaktifkan animasi judul menu jeda, gugur, & menang');
+
+console.log('✓ TEST 23 LULUS: Lockup logo Hub, konsistensi judul menu in-game, & guard hemat gerak terverifikasi.');
+
+// TEST 24: Kontrak protokol relay WebSocket co-op (zero-dependency) & wiring klien.
+// Memverifikasi handshake RFC 6455 (Accept-Key), codec frame (encode/decode, masking,
+// payload 16-bit), sanitasi input tak terpercaya (kode kamar & callsign), penugasan
+// indeks peer (host=0), fan-out WELCOME/PEER_JOIN/PEER_LEAVE, stamping peerIndex oleh
+// server, dan wiring klien (JOIN/WELCOME/PEER_LEAVE/ERROR, tanpa double-start).
+
+const relayPath = path.join(__dirname, '../tools/relay.mjs');
+assert(fs.existsSync(relayPath), 'Server relay tanpa dependency harus ada di tools/relay.mjs');
+const relayJs = fs.readFileSync(relayPath, 'utf8');
+
+// 24a. Zero-dependency: hanya modul inti Node, dijalankan lewat skrip npm.
+const relayImports = [...relayJs.matchAll(/from\s+['"]([^'"]+)['"]/g)].map(m => m[1]);
+assert(relayImports.length > 0, 'Relay harus mengimpor modul Node (http/crypto/url)');
+assert(relayImports.every(s => s.startsWith('node:')), 'Relay hanya boleh mengimpor modul inti Node (node:...), bukan paket npm');
+assert(!/\brequire\s*\(/.test(relayJs), 'Relay (ESM) tidak boleh memakai require()');
+
+const pkgJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8'));
+assert(pkgJson.scripts && /tools\/relay\.mjs/.test(pkgJson.scripts.relay || ''), 'package.json harus punya skrip "relay" yang menjalankan tools/relay.mjs');
+assert(!pkgJson.dependencies || Object.keys(pkgJson.dependencies).length === 0, 'Proyek tidak boleh memiliki dependency runtime eksternal');
+
+const checkSrc = fs.readFileSync(path.join(__dirname, '../tools/check.mjs'), 'utf8');
+assert(checkSrc.includes('tools/relay.mjs'), 'check.mjs harus memverifikasi tools/relay.mjs (sintaks + secret scan)');
+
+// Ekstraksi fungsi murni relay agar dapat diuji tanpa membuka socket jaringan.
+function extractRelayFn(name) {
+    const m = relayJs.match(new RegExp('function\\s+' + name + '\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?\\n\\}'));
+    assert(m, 'Fungsi relay ' + name + '() harus dapat diekstrak dari tools/relay.mjs');
+    return m[0];
+}
+const relayFnNames = [
+    'computeAcceptKey', 'decodeWebSocketFrame', 'encodeWebSocketFrame', 'encodeTextFrame',
+    'sanitizeRoomCode', 'sanitizeCallsign', 'assignPeerIndex',
+    'safeWrite', 'sendTo', 'broadcast', 'findClient', 'leaveRoom', 'handleJoin', 'routeMessage'
+];
+const relaySrc = relayFnNames.map(extractRelayFn).join('\n\n');
+const relay = new Function(
+    'crypto', 'Buffer', 'MAX_PLAYERS', 'MAX_ROOMS',
+    relaySrc + '\nreturn { computeAcceptKey: computeAcceptKey, decodeWebSocketFrame: decodeWebSocketFrame, ' +
+    'encodeWebSocketFrame: encodeWebSocketFrame, encodeTextFrame: encodeTextFrame, sanitizeRoomCode: sanitizeRoomCode, ' +
+    'sanitizeCallsign: sanitizeCallsign, assignPeerIndex: assignPeerIndex, handleJoin: handleJoin, ' +
+    'leaveRoom: leaveRoom, routeMessage: routeMessage };'
+)(require('node:crypto'), Buffer, 4, 500);
+
+// 24b. Handshake RFC 6455 memakai vektor contoh resmi.
+assert(relay.computeAcceptKey('dGhlIHNhbXBsZSBub25jZQ==') === 's3pPLMBiTxaQ9kYGzzhZRbK+xOo=', 'ComputeAcceptKey harus sesuai contoh RFC 6455');
+assert(relay.computeAcceptKey('x') === '', 'Key handshake terlalu pendek harus ditolak (string kosong)');
+assert(relay.computeAcceptKey(123) === '', 'Key handshake non-string harus ditolak');
+
+// 24c. Codec frame: round-trip teks pendek, payload 16-bit, & masking klien.
+function decodeTextFrame(buf) {
+    const f = relay.decodeWebSocketFrame(buf);
+    assert(f && !f.error, 'Frame relay harus dapat didekode');
+    return f.payload.toString('utf8');
+}
+const shortMsg = 'halo dunia ✓';
+const shortFrame = relay.encodeTextFrame(shortMsg);
+assert(relay.decodeWebSocketFrame(shortFrame).opcode === 0x1, 'Frame teks harus memakai opcode 0x1');
+assert(decodeTextFrame(shortFrame) === shortMsg, 'Round-trip frame teks pendek (UTF-8) harus utuh');
+const longMsg = 'X'.repeat(200);
+assert(decodeTextFrame(relay.encodeTextFrame(longMsg)) === longMsg, 'Round-trip frame payload 16-bit (126-65535) harus utuh');
+const maskedFrame = relay.encodeWebSocketFrame(0x1, Buffer.from(shortMsg, 'utf8'), true);
+const maskedDecoded = relay.decodeWebSocketFrame(maskedFrame);
+assert(maskedDecoded && maskedDecoded.masked === true, 'Frame bermask harus terdeteksi sebagai masked');
+assert(maskedDecoded.payload.toString('utf8') === shortMsg, 'Dekode frame bermask harus membuka XOR mask dengan benar');
+assert(relay.decodeWebSocketFrame(Buffer.from([0x81])) === null, 'Buffer tidak lengkap harus mengembalikan null (bukan crash)');
+
+// 24d. Sanitasi input tak terpercaya (kode kamar & callsign).
+assert(relay.sanitizeRoomCode('7x49') === '7X49', 'Kode kamar harus dinormalisasi ke huruf besar');
+assert(relay.sanitizeRoomCode('ab') === '', 'Kode kamar < 3 karakter harus ditolak');
+assert(!/[^A-Z0-9]/.test(relay.sanitizeRoomCode('<script>alert(1)</script>')), 'Kode kamar hanya boleh menyisakan A-Z0-9');
+assert(relay.sanitizeRoomCode('abcdefghijkl').length === 8, 'Kode kamar dibatasi maksimum 8 karakter');
+assert(relay.sanitizeCallsign('<b>Ari</b>').indexOf('Ari') !== -1, 'Callsign harus mempertahankan teks biasa');
+assert(!/[<>"'&\\`]/.test(relay.sanitizeCallsign('<b>Ari</b>"&`')), 'Callsign harus membuang karakter berbahaya (< > " \' & \\ `)');
+assert(relay.sanitizeCallsign('A\u0001B') === 'AB', 'Callsign harus membuang karakter kontrol');
+assert(relay.sanitizeCallsign('Z'.repeat(40)).length === 16, 'Callsign dibatasi maksimum 16 karakter');
+
+// 24e. Penugasan indeks peer: host selalu 0, tamu 1..3, kamar penuh => -1.
+assert(relay.assignPeerIndex(new Set(), true, 4) === 0, 'Host harus mendapat indeks 0');
+assert(relay.assignPeerIndex(new Set([0]), false, 4) === 1, 'Tamu pertama harus mendapat indeks 1');
+assert(relay.assignPeerIndex(new Set([0, 1, 2]), false, 4) === 3, 'Tamu ketiga harus mendapat indeks 3');
+assert(relay.assignPeerIndex(new Set([0, 1, 2, 3]), false, 4) === -1, 'Kamar penuh harus mengembalikan -1');
+assert(relay.assignPeerIndex([1], true, 4) === 0, 'Host harus tetap mendapat 0 walau himpunan berupa array');
+
+// 24f. handleJoin: WELCOME ke pendatang + PEER_JOIN ke anggota lain, peerIndex di-stamp server.
+const rooms = new Map();
+function mockClient() {
+    return {
+        sent: [],
+        socket: { destroyed: false, write(b) { this.owner.sent.push(Buffer.from(b)); return true; }, owner: null }
+    };
+}
+function readSent(client) {
+    return client.sent.map(b => JSON.parse(relay.decodeWebSocketFrame(b).payload.toString('utf8')));
+}
+function makeClient() {
+    const c = mockClient();
+    c.socket.owner = c;
+    return c;
+}
+
+const host = makeClient();
+const hostRes = relay.handleJoin(rooms, host, { type: 'JOIN', roomId: '7x49', isHost: true, peerIndex: 77, callsign: 'HOST' });
+assert(hostRes.ok === true && hostRes.peerIndex === 0, 'Host pertama harus diterima sebagai peer 0');
+assert(hostRes.isHost === true && host.isHost === true, 'Host harus ditandai otoritatif');
+const hostMsgs = readSent(host);
+assert(hostMsgs.length === 1 && hostMsgs[0].type === 'WELCOME', 'Pendatang harus menerima tepat satu WELCOME');
+assert(hostMsgs[0].peerIndex === 0, 'WELCOME harus memuat indeks final hasil stamping server (bukan 77 dari klien)');
+assert(Array.isArray(hostMsgs[0].peers) && hostMsgs[0].peers[0].idx === 0, 'WELCOME harus memuat daftar peer (idx pemain)');
+assert(host.peerIndex === 0, 'peerIndex pada objek klien harus di-stamp server');
+
+const guest = makeClient();
+const guestRes = relay.handleJoin(rooms, guest, { type: 'JOIN', roomId: '7X49', isHost: false, callsign: 'Tamu' });
+assert(guestRes.peerIndex === 1, 'Tamu pertama harus mendapat indeks 1');
+const guestMsgs = readSent(guest);
+assert(guestMsgs[0].type === 'WELCOME' && guestMsgs[0].peerIndex === 1, 'Tamu harus menerima WELCOME dengan indeksnya');
+assert(guestMsgs[0].peers.length === 2, 'WELCOME tamu harus memuat kedua peer');
+const hostAfterJoin = readSent(host);
+assert(hostAfterJoin.some(m => m.type === 'PEER_JOIN' && m.peerIndex === 1), 'Host harus menerima PEER_JOIN saat tamu bergabung');
+assert(hostAfterJoin.filter(m => m.type === 'PEER_JOIN')[0].callsign === 'Tamu', 'PEER_JOIN harus memuat callsign tamu');
+
+// Klien mengaku host, server menolak (indeks host sudah terisi).
+const faker = makeClient();
+const fakerRes = relay.handleJoin(rooms, faker, { type: 'JOIN', roomId: '7X49', isHost: true, callsign: 'Fake' });
+assert(fakerRes.peerIndex === 2 && fakerRes.isHost === false, 'Klien tidak boleh merebut kekuasaan host (peerIndex != 0, isHost false)');
+
+const fourth = makeClient();
+assert(relay.handleJoin(rooms, fourth, { type: 'JOIN', roomId: '7X49', isHost: false }).peerIndex === 3, 'Kamar harus mengizinkan 4 pemain (indeks 0..3)');
+
+const fifth = makeClient();
+const fifthRes = relay.handleJoin(rooms, fifth, { type: 'JOIN', roomId: '7X49', isHost: false });
+assert(fifthRes.ok === false && fifthRes.code === 'ROOM_FULL', 'Pemain ke-5 harus ditolak dengan ROOM_FULL');
+
+const badRoom = makeClient();
+const badRes = relay.handleJoin(rooms, badRoom, { type: 'JOIN', roomId: 'ab', isHost: false });
+assert(badRes.ok === false && badRes.code === 'BAD_ROOM', 'Kode kamar tidak valid harus ditolak dengan BAD_ROOM');
+
+// 24g. leaveRoom: broadcast PEER_LEAVE, indeks dibebaskan, kamar dihapus saat kosong.
+relay.leaveRoom(rooms, guest);
+assert(readSent(host).some(m => m.type === 'PEER_LEAVE' && m.peerIndex === 1), 'Anggota lain harus menerima PEER_LEAVE');
+assert(rooms.get('7X49').used.has(1) === false, 'Indeks peer yang pergi harus dibebaskan (dapat dipakai ulang)');
+relay.leaveRoom(rooms, host);
+relay.leaveRoom(rooms, faker);
+relay.leaveRoom(rooms, fourth);
+assert(!rooms.has('7X49'), 'Kamar harus dihapus saat anggota terakhir keluar');
+
+// 24h. routeMessage: broadcast dengan peerIndex di-stamp server; PING bertarget; ERROR saat JOIN gagal.
+const r2 = new Map();
+const h2 = makeClient();
+relay.routeMessage(r2, h2, { type: 'JOIN', roomId: 'ABCD', isHost: true, callsign: 'H' });
+h2.sent.length = 0;
+const g2 = makeClient();
+relay.routeMessage(r2, g2, { type: 'JOIN', roomId: 'ABCD', isHost: false, callsign: 'G' });
+h2.sent.length = 0;
+g2.sent.length = 0;
+
+relay.routeMessage(r2, h2, { type: 'INPUT', peerIndex: 99, dx: 3, dy: -2 });
+const inputAtGuest = readSent(g2);
+assert(inputAtGuest.some(m => m.type === 'INPUT' && m.peerIndex === 0 && m.from === 0), 'INPUT harus diteruskan dengan peerIndex/from di-stamp server (bukan 99)');
+assert(!inputAtGuest.some(m => m.peerIndex === 99), 'peerIndex palsu dari klien tidak boleh bocor ke peer lain');
+
+relay.routeMessage(r2, h2, { type: 'SNAPSHOT', snap: { tick: 1 } });
+assert(readSent(g2).some(m => m.type === 'SNAPSHOT'), 'SNAPSHOT host harus diteruskan ke tamu');
+
+relay.routeMessage(r2, h2, { type: 'START_GAME', seed: 123 });
+assert(readSent(g2).some(m => m.type === 'START_GAME' && m.seed === 123), 'START_GAME host harus diteruskan ke tamu');
+
+g2.sent.length = 0;
+relay.routeMessage(r2, h2, { type: 'PING', to: 1, t: 5 });
+const pingAtGuest = readSent(g2);
+assert(pingAtGuest.length === 1 && pingAtGuest[0].type === 'PING' && pingAtGuest[0].to === 1, 'PING bertarget hanya boleh sampai ke peer tujuan');
+assert(readSent(h2).every(m => m.type !== 'PING'), 'PING bertarget tidak boleh dipantulkan ke pengirim');
+
+const r3 = new Map();
+relay.routeMessage(r3, makeClient(), { type: 'JOIN', roomId: 'ZZZZ', isHost: true });
+for (let i = 0; i < 3; i++) relay.routeMessage(r3, makeClient(), { type: 'JOIN', roomId: 'ZZZZ', isHost: false });
+const overflow = makeClient();
+relay.routeMessage(r3, overflow, { type: 'JOIN', roomId: 'ZZZZ', isHost: false });
+assert(readSent(overflow).some(m => m.type === 'ERROR' && m.code === 'ROOM_FULL'), 'routeMessage harus mengirim ERROR saat JOIN gagal (ROOM_FULL)');
+
+const overflowBad = makeClient();
+relay.routeMessage(r3, overflowBad, { type: 'JOIN', roomId: 'x', isHost: false });
+assert(readSent(overflowBad).some(m => m.type === 'ERROR' && m.code === 'BAD_ROOM'), 'routeMessage harus mengirim ERROR untuk kode kamar tidak valid');
+
+// 24i. Wiring klien: JOIN membawa callsign, menangani WELCOME/PEER_LEAVE/ERROR, tanpa double-start.
+assert(/sendCoopMessage\(\s*'JOIN'[\s\S]{0,240}callsign/.test(gameJs), 'Klien harus mengirim JOIN beserta callsign');
+assert(/msg\.type === 'WELCOME'/.test(gameJs), 'Klien harus menangani pesan WELCOME dari relay');
+assert(/msg\.type === 'PEER_LEAVE'/.test(gameJs), 'Klien harus menangani PEER_LEAVE (membersihkan slot peer)');
+assert(/msg\.type === 'ERROR'/.test(gameJs), 'Klien harus menangani pesan ERROR dari relay');
+assert(/coop_err_invalid_code/.test(gameJs) && /coop_err_room_full/.test(gameJs) && /coop_err_server_full/.test(gameJs) && /coop_err_generic/.test(gameJs), 'Kunci i18n pesan error co-op harus tersedia');
+assert(/function resolveCoopRelayUrl/.test(gameJs), 'Klien harus punya resolver URL relay (override/skema wss)');
+assert(/localStorage\.getItem\('vita_relay_url'\)/.test(gameJs), 'URL relay harus dapat di-override lewat localStorage vita_relay_url');
+assert(/wss:\/\//.test(gameJs), 'Resolver relay harus menaikkan ws:// ke wss:// saat halaman https (hindari mixed content)');
+assert(!/proceedToWebGame\(true\)\s*;\s*\n\s*startGame\(\)\s*;/.test(gameJs), 'START_GAME tidak boleh memanggil proceedToWebGame lalu startGame() lagi (double initLevel)');
+assert(/id="coopJoinInput"[^>]*maxlength="4"/.test(indexHtml), '#coopJoinInput harus memakai maxlength="4" (kode kamar 4 karakter)');
+
+console.log('✓ TEST 24 LULUS: Kontrak protokol relay WebSocket zero-dependency & wiring klien co-op terverifikasi.');
 
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (23/23)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (24/24)');
 console.log('=========================================');

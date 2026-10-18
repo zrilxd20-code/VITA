@@ -523,7 +523,11 @@ const T = {
         coop_peer_disconnected: 'OPERATIF TERPUTUS',
         coop_operative_downed: 'OPERATIF JATUH! (BUTUH BANTUAN)',
         coop_operative_revived: 'OPERATIF DIBANGKITKAN!',
-        coop_reviving: 'MEMBANGKITKAN...'
+        coop_reviving: 'MEMBANGKITKAN...',
+        coop_err_invalid_code: 'KODE KAMAR TIDAK VALID (MIN. 3 KARAKTER).',
+        coop_err_room_full: 'KAMAR PENUH (MAKS 4 OPERATIF).',
+        coop_err_server_full: 'RELAY PENUH. COBA LAGI NANTI.',
+        coop_err_generic: 'KONEKSI RELAY GAGAL. PASTIKAN SERVER RELAY AKTIF (npm run relay).'
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
@@ -760,7 +764,11 @@ const T = {
         coop_peer_disconnected: 'OPERATIVE DISCONNECTED',
         coop_operative_downed: 'OPERATIVE DOWNED! (NEED REVIVE)',
         coop_operative_revived: 'OPERATIVE REVIVED!',
-        coop_reviving: 'REVIVING...'
+        coop_reviving: 'REVIVING...',
+        coop_err_invalid_code: 'INVALID ROOM CODE (MIN. 3 CHARS).',
+        coop_err_room_full: 'ROOM FULL (MAX 4 OPERATIVES).',
+        coop_err_server_full: 'RELAY FULL. TRY AGAIN LATER.',
+        coop_err_generic: 'RELAY CONNECTION FAILED. MAKE SURE THE RELAY IS RUNNING (npm run relay).'
     }
 };
 
@@ -3847,8 +3855,15 @@ function buildLevelWorld(level) {
         peerIndex: 0,
         callsign: (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'PROTOTYPE-19'
     };
-    players = [player];
-    localPlayerIndex = 0;
+    // Co-op: pemain tamu mempertahankan indeks yang diberikan relay (1..3) agar input
+    // dan avatar-nya dianggap benar oleh host; slot lain diisi bertahap dari snapshot
+    // host (array sparse — players[0] boleh kosong di sisi tamu).
+    const coopLocalIdx = (coopRoomId && !isCoopHost && localPlayerIndex > 0) ? localPlayerIndex : 0;
+    player.id = 'p' + coopLocalIdx;
+    player.peerIndex = coopLocalIdx;
+    players = [];
+    players[coopLocalIdx] = player;
+    localPlayerIndex = coopLocalIdx;
 
     // Save run progress & equipment state
     if (!menuDemo) {
@@ -13338,14 +13353,16 @@ function submitJoinCoopRoom() {
     if (!input) return;
     const code = input.value.trim().toUpperCase();
     if (code.length < 3) {
-        if (errEl) { errEl.textContent = 'Kode kamar tidak valid.'; errEl.style.display = 'block'; }
+        if (errEl) { errEl.textContent = tt('coop_err_invalid_code'); errEl.style.display = 'block'; }
         return;
     }
     if (errEl) errEl.style.display = 'none';
 
     coopRoomId = code;
     isCoopHost = false;
-    localPlayerIndex = 1; // Default join peer index
+    // Indeks sementara; relay akan menetapkan indeks final lewat pesan WELCOME
+    // (server-host otoritatif, mendukung hingga 4 pemain / indeks 0..3).
+    localPlayerIndex = 1;
     const myCallsign = (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'AGENT-GUEST';
     coopPeers = [
         { idx: 0, callsign: 'HOST_OPERATIVE', isHost: true },
@@ -13364,10 +13381,24 @@ function submitJoinCoopRoom() {
     connectCoopRelay();
 }
 
+function resolveCoopRelayUrl() {
+    let url = coopRelayUrl;
+    try {
+        const saved = localStorage.getItem('vita_relay_url');
+        if (saved) url = saved;
+    } catch (_) {}
+    // Cegah mixed-content: halaman https tidak boleh membuka ws:// (diblokir browser).
+    try {
+        if (typeof location !== 'undefined' && location.protocol === 'https:' && /^ws:\/\//i.test(url)) {
+            url = 'wss://' + url.slice(5);
+        }
+    } catch (_) {}
+    return url;
+}
+
 function connectCoopRelay() {
     try {
-        const savedUrl = localStorage.getItem('vita_relay_url');
-        const url = savedUrl || coopRelayUrl;
+        const url = resolveCoopRelayUrl();
         const badge = document.getElementById('coopRelayBadge');
 
         // Buka WebSocket native
@@ -13382,7 +13413,13 @@ function connectCoopRelay() {
                     badge.classList.remove('unverified');
                     badge.classList.add('verified');
                 }
-                sendCoopMessage('JOIN', { roomId: coopRoomId, peerIndex: localPlayerIndex, isHost: isCoopHost });
+                // Relay menetapkan peerIndex final lewat WELCOME (otoritatif).
+                sendCoopMessage('JOIN', {
+                    roomId: coopRoomId,
+                    isHost: isCoopHost,
+                    peerIndex: localPlayerIndex,
+                    callsign: (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'AGENT-GUEST'
+                });
             };
             coopWs.onmessage = (event) => {
                 try {
@@ -13392,9 +13429,15 @@ function connectCoopRelay() {
             };
             coopWs.onerror = () => {
                 if (badge) {
-                    badge.textContent = 'RELAY: LOCAL (OFFLINE)';
+                    badge.textContent = typeof tt === 'function' ? tt('coop_status_error') : 'RELAY: LOCAL (OFFLINE)';
                     badge.classList.remove('verified');
                     badge.classList.add('unverified');
+                }
+                // Penyebab paling umum: server relay belum dijalankan.
+                const errEl = document.getElementById('coopJoinError');
+                if (errEl && !isCoopHost) {
+                    errEl.textContent = tt('coop_err_generic');
+                    errEl.style.display = 'block';
                 }
             };
             coopWs.onclose = () => {
@@ -13734,8 +13777,14 @@ function handleCoopMessage(msg) {
     if (msg.type === 'START_GAME') {
         if (msg.seed) netSessionSeed = msg.seed;
         closeCoopLobbyModal();
-        if (typeof proceedToWebGame === 'function') proceedToWebGame(true);
-        startGame();
+        // proceedToWebGame(true) sudah menangani perpindahan view SEKALIGUS memanggil
+        // startGame(true). Memanggil startGame() lagi akan memulai level dua kali
+        // (dua kali initLevel → state bersama tertimpa).
+        if (typeof proceedToWebGame === 'function') {
+            proceedToWebGame(true);
+        } else {
+            startGame(true);
+        }
     } else if (msg.type === 'SNAPSHOT' && !isCoopHost) {
         if (typeof applySnapshot === 'function') {
             applySnapshot(msg.snap || msg, false);
@@ -13759,11 +13808,45 @@ function handleCoopMessage(msg) {
             netPing = Math.max(1, Math.round(Date.now() - msg.t));
             updateNetBadgeUI();
         }
+    } else if (msg.type === 'WELCOME') {
+        // Relay otoritatif menetapkan indeks final (host = 0, tamu = 1..3) dan
+        // mengirim daftar peer yang sudah ada. Ini menggantikan indeks sementara
+        // yang dipatok klien sebelum handshake selesai.
+        if (typeof msg.peerIndex === 'number' && msg.peerIndex >= 0) {
+            localPlayerIndex = msg.peerIndex;
+            isCoopHost = msg.peerIndex === 0 || !!msg.isHost;
+        }
+        if (Array.isArray(msg.peers)) {
+            coopPeers = msg.peers
+                .filter(p => p && typeof p.idx === 'number')
+                .map(p => ({ idx: p.idx, callsign: p.callsign || ('P' + (p.idx + 1)), isHost: !!p.isHost }));
+        }
+        updateCoopSlotsUI();
     } else if (msg.type === 'PEER_JOIN') {
         if (!coopPeers.find(p => p.idx === msg.peerIndex)) {
             coopPeers.push({ idx: msg.peerIndex, callsign: msg.callsign || ('P' + (msg.peerIndex + 1)), isHost: false });
             updateCoopSlotsUI();
         }
+    } else if (msg.type === 'PEER_LEAVE') {
+        if (typeof msg.peerIndex === 'number') {
+            coopPeers = coopPeers.filter(p => p.idx !== msg.peerIndex);
+            // Kosongkan slot pemain yang pergi; array tetap sparse agar indeks
+            // peer lain tidak bergeser (semua konsumen punya guard !p).
+            if (players && players[msg.peerIndex]) players[msg.peerIndex] = null;
+            updateCoopSlotsUI();
+        }
+    } else if (msg.type === 'ERROR') {
+        const errEl = document.getElementById('coopJoinError');
+        if (errEl) {
+            let key = 'coop_err_generic';
+            if (msg.code === 'INVALID_ROOM' || msg.code === 'BAD_ROOM' || msg.code === 'BAD_REQUEST') key = 'coop_err_invalid_code';
+            else if (msg.code === 'ROOM_FULL') key = 'coop_err_room_full';
+            else if (msg.code === 'SERVER_FULL') key = 'coop_err_server_full';
+            errEl.textContent = tt(key);
+            errEl.style.display = 'block';
+        }
+        // Kembalikan ke panel gabung biar kode bisa diperbaiki lalu dicoba lagi.
+        if (typeof switchCoopTab === 'function') switchCoopTab('join');
     }
 }
 
@@ -13774,8 +13857,13 @@ function launchCoopMission() {
     netSessionSeed = sessionSeed;
     sendCoopMessage('START_GAME', { seed: sessionSeed });
     closeCoopLobbyModal();
-    if (typeof proceedToWebGame === 'function') proceedToWebGame(true);
-    startGame();
+    // Satu jalur start saja: proceedToWebGame(true) memindahkan view dan
+    // memanggil startGame(true) di dalamnya (hindari double initLevel).
+    if (typeof proceedToWebGame === 'function') {
+        proceedToWebGame(true);
+    } else {
+        startGame(true);
+    }
 }
 
 window.openCoopLobbyModal = openCoopLobbyModal;

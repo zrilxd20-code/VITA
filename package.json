@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "node tools/serve.mjs",
+    "relay": "node tools/relay.mjs",
     "check": "node tools/check.mjs && node tools/check_html.cjs",
     "check:html": "node tools/check_html.cjs",
     "test": "node tests/test_web_security_qa.js",

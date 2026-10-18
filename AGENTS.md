@@ -21,9 +21,10 @@ vita/
 ├── sw.js               # Service worker network-first dengan cache offline fallback (http saja)
 ├── icon.svg            # Ikon prosedural SVG lokal
 ├── version.json        # Versi rilis (polling update PWA)
-├── package.json        # Script Node stdlib: dev/check/test/icons/bump
-├── tools/              # Tooling Node tanpa dependency (serve/check/gen-icons/bump)
+├── package.json        # Script Node stdlib: dev/relay/check/test/icons/bump
+├── tools/              # Tooling Node tanpa dependency (serve/relay/check/gen-icons/bump)
 │   ├── serve.mjs       # Dev server statis http (wajib untuk SW/PWA)
+│   ├── relay.mjs       # Server relay WebSocket co-op tanpa dependency (handshake RFC 6455 + codec frame)
 │   ├── check.mjs       # Cek sintaks + scope global + parity & cakupan i18n + secret scan
 │   ├── check_html.cjs  # Verifikasi HTML well-formed (deteksi tag belum tertutup)
 │   ├── gen-icons.mjs   # Generator ikon PWA reproducible (fs+zlib saja)
@@ -41,7 +42,7 @@ vita/
 │   └── modules/        # [Eksperimental/Roadmap] Modul TypeScript terpisah (persiapan refactoring)
 ├── script.md           # Naskah cerita, karakter, dan dialog (kanon narasi — jangan diubah tanpa izin)
 ├── supabase_schema.sql # Skema PostgreSQL, check constraint, dan kebijakan RLS
-├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 23 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion, live region status async, ketahanan loop game/anti-freeze, interaksi modal memori robot, dunia deterministik ber-seed untuk co-op online, pemisahan simulasi vs render untuk arsitektur host-authoritative, abstraksi pemain multi via players[] & host index 0, serialisasi snapshot & rekonsiliasi state, lobi co-op & transport relay WebSocket, lockup logo Hub prosedural & guard hemat gerak)
+├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 24 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion, live region status async, ketahanan loop game/anti-freeze, interaksi modal memori robot, dunia deterministik ber-seed untuk co-op online, pemisahan simulasi vs render untuk arsitektur host-authoritative, abstraksi pemain multi via players[] & host index 0, serialisasi snapshot & rekonsiliasi state, lobi co-op & transport relay WebSocket, lockup logo Hub prosedural yang diterapkan konsisten ke judul menu in-game (mulai/jeda/gugur/menang) & guard hemat gerak, kontrak protokol relay WebSocket tanpa dependency & wiring klien co-op)
 ├── AGENTS.md           # [Berkas Ini] Panduan sistem & aturan khusus untuk AI Agent
 └── README.md           # Dokumentasi proyek untuk pengembang & pemain
 ```
@@ -82,6 +83,28 @@ vita/
 1. **Pengaturan**: key `'vita_save'` (volume, brightness, lang, difficulty, quality).
 2. **Supabase config**: key `'vita_supabase_config'` (hanya dari input user, tanpa hardcoded secret).
 3. **Rekor**: key `'vita_high'`.
+4. **Override relay co-op**: key `'vita_relay_url'` (opsional, mis. `ws://192.168.1.10:8080`).
+
+### C. Co-op Online (Host-Authoritative, maks 4 pemain)
+1. **Pemisahan simulasi vs render**: `stepSimulation()` memperbarui seluruh state game, lalu
+   `stepLocalVisuals()`/`stepCamera()`/`updatePerfCounters()`/`renderFrame()` menangani efek
+   lokal & presentasi. Host menjalankan simulasi otoritatif; klien hanya memprediksi.
+2. **Dunia deterministik ber-seed**: `netSessionSeed` (dari URL) di-hash FNV-1a → `mulberry32`
+   yang dipasang sementara HANYA selama `buildLevelWorld()` berjalan (`initLevel()`), sehingga
+   labirin & spawn monster identik di semua peer. Single-player tak berubah (`netSessionSeed=null`).
+3. **Abstraksi pemain multi**: state pemain diwadahi `players[]` (sparse), pemain lokal ditandai
+   `localPlayerIndex` (host = 0). Tamu mempertahankan indeks 1..3 yang diberikan relay; slot yang
+   belum terisi diisi bertahap dari snapshot host.
+4. **Transport relay**: `tools/relay.mjs` — server WebSocket **tanpa dependency** (handshake
+   RFC 6455 + codec frame, hanya `node:http`/`node:crypto`/`node:url`). Relay men-scope pesan per
+   `roomId`, menetapkan indeks peer (host=0, tamu 1..3), dan menstempel ulang `peerIndex`/`from`
+   pada setiap pesan yang diteruskan agar host dapat mengatribusikan `INPUT`/`PING`. Batas:
+   `MAX_PLAYERS=4`, `MAX_MESSAGE_BYTES=256KB`, `MAX_ROOMS=500`. Jalankan dengan `npm run relay`.
+5. **Protokol klien** (`js/game.js`): `JOIN` → `WELCOME` (ke tamu) + `PEER_JOIN` (ke peer lain);
+   `INPUT` & `SNAPSHOT` (20 Hz) mengalir host↔tamu; `START_GAME` disiarkan host; `PEER_LEAVE`
+   saat disconnect. Resolusi URL relay lewat `resolveCoopRelayUrl()` (default
+   `ws://localhost:8080`, di-override `localStorage['vita_relay_url']`, dan `ws://` dinaikkan ke
+   `wss://` bila halaman `https:` untuk menghindari blokir mixed content).
 
 ---
 
@@ -144,5 +167,17 @@ vita/
   npm run check
   npm test
   ```
-  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 23 modul audit QA/security/BFS/a11y/perf/determinisme/sim-render/players-abstraction/snapshot-relay/coop-lobby/logo-lockup).
+  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 24 modul audit QA/security/BFS/a11y/perf/determinisme/sim-render/players-abstraction/snapshot-relay/coop-lobby/relay-protocol/logo-lockup/in-game-menu-titles).
+
+* **Menjalankan & Menguji Co-op Online (host-authoritative, maks 4 pemain)**:
+  ```bash
+  npm run dev     # terminal 1: game statis → http://localhost:8000
+  npm run relay   # terminal 2: relay WebSocket → ws://localhost:8080 (atau -- --port <n>)
+  ```
+  Buka `http://localhost:8000` di 2+ tab/perangkat: host membuat kamar (dapat kode 4 karakter)
+  lalu tamu memasukkan kode tersebut di tab "Gabung". Relay `ws://localhost:8080` dapat
+  di-override via `localStorage['vita_relay_url']`; halaman `https://` tidak boleh membuka `ws://`
+  (mixed content) sehingga resolver klien menaikkannya ke `wss://`. Tanpa relay berjalan, lobi
+  hanya menampilkan galat koneksi (tidak ada peer yang bisa bergabung).
+
 
