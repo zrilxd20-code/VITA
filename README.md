@@ -128,7 +128,7 @@ vita/
 ├── script.md               # Narrative script, characters, and dialogue canon
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # 21-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay)
+│   └── test_web_security_qa.js # 22-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```

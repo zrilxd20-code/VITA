@@ -662,6 +662,98 @@ assert(/sendCoopMessage\(\s*'PONG'/.test(gameJs), 'Relay handler harus membalas 
 
 console.log('✓ TEST 21 LULUS: Sinkronisasi input peer, rekonsiliasi client prediction & HUD badge terverifikasi.');
 
+// TEST 22: Combat Multi-Target, Revive Downed Operative, & Peer Weapon Firing (Fase 4 co-op online).
+// Memverifikasi pemilihan target cerdas monster AI (getClosestActivePlayer),
+// mekanisme Downed (30s timer) & Revive (interaksi tim 3s) tanpa softlock/desync,
+// serta penembakan senjata remote peer otoritatif.
+console.log('\n[TEST 22] Pengujian Combat Multi-Target, Revive Downed, & Peer Firing (Fase 4 co-op online)...');
+
+// 22a. Ketersediaan fungsi Fase 4 di js/game.js
+['getClosestActivePlayer', 'damagePlayerDowned', 'updateDownedAndRevive', 'triggerRemotePeerAttack']
+  .forEach(fn => assert(gameJs.includes('function ' + fn), 'Fungsi combat co-op ' + fn + '() harus tersedia di game.js'));
+
+// 22b. Pengujian pemilihan target monster AI multi-operatif
+const combatScope = new Function(`
+    let dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    let tt = (k) => k;
+    let sDie = () => {};
+    let sEMPBlast = () => {};
+    let sPiercingRifle = () => {};
+    let sShotgun = () => {};
+    let sMinigun = () => {};
+    let addShockwave = () => {};
+    let addParticle = () => {};
+    let floatingTexts = [];
+    let projectiles = [];
+    let deathTriggered = false;
+    let handlePlayerDeath = () => { deathTriggered = true; };
+    let coopRoomId = 'TEST';
+    let gameState = 'playing';
+
+    let WEAPONS = {
+        knife: { id: 'knife', cooldown: 20 },
+        rifle: { id: 'rifle', cooldown: 28 },
+        shotgun: { id: 'shotgun', cooldown: 35 },
+        minigun: { id: 'minigun', cooldown: 8 }
+    };
+
+    let player = { id: 'p0', peerIndex: 0, x: 100, y: 100, hp: 100, maxHp: 100, downed: false };
+    let players = [
+        player,
+        { id: 'p1', peerIndex: 1, x: 400, y: 400, hp: 100, maxHp: 100, downed: false, currentWeapon: 'rifle', atk: 30 }
+    ];
+
+    ${(gameJs.match(/function getClosestActivePlayer[\s\S]*?\n\}/) || [''])[0]}
+    ${(gameJs.match(/function damagePlayerDowned[\s\S]*?\n\}/) || [''])[0]}
+    ${(gameJs.match(/function updateDownedAndRevive[\s\S]*?\n\}/) || [''])[0]}
+    ${(gameJs.match(/function triggerRemotePeerAttack[\s\S]*?\n\}/) || [''])[0]}
+
+    return {
+        getClosest: getClosestActivePlayer,
+        damageDowned: damagePlayerDowned,
+        updateRevive: updateDownedAndRevive,
+        peerAttack: triggerRemotePeerAttack,
+        getPlayers: () => players,
+        getProjectiles: () => projectiles,
+        isDead: () => deathTriggered
+    };
+`)();
+
+// Monster di (380, 380) harus menarget p1 yang paling dekat (jarak ~28px vs p0 ~395px)
+const monsterNearP1 = { x: 380, y: 380 };
+let target = combatScope.getClosest(monsterNearP1);
+assert(target.id === 'p1', 'Monster harus menarget p1 karena posisinya paling dekat');
+
+// 22c. Pengujian mekanik Downed: saat HP p1 habis, masuk ke status Downed
+combatScope.damageDowned(target, 'Harvester');
+assert(target.hp === 0, 'HP operatif harus 0 saat downed');
+assert(target.downed === true, 'Operatif harus berstatus downed=true');
+assert(target.downTimer === 1800, 'downTimer harus dimulai dari 1800 tick (30 detik)');
+assert(combatScope.isDead() === false, 'Game over TIDAK boleh langsung terjadi bila masih ada rekan skuad hidup');
+
+// Setelah p1 downed, monster terdekat harus beralih menarget p0
+target = combatScope.getClosest(monsterNearP1);
+assert(target.id === 'p0', 'Monster harus beralih menarget rekan skuad yang masih aktif (p0)');
+
+// 22d. Pengujian mekanik Revive: rekan tim (p0) mendekat (<42px) dan membangkitkan
+const p0 = combatScope.getPlayers()[0];
+p0.x = 405; p0.y = 400; // Jarak 5px dari p1
+for (let t = 0; t < 185; t++) {
+    combatScope.updateRevive();
+}
+const p1Revived = combatScope.getPlayers()[1];
+assert(p1Revived.downed === false, 'Operatif harus berhasil dibangkitkan (downed=false)');
+assert(p1Revived.hp === 35, 'Operatif harus pulih ke 35% HP saat dibangkitkan (35 HP)');
+
+// 22e. Pengujian tembakan senjata remote peer (triggerRemotePeerAttack)
+combatScope.peerAttack(p1Revived);
+const projs = combatScope.getProjectiles();
+assert(projs.length > 0, 'Penembakan peer remote harus menambahkan proyektil ke projectiles[]');
+assert(projs[0].isPlayer === true, 'Proyektil tembakan peer harus ditandai isPlayer=true');
+assert(projs[0].ownerIndex === 1, 'Proyektil harus mencatat ownerIndex pemiliknya');
+
+console.log('✓ TEST 22 LULUS: Multi-target monster AI, mekanik Downed/Revive, & tembakan remote peer terverifikasi.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (21/21)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (22/22)');
 console.log('=========================================');

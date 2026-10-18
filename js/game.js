@@ -520,7 +520,10 @@ const T = {
         coop_status_error: 'GAGAL TERHUBUNG KE RELAY',
         coop_waiting_agent: 'MENUNGGU OPERATIF...',
         coop_net_host: 'HOST',
-        coop_peer_disconnected: 'OPERATIF TERPUTUS'
+        coop_peer_disconnected: 'OPERATIF TERPUTUS',
+        coop_operative_downed: 'OPERATIF JATUH! (BUTUH BANTUAN)',
+        coop_operative_revived: 'OPERATIF DIBANGKITKAN!',
+        coop_reviving: 'MEMBANGKITKAN...'
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
@@ -754,7 +757,10 @@ const T = {
         coop_status_error: 'FAILED TO CONNECT TO RELAY',
         coop_waiting_agent: 'WAITING FOR OPERATIVE...',
         coop_net_host: 'HOST',
-        coop_peer_disconnected: 'OPERATIVE DISCONNECTED'
+        coop_peer_disconnected: 'OPERATIVE DISCONNECTED',
+        coop_operative_downed: 'OPERATIVE DOWNED! (NEED REVIVE)',
+        coop_operative_revived: 'OPERATIVE REVIVED!',
+        coop_reviving: 'REVIVING...'
     }
 };
 
@@ -6492,7 +6498,8 @@ function updateMonsters() {
             m.vy = 0;
             if (m.filamentTrapCooldown > 0) m.filamentTrapCooldown--;
 
-            const pdist = dist(m, player);
+            const targetP = (players && players.length > 1) ? getClosestActivePlayer(m) : player;
+            const pdist = dist(m, targetP);
             let steppedOnTrap = false;
 
             if (pdist < m.size + 14) {
@@ -6501,7 +6508,7 @@ function updateMonsters() {
                 for (let f = 0; f < m.filaments.length; f++) {
                     const pts = m.filaments[f];
                     for (let p = 0; p < pts.length - 1; p++) {
-                        const dSeg = distToSegment(player.x, player.y, pts[p].x, pts[p].y, pts[p + 1].x, pts[p + 1].y);
+                        const dSeg = distToSegment(targetP.x, targetP.y, pts[p].x, pts[p].y, pts[p + 1].x, pts[p + 1].y);
                         if (dSeg < 14) {
                             steppedOnTrap = true;
                             break;
@@ -6668,11 +6675,12 @@ function updateMonsters() {
         if (m.attackCooldown > 0) m.attackCooldown--;
         if (m.pathCooldown > 0) m.pathCooldown--;
 
-        const pdist = dist(m, player);
+        const targetP = (players && players.length > 1) ? getClosestActivePlayer(m) : player;
+        const pdist = dist(m, targetP);
         let detection = currentLevel % 2 === 0 ? 150 : 200;
         detection *= getDiffDetectMult();
         if (m.ai === 'chase') detection *= 1.25;
-        const sight = pdist < detection && hasLineOfSight(m, player);
+        const sight = pdist < detection && hasLineOfSight(m, targetP);
         let chaseSpeed = Math.max(m.speed * (0.8 + currentLevel * 0.04), 1.5);
         if (isFrozen) chaseSpeed *= 0.5;
 
@@ -7979,7 +7987,7 @@ function drawPlayer(targetPlayer) {
     // Diegetic Teammate Callsign Tag & Operative Dot (Co-op Peers)
     if (!isLocal) {
         ctx.save();
-        const pCol = (PLAYER_COLORS[p.peerIndex % 4] || PLAYER_COLORS[1]).hex;
+        const pCol = (PLAYER_COLORS[(p.peerIndex || 0) % 4] || PLAYER_COLORS[1]).hex;
         ctx.fillStyle = pCol;
         ctx.font = 'bold 9px monospace';
         ctx.textAlign = 'center';
@@ -7987,6 +7995,39 @@ function drawPlayer(targetPlayer) {
         ctx.shadowBlur = 6;
         const tagText = p.callsign || ('P' + ((p.peerIndex || 0) + 1));
         ctx.fillText(tagText, sx, sy - p.size - 14);
+        ctx.restore();
+    }
+
+    // Co-op Downed Aura & Revive Progress Indicator
+    if (p.downed) {
+        ctx.save();
+        const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 150);
+        ctx.strokeStyle = 'rgba(225, 29, 72, ' + (0.4 + 0.6 * pulse) + ')';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = '#e11d48';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(sx, sy, (p.size || 10) + 12 + pulse * 4, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#f43f5e';
+        ctx.font = 'bold 9px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(tt('coop_operative_downed'), sx, sy - (p.size || 10) - 22);
+
+        if (p.reviveProgress > 0) {
+            const revPct = Math.min(1, p.reviveProgress / 180);
+            const barW = 36;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+            ctx.fillRect(sx - barW / 2, sy + (p.size || 10) + 8, barW, 5);
+            ctx.fillStyle = '#00f0ff';
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 8;
+            ctx.fillRect(sx - barW / 2, sy + (p.size || 10) + 8, barW * revPct, 5);
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 0.8;
+            ctx.strokeRect(sx - barW / 2, sy + (p.size || 10) + 8, barW, 5);
+        }
         ctx.restore();
     }
 }
@@ -10948,6 +10989,7 @@ function demoUpdate() {
 
     updateMonsters();
     updateProjectiles();
+    updateDownedAndRevive();
     updateThermalTrails();
     updateShockwaves();
     updateGasClouds();
@@ -11051,6 +11093,8 @@ function serializeSnapshot() {
                 maxHp: Math.round(p.maxHp),
                 facing: Math.round(p.facing * 100) / 100,
                 dashing: !!p.dashing,
+                downed: !!p.downed,
+                reviveProgress: p.reviveProgress || 0,
                 curW: p.currentWeapon || 'knife',
                 size: p.size || 10
             });
@@ -11127,6 +11171,8 @@ function applySnapshot(snap, isHost = false) {
                 }
                 targetP.hp = sp.hp;
                 targetP.maxHp = sp.maxHp;
+                targetP.downed = !!sp.downed;
+                targetP.reviveProgress = sp.reviveProgress || 0;
             } else {
                 // Remote peer di klien: interpolasi posisi secara halus
                 targetP.targetX = sp.x;
@@ -11144,6 +11190,8 @@ function applySnapshot(snap, isHost = false) {
                 targetP.dashing = sp.dashing;
                 targetP.currentWeapon = sp.curW;
                 targetP.callsign = sp.callsign;
+                targetP.downed = !!sp.downed;
+                targetP.reviveProgress = sp.reviveProgress || 0;
             }
         }
     }
@@ -13361,6 +13409,178 @@ function sendCoopMessage(type, payload) {
     }
 }
 
+// ---- Fase 4 co-op: Multi-Target Monster AI, Revive Downed Operative, & Peer Combat ----
+function getClosestActivePlayer(entity) {
+    if (!players || !players.length) return player;
+    let closest = null;
+    let minDist = Infinity;
+    for (let i = 0; i < players.length; i++) {
+        const p = players[i];
+        if (!p || p.hp <= 0 || p.downed) continue;
+        const d = dist(entity, p);
+        if (d < minDist) {
+            minDist = d;
+            closest = p;
+        }
+    }
+    return closest || players[0] || player;
+}
+
+function damagePlayerDowned(targetP, cause) {
+    if (!targetP) return;
+    targetP.hp = 0;
+    if (coopRoomId && players && players.length > 1) {
+        if (!targetP.downed) {
+            targetP.downed = true;
+            targetP.downTimer = 1800; // 30 detik pada 60fps
+            targetP.reviveProgress = 0;
+            sDie();
+            addShockwave(targetP.x, targetP.y, 45, '#e11d48', 20);
+            floatingTexts.push({
+                x: targetP.x,
+                y: targetP.y - 24,
+                text: tt('coop_operative_downed'),
+                color: '#e11d48',
+                life: 90,
+                maxLife: 90
+            });
+        }
+        // Cek apakah seluruh skuad tumbang
+        const hasAlive = players.some(p => p && p.hp > 0 && !p.downed);
+        if (!hasAlive) {
+            handlePlayerDeath(cause || 'Squad KIA');
+        }
+    } else {
+        handlePlayerDeath(cause);
+    }
+}
+
+function updateDownedAndRevive() {
+    if (!coopRoomId || !players || players.length <= 1) return;
+    for (let i = 0; i < players.length; i++) {
+        const downedP = players[i];
+        if (!downedP || !downedP.downed) continue;
+
+        if (downedP.downTimer > 0) {
+            downedP.downTimer--;
+            if (downedP.downTimer % 30 === 0) {
+                addParticle(downedP.x, downedP.y, '#e11d48', 2, 1.5, 12);
+            }
+        } else {
+            downedP.dead = true;
+        }
+
+        let beingRevived = false;
+        for (let j = 0; j < players.length; j++) {
+            if (i === j) continue;
+            const helper = players[j];
+            if (helper && helper.hp > 0 && !helper.downed && dist(helper, downedP) < 42) {
+                beingRevived = true;
+                downedP.reviveProgress = (downedP.reviveProgress || 0) + 1;
+                if (downedP.reviveProgress % 10 === 0) {
+                    addParticle(downedP.x, downedP.y, '#00f0ff', 3, 2, 8);
+                }
+                if (downedP.reviveProgress >= 180) { // 3 detik interaksi
+                    downedP.downed = false;
+                    downedP.hp = Math.round((downedP.maxHp || 100) * 0.35);
+                    downedP.invincible = 90;
+                    downedP.reviveProgress = 0;
+                    sEMPBlast();
+                    addShockwave(downedP.x, downedP.y, 50, '#10b981', 18);
+                    floatingTexts.push({
+                        x: downedP.x,
+                        y: downedP.y - 24,
+                        text: tt('coop_operative_revived'),
+                        color: '#10b981',
+                        life: 80,
+                        maxLife: 80
+                    });
+                }
+                break;
+            }
+        }
+        if (!beingRevived && downedP.reviveProgress > 0) {
+            downedP.reviveProgress = Math.max(0, downedP.reviveProgress - 1);
+        }
+    }
+}
+
+function triggerRemotePeerAttack(p) {
+    if (!p || p.hp <= 0 || p.downed || gameState !== 'playing') return;
+    const curW = p.currentWeapon || 'knife';
+    const wConf = WEAPONS[curW] || WEAPONS.knife;
+
+    if (!p.weaponCooldowns) p.weaponCooldowns = {};
+    if (p.weaponCooldowns[curW] > 0) return;
+
+    p.weaponCooldowns[curW] = wConf.cooldown || 20;
+    p.attackAnim = 12;
+
+    if (curW === 'knife') {
+        const range = 44;
+        const ax = p.x + Math.cos(p.facing) * range * 0.7;
+        const ay = p.y + Math.sin(p.facing) * range * 0.7;
+        if (monsters) {
+            monsters.forEach(m => {
+                if (m.hp > 0 && dist({ x: ax, y: ay }, m) < range) {
+                    const dmg = (p.atk || 25) * (0.85 + Math.random() * 0.3);
+                    attackMonster(m, dmg);
+                    addParticle(m.x, m.y, '#ffd700', 6, 3, 12);
+                }
+            });
+        }
+    } else if (curW === 'rifle') {
+        const spd = 12;
+        projectiles.push({
+            x: p.x + Math.cos(p.facing) * 14,
+            y: p.y + Math.sin(p.facing) * 14,
+            dx: Math.cos(p.facing) * spd,
+            dy: Math.sin(p.facing) * spd,
+            life: 45,
+            dmg: (p.atk || 25) * 1.5,
+            isPlayer: true,
+            ownerIndex: p.peerIndex,
+            kind: 'rifle',
+            color: '#00f0ff'
+        });
+        sPiercingRifle();
+    } else if (curW === 'shotgun') {
+        const spd = 9;
+        for (let k = -2; k <= 2; k++) {
+            const spread = p.facing + k * 0.12;
+            projectiles.push({
+                x: p.x + Math.cos(spread) * 12,
+                y: p.y + Math.sin(spread) * 12,
+                dx: Math.cos(spread) * spd,
+                dy: Math.sin(spread) * spd,
+                life: 25,
+                dmg: (p.atk || 25) * 0.45,
+                isPlayer: true,
+                ownerIndex: p.peerIndex,
+                kind: 'shotgun',
+                color: '#f97316'
+            });
+        }
+        sShotgun();
+    } else if (curW === 'minigun') {
+        const spd = 11;
+        const spread = p.facing + (Math.random() - 0.5) * 0.15;
+        projectiles.push({
+            x: p.x + Math.cos(spread) * 14,
+            y: p.y + Math.sin(spread) * 14,
+            dx: Math.cos(spread) * spd,
+            dy: Math.sin(spread) * spd,
+            life: 35,
+            dmg: (p.atk || 25) * 0.5,
+            isPlayer: true,
+            ownerIndex: p.peerIndex,
+            kind: 'minigun',
+            color: '#ffeaa7'
+        });
+        sMinigun();
+    }
+}
+
 // ---- Fase 3 co-op: Sinkronisasi Input, Snapshot 20Hz, dan Client Prediction ----
 let netSnapshotInterval = 50; // ms (20Hz)
 let netLastSnapshotTime = 0;
@@ -13455,6 +13675,9 @@ function updateRemotePeers() {
             }
             if (typeof input.facing === 'number') {
                 p.facing = input.facing;
+            }
+            if (input.firing && !p.downed) {
+                triggerRemotePeerAttack(p);
             }
             if (p.invincible > 0) p.invincible--;
             if (p.attackAnim > 0) p.attackAnim--;
