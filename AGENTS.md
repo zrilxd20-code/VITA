@@ -6,7 +6,7 @@ Dokumen ini ditujukan khusus untuk **AI Coding Assistant & Agent** (Google Antig
 
 ## 🧭 1. Ringkasan Proyek
 
-* **Nama Proyek**: VITA (*Sektor Terlupakan / Maze of the Tide / Maze Monster Trainer*)
+* **Nama Proyek**: VITA (*Sektor Terlupakan / Forgotten Sector*)
 * **Genre**: Top-Down Survival Horror Maze Roguelite / Action.
 * **Paradigma Utama**: **Web-Only (v2.0)** dengan prinsip **Zero External Asset Dependencies** (semua visual monster, efek pencahayaan, partikel, hingga audio efek digenerasi 100% secara prosedural).
 

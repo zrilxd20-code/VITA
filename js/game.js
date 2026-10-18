@@ -13240,8 +13240,12 @@ function generateRoomCode() {
 }
 
 function openCoopLobbyModal() {
+    if (typeof ensureAudio === 'function') {
+        try { ensureAudio(); } catch (_) {}
+    }
     const m = document.getElementById('coopLobbyModal');
     if (!m) return;
+    m.classList.add('open');
     m.style.display = 'flex';
     switchCoopTab('host');
     if (!coopRoomId) {
@@ -13252,7 +13256,10 @@ function openCoopLobbyModal() {
 
 function closeCoopLobbyModal() {
     const m = document.getElementById('coopLobbyModal');
-    if (m) m.style.display = 'none';
+    if (m) {
+        m.classList.remove('open');
+        m.style.display = 'none';
+    }
 }
 
 function switchCoopTab(tab) {
@@ -13727,6 +13734,7 @@ function handleCoopMessage(msg) {
     if (msg.type === 'START_GAME') {
         if (msg.seed) netSessionSeed = msg.seed;
         closeCoopLobbyModal();
+        if (typeof proceedToWebGame === 'function') proceedToWebGame(true);
         startGame();
     } else if (msg.type === 'SNAPSHOT' && !isCoopHost) {
         if (typeof applySnapshot === 'function') {
@@ -13766,6 +13774,7 @@ function launchCoopMission() {
     netSessionSeed = sessionSeed;
     sendCoopMessage('START_GAME', { seed: sessionSeed });
     closeCoopLobbyModal();
+    if (typeof proceedToWebGame === 'function') proceedToWebGame(true);
     startGame();
 }
 

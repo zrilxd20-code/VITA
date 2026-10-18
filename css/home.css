@@ -1440,3 +1440,40 @@ body {
     padding: 7px 12px;
   }
 }
+
+/* Dedicated Co-op Launch Button on Home Hub Hero */
+#homeView .btn-hero-coop {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.16), rgba(15, 23, 42, 0.85));
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  color: #00f0ff;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all .2s ease;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 14px rgba(0, 240, 255, 0.2);
+  margin-top: 10px;
+  width: 100%;
+  max-width: 440px;
+}
+#homeView .btn-hero-coop:hover {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.32), rgba(15, 23, 42, 0.95));
+  border-color: #00f0ff;
+  color: #ffffff;
+  box-shadow: 0 6px 24px rgba(0, 240, 255, 0.4);
+  transform: translateY(-2px);
+}
+@media (max-width: 560px) {
+  #homeView .btn-hero-coop {
+    font-size: 12px;
+    padding: 10px 16px;
+  }
+}
+
