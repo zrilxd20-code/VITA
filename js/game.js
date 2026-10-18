@@ -10995,6 +10995,124 @@ function gameLoop() {
 // single-player tidak berubah. updateMonsterProximityAndHeartbeat() tetap dipanggil
 // di jalur klien karena sifatnya feedback audio/getaran milik tiap pemain.
 
+// ---- Fase 1 co-op: serialisasi & rekonsiliasi snapshot (fungsi murni) ----
+let netSnapshotSeq = 0;
+
+function serializeSnapshot() {
+    netSnapshotSeq++;
+    const snapPlayers = [];
+    if (players && players.length) {
+        for (let i = 0; i < players.length; i++) {
+            const p = players[i];
+            if (!p) continue;
+            snapPlayers.push({
+                idx: (typeof p.peerIndex === 'number') ? p.peerIndex : i,
+                id: p.id || ('p' + i),
+                callsign: p.callsign || ('P' + (i + 1)),
+                x: Math.round(p.x * 10) / 10,
+                y: Math.round(p.y * 10) / 10,
+                hp: Math.max(0, Math.round(p.hp)),
+                maxHp: Math.round(p.maxHp),
+                facing: Math.round(p.facing * 100) / 100,
+                dashing: !!p.dashing,
+                curW: p.currentWeapon || 'knife',
+                size: p.size || 10
+            });
+        }
+    }
+
+    const snapMonsters = [];
+    if (monsters && monsters.length) {
+        for (let i = 0; i < monsters.length; i++) {
+            const m = monsters[i];
+            if (!m || m.hp <= 0) continue;
+            snapMonsters.push({
+                idx: i,
+                x: Math.round(m.x * 10) / 10,
+                y: Math.round(m.y * 10) / 10,
+                hp: Math.round(m.hp),
+                maxHp: Math.round(m.maxHp),
+                state: m.state || 'chase',
+                angle: Math.round((m.angle || 0) * 100) / 100
+            });
+        }
+    }
+
+    return {
+        seq: netSnapshotSeq,
+        level: currentLevel,
+        coins: typeof coinsCollected !== 'undefined' ? coinsCollected : 0,
+        players: snapPlayers,
+        monsters: snapMonsters
+    };
+}
+
+function applySnapshot(snap, isHost = false) {
+    if (!snap || typeof snap !== 'object') return false;
+
+    // Rekonsiliasi koin / artefak
+    if (!isHost && typeof snap.coins === 'number' && typeof coinsCollected !== 'undefined') {
+        coinsCollected = snap.coins;
+    }
+
+    // Rekonsiliasi pemain dalam players[]
+    if (Array.isArray(snap.players)) {
+        for (let i = 0; i < snap.players.length; i++) {
+            const sp = snap.players[i];
+            const pIdx = sp.idx;
+            if (isHost && pIdx === localPlayerIndex) continue; // Host tidak menimpa posisi lokal
+
+            let targetP = players[pIdx];
+            if (!targetP) {
+                targetP = {
+                    id: sp.id,
+                    peerIndex: pIdx,
+                    callsign: sp.callsign,
+                    x: sp.x,
+                    y: sp.y,
+                    hp: sp.hp,
+                    maxHp: sp.maxHp,
+                    facing: sp.facing,
+                    dashing: sp.dashing,
+                    currentWeapon: sp.curW,
+                    size: sp.size,
+                    weapons: ['knife'],
+                    perks: [],
+                    afterimages: []
+                };
+                players[pIdx] = targetP;
+            } else {
+                targetP.x = sp.x;
+                targetP.y = sp.y;
+                targetP.hp = sp.hp;
+                targetP.maxHp = sp.maxHp;
+                targetP.facing = sp.facing;
+                targetP.dashing = sp.dashing;
+                targetP.currentWeapon = sp.curW;
+                targetP.callsign = sp.callsign;
+            }
+        }
+    }
+
+    // Rekonsiliasi monster (klien menginterpolasi posisi dari host otoritatif)
+    if (!isHost && Array.isArray(snap.monsters) && monsters) {
+        for (let i = 0; i < snap.monsters.length; i++) {
+            const sm = snap.monsters[i];
+            const m = monsters[sm.idx];
+            if (m) {
+                m.x = sm.x;
+                m.y = sm.y;
+                m.hp = sm.hp;
+                m.maxHp = sm.maxHp;
+                if (typeof sm.state !== 'undefined') m.state = sm.state;
+                if (typeof sm.angle !== 'undefined') m.angle = sm.angle;
+            }
+        }
+    }
+
+    return true;
+}
+
 function stepSimulation() {
     // Inti state otoritatif — host menjalankan ini setiap tick.
     updatePlayer();

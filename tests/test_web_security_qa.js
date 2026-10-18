@@ -11,7 +11,8 @@
  * interaksi modal Memori Robot (jeda game, i18n, guard kabut, focus trap),
  * dunia deterministik ber-seed (fondasi co-op online: PRNG mulberry32),
  * pemisahan simulasi vs render (fondasi arsitektur host-authoritative),
- * serta abstraksi pemain multi (fondasi co-op 4 pemain: players[] & host index 0).
+ * abstraksi pemain multi (fondasi co-op 4 pemain: players[] & host index 0),
+ * serta serialisasi & rekonsiliasi snapshot state (fondasi sinkronisasi relay).
  */
 
 const fs = require('fs');
@@ -493,6 +494,68 @@ assert(/const\s+lp\s*=\s*getLocalPlayer\(\);/.test(gameJs),
 
 console.log('✓ TEST 18 LULUS: Abstraksi players[] & localPlayerIndex siap untuk co-op 4 pemain.');
 
+
+// TEST 19: Serialisasi & rekonsiliasi snapshot (fondasi sinkronisasi relay host-authoritative).
+// Menguji fungsi murni serializeSnapshot() dan applySnapshot() serta round-trip state.
+console.log('\n[TEST 19] Pengujian Serialisasi Snapshot & Round-Trip (fondasi relay state)...');
+// 19a. Fungsi serialisasi & rekonsiliasi harus ada
+assert(/function\s+serializeSnapshot\(\)/.test(gameJs), 'serializeSnapshot() harus tersedia');
+assert(/function\s+applySnapshot\(/.test(gameJs), 'applySnapshot() harus tersedia');
+
+// 19b. Jalankan round-trip snapshot dengan mock state terisolasi (tanpa DOM)
+const snapFnSrc = (gameJs.match(/function serializeSnapshot\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+const applyFnSrc = (gameJs.match(/function applySnapshot\([\s\S]*?\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+assert(snapFnSrc.length > 0, 'Fungsi serializeSnapshot() tidak boleh kosong');
+assert(applyFnSrc.length > 0, 'Fungsi applySnapshot() tidak boleh kosong');
+
+const snapScope = new Function(`
+    let netSnapshotSeq = 0;
+    let currentLevel = 2;
+    let coinsCollected = 5;
+    let localPlayerIndex = 0;
+    let player = {
+        id: 'p0', peerIndex: 0, callsign: 'HOST_TEST',
+        x: 120.4, y: 340.8, hp: 85, maxHp: 100, facing: 1.57, dashing: false,
+        currentWeapon: 'rifle', size: 10
+    };
+    let players = [player];
+    let monsters = [
+        { x: 200.2, y: 150.4, hp: 40, maxHp: 50, state: 'chase', angle: 0.8 },
+        { x: 300.0, y: 250.0, hp: 0, maxHp: 50, state: 'dead', angle: 0 }
+    ];
+
+    ${snapFnSrc}
+    ${applyFnSrc}
+
+    return {
+        serialize: serializeSnapshot,
+        apply: applySnapshot,
+        getState: () => ({ players, monsters, player, coins: coinsCollected })
+    };
+`)();
+
+const snap = snapScope.serialize();
+assert(snap.seq === 1, 'Sequence nomor snapshot pertama harus 1');
+assert(snap.level === 2, 'Level dalam snapshot harus cocok');
+assert(snap.coins === 5, 'Koin dalam snapshot harus cocok');
+assert(snap.players.length === 1 && snap.players[0].x === 120.4, 'Data pemain snapshot harus cocok');
+// Monster mati (hp <= 0) harus di-cull
+assert(snap.monsters.length === 1 && snap.monsters[0].x === 200.2, 'Monster mati harus di-cull dari snapshot');
+
+// Uji rekonsiliasi klien (isHost = false)
+snapScope.getState().monsters[0].x = 0;
+snapScope.getState().monsters[0].y = 0;
+const ok = snapScope.apply(snap, false);
+assert(ok === true, 'applySnapshot() harus mengembalikan true');
+assert(snapScope.getState().monsters[0].x === 200.2, 'applySnapshot harus merekonsiliasi posisi monster');
+
+// Uji guard host: host tidak menimpa posisi lokal sendiri
+snapScope.getState().player.x = 999;
+snap.players[0].x = 111;
+snapScope.apply(snap, true);
+assert(snapScope.getState().player.x === 999, 'Guard host harus mencegah overwriting pemain lokal');
+console.log('✓ TEST 19 LULUS: Serialisasi snapshot hemat-bandwidth & rekonsiliasi round-trip valid.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (18/18)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (19/19)');
 console.log('=========================================');
