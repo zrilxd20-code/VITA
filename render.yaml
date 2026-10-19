@@ -1,0 +1,23 @@
+# Render Blueprint — relay WebSocket co-op VITA (zero-dependency Node stdlib).
+# Cara pakai:
+#   1. Push repo ini ke GitHub.
+#   2. Render Dashboard → New → Blueprint → pilih repo → Apply.
+#   3. Salin alamat `wss://<service>.onrender.com` hasil deploy ke kolom
+#      "Alamat Relay" di lobi co-op dalam game.
+#
+# Catatan free tier: service tidur setelah ±15 menit tanpa trafik; koneksi
+# pertama setelah tidur butuh ±30-60 detik (cold start) lalu normal kembali.
+services:
+  - type: web
+    name: vita-coop-relay
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo 'zero dependencies - tidak ada build step'"
+    startCommand: "node tools/relay.mjs"
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"

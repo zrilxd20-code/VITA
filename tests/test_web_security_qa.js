@@ -15,7 +15,9 @@
  * serialisasi & rekonsiliasi snapshot state (fondasi sinkronisasi relay),
  * serta lobi co-op & transport relay WebSocket (Fase 2 co-op online: 4 pemain),
  * dan lockup logo Hub (emblem inline SVG prosedural + wordmark berlapis) yang diterapkan
- * konsisten ke seluruh judul menu in-game (mulai/jeda/gugur/menang) beserta guard prefers-reduced-motion.
+ * konsisten ke seluruh judul menu in-game (mulai/jeda/gugur/menang) beserta guard prefers-reduced-motion,
+ * kontrak protokol relay tanpa dependency, konfigurasi alamat relay & tautan undangan co-op
+ * (dengan penolakan input tak terpercaya), serta kontrak artefak deploy relay (Docker/Render) & lisensi MIT.
  */
 
 const fs = require('fs');
@@ -1029,6 +1031,153 @@ assert(/id="coopJoinInput"[^>]*maxlength="4"/.test(indexHtml), '#coopJoinInput h
 
 console.log('✓ TEST 24 LULUS: Kontrak protokol relay WebSocket zero-dependency & wiring klien co-op terverifikasi.');
 
+// TEST 25: Konfigurasi relay co-op — normalisasi alamat relay, badge lokal/online,
+// parsing tautan undangan (?coop=&relay=), & pembentukan tautan undangan.
+// Input dianggap TIDAK TERPERCAYA: skema berbahaya & karakter injeksi wajib ditolak.
+console.log('\n[TEST 25] Pengujian konfigurasi relay & tautan undangan co-op...');
+const coopStart = gameJs.indexOf('const COOP_DEFAULT_RELAY_URL');
+const coopEnd = gameJs.indexOf('function connectCoopRelay');
+assert(coopStart !== -1 && coopEnd > coopStart, 'Blok helper relay/undangan harus dapat diekstrak dari js/game.js');
+const coopSrc = gameJs.slice(coopStart, coopEnd);
+
+// Bangun konteks terisolasi: stub localStorage/location/document + nilai co-op.
+function makeCoopCtx(opts) {
+  const o = opts || {};
+  const store = Object.assign({}, o.store || {});
+  const localStorageStub = {
+    getItem(k) { return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null; },
+    setItem(k, v) { store[k] = String(v); },
+    removeItem(k) { delete store[k]; }
+  };
+  const locationStub = {
+    origin: o.origin !== undefined ? o.origin : 'https://zrilxd20-code.github.io',
+    pathname: o.pathname !== undefined ? o.pathname : '/VITA/',
+    protocol: o.protocol !== undefined ? o.protocol : 'https:',
+    search: o.search !== undefined ? o.search : ''
+  };
+  const documentStub = { getElementById() { return null; } };
+  const fn = new Function(
+    'localStorage', 'location', 'document', 'navigator', 'tt', 'window',
+    'coopRelayUrl', 'coopRoomId', 'coopInviteConsumed',
+    coopSrc + '\nreturn { normalizeCoopRelayUrl: normalizeCoopRelayUrl, isLocalCoopRelayUrl: isLocalCoopRelayUrl, ' +
+    'parseCoopInvite: parseCoopInvite, buildCoopInviteLink: buildCoopInviteLink, ' +
+    'getStoredCoopRelayUrl: getStoredCoopRelayUrl, resolveCoopRelayUrl: resolveCoopRelayUrl };'
+  );
+  return fn(
+    localStorageStub, locationStub, documentStub, {}, k => 'T:' + k, { location: locationStub },
+    o.coopRelayUrl || 'ws://localhost:8080',
+    o.coopRoomId !== undefined ? o.coopRoomId : null,
+    false
+  );
+}
+
+// 25a. Normalisasi: trim, naikkan http(s):// → ws(s)://, dukung IPv6 dalam kurung siku.
+const coop = makeCoopCtx({});
+assert(coop.normalizeCoopRelayUrl('ws://localhost:8080') === 'ws://localhost:8080', 'Alamat ws:// lokal harus diterima apa adanya');
+assert(coop.normalizeCoopRelayUrl('  wss://vita-coop.onrender.com  ') === 'wss://vita-coop.onrender.com', 'Spasi di tepi harus dipangkas');
+assert(coop.normalizeCoopRelayUrl('https://vita-coop.onrender.com') === 'wss://vita-coop.onrender.com', 'Tempelan https:// harus dinaikkan ke wss://');
+assert(coop.normalizeCoopRelayUrl('http://192.168.1.10:8080') === 'ws://192.168.1.10:8080', 'Tempelan http:// harus dinaikkan ke ws://');
+assert(coop.normalizeCoopRelayUrl('ws://[2001:db8::1]:8080') === 'ws://[2001:db8::1]:8080', 'IPv6 dalam kurung siku harus diterima');
+assert(coop.normalizeCoopRelayUrl('wss://host.example/relay?x=1') === 'wss://host.example/relay?x=1', 'Path & query relay harus dipertahankan');
+
+// 25b. Penolakan input tak terpercaya / tidak valid.
+['', '   ', 'javascript:alert(1)', 'ws://', 'ws://bad host', 'ws://host:999999',
+ 'ws://host/<script>alert(1)</script>', 'wss://host/"x"', 'x'.repeat(300)].forEach(bad => {
+  assert(coop.normalizeCoopRelayUrl(bad) === '', 'Alamat relay tidak valid harus ditolak: ' + JSON.stringify(bad.slice(0, 40)));
+});
+assert(coop.normalizeCoopRelayUrl(null) === '' && coop.normalizeCoopRelayUrl(123) === '', 'Alamat relay non-string harus ditolak');
+
+// 25c. Deteksi relay lokal (untuk badge & keputusan menyertakan relay di tautan undangan).
+['ws://localhost:8080', 'wss://localhost', 'ws://127.0.0.1:9000', 'ws://[::1]:8080', 'wss://localhost/x'].forEach(u =>
+  assert(coop.isLocalCoopRelayUrl(u) === true, 'Relay lokal harus terdeteksi: ' + u));
+['wss://vita-coop.onrender.com', 'ws://192.168.1.10:8080', 'ws://localhostfoo:8080', ''].forEach(u =>
+  assert(coop.isLocalCoopRelayUrl(u) === false, 'Relay non-lokal harus terdeteksi sebagai online: ' + JSON.stringify(u)));
+
+// 25d. Parsing undangan: kode dinormalisasi ke huruf besar, relay divalidasi ulang.
+assert(coop.parseCoopInvite('?coop=7x49').code === '7X49', 'Kode undangan harus dinormalisasi ke huruf besar');
+assert(coop.parseCoopInvite('?coop=7X49&relay=' + encodeURIComponent('wss://vita-coop.onrender.com')).relay === 'wss://vita-coop.onrender.com', 'Relay pada undangan harus diparse & divalidasi');
+assert(coop.parseCoopInvite('?relay=http%3A%2F%2Fhost%2Fp').relay === 'ws://host/p', 'Relay http:// pada undangan harus dinaikkan ke ws://');
+assert(coop.parseCoopInvite('?coop=ab').code === '', 'Kode undangan terlalu pendek harus diabaikan');
+assert(coop.parseCoopInvite('?coop=' + encodeURIComponent('<script>')).code === '', 'Kode undangan berisi injeksi harus diabaikan');
+assert(coop.parseCoopInvite('?coop=7X49&relay=' + encodeURIComponent('javascript:alert(1)')).relay === '', 'Relay undangan berbahaya harus diabaikan');
+const emptyInvite = coop.parseCoopInvite('');
+assert(emptyInvite.code === '' && emptyInvite.relay === '', 'Query kosong harus menghasilkan undangan kosong');
+
+// 25e. Pembentukan tautan undangan (relay hanya disertakan bila non-lokal).
+const inviteOnline = makeCoopCtx({ coopRoomId: '7X49', coopRelayUrl: 'wss://vita-coop.onrender.com' });
+assert(inviteOnline.buildCoopInviteLink() === 'https://zrilxd20-code.github.io/VITA/?coop=7X49&relay=wss%3A%2F%2Fvita-coop.onrender.com',
+  'Tautan undangan harus memuat kode kamar & relay (ter-encode) untuk relay online');
+const inviteLocal = makeCoopCtx({ coopRoomId: '7X49', coopRelayUrl: 'ws://localhost:8080', protocol: 'http:' });
+assert(inviteLocal.buildCoopInviteLink() === 'https://zrilxd20-code.github.io/VITA/?coop=7X49',
+  'Relay lokal tidak perlu disertakan pada tautan undangan (penerima memakai default)');
+assert(makeCoopCtx({ coopRoomId: null }).buildCoopInviteLink() === '', 'Tanpa kode kamar tidak ada tautan undangan');
+assert(makeCoopCtx({ coopRoomId: '7X49', origin: 'null' }).buildCoopInviteLink() === '', 'file:// (origin null) tidak boleh menghasilkan tautan undangan');
+
+// 25f. Override tersimpan dibaca apa adanya, & resolver menaikkan ws:// → wss:// di halaman https.
+const stored = makeCoopCtx({ store: { vita_relay_url: 'wss://stored.example:4443' } });
+assert(stored.getStoredCoopRelayUrl() === 'wss://stored.example:4443', 'Override tersimpan harus dibaca dari localStorage vita_relay_url');
+assert(stored.resolveCoopRelayUrl() === 'wss://stored.example:4443', 'Resolver harus memprioritaskan override tersimpan');
+const upgradeCtx = makeCoopCtx({ coopRelayUrl: 'ws://public.example:8080', protocol: 'https:' });
+assert(upgradeCtx.resolveCoopRelayUrl() === 'wss://public.example:8080', 'ws:// harus dinaikkan ke wss:// pada halaman https (hindari mixed content)');
+assert(makeCoopCtx({ coopRelayUrl: 'ws://public.example:8080', protocol: 'http:' }).resolveCoopRelayUrl() === 'ws://public.example:8080', 'ws:// dipertahankan pada halaman http');
+
+// 25g. Wiring UI: helper terdaftar, undangan dikonsumsi sekali, badge & tab terhubung.
+['function normalizeCoopRelayUrl', 'function isLocalCoopRelayUrl', 'function applyCoopRelayInput',
+ 'function syncCoopRelayInput', 'function updateCoopRelayBadge', 'function refreshCoopInviteLink',
+ 'function copyCoopInviteLink', 'function parseCoopInvite', 'function takeCoopInvite',
+ 'function persistCoopRelayUrl', 'function getStoredCoopRelayUrl', 'function buildCoopInviteLink'].forEach(sig =>
+  assert(gameJs.includes(sig), 'Klien harus mendefinisikan ' + sig + '()'));
+assert(/function takeCoopInvite[\s\S]*?coopInviteConsumed[\s\S]*?\n\}/.test(gameJs), 'Undangan harus dikonsumsi sekali via penanda coopInviteConsumed');
+assert(/function openCoopLobbyModal[\s\S]*?takeCoopInvite\(\)/.test(gameJs), 'Membuka lobi harus mengonsumsi undangan (takeCoopInvite)');
+assert(/function openCoopLobbyModal[\s\S]*?switchCoopTab\('join'\)/.test(gameJs), 'Undangan berisi kode harus langsung membuka tab "Gabung"');
+assert(/function openCoopLobbyModal[\s\S]*?coopJoinHint/.test(gameJs), 'Undangan terisi harus menampilkan petunjuk prefill kode');
+assert(/function initHostLobbyRoom[\s\S]*?refreshCoopInviteLink\(\)/.test(gameJs), 'Membuat kamar harus menyegarkan tautan undangan');
+assert(/function submitJoinCoopRoom[\s\S]*?refreshCoopInviteLink\(\)/.test(gameJs), 'Bergabung ke kamar harus menyegarkan tautan undangan');
+assert(/tt\('coop_connected'\)/.test(gameJs) && /tt\('coop_disconnected'\)/.test(gameJs), 'Badge relay harus dinarasikan lewat i18n (coop_connected/coop_disconnected)');
+assert(/coop_badge_local/.test(gameJs) && /coop_badge_online/.test(gameJs), 'Badge relay harus membedakan lokal vs online lewat i18n');
+[['id="coopRelayInput"', indexHtml], ['id="coopInviteLink"', indexHtml], ['id="coopJoinHint"', indexHtml],
+ ['onclick="applyCoopRelayInput()"', indexHtml], ['onclick="copyCoopInviteLink()"', indexHtml],
+ ['data-i18n="coop_relay_url_label"', indexHtml], ['data-i18n="coop_invite_label"', indexHtml],
+ ['data-i18n="coop_invite_prefilled"', indexHtml], ['.coop-relay-config', gameCss],
+ ['.coop-input-relay', gameCss], ['.coop-invite-box', gameCss], ['.coop-input-invite', gameCss],
+ ['.coop-input-invalid', gameCss]].forEach(([needle, hay]) =>
+  assert(hay.includes(needle), 'Markup/gaya co-op harus tersedia: ' + needle));
+
+console.log('✓ TEST 25 LULUS: Normalisasi relay, badge, & tautan undangan co-op terverifikasi (input tak terpercaya ditolak).');
+
+// TEST 26: Kontrak artefak deploy relay (Docker/Render) & lisensi proyek.
+// Memastikan relay dapat di-deploy TANPA build/dependency & proyek berlisensi eksplisit.
+console.log('\n[TEST 26] Pengujian kontrak artefak deploy relay & lisensi...');
+const readRaw = rel => fs.readFileSync(path.join(__dirname, '..', rel), 'utf8');
+const dockerfile = readRaw('Dockerfile');
+const dockerignore = readRaw('.dockerignore');
+const renderYaml = readRaw('render.yaml');
+const vercelJson = readRaw('vercel.json');
+const licenseTxt = readRaw('LICENSE');
+// Hanya baris executable (bukan komentar) yang diuji; komentar boleh menyebut npm install.
+const dockerfileCode = dockerfile.split('\n').filter(line => !/^\s*#/.test(line)).join('\n');
+
+assert(/^FROM\s+node:20-alpine\s*$/m.test(dockerfile), 'Dockerfile harus memakai base node:20-alpine (ringan)');
+assert(/COPY\s+tools\/relay\.mjs/.test(dockerfile), 'Dockerfile hanya boleh menyalin tools/relay.mjs (tanpa seluruh proyek)');
+assert(/USER\s+node/.test(dockerfile), 'Container relay harus berjalan sebagai non-root (USER node)');
+assert(/EXPOSE\s+8080/.test(dockerfile), 'Dockerfile harus mengekspos port relay 8080');
+assert(/CMD\s*\[\s*"node"\s*,\s*"tools\/relay\.mjs"\s*\]/.test(dockerfile), 'Dockerfile harus menjalankan node tools/relay.mjs');
+assert(!/npm\s+(install|ci)\b/.test(dockerfileCode), 'Dockerfile tidak boleh menjalankan npm install (zero dependency)');
+
+assert(/^\*\s*$/m.test(dockerignore), 'dockerignore harus memulai dengan whitelist ("*")');
+assert(/^!tools\/relay\.mjs\s*$/m.test(dockerignore), 'dockerignore harus mengizinkan tools/relay.mjs masuk build context');
+
+assert(/runtime:\s*node/.test(renderYaml), 'render.yaml harus memakai runtime node (tanpa Docker build)');
+assert(/startCommand:\s*"?node tools\/relay\.mjs"?/.test(renderYaml), 'render.yaml harus menjalankan node tools/relay.mjs');
+assert(/healthCheckPath:\s*\/\s*$|healthCheckPath:\s*\/\n/.test(renderYaml), 'render.yaml harus memakai health check GET / (endpoint JSON relay)');
+assert(/key:\s*NODE_VERSION/.test(renderYaml), 'render.yaml harus menetapkan NODE_VERSION (>=20)');
+assert(/"headers"/.test(vercelJson), 'vercel.json harus tetap menjadi konfigurasi deploy front-end (headers)');
+assert(/env\.PORT|process\.env\.PORT|\.PORT\b/.test(relayJs), 'Relay harus menghormati env PORT agar port-nya dapat dikonfigurasi host');
+assert(/MIT License/.test(licenseTxt) && /zrilxd20-code/.test(licenseTxt), 'LICENSE harus berisi MIT License dengan pemegang hak proyek');
+assert(pkgJson.license === 'MIT', 'package.json harus mendeklarasikan license MIT');
+
+console.log('✓ TEST 26 LULUS: Kontrak deploy relay (Docker/Render) & lisensi terverifikasi.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (24/24)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (26/26)');
 console.log('=========================================');

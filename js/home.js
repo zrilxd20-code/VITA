@@ -2171,7 +2171,7 @@ function proceedToWebGame(autoStart = false) {
 //   2) samakan "version" di version.json,
 //   3) naikkan CACHE di sw.js (mis. vita-v3 -> vita-v4).
 // App yang sudah ter-install otomatis menampilkan spanduk update.
-const APP_VERSION = '2.4.0';
+const APP_VERSION = '2.5.0';
 const UPDATE_TXT = {
   id: { msg: 'Pembaruan tersedia!', btn: 'Update Sekarang', later: 'Nanti' },
   en: { msg: 'Update available!', btn: 'Update Now', later: 'Later' }

@@ -527,7 +527,19 @@ const T = {
         coop_err_invalid_code: 'KODE KAMAR TIDAK VALID (MIN. 3 KARAKTER).',
         coop_err_room_full: 'KAMAR PENUH (MAKS 4 OPERATIF).',
         coop_err_server_full: 'RELAY PENUH. COBA LAGI NANTI.',
-        coop_err_generic: 'KONEKSI RELAY GAGAL. PASTIKAN SERVER RELAY AKTIF (npm run relay).'
+        coop_err_generic: 'KONEKSI RELAY GAGAL. PASTIKAN SERVER RELAY AKTIF (npm run relay).',
+        coop_relay_url_label: 'ALAMAT RELAY (WEBSOCKET)',
+        coop_relay_apply_btn: 'TERAPKAN',
+        coop_relay_hint: 'Alamat relay publik (ws:// atau wss://) agar bisa bermain lintas jaringan. Kosongkan untuk lokal.',
+        coop_badge_local: 'RELAY: LOKAL',
+        coop_badge_online: 'RELAY: ONLINE',
+        coop_connected: 'RELAY: TERHUBUNG',
+        coop_disconnected: 'RELAY: TERPUTUS',
+        coop_invite_label: 'TAUTAN UNDANGAN',
+        coop_copy_invite_btn: 'SALIN TAUTAN',
+        coop_invite_copied: 'TAUTAN DISALIN!',
+        coop_invite_hint: 'Kirim tautan ini ke rekan; kode kamar & relay terisi otomatis.',
+        coop_invite_prefilled: 'KODE UNDANGAN TERISI OTOMATIS. TEKAN HUBUNGKAN.'
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
@@ -768,7 +780,19 @@ const T = {
         coop_err_invalid_code: 'INVALID ROOM CODE (MIN. 3 CHARS).',
         coop_err_room_full: 'ROOM FULL (MAX 4 OPERATIVES).',
         coop_err_server_full: 'RELAY FULL. TRY AGAIN LATER.',
-        coop_err_generic: 'RELAY CONNECTION FAILED. MAKE SURE THE RELAY IS RUNNING (npm run relay).'
+        coop_err_generic: 'RELAY CONNECTION FAILED. MAKE SURE THE RELAY IS RUNNING (npm run relay).',
+        coop_relay_url_label: 'RELAY ADDRESS (WEBSOCKET)',
+        coop_relay_apply_btn: 'APPLY',
+        coop_relay_hint: 'Public relay address (ws:// or wss://) to play across networks. Leave empty for local.',
+        coop_badge_local: 'RELAY: LOCAL',
+        coop_badge_online: 'RELAY: ONLINE',
+        coop_connected: 'RELAY: CONNECTED',
+        coop_disconnected: 'RELAY: DISCONNECTED',
+        coop_invite_label: 'INVITE LINK',
+        coop_copy_invite_btn: 'COPY LINK',
+        coop_invite_copied: 'LINK COPIED!',
+        coop_invite_hint: 'Send this link to your squad; room code & relay auto-fill.',
+        coop_invite_prefilled: 'INVITE CODE PREFILLED. PRESS CONNECT.'
     }
 };
 
@@ -13244,6 +13268,9 @@ let coopRoomId = null;
 let isCoopHost = false;
 let coopPeers = [];
 let coopRelayUrl = 'ws://localhost:8080';
+// Tautan undangan (parameter ?coop=KODE & relay=ALAMAT) hanya boleh dipakai
+// sekali per pemuatan halaman agar membuka lobi berulang tidak menggeser tab.
+let coopInviteConsumed = false;
 
 function generateRoomCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -13262,11 +13289,33 @@ function openCoopLobbyModal() {
     if (!m) return;
     m.classList.add('open');
     m.style.display = 'flex';
-    switchCoopTab('host');
-    if (!coopRoomId) {
-        initHostLobbyRoom();
+
+    // Undangan (?coop=KODE & relay=ALAMAT) dikonsumsi sekali: relay dulu, lalu
+    // pilih tab. Bila ada kode, langsung prefill form "Gabung".
+    const invite = (typeof takeCoopInvite === 'function') ? takeCoopInvite() : { code: '', relay: '' };
+    if (invite.relay) {
+        persistCoopRelayUrl(invite.relay);
+        coopRelayUrl = invite.relay;
+    }
+    syncCoopRelayInput();
+
+    const joinInput = document.getElementById('coopJoinInput');
+    const joinHint = document.getElementById('coopJoinHint');
+    if (invite.code) {
+        switchCoopTab('join');
+        if (joinInput) {
+            joinInput.value = invite.code;
+            try { joinInput.focus(); } catch (_) {}
+        }
+        if (joinHint) joinHint.style.display = 'block';
+    } else {
+        switchCoopTab('host');
+        if (!coopRoomId) {
+            initHostLobbyRoom();
+        }
     }
     updateCoopSlotsUI();
+    refreshCoopInviteLink();
 }
 
 function closeCoopLobbyModal() {
@@ -13306,6 +13355,7 @@ function initHostLobbyRoom() {
     ];
     const codeEl = document.getElementById('coopRoomCodeDisplay');
     if (codeEl) codeEl.textContent = coopRoomId;
+    refreshCoopInviteLink();
     connectCoopRelay();
 }
 
@@ -13357,6 +13407,8 @@ function submitJoinCoopRoom() {
         return;
     }
     if (errEl) errEl.style.display = 'none';
+    const joinHint = document.getElementById('coopJoinHint');
+    if (joinHint) joinHint.style.display = 'none';
 
     coopRoomId = code;
     isCoopHost = false;
@@ -13378,15 +13430,60 @@ function submitJoinCoopRoom() {
         launchBtn.textContent = tt('coop_waiting_client');
     }
     updateCoopSlotsUI();
+    refreshCoopInviteLink();
     connectCoopRelay();
+}
+
+// ============================================================
+// RELAI & TAUTAN UNDANGAN: normalisasi alamat, persist, badge, invite.
+// ============================================================
+const COOP_DEFAULT_RELAY_URL = 'ws://localhost:8080';
+const COOP_RELAY_URL_MAX = 256;
+// Host: nama host / IPv4 / IPv6 dalam kurung siku. Port opsional 1..5 digit.
+// Backtick ditulis sebagai \x60 agar aman bila blok ini dibaca tooling berbasis
+// template string (lihat tests/test_web_security_qa.js TEST 25).
+const COOP_RELAY_URL_RE = /^wss?:\/\/(?:\[[0-9a-f:]+\]|[a-z0-9.\-_]+)(?::\d{1,5})?(\/[^\s<>"'\x60]*)?$/i;
+const COOP_RELAY_LOCAL_RE = /^wss?:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d{1,5})?(\/|$)/i;
+
+// Baca override tersimpan. Literal kunci sengaja dipertahankan apa adanya
+// (kontrak yang diverifikasi suite audit).
+function getStoredCoopRelayUrl() {
+    try {
+        const saved = localStorage.getItem('vita_relay_url');
+        return saved ? String(saved) : '';
+    } catch (_) {
+        return '';
+    }
+}
+
+function persistCoopRelayUrl(raw) {
+    try {
+        if (raw) localStorage.setItem('vita_relay_url', raw);
+        else localStorage.removeItem('vita_relay_url');
+    } catch (_) {}
+}
+
+// Validasi + normalisasi alamat relay dari input user (input tak dipercaya).
+// Mengembalikan '' bila tidak valid.
+function normalizeCoopRelayUrl(raw) {
+    if (typeof raw !== 'string') return '';
+    let s = raw.trim();
+    if (!s || s.length > COOP_RELAY_URL_MAX) return '';
+    // Terima tempelan http(s):// (umum dari dashboard provider) → naikkan ke ws(s).
+    if (/^https:\/\//i.test(s)) s = 'wss://' + s.slice(8);
+    else if (/^http:\/\//i.test(s)) s = 'ws://' + s.slice(7);
+    if (!COOP_RELAY_URL_RE.test(s)) return '';
+    return s;
+}
+
+function isLocalCoopRelayUrl(url) {
+    return COOP_RELAY_LOCAL_RE.test(String(url || ''));
 }
 
 function resolveCoopRelayUrl() {
     let url = coopRelayUrl;
-    try {
-        const saved = localStorage.getItem('vita_relay_url');
-        if (saved) url = saved;
-    } catch (_) {}
+    const saved = getStoredCoopRelayUrl();
+    if (saved) url = saved;
     // Cegah mixed-content: halaman https tidak boleh membuka ws:// (diblokir browser).
     try {
         if (typeof location !== 'undefined' && location.protocol === 'https:' && /^ws:\/\//i.test(url)) {
@@ -13394,6 +13491,106 @@ function resolveCoopRelayUrl() {
         }
     } catch (_) {}
     return url;
+}
+
+// Terapkan alamat relay dari input (tombol "Terapkan"/Enter): validasi,
+// persist, perbarui badge + tautan undangan. Kosong = kembali ke default lokal.
+function applyCoopRelayInput() {
+    const input = document.getElementById('coopRelayInput');
+    if (!input) return;
+    const raw = String(input.value || '').trim();
+    const normalized = raw ? normalizeCoopRelayUrl(raw) : '';
+    if (raw && !normalized) {
+        input.classList.add('coop-input-invalid');
+        return;
+    }
+    input.classList.remove('coop-input-invalid');
+    persistCoopRelayUrl(normalized);
+    coopRelayUrl = normalized || COOP_DEFAULT_RELAY_URL;
+    input.value = coopRelayUrl;
+    updateCoopRelayBadge();
+    refreshCoopInviteLink();
+}
+
+// Isi kolom input dari penyimpanan / default lalu sinkronkan badge.
+function syncCoopRelayInput() {
+    const input = document.getElementById('coopRelayInput');
+    if (!input) return;
+    input.value = resolveCoopRelayUrl();
+    input.classList.remove('coop-input-invalid');
+    updateCoopRelayBadge();
+}
+
+function updateCoopRelayBadge() {
+    const badge = document.getElementById('coopRelayBadge');
+    if (!badge) return;
+    const key = isLocalCoopRelayUrl(resolveCoopRelayUrl()) ? 'coop_badge_local' : 'coop_badge_online';
+    const label = tt(key);
+    if (badge.textContent !== label) badge.textContent = label;
+}
+
+// Tautan undangan: origin+pathname + ?coop=KODE (+ &relay=... bila non-lokal).
+// Kosong pada file:// (origin "null") karena tidak bisa dibagikan.
+function buildCoopInviteLink() {
+    if (!coopRoomId) return '';
+    try {
+        if (typeof location === 'undefined') return '';
+        const origin = location.origin;
+        if (!origin || origin === 'null') return '';
+        const effective = resolveCoopRelayUrl();
+        let link = origin + location.pathname + '?coop=' + encodeURIComponent(coopRoomId);
+        if (effective && !isLocalCoopRelayUrl(effective)) {
+            link += '&relay=' + encodeURIComponent(effective);
+        }
+        return link;
+    } catch (_) {
+        return '';
+    }
+}
+
+function refreshCoopInviteLink() {
+    const box = document.getElementById('coopInviteLink');
+    if (box) box.value = buildCoopInviteLink();
+}
+
+function copyCoopInviteLink() {
+    const link = buildCoopInviteLink();
+    if (!link) return;
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link);
+    } catch (_) {}
+    const btn = document.getElementById('coopCopyInviteBtn');
+    // Tulis ke <span data-i18n> di dalam tombol agar label tetap bisa
+    // diterjemahkan ulang oleh applyLang() (pola yang sama seperti tombol lain).
+    const span = btn ? btn.querySelector('[data-i18n]') : null;
+    if (span) {
+        span.textContent = tt('coop_invite_copied');
+        setTimeout(() => { if (span) span.textContent = tt('coop_copy_invite_btn'); }, 2000);
+    }
+}
+
+// Baca parameter undangan dari query string (input tak dipercaya).
+function parseCoopInvite(search) {
+    const out = { code: '', relay: '' };
+    try {
+        const params = new URLSearchParams(search || '');
+        const rawCode = String(params.get('coop') || '').trim().toUpperCase();
+        if (/^[A-Z0-9]{3,8}$/.test(rawCode)) out.code = rawCode;
+        const rawRelay = params.get('relay');
+        if (rawRelay) out.relay = normalizeCoopRelayUrl(rawRelay);
+    } catch (_) {}
+    return out;
+}
+
+// Konsumsi undangan SEKALI saja per pemuatan halaman.
+function takeCoopInvite() {
+    if (coopInviteConsumed) return { code: '', relay: '' };
+    coopInviteConsumed = true;
+    try {
+        return parseCoopInvite(window.location.search);
+    } catch (_) {
+        return { code: '', relay: '' };
+    }
 }
 
 function connectCoopRelay() {
@@ -13409,7 +13606,7 @@ function connectCoopRelay() {
             coopWs = new WebSocket(url);
             coopWs.onopen = () => {
                 if (badge) {
-                    badge.textContent = 'RELAY: CONNECTED';
+                    badge.textContent = typeof tt === 'function' ? tt('coop_connected') : 'RELAY: CONNECTED';
                     badge.classList.remove('unverified');
                     badge.classList.add('verified');
                 }
@@ -13442,7 +13639,7 @@ function connectCoopRelay() {
             };
             coopWs.onclose = () => {
                 if (badge) {
-                    badge.textContent = 'RELAY: DISCONNECTED';
+                    badge.textContent = typeof tt === 'function' ? tt('coop_disconnected') : 'RELAY: DISCONNECTED';
                     badge.classList.remove('verified');
                     badge.classList.add('unverified');
                 }

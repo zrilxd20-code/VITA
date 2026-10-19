@@ -23,9 +23,9 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>VITA — Forgotten Sector</title>
-<link rel="stylesheet" href="css/tokens.css?v=2.4.0">
-<link rel="stylesheet" href="css/home.css?v=2.4.0">
-<link rel="stylesheet" href="css/game.css?v=2.4.0">
+<link rel="stylesheet" href="css/tokens.css?v=2.5.0">
+<link rel="stylesheet" href="css/home.css?v=2.5.0">
+<link rel="stylesheet" href="css/game.css?v=2.5.0">
 </head>
 <body class="hud-hidden">
 <div id="homeView">
@@ -616,6 +616,18 @@
       </div>
     </div>
 
+    <!-- Relay Configuration (dipakai bersama oleh host & tamu) -->
+    <div class="coop-relay-config">
+      <label for="coopRelayInput" class="coop-code-label" data-i18n="coop_relay_url_label">ALAMAT RELAY (WEBSOCKET)</label>
+      <div class="coop-relay-row">
+        <input type="text" id="coopRelayInput" class="coop-input-relay" placeholder="ws://localhost:8080" autocomplete="off" spellcheck="false" onchange="applyCoopRelayInput()" onkeydown="if(event.key==='Enter'){event.preventDefault();applyCoopRelayInput();}">
+        <button class="btn-micro" type="button" id="coopApplyRelayBtn" onclick="applyCoopRelayInput()">
+          <span data-i18n="coop_relay_apply_btn">TERAPKAN</span>
+        </button>
+      </div>
+      <div class="coop-relay-hint" data-i18n="coop_relay_hint">Alamat relay publik (ws:// atau wss://) agar bisa bermain lintas jaringan. Kosongkan untuk lokal.</div>
+    </div>
+
     <!-- Mode Selector Tabs: Host vs Join -->
     <div class="coop-tabs-bar">
       <button class="btn-coop-tab active" id="coopTabHost" type="button" onclick="switchCoopTab('host')">
@@ -635,6 +647,16 @@
           <span data-i18n="coop_copy_code_btn">SALIN KODE</span>
         </button>
       </div>
+      <div class="coop-invite-box">
+        <label for="coopInviteLink" class="coop-code-label" data-i18n="coop_invite_label">TAUTAN UNDANGAN</label>
+        <div class="coop-invite-row">
+          <input type="text" id="coopInviteLink" class="coop-input-invite" readonly onclick="this.select()">
+          <button class="btn-micro" type="button" id="coopCopyInviteBtn" onclick="copyCoopInviteLink()">
+            <span data-i18n="coop_copy_invite_btn">SALIN TAUTAN</span>
+          </button>
+        </div>
+        <div class="coop-relay-hint" data-i18n="coop_invite_hint">Kirim tautan ini ke rekan; kode kamar &amp; relay terisi otomatis.</div>
+      </div>
       <div class="coop-slots-grid" id="coopPlayerSlots">
         <!-- 4 Slots dynamically injected by updateCoopSlotsUI() -->
       </div>
@@ -649,7 +671,8 @@
     <div class="coop-tab-content" id="coopJoinPanel" style="display:none;">
       <div class="coop-join-form">
         <label for="coopJoinInput" class="coop-code-label" data-i18n="coop_enter_code_label">MASUKKAN KODE KAMAR (4 DIGIT)</label>
-        <input type="text" id="coopJoinInput" class="coop-input-code" maxlength="4" placeholder="KODE (cth: 7X49)" autocomplete="off" inputmode="latin" spellcheck="false">
+        <input type="text" id="coopJoinInput" class="coop-input-code" maxlength="4" placeholder="KODE (cth: 7X49)" autocomplete="off" inputmode="latin" spellcheck="false" oninput="var _h=document.getElementById('coopJoinHint');if(_h)_h.style.display='none';">
+        <div id="coopJoinHint" class="coop-relay-hint" style="display:none;" data-i18n="coop_invite_prefilled">KODE UNDANGAN TERISI OTOMATIS. TEKAN HUBUNGKAN.</div>
         <div id="coopJoinError" class="coop-error-msg" style="display:none;"></div>
         <button class="btn" id="coopConnectBtn" type="button" onclick="submitJoinCoopRoom()">
           <span data-i18n="coop_connect_btn">HUBUNGKAN KE REGU ▸</span>
@@ -1410,9 +1433,9 @@
 </div>
 </div>
 
-<script src="js/supabase.js?v=2.4.0"></script>
-<script src="js/home.js?v=2.4.0"></script>
-<script src="js/prologue.js?v=2.4.0"></script>
-<script src="js/game.js?v=2.4.0"></script>
+<script src="js/supabase.js?v=2.5.0"></script>
+<script src="js/home.js?v=2.5.0"></script>
+<script src="js/prologue.js?v=2.5.0"></script>
+<script src="js/game.js?v=2.5.0"></script>
 </body>
 </html>

@@ -30,6 +30,11 @@ vita/
 │   ├── gen-icons.mjs   # Generator ikon PWA reproducible (fs+zlib saja)
 │   └── bump-version.mjs# Sinkron versi rilis satu perintah
 ├── .github/workflows/  # CI: jalankan npm run check + npm test pada push/PR
+├── Dockerfile          # Image relay minimal (node:20-alpine, hanya COPY relay, USER node)
+├── .dockerignore       # Whitelist build context (hanya tools/relay.mjs)
+├── render.yaml         # Render Blueprint: relay Node free-tier (auto-deploy + health check /)
+├── vercel.json         # Konfigurasi deploy front-end Vercel (security headers)
+├── LICENSE             # Lisensi MIT
 ├── css/
 │   ├── tokens.css      # Design tokens industri (dimuat pertama, global :root)
 │   ├── home.css        # Gaya Hub, di-scope #homeView (kecuali :root/* global)
@@ -42,7 +47,7 @@ vita/
 │   └── modules/        # [Eksperimental/Roadmap] Modul TypeScript terpisah (persiapan refactoring)
 ├── script.md           # Naskah cerita, karakter, dan dialog (kanon narasi — jangan diubah tanpa izin)
 ├── supabase_schema.sql # Skema PostgreSQL, check constraint, dan kebijakan RLS
-├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 24 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion, live region status async, ketahanan loop game/anti-freeze, interaksi modal memori robot, dunia deterministik ber-seed untuk co-op online, pemisahan simulasi vs render untuk arsitektur host-authoritative, abstraksi pemain multi via players[] & host index 0, serialisasi snapshot & rekonsiliasi state, lobi co-op & transport relay WebSocket, lockup logo Hub prosedural yang diterapkan konsisten ke judul menu in-game (mulai/jeda/gugur/menang) & guard hemat gerak, kontrak protokol relay WebSocket tanpa dependency & wiring klien co-op)
+├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 26 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion, live region status async, ketahanan loop game/anti-freeze, interaksi modal memori robot, dunia deterministik ber-seed untuk co-op online, pemisahan simulasi vs render untuk arsitektur host-authoritative, abstraksi pemain multi via players[] & host index 0, serialisasi snapshot & rekonsiliasi state, lobi co-op & transport relay WebSocket, lockup logo Hub prosedural yang diterapkan konsisten ke judul menu in-game (mulai/jeda/gugur/menang) & guard hemat gerak, kontrak protokol relay WebSocket tanpa dependency & wiring klien co-op, normalisasi alamat relay & parsing/pembentukan tautan undangan co-op, kontrak artefak deploy relay (Docker/Render) & lisensi MIT)
 ├── AGENTS.md           # [Berkas Ini] Panduan sistem & aturan khusus untuk AI Agent
 └── README.md           # Dokumentasi proyek untuk pengembang & pemain
 ```
@@ -102,9 +107,19 @@ vita/
    `MAX_PLAYERS=4`, `MAX_MESSAGE_BYTES=256KB`, `MAX_ROOMS=500`. Jalankan dengan `npm run relay`.
 5. **Protokol klien** (`js/game.js`): `JOIN` → `WELCOME` (ke tamu) + `PEER_JOIN` (ke peer lain);
    `INPUT` & `SNAPSHOT` (20 Hz) mengalir host↔tamu; `START_GAME` disiarkan host; `PEER_LEAVE`
-   saat disconnect. Resolusi URL relay lewat `resolveCoopRelayUrl()` (default
-   `ws://localhost:8080`, di-override `localStorage['vita_relay_url']`, dan `ws://` dinaikkan ke
-   `wss://` bila halaman `https:` untuk menghindari blokir mixed content).
+   saat disconnect.
+6. **Konfigurasi alamat & undangan**: alamat relay diketik di lobi (`#coopRelayInput`, tombol
+   `applyCoopRelayInput()`), disimpan ke `localStorage['vita_relay_url']`. Presedensi:
+   input → tersimpan → default `ws://localhost:8080`. Normalisasi lewat `normalizeCoopRelayUrl()`
+   (trim; `http(s)://` → `ws(s)://`; validasi regex; tolak skema/karakter injeksi & panjang >256).
+   Halaman `https:` menaikkan `ws://` → `wss://` (hindari mixed content). Host dapat membagikan
+   tautan undangan `…/?coop=CODE&relay=…` (`buildCoopInviteLink()`), dan `parseCoopInvite()`
+   memvalidasi ulang kode + relay saat dibuka (dikonsumsi sekali via `coopInviteConsumed`).
+7. **Deploy relay (artefak siap pakai)**: `Dockerfile` (node:20-alpine, hanya `COPY tools/relay.mjs`,
+   `USER node`, `EXPOSE 8080`), `.dockerignore` (whitelist), `render.yaml` (Render Blueprint
+   free-tier, `startCommand: node tools/relay.mjs`, `healthCheckPath: /`), dan `vercel.json`
+   (front-end). Relay menghormati `env.PORT`. Tanpa kredensial akun, deploy tetap harus dijalankan
+   oleh pemilik repo (lihat catatan README).
 
 ---
 
@@ -167,7 +182,7 @@ vita/
   npm run check
   npm test
   ```
-  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 24 modul audit QA/security/BFS/a11y/perf/determinisme/sim-render/players-abstraction/snapshot-relay/coop-lobby/relay-protocol/logo-lockup/in-game-menu-titles).
+  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 26 modul audit QA/security/BFS/a11y/perf/determinisme/sim-render/players-abstraction/snapshot-relay/coop-lobby/relay-protocol/logo-lockup/in-game-menu-titles/relay-config-invite/deploy-license).
 
 * **Menjalankan & Menguji Co-op Online (host-authoritative, maks 4 pemain)**:
   ```bash
@@ -175,9 +190,20 @@ vita/
   npm run relay   # terminal 2: relay WebSocket → ws://localhost:8080 (atau -- --port <n>)
   ```
   Buka `http://localhost:8000` di 2+ tab/perangkat: host membuat kamar (dapat kode 4 karakter)
-  lalu tamu memasukkan kode tersebut di tab "Gabung". Relay `ws://localhost:8080` dapat
-  di-override via `localStorage['vita_relay_url']`; halaman `https://` tidak boleh membuka `ws://`
-  (mixed content) sehingga resolver klien menaikkannya ke `wss://`. Tanpa relay berjalan, lobi
+  lalu tamu memasukkan kode tersebut di tab "Gabung". Alamat relay diisi di kolom lobi
+  (tersimpan ke `localStorage['vita_relay_url']`); host juga bisa membagikan tautan undangan
+  `…/?coop=CODE&relay=…` yang otomatis mengisi kode. Halaman `https://` tidak boleh membuka
+  `ws://` (mixed content) sehingga resolver klien menaikkannya ke `wss://`. Tanpa relay berjalan, lobi
   hanya menampilkan galat koneksi (tidak ada peer yang bisa bergabung).
+
+* **Deploy Relay Online (`wss://`)**:
+  ```bash
+  docker build -t vita-relay . && docker run --rm -p 8080:8080 -e PORT=8080 vita-relay
+  # atau: Render Dashboard → New → Blueprint → pilih repo (render.yaml) → Apply
+  # atau: PORT=8080 node tools/relay.mjs
+  ```
+  Front-end statis dapat dihosting di Vercel (lihat `vercel.json`). Hasil deploy relay
+  (`wss://<service>.onrender.com`) ditempel ke kolom "Alamat Relay" di lobi co-op.
+  Deploy cloud butuh kredensial pemilik repo sehingga tidak dapat dijalankan otomatis oleh agent.
 
 

@@ -6,7 +6,7 @@
 [![Zero External Assets](https://img.shields.io/badge/Assets-100%25%20Procedural-red)](index.html)
 [![PWA Ready](https://img.shields.io/badge/PWA-Network--First%20Offline-brightgreen)](sw.js)
 [![Database](https://img.shields.io/badge/Database-Supabase%20%2F%20PostgreSQL-3ECF8E)](supabase_schema.sql)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(24%2F24%20QA)-success)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(26%2F26%20QA)-success)](tests/)
 
 ---
 
@@ -109,12 +109,38 @@ Then, with the game open in **two or more browser tabs/devices**:
 
 Notes & troubleshooting:
 
-- The relay URL defaults to `ws://localhost:8080`. Override it with
-  `localStorage.setItem('vita_relay_url', 'ws://<host>:<port>')` (or `wss://…`) in the browser console.
+- The relay URL is set in the Co-op lobby's **Relay address** field (persisted to
+  `localStorage['vita_relay_url']`). Precedence: lobby field → stored override → default
+  `ws://localhost:8080`. You can also set it directly:
+  `localStorage.setItem('vita_relay_url', 'wss://<host>')`.
+- **Invite links:** the host lobby shows a shareable link (`…/?coop=CODE&relay=…`). Opening it
+  auto-fills the code (and relay, when non-local) and jumps straight to the **Join** tab.
 - Browsers block `ws://` from an `https://` page (mixed content). Serve both the game and
-  relay over `http://` for local play, or put the relay behind TLS (`wss://`) for production.
+  relay over `http://` for local play, or put the relay behind TLS (`wss://`) for production
+  (the client auto-upgrades `ws://` → `wss://` on an `https://` page).
 - Co-op **requires the relay process to be running** — without it the lobby shows a
   connection error and no peers can join.
+
+### Deploying the Relay Online (`wss://`)
+
+The relay is deploy-ready with **zero build step and zero dependencies**:
+
+```powershell
+# Option A — Docker (any host)
+docker build -t vita-relay .
+docker run --rm -p 8080:8080 -e PORT=8080 vita-relay
+
+# Option B — Render Blueprint (render.yaml in this repo)
+#   Render Dashboard → New → Blueprint → select repo → Apply
+#   → yields wss://<service>.onrender.com, paste it into the lobby's Relay address field.
+
+# Option C — any Node host
+PORT=8080 node tools/relay.mjs
+```
+
+Host the static front-end anywhere (e.g. `vercel.json` is included for Vercel). Because the
+game is served over `https://` in production, the relay must be reachable over `wss://`
+(Render/`render.yaml` and the bundled `Dockerfile` both give you that automatically).
 
 ### Node Tooling (stdlib only, zero install)
 
@@ -146,6 +172,11 @@ vita/
 │   ├── gen-icons.mjs       # Reproducible PWA icon generator (fs+zlib only)
 │   └── bump-version.mjs    # Single-command release version sync
 ├── .github/workflows/ci.yml# CI pipeline: npm run check + npm test on push/PR
+├── Dockerfile              # Minimal relay image (node:20-alpine, COPY relay only, USER node)
+├── .dockerignore           # Whitelist: only tools/relay.mjs enters the build context
+├── render.yaml             # Render Blueprint: free-tier Node relay (auto-deploy + health check)
+├── vercel.json             # Vercel front-end deploy config (security headers)
+├── LICENSE                 # MIT license
 ├── css/
 │   ├── tokens.css          # Industrial design tokens (colors, type, motion)
 │   ├── home.css            # Cyberpunk hub terminal styling (scoped #homeView)
@@ -159,7 +190,7 @@ vita/
 ├── script.md               # Narrative script, characters, and dialogue canon
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # 24-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup with consistent in-game menu titles (start/pause/death/win) & reduced-motion guard, zero-dependency relay protocol contract & client wiring)
+│   └── test_web_security_qa.js # 26-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup with consistent in-game menu titles (start/pause/death/win) & reduced-motion guard, zero-dependency relay protocol contract & client wiring, co-op relay address normalization & invite-link parsing/building, relay deploy artifacts (Docker/Render) & MIT license contract)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```
@@ -174,12 +205,14 @@ Run the automated test suites to ensure complete integrity:
 # 1. Unified check (syntax + scope + i18n + secrets)
 npm run check
 
-# 2. Run Web Security & Input Validation Audit
+# 2. Run the 26-module Web Security & Input Validation Audit
 npm test
 ```
 
 ---
 
 ## 🛡️ License
+
+Released under the **MIT License** — see [LICENSE](LICENSE).
 
 Developed by [Rifky / Dev Team]. Open source and available for portfolio review and personal demonstration.

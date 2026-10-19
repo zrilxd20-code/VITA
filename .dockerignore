@@ -1,0 +1,4 @@
+# Image relay hanya butuh satu berkas: whitelist sisanya.
+*
+!tools/
+!tools/relay.mjs
