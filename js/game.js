@@ -443,6 +443,9 @@ const T = {
         tut_move: 'WASD / Joystick: bergerak — kumpulkan artefak berpendar',
         tut_attack: 'SPACE / Klik: serang ke arah kursor. SHIFT: dash kebal!',
         tut_exit: 'Semua artefak didapat! Cari portal EXIT hijau sekarang!',
+        holo_move: 'WASD / Joystick untuk bergerak',
+        holo_attack: 'Klik Kiri / Tombol Arah untuk menembak',
+        holo_artifact: 'Dekati artefak kuning untuk membawanya ke portal',
         perk_vamp_name: 'Sifon Biomassa Nanit',
         perk_vamp_role: 'Regenerasi Darah & Combo',
         perk_vamp_desc: 'Setiap anomali yang dinetralisir memulihkan +12 HP (+20 HP saat combo multi-kill).',
@@ -696,6 +699,9 @@ const T = {
         tut_move: 'WASD / Joystick: move — collect glowing artifacts',
         tut_attack: 'SPACE / Click: attack toward cursor. SHIFT: invincible dash!',
         tut_exit: 'All artifacts secured! Find the green EXIT portal now!',
+        holo_move: 'WASD / Joystick to move',
+        holo_attack: 'Left Click / Direction Button to shoot',
+        holo_artifact: 'Approach yellow artifacts to carry them to the portal',
         perk_vamp_name: 'Nanite Bio-Siphon',
         perk_vamp_role: 'Blood Regen & Combo',
         perk_vamp_desc: 'Every eliminated anomaly restores +12 HP (+20 HP during multi-kill combo).',
@@ -10595,6 +10601,157 @@ function drawDirectionArrow() {
     ctx.restore();
 }
 
+// HARI 2 — Onboarding halus Sektor 1.
+// Papan lantai holografis di titik spawn: hanya untuk pemain baru (tutorial aktif),
+// tiap baris memudar setelah aksinya dilakukan. Teks dibungkus & di-cache per bahasa
+// agar jalur render tidak mengalokasi array setiap frame.
+const holoPromptCache = { lang: '', rows: [], widths: [], measured: false };
+
+function wrapHoloPrompt(text, maxChars) {
+    const out = [];
+    const words = String(text).split(' ');
+    let line = '';
+    for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        if (line && (line.length + 1 + word.length) > maxChars) {
+            out.push(line);
+            line = word;
+        } else {
+            line = line ? line + ' ' + word : word;
+        }
+    }
+    if (line) out.push(line);
+    return out;
+}
+
+function drawSpawnHoloPrompts() {
+    if (currentLevel !== 0 || menuDemo || !tutorialActive || !settings) return;
+    const p = getLocalPlayer();
+    if (!p) return;
+
+    const spawnX = 1.5 * CELL;
+    const spawnY = 1.5 * CELL;
+    const proximity = 1 - Math.min(1, Math.hypot(p.x - spawnX, p.y - spawnY) / (7 * CELL));
+    if (proximity <= 0.01) return;
+
+    // Baris per kelompok aksi: 0 gerak, 1 serang, 2 artefak.
+    const groupAlpha = [
+        tutorialStep <= 0 ? 1 : 0,
+        tutorialStep <= 2 ? 0.85 : 0,
+        coinsCollected === 0 ? 0.9 : 0
+    ];
+    if (groupAlpha[0] + groupAlpha[1] + groupAlpha[2] <= 0) return;
+
+    if (holoPromptCache.lang !== lang) {
+        holoPromptCache.lang = lang;
+        holoPromptCache.rows = [];
+        const groups = [tt('holo_move'), tt('holo_attack'), tt('holo_artifact')];
+        for (let g = 0; g < groups.length; g++) {
+            const wrapped = wrapHoloPrompt(groups[g], 26);
+            for (let i = 0; i < wrapped.length; i++) {
+                holoPromptCache.rows.push({ text: wrapped[i], group: g });
+            }
+        }
+        holoPromptCache.widths = [];
+        holoPromptCache.measured = false;
+    }
+
+    const sx = spawnX - cameraX + W / 2;
+    const sy = spawnY - cameraY + H / 2;
+    if (sx < -140 || sx > W + 140 || sy < -100 || sy > H + 100) return;
+
+    ctx.save();
+    ctx.font = "bold 7px 'Cascadia Code', monospace";
+    if (!holoPromptCache.measured) {
+        holoPromptCache.widths = holoPromptCache.rows.map(r => ctx.measureText(r.text).width);
+        holoPromptCache.measured = true;
+    }
+
+    const rows = holoPromptCache.rows;
+    const widths = holoPromptCache.widths;
+    let panelW = 0;
+    for (let i = 0; i < widths.length; i++) {
+        if (widths[i] > panelW) panelW = widths[i];
+    }
+    panelW += 10;
+    const panelH = rows.length * 8 + 8;
+    const px = -panelW / 2;
+    const py = 22;
+
+    const t = Date.now() / 1000;
+    const flicker = REDUCE_MOTION ? 1 : 0.86 + Math.sin(t * 7.3) * 0.08 + Math.sin(t * 19.1) * 0.04;
+    const base = 0.4 * proximity * flicker;
+
+    ctx.translate(sx, sy);
+    ctx.globalAlpha = base * 0.5;
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.08)';
+    ctx.fillRect(px, py, panelW, panelH);
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.55)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px + 0.5, py + 0.5, panelW - 1, panelH - 1);
+
+    // Bracket sudut + garis proyeksi dari titik spawn.
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px - 4, py);
+    ctx.moveTo(px, py + panelH);
+    ctx.lineTo(px - 4, py + panelH);
+    ctx.moveTo(px + panelW, py);
+    ctx.lineTo(px + panelW + 4, py);
+    ctx.moveTo(px + panelW, py + panelH);
+    ctx.lineTo(px + panelW + 4, py + panelH);
+    ctx.moveTo(0, py);
+    ctx.lineTo(0, 10);
+    ctx.stroke();
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 5;
+    for (let i = 0; i < rows.length; i++) {
+        const a = groupAlpha[rows[i].group];
+        if (a <= 0) continue;
+        ctx.globalAlpha = base * a;
+        ctx.fillStyle = rows[i].group === 2 ? '#f1c40f' : '#9ff9ff';
+        ctx.fillText(rows[i].text, px + 5, py + 8 + i * 8);
+    }
+    ctx.restore();
+}
+
+// Pulsa kompas samar di sekitar pemain saat seluruh artefak Sektor 1 sudah diambil.
+// Melengkapi drawDirectionArrow() (panah tepi layar) dengan isyarat jarak dekat.
+function drawExitCompassPulse() {
+    if (currentLevel !== 0 || menuDemo || !exitPos) return;
+    if (!exitPos || !artifacts || !artifacts.length || coinsCollected < artifacts.length) return;
+    const p = getLocalPlayer();
+    if (!p || p.hp <= 0) return;
+
+    const sx = p.x - cameraX + W / 2;
+    const sy = p.y - cameraY + H / 2;
+    const angle = Math.atan2(exitPos.y - p.y, exitPos.x - p.x);
+    const t = Date.now() / 1000;
+    const pulse = REDUCE_MOTION ? 0.5 : (Math.sin(t * 3.4) * 0.5 + 0.5);
+
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.rotate(angle);
+    ctx.strokeStyle = '#2ecc71';
+    ctx.shadowColor = '#2ecc71';
+    ctx.shadowBlur = 8;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 3; i++) {
+        const r = 24 + i * 8 + pulse * 3;
+        ctx.globalAlpha = (0.30 - i * 0.07) * (0.55 + pulse * 0.45);
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(r - 4, -5);
+        ctx.lineTo(r + 1, 0);
+        ctx.lineTo(r - 4, 5);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
 function drawDarkModeOverlay() {
     if (currentLevel % 2 !== 0) return;
 
@@ -10885,6 +11042,7 @@ function renderGame() {
 
     drawMaze();
     drawDecals();
+    drawSpawnHoloPrompts();
     drawThermalTrails();
     drawGasClouds();
     drawBrassCasings();
@@ -10912,6 +11070,7 @@ function renderGame() {
     drawDarkModeOverlay();
     drawLightModeEffects();
     drawDirectionArrow();
+    drawExitCompassPulse();
 
     ctx.restore();
 
