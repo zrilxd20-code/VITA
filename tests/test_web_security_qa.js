@@ -1232,7 +1232,7 @@ assert(/^dist\/\s*$/m.test(gitignore), '.gitignore harus mengabaikan dist/ (hasi
 
 // 27c. CI APK di cloud: tanpa JDK lokal, tanpa secret, artifact debug yang gagal bila kosong.
 assert(/actions\/checkout@v4/.test(androidWorkflow), 'CI Android harus checkout kode');
-assert(/node-version:\s*'20'/.test(androidWorkflow), 'CI Android harus memakai Node 20');
+assert(/node-version:\s*'22'/.test(androidWorkflow), 'CI Android harus memakai Node 22 (Capacitor CLI mensyaratkan Node >=22)');
 assert(/java-version:\s*'21'/.test(androidWorkflow),
   'CI Android harus memakai JDK 21 (Capacitor menetapkan JavaVersion.VERSION_21)');
 assert(/npm ci/.test(androidWorkflow) && /npm run build:www/.test(androidWorkflow),

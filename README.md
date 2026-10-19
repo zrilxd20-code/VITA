@@ -150,7 +150,7 @@ committed with the app identity (`com.zrilxd20.vita`, label **VITA**) and proced
 launcher icons/splash already in place, so CI only has to compile.
 
 - **No local toolchain needed.** `.github/workflows/android.yml` runs on `ubuntu-latest` with
-  Node 20 + JDK 21 + the Android SDK, then uploads the debug APK as the **`vita-debug-apk`**
+  Node 22 + JDK 21 + the Android SDK, then uploads the debug APK as the **`vita-debug-apk`**
   artifact (Actions → *VITA Android APK* → newest run → Artifacts). The job fails instead of
   passing silently if no APK is produced.
 - **Preview:** Actions → *VITA Android APK* → **Run workflow**.

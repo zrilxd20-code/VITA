@@ -137,7 +137,7 @@ vita/
    ikon legacy 48dp (membulat), round 48dp, lapisan adaptive 108dp **transparan di sudut**,
    dan 11 `splash.png` berlatar `#0a0a12` (dimensi dipertahankan). `gen-icons.mjs` menulis ikon
    PWA hanya saat dijalankan langsung (`invokedDirectly` + `import.meta.url`).
-4. **CI**: `.github/workflows/android.yml` — Node 20 + JDK 21 (Capacitor menetapkan
+4. **CI**: `.github/workflows/android.yml` — Node 22 + JDK 21 (Capacitor menetapkan
    `JavaVersion.VERSION_21`) + `npm ci` → `npm run build:www` → `npx cap sync android` →
    `gradlew assembleDebug` → artifact **`vita-debug-apk`** (`if-no-files-found: error`),
    tanpa secret. APK **tidak** dapat dibangun lokal di mesin tanpa JDK/Android SDK.
