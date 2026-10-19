@@ -13,3 +13,17 @@ vita_local.json
 # Backup lokal
 backup/
 scratch/
+
+# Paket web hasil build (dibuat ulang oleh `npm run build:www`)
+dist/
+
+# Capacitor / Gradle (unduh ulang oleh build; jangan commit)
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/captures/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json

@@ -7,7 +7,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 
-const FILES = ['js/supabase.js', 'js/home.js', 'js/prologue.js', 'js/game.js', 'sw.js', 'tools/relay.mjs'];
+const FILES = ['js/supabase.js', 'js/home.js', 'js/prologue.js', 'js/game.js', 'sw.js', 'tools/relay.mjs', 'tools/build-www.mjs', 'tools/gen-android-icons.mjs'];
 let failed = false;
 const fail = (m) => { failed = true; console.error('FAIL:', m); };
 const ok = (m) => console.log('OK:', m);
@@ -32,7 +32,8 @@ try {
 try {
   const src = readFileSync('js/game.js', 'utf8');
   const idBlock = src.match(/const T = \{\s*id:\s*\{([\s\S]*?)\},\s*en:/);
-  const enBlock = src.match(/,\s*en:\s*\{([\s\S]*?)\n    \}\n\};/);
+  // Tolerate both LF and CRLF checkouts (git autocrlf on Windows must not break CI locally).
+  const enBlock = src.match(/,\s*en:\s*\{([\s\S]*?)\r?\n    \}\r?\n\};/);
   if (!idBlock || !enBlock) throw new Error('T blocks not found');
   // Strip quoted values / line comments first so strings like 'Mode:' or URLs never
   // register as keys, then capture EVERY `key:` (dictionaries pack several per line).

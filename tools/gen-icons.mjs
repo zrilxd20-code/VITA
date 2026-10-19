@@ -3,8 +3,11 @@
 // Run: npm run icons
 import { writeFileSync } from 'node:fs';
 import { deflateSync, crc32 } from 'node:zlib';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+// Helper Canvas/drawContent di-export agar tools lain (mis. gen-android-icons.mjs)
+// dapat memakai ulang seni prosedural yang sama tanpa duplikasi kode.
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const BG = [10, 10, 18, 255];
@@ -26,7 +29,7 @@ function chunk(tag, data) {
   return Buffer.concat([len, body, crc]);
 }
 
-class Canvas {
+export class Canvas {
   constructor(w, h) {
     this.w = w;
     this.h = h || w;
@@ -93,7 +96,7 @@ class Canvas {
   }
 }
 
-function drawContent(cv, k, ox, oy) {
+export function drawContent(cv, k, ox, oy) {
   const X = (v) => ox + v * k;
   cv.line(X(96), X(96), X(416), X(96), 20 * k, GRID1);
   cv.line(X(416), X(96), X(416), X(416), 20 * k, GRID1);
@@ -109,7 +112,7 @@ function drawContent(cv, k, ox, oy) {
   cv.disk(X(396), X(396), 26 * k, GOLD);
 }
 
-function makeIcon(size, rounded, contentScale) {
+export function makeIcon(size, rounded, contentScale) {
   const cv = new Canvas(size, size);
   const k = (size / 512) * contentScale;
   const off = (size - 512 * k) / 2;
@@ -119,7 +122,7 @@ function makeIcon(size, rounded, contentScale) {
 }
 
 // Procedural tactical screenshot showing BMPT robot drone, maze walls, headlights, and HUD
-function makeScreenshot(w, h) {
+export function makeScreenshot(w, h) {
   const cv = new Canvas(w, h);
   const cx = Math.floor(w / 2), cy = Math.floor(h / 2);
 
@@ -187,12 +190,18 @@ function makeScreenshot(w, h) {
   return cv;
 }
 
-// Generate Icons
-makeIcon(512, true, 1.0).save(join(ROOT, 'icon-512.png'));
-makeIcon(192, true, 1.0).save(join(ROOT, 'icon-192.png'));
-makeIcon(180, false, 1.0).save(join(ROOT, 'apple-touch-icon.png'));
-makeIcon(512, false, 0.72).save(join(ROOT, 'icon-maskable-512.png'));
+// Hanya tulis berkas PWA bila modul ini dijalankan langsung (`npm run icons`).
+// Saat di-import tools lain (mis. gen-android-icons.mjs), jangan sentuh ikon PWA.
+const invokedDirectly = !!process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
-// Generate PWA Screenshots (W3C Rich Install UI)
-makeScreenshot(1280, 720).save(join(ROOT, 'screenshot-wide.png'));
-makeScreenshot(540, 960).save(join(ROOT, 'screenshot-narrow.png'));
+if (invokedDirectly) {
+  // Generate Icons
+  makeIcon(512, true, 1.0).save(join(ROOT, 'icon-512.png'));
+  makeIcon(192, true, 1.0).save(join(ROOT, 'icon-192.png'));
+  makeIcon(180, false, 1.0).save(join(ROOT, 'apple-touch-icon.png'));
+  makeIcon(512, false, 0.72).save(join(ROOT, 'icon-maskable-512.png'));
+
+  // Generate PWA Screenshots (W3C Rich Install UI)
+  makeScreenshot(1280, 720).save(join(ROOT, 'screenshot-wide.png'));
+  makeScreenshot(540, 960).save(join(ROOT, 'screenshot-narrow.png'));
+}

@@ -21,15 +21,19 @@ vita/
 ├── sw.js               # Service worker network-first dengan cache offline fallback (http saja)
 ├── icon.svg            # Ikon prosedural SVG lokal
 ├── version.json        # Versi rilis (polling update PWA)
-├── package.json        # Script Node stdlib: dev/relay/check/test/icons/bump
+├── package.json        # Script Node stdlib: dev/relay/check/test/icons/bump + build:www/cap:sync/apk:debug
 ├── tools/              # Tooling Node tanpa dependency (serve/relay/check/gen-icons/bump)
 │   ├── serve.mjs       # Dev server statis http (wajib untuk SW/PWA)
 │   ├── relay.mjs       # Server relay WebSocket co-op tanpa dependency (handshake RFC 6455 + codec frame)
 │   ├── check.mjs       # Cek sintaks + scope global + parity & cakupan i18n + secret scan
 │   ├── check_html.cjs  # Verifikasi HTML well-formed (deteksi tag belum tertutup)
 │   ├── gen-icons.mjs   # Generator ikon PWA reproducible (fs+zlib saja)
+│   ├── gen-android-icons.mjs # Generator ikon launcher Android + splash gelap (memakai ulang seni gen-icons.mjs)
+│   ├── build-www.mjs   # Builder dist/ — whitelist runtime eksplisit (tanpa metadata repo/TypeScript)
 │   └── bump-version.mjs# Sinkron versi rilis satu perintah
-├── .github/workflows/  # CI: jalankan npm run check + npm test pada push/PR
+├── .github/workflows/  # CI: npm run check + npm test (ci.yml) & build APK cloud (android.yml)
+├── capacitor.config.json # Konfigurasi shell Capacitor (appId, webDir=dist, androidScheme=https)
+├── android/            # Proyek Android Capacitor yang di-commit (ikon/splash sudah bertema)
 ├── Dockerfile          # Image relay minimal (node:20-alpine, hanya COPY relay, USER node)
 ├── .dockerignore       # Whitelist build context (hanya tools/relay.mjs)
 ├── render.yaml         # Render Blueprint: relay Node free-tier (auto-deploy + health check /)
@@ -47,7 +51,7 @@ vita/
 │   └── modules/        # [Eksperimental/Roadmap] Modul TypeScript terpisah (persiapan refactoring)
 ├── script.md           # Naskah cerita, karakter, dan dialog (kanon narasi — jangan diubah tanpa izin)
 ├── supabase_schema.sql # Skema PostgreSQL, check constraint, dan kebijakan RLS
-├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 26 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion, live region status async, ketahanan loop game/anti-freeze, interaksi modal memori robot, dunia deterministik ber-seed untuk co-op online, pemisahan simulasi vs render untuk arsitektur host-authoritative, abstraksi pemain multi via players[] & host index 0, serialisasi snapshot & rekonsiliasi state, lobi co-op & transport relay WebSocket, lockup logo Hub prosedural yang diterapkan konsisten ke judul menu in-game (mulai/jeda/gugur/menang) & guard hemat gerak, kontrak protokol relay WebSocket tanpa dependency & wiring klien co-op, normalisasi alamat relay & parsing/pembentukan tautan undangan co-op, kontrak artefak deploy relay (Docker/Render) & lisensi MIT)
+├── tests/              # Suite audit keamanan & QA web (test_web_security_qa.js: 27 modul — XSS, avatar, callsign, data lokal korup, batas level, schema Supabase, BFS anti-softlock, kecerahan Hub, aksesibilitas dialog, aksesibilitas keyboard, kelengkapan i18n, kinerja loop Hub & prefers-reduced-motion, live region status async, ketahanan loop game/anti-freeze, interaksi modal memori robot, dunia deterministik ber-seed untuk co-op online, pemisahan simulasi vs render untuk arsitektur host-authoritative, abstraksi pemain multi via players[] & host index 0, serialisasi snapshot & rekonsiliasi state, lobi co-op & transport relay WebSocket, lockup logo Hub prosedural yang diterapkan konsisten ke judul menu in-game (mulai/jeda/gugur/menang) & guard hemat gerak, kontrak protokol relay WebSocket tanpa dependency & wiring klien co-op, normalisasi alamat relay & parsing/pembentukan tautan undangan co-op, kontrak artefak deploy relay (Docker/Render) & lisensi MIT, kontrak pengemasan Android/Capacitor (bundel whitelist, ikon/splash prosedural, CI APK))
 ├── AGENTS.md           # [Berkas Ini] Panduan sistem & aturan khusus untuk AI Agent
 └── README.md           # Dokumentasi proyek untuk pengembang & pemain
 ```
@@ -121,6 +125,28 @@ vita/
    (front-end). Relay menghormati `env.PORT`. Tanpa kredensial akun, deploy tetap harus dijalankan
    oleh pemilik repo (lihat catatan README).
 
+### D. Pengemasan Android (Capacitor, APK di CI)
+1. **Shell native**: `capacitor.config.json` (`appId com.zrilxd20.vita`, `appName VITA`,
+   `webDir dist`, `server.androidScheme = https`, `android.allowMixedContent = false`).
+   Proyek `android/` **di-commit** (identitas + ikon/splash sudah final) agar CI hanya mengompilasi.
+2. **Bundel web**: `tools/build-www.mjs` menyalin **whitelist eksplisit** ke `dist/` — daftar
+   diselaraskan dengan precache `CORE` di `sw.js` + `sw.js`/`version.json`; `js/modules/*.ts`,
+   `tests/`, `tools/`, `script.md`, dan metadata repo **tidak pernah** ikut.
+3. **Aset ikon/splash**: `tools/gen-android-icons.mjs` **mengimpor** `Canvas`/`drawContent`/
+   `makeIcon` dari `tools/gen-icons.mjs` (tanpa duplikasi encoder PNG, tanpa aset eksternal):
+   ikon legacy 48dp (membulat), round 48dp, lapisan adaptive 108dp **transparan di sudut**,
+   dan 11 `splash.png` berlatar `#0a0a12` (dimensi dipertahankan). `gen-icons.mjs` menulis ikon
+   PWA hanya saat dijalankan langsung (`invokedDirectly` + `import.meta.url`).
+4. **CI**: `.github/workflows/android.yml` — Node 20 + JDK 21 (Capacitor menetapkan
+   `JavaVersion.VERSION_21`) + `npm ci` → `npm run build:www` → `npx cap sync android` →
+   `gradlew assembleDebug` → artifact **`vita-debug-apk`** (`if-no-files-found: error`),
+   tanpa secret. APK **tidak** dapat dibangun lokal di mesin tanpa JDK/Android SDK.
+5. **Batasan APK**: origin WebView `https://localhost` → klien menaikkan semua `ws://` ke `wss://`,
+   jadi relay LAN plain `ws://` **tidak** berfungsi (pakai tunnel TLS/`wss://`). Tautan undangan
+   `?coop=…` tidak berguna di dalam APK (origin `https://localhost`); masukkan kode kamar manual.
+6. **Dependency**: Capacitor hanya `devDependencies` (versi dipin). Tidak ada `dependencies`
+   runtime — dijaga oleh TEST 27.
+
 ---
 
 ## 🚨 4. Aturan Penting untuk AI Agent (Golden Rules)
@@ -182,7 +208,7 @@ vita/
   npm run check
   npm test
   ```
-  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 26 modul audit QA/security/BFS/a11y/perf/determinisme/sim-render/players-abstraction/snapshot-relay/coop-lobby/relay-protocol/logo-lockup/in-game-menu-titles/relay-config-invite/deploy-license).
+  (`npm run check` menjalankan `check.mjs` — sintaks + scope global gabungan + parity & cakupan i18n + secret scan — lalu `check_html.cjs` untuk well-formedness HTML; `npm test` menjalankan `test_web_security_qa.js`: 27 modul audit QA/security/BFS/a11y/perf/determinisme/sim-render/players-abstraction/snapshot-relay/coop-lobby/relay-protocol/logo-lockup/in-game-menu-titles/relay-config-invite/deploy-license/android-packaging).
 
 * **Menjalankan & Menguji Co-op Online (host-authoritative, maks 4 pemain)**:
   ```bash
@@ -205,5 +231,18 @@ vita/
   Front-end statis dapat dihosting di Vercel (lihat `vercel.json`). Hasil deploy relay
   (`wss://<service>.onrender.com`) ditempel ke kolom "Alamat Relay" di lobi co-op.
   Deploy cloud butuh kredensial pemilik repo sehingga tidak dapat dijalankan otomatis oleh agent.
+
+* **Membangun APK Android (Capacitor, tanpa toolchain lokal)**:
+  ```bash
+  npm run build:www   # dist/ whitelist (18 berkas runtime)
+  npm run cap:sync    # salin dist/ ke android/app/src/main/assets/public
+  # Opsi utama: push ke GitHub → Actions → "VITA Android APK" → Run workflow
+  #   → unduh artifact "vita-debug-apk" (app-debug.apk)
+  # Opsi lokal (butuh JDK 21 + Android SDK): npm run apk:debug
+  ```
+  `android/` di-commit sehingga CI tidak membuat ulang identitas/ikon. APK memakai origin
+  `https://localhost`; relay **wajib** `wss://` (tunnel TLS), plain `ws://` LAN tidak didukung.
+  Tautan undangan `?coop=…` tidak berguna di APK — masukkan kode kamar secara manual.
+  Capacitor adalah `devDependencies` saja; runtime web tetap zero-dependency (dijaga TEST 27).
 
 

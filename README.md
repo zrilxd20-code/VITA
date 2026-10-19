@@ -6,7 +6,8 @@
 [![Zero External Assets](https://img.shields.io/badge/Assets-100%25%20Procedural-red)](index.html)
 [![PWA Ready](https://img.shields.io/badge/PWA-Network--First%20Offline-brightgreen)](sw.js)
 [![Database](https://img.shields.io/badge/Database-Supabase%20%2F%20PostgreSQL-3ECF8E)](supabase_schema.sql)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(26%2F26%20QA)-success)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(27%2F27%20QA)-success)](tests/)
+[![Android](https://img.shields.io/badge/Android-APK%20via%20GitHub%20Actions-3DDC84)](.github/workflows/android.yml)
 
 ---
 
@@ -142,13 +143,39 @@ Host the static front-end anywhere (e.g. `vercel.json` is included for Vercel). 
 game is served over `https://` in production, the relay must be reachable over `wss://`
 (Render/`render.yaml` and the bundled `Dockerfile` both give you that automatically).
 
+### Android APK (Capacitor, built in GitHub Actions)
+
+The same HTML5 build ships as a native Android app via **Capacitor**. The `android/` project is
+committed with the app identity (`com.zrilxd20.vita`, label **VITA**) and procedurally generated
+launcher icons/splash already in place, so CI only has to compile.
+
+- **No local toolchain needed.** `.github/workflows/android.yml` runs on `ubuntu-latest` with
+  Node 20 + JDK 21 + the Android SDK, then uploads the debug APK as the **`vita-debug-apk`**
+  artifact (Actions → *VITA Android APK* → newest run → Artifacts). The job fails instead of
+  passing silently if no APK is produced.
+- **Preview:** Actions → *VITA Android APK* → **Run workflow**.
+- **Locally (only if you have JDK 21 + Android SDK):** `npm run apk:debug` → APK at
+  `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+**Co-op from the APK:** the WebView origin is `https://localhost`, so the client upgrades every
+`ws://` address to `wss://` — use the **Cloudflare tunnel** (or any TLS relay), not a plain LAN
+`ws://` address. Invite links (`?coop=…`) are not usable inside the APK (they resolve to
+`https://localhost`); type the 4-character room code instead.
+
+Capacitor is a **devDependency only** — it is never bundled into the web app, so the shipped
+game keeps its zero-runtime-dependency guarantee (`npm test` enforces this).
+
 ### Node Tooling (stdlib only, zero install)
 
 ```powershell
 npm run check   # syntax + global-scope + i18n parity & coverage + secret scan + manifest & HTML checks
-npm test        # web security & input validation audit
+npm test        # 27-module web security, QA & packaging audit
 npm run relay   # zero-dependency WebSocket co-op relay server
 npm run icons   # regenerate PWA icons (pure Node, reproducible)
+npm run icons:android  # regenerate Android launcher icons + splash (same procedural art)
+npm run build:www      # build dist/ web bundle (explicit runtime whitelist)
+npm run cap:sync       # copy dist/ into the Capacitor Android project
+npm run apk:debug      # local debug APK (requires JDK 21 + Android SDK)
 npm run bump -- 2.5.0  # sync version.json, sw.js, index.html, APP_VERSION
 ```
 
@@ -170,8 +197,14 @@ vita/
 │   ├── check.mjs           # Syntax + scope + i18n parity & coverage + secret scan
 │   ├── check_html.cjs      # HTML well-formedness (unclosed-tag) verification
 │   ├── gen-icons.mjs       # Reproducible PWA icon generator (fs+zlib only)
+│   ├── gen-android-icons.mjs # Android launcher icons + dark splash (reuses gen-icons art)
+│   ├── build-www.mjs       # dist/ builder — explicit runtime whitelist, no repo metadata
 │   └── bump-version.mjs    # Single-command release version sync
-├── .github/workflows/ci.yml# CI pipeline: npm run check + npm test on push/PR
+├── .github/workflows/
+│   ├── ci.yml              # CI pipeline: npm run check + npm test on push/PR
+│   └── android.yml         # Cloud APK build (JDK 21 + Android SDK) → artifact vita-debug-apk
+├── capacitor.config.json   # Capacitor shell config (appId, webDir=dist, androidScheme=https)
+├── android/                # Committed Capacitor Android studio project (icons/splash themed)
 ├── Dockerfile              # Minimal relay image (node:20-alpine, COPY relay only, USER node)
 ├── .dockerignore           # Whitelist: only tools/relay.mjs enters the build context
 ├── render.yaml             # Render Blueprint: free-tier Node relay (auto-deploy + health check)
@@ -190,7 +223,7 @@ vita/
 ├── script.md               # Narrative script, characters, and dialogue canon
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # 26-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup with consistent in-game menu titles (start/pause/death/win) & reduced-motion guard, zero-dependency relay protocol contract & client wiring, co-op relay address normalization & invite-link parsing/building, relay deploy artifacts (Docker/Render) & MIT license contract)
+│   └── test_web_security_qa.js # 27-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup with consistent in-game menu titles (start/pause/death/win) & reduced-motion guard, zero-dependency relay protocol contract & client wiring, co-op relay address normalization & invite-link parsing/building, relay deploy artifacts (Docker/Render) & MIT license contract, Android/Capacitor packaging contract — whitelist bundle, procedural icons/splash, cloud APK CI)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```
@@ -205,7 +238,7 @@ Run the automated test suites to ensure complete integrity:
 # 1. Unified check (syntax + scope + i18n + secrets)
 npm run check
 
-# 2. Run the 26-module Web Security & Input Validation Audit
+# 2. Run the 27-module Web Security, QA & Packaging Audit
 npm test
 ```
 

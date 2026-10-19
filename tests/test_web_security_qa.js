@@ -17,7 +17,8 @@
  * dan lockup logo Hub (emblem inline SVG prosedural + wordmark berlapis) yang diterapkan
  * konsisten ke seluruh judul menu in-game (mulai/jeda/gugur/menang) beserta guard prefers-reduced-motion,
  * kontrak protokol relay tanpa dependency, konfigurasi alamat relay & tautan undangan co-op
- * (dengan penolakan input tak terpercaya), serta kontrak artefak deploy relay (Docker/Render) & lisensi MIT.
+ * (dengan penolakan input tak terpercaya), kontrak artefak deploy relay (Docker/Render) & lisensi MIT,
+ * serta kontrak pengemasan Android/Capacitor (bundel web whitelist, ikon/splash prosedural, CI APK).
  */
 
 const fs = require('fs');
@@ -1178,6 +1179,204 @@ assert(pkgJson.license === 'MIT', 'package.json harus mendeklarasikan license MI
 
 console.log('✓ TEST 26 LULUS: Kontrak deploy relay (Docker/Render) & lisensi terverifikasi.');
 
+// TEST 27: Kontrak pengemasan Android (Capacitor/APK) — bundel web whitelist, aset
+// ikon/splash prosedural, dan CI build di cloud. Membuktikan APK dapat dibangun
+// tanpa satu pun aset gambar eksternal maupun dependency runtime baru.
+console.log('\n[TEST 27] Pengujian kontrak pengemasan Android (Capacitor/APK)...');
+
+const zlib = require('node:zlib');
+const capConfig = JSON.parse(readRaw('capacitor.config.json'));
+const buildWww = readRaw('tools/build-www.mjs');
+const genAndroidIcons = readRaw('tools/gen-android-icons.mjs');
+const genIcons = readRaw('tools/gen-icons.mjs');
+const androidWorkflow = readRaw('.github/workflows/android.yml');
+const gitignore = readRaw('.gitignore');
+const swJs = readRaw('sw.js');
+
+// 27a. Konfigurasi Capacitor: identitas aplikasi & skema web yang aman (tanpa konten campuran).
+assert(/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/.test(capConfig.appId || ''),
+  'appId Capacitor harus reverse-DNS huruf kecil');
+assert(capConfig.appId === 'com.zrilxd20.vita',
+  'appId harus sama dengan applicationId proyek android/');
+assert(capConfig.appName === 'VITA', 'appName harus VITA');
+assert(capConfig.webDir === 'dist', 'webDir harus dist (hasil npm run build:www)');
+assert(capConfig.server && capConfig.server.androidScheme === 'https',
+  'androidScheme harus https (klien menaikkan ws:// → wss://, sama seperti halaman Vercel)');
+assert(capConfig.android && capConfig.android.allowMixedContent === false,
+  'allowMixedContent harus false (tolak konten campuran)');
+
+// 27b. Bundel web: whitelist eksplisit, zero-dependency, bebas metadata repo.
+const wwwImports = [...buildWww.matchAll(/from\s+['"]([^'"]+)['"]/g)].map(m => m[1]);
+assert(wwwImports.length > 0 && wwwImports.every(s => s.startsWith('node:')),
+  'build-www.mjs hanya boleh memakai modul inti Node');
+const coreBody = swJs.split('const CORE = [')[1].split('];')[0];
+const coreList = [...coreBody.matchAll(/'([^']+)'/g)]
+  .map(m => m[1].replace(/^\.\//, ''))
+  .filter(Boolean);
+assert(coreList.length >= 10, 'precache CORE sw.js harus terbaca sebagai rujukan whitelist');
+coreList.forEach(rel => assert(buildWww.includes("'" + rel + "'"),
+  'build-www.mjs harus menyertakan berkas precache sw.js: ' + rel));
+['sw.js', 'version.json'].forEach(rel => assert(buildWww.includes("'" + rel + "'"),
+  'build-www.mjs harus menyertakan ' + rel));
+const wwwForbidden = buildWww.match(/for\s*\(const forbidden of \[([^\]]*)\]\)/);
+assert(wwwForbidden, 'build-www.mjs harus mendefinisikan daftar berkas non-runtime terlarang');
+['script.md', 'AGENTS.md', 'package.json', 'tests', 'tools'].forEach(bad =>
+  assert(wwwForbidden[1].includes("'" + bad + "'"),
+    'daftar terlarang build-www.mjs harus memuat ' + bad));
+assert(/OUT === ROOT \|\| !OUT\.startsWith\(ROOT \+ sep\)/.test(buildWww),
+  'build-www.mjs harus memastikan dist/ berada di dalam root proyek');
+const wwwBody = buildWww.split('const WWW = [')[1].split('];')[0];
+assert(!/js\/modules/.test(wwwBody),
+  'build-www.mjs tidak boleh menyalin modul TypeScript eksperimental ke paket aplikasi');
+assert(/^dist\/\s*$/m.test(gitignore), '.gitignore harus mengabaikan dist/ (hasil build tidak di-commit)');
+
+// 27c. CI APK di cloud: tanpa JDK lokal, tanpa secret, artifact debug yang gagal bila kosong.
+assert(/actions\/checkout@v4/.test(androidWorkflow), 'CI Android harus checkout kode');
+assert(/node-version:\s*'20'/.test(androidWorkflow), 'CI Android harus memakai Node 20');
+assert(/java-version:\s*'21'/.test(androidWorkflow),
+  'CI Android harus memakai JDK 21 (Capacitor menetapkan JavaVersion.VERSION_21)');
+assert(/npm ci/.test(androidWorkflow) && /npm run build:www/.test(androidWorkflow),
+  'CI Android harus membangun dist/ lewat npm ci + npm run build:www');
+assert(/npx cap sync android/.test(androidWorkflow), 'CI Android harus menjalankan npx cap sync android');
+assert(/gradlew assembleDebug/.test(androidWorkflow), 'CI Android harus membangun task Gradle assembleDebug');
+assert(/name:\s*vita-debug-apk/.test(androidWorkflow), 'artifact APK harus bernama vita-debug-apk');
+assert(/actions\/upload-artifact@v4/.test(androidWorkflow), 'CI Android harus mengunggah artifact APK');
+assert(/if-no-files-found:\s*error/.test(androidWorkflow),
+  'CI Android harus gagal bila APK tidak dihasilkan (bukan hijau palsu)');
+assert(!/secrets\./.test(androidWorkflow), 'CI Android tidak boleh memerlukan secret (build debug)');
+
+// 27d. Proyek android/ yang di-commit: izin jaringan, tema splash, ikon adaptive, Java 21.
+const ANDROID_RES = 'android/app/src/main/res/';
+const manifest = readRaw('android/app/src/main/AndroidManifest.xml');
+assert(/android\.permission\.INTERNET/.test(manifest),
+  'AndroidManifest harus meminta izin INTERNET agar co-op online dapat berjalan');
+assert(/@style\/AppTheme\.NoActionBarLaunch/.test(manifest),
+  'AndroidManifest harus memakai tema splash AppTheme.NoActionBarLaunch');
+assert(/@drawable\/splash/.test(readRaw(ANDROID_RES + 'values/styles.xml')),
+  'styles.xml harus memakai @drawable/splash (splash gelap #0a0a12)');
+assert(/#0A0A12/.test(readRaw(ANDROID_RES + 'values/ic_launcher_background.xml')),
+  'warna latar ikon adaptive harus #0A0A12 (senada kanvas game)');
+const adaptiveIcon = readRaw(ANDROID_RES + 'mipmap-anydpi-v26/ic_launcher.xml');
+assert(/@color\/ic_launcher_background/.test(adaptiveIcon),
+  'adaptive icon harus memakai @color/ic_launcher_background');
+assert(/@mipmap\/ic_launcher_foreground/.test(adaptiveIcon),
+  'adaptive icon harus memakai @mipmap/ic_launcher_foreground');
+assert(/@mipmap\/ic_launcher_foreground/.test(readRaw(ANDROID_RES + 'mipmap-anydpi-v26/ic_launcher_round.xml')),
+  'adaptive icon bulat harus memakai @mipmap/ic_launcher_foreground');
+assert(/JavaVersion\.VERSION_21(?!\d)/.test(readRaw('android/app/capacitor.build.gradle')),
+  'capacitor.build.gradle harus menargetkan Java 21 (selaras dengan CI)');
+
+// 27e. Ikon & splash prosedural: dimensi per-densitas benar, lapisan adaptive transparan
+// di sudut (bukan kotak putih), dan splash berlatar #0a0a12. Ini membuktikan tidak ada
+// satu pun aset gambar eksternal yang diunduh/di-commit.
+function pngDecode(rel) {
+  const buf = fs.readFileSync(path.join(__dirname, '..', rel));
+  const isPng = buf.length >= 33 && buf.readUInt32BE(0) === 0x89504e47 &&
+    buf.readUInt32BE(4) === 0x0d0a1a0a;
+  assert(isPng, 'Berkas harus PNG yang valid: ' + rel);
+  let off = 8;
+  const idat = [];
+  while (off + 8 <= buf.length) {
+    const len = buf.readUInt32BE(off);
+    const tag = buf.toString('ascii', off + 4, off + 8);
+    if (tag === 'IDAT') idat.push(buf.subarray(off + 8, off + 8 + len));
+    off += 12 + len;
+  }
+  const w = buf.readUInt32BE(16);
+  const h = buf.readUInt32BE(20);
+  const colorType = buf[25];
+  // Encoder gen-icons.mjs selalu menulis bit depth 8 + filter 0 per baris (4 byte RGBA).
+  const raw = zlib.inflateSync(Buffer.concat(idat));
+  return { w, h, colorType, raw, stride: w * 4 + 1 };
+}
+function pngAlphaAt(img, x, y) {
+  return img.raw[y * img.stride + 1 + x * 4 + 3];
+}
+function pngOpaqueCount(img) {
+  let n = 0;
+  for (let y = 0; y < img.h; y++) {
+    const row = y * img.stride + 1;
+    for (let x = 0; x < img.w; x++) if (img.raw[row + x * 4 + 3] > 0) n++;
+  }
+  return n;
+}
+const DENSITY_SCALE = { mdpi: 1, hdpi: 1.5, xhdpi: 2, xxhdpi: 3, xxxhdpi: 4 };
+for (const [density, scale] of Object.entries(DENSITY_SCALE)) {
+  const legacy = Math.round(48 * scale);
+  const adaptive = Math.round(108 * scale);
+  const legacyIcon = pngDecode(ANDROID_RES + 'mipmap-' + density + '/ic_launcher.png');
+  const roundIcon = pngDecode(ANDROID_RES + 'mipmap-' + density + '/ic_launcher_round.png');
+  const foreground = pngDecode(ANDROID_RES + 'mipmap-' + density + '/ic_launcher_foreground.png');
+  assert(legacyIcon.w === legacy && legacyIcon.h === legacy,
+    'Ikon legacy ' + density + ' harus ' + legacy + 'px (48dp × ' + scale + ')');
+  assert(roundIcon.w === legacy && roundIcon.h === legacy,
+    'Ikon bundar ' + density + ' harus ' + legacy + 'px');
+  assert(foreground.w === adaptive && foreground.h === adaptive,
+    'Lapisan adaptive ' + density + ' harus ' + adaptive + 'px (108dp × ' + scale + ')');
+  assert(foreground.colorType === 6,
+    'Lapisan adaptive ' + density + ' harus RGBA (memiliki kanal alfa)');
+  assert(pngAlphaAt(foreground, 0, 0) === 0,
+    'Lapisan adaptive ' + density + ' harus transparan di sudut (bukan kotak putih opaque)');
+  assert(pngOpaqueCount(foreground) > 100,
+    'Lapisan adaptive ' + density + ' harus memuat seni logo yang terlihat');
+}
+const SPLASH_DIMS = {
+  'drawable/splash.png': [480, 320],
+  'drawable-land-mdpi/splash.png': [480, 320],
+  'drawable-land-hdpi/splash.png': [800, 480],
+  'drawable-land-xhdpi/splash.png': [1280, 720],
+  'drawable-land-xxhdpi/splash.png': [1600, 960],
+  'drawable-land-xxxhdpi/splash.png': [1920, 1280],
+  'drawable-port-mdpi/splash.png': [320, 480],
+  'drawable-port-hdpi/splash.png': [480, 800],
+  'drawable-port-xhdpi/splash.png': [720, 1280],
+  'drawable-port-xxhdpi/splash.png': [960, 1600],
+  'drawable-port-xxxhdpi/splash.png': [1280, 1920],
+};
+for (const [rel, [w, h]] of Object.entries(SPLASH_DIMS)) {
+  const img = pngDecode(ANDROID_RES + rel);
+  assert(img.w === w && img.h === h, 'Splash ' + rel + ' harus ' + w + '×' + h);
+  const px = img.raw.slice(1, 5);
+  assert(px[0] === 10 && px[1] === 10 && px[2] === 18 && px[3] === 255,
+    'Splash ' + rel + ' harus berlatar #0a0a12 (bukan putih kilat)');
+}
+
+// 27f. Generator: tanpa dependency, tanpa duplikasi encoder PNG, dan pemisahan
+// entry-point PWA vs pemakaian sebagai modul.
+assert(fs.existsSync(path.join(__dirname, '../tools/gen-android-icons.mjs')),
+  'tools/gen-android-icons.mjs harus ada');
+const androidImports = [...genAndroidIcons.matchAll(/from\s+['"]([^'"]+)['"]/g)].map(m => m[1]);
+assert(androidImports.every(s => s.startsWith('node:') || s === './gen-icons.mjs'),
+  'gen-android-icons.mjs hanya boleh memakai modul inti Node + seni gen-icons.mjs');
+assert(/import\s*\{[^}]*\bCanvas\b[^}]*\}\s*from\s*'\.\/gen-icons\.mjs'/.test(genAndroidIcons),
+  'Ikon Android harus memakai ulang Canvas dari gen-icons.mjs');
+assert(!/class\s+Canvas/.test(genAndroidIcons),
+  'gen-android-icons.mjs tidak boleh menduplikasi encoder PNG');
+assert(/export\s+class\s+Canvas/.test(genIcons) && /export\s+function\s+makeIcon/.test(genIcons),
+  'gen-icons.mjs harus mengekspor Canvas & makeIcon agar dapat dipakai ulang');
+assert(/invokedDirectly/.test(genIcons) && /import\.meta\.url/.test(genIcons),
+  'gen-icons.mjs harus menulis ikon PWA HANYA saat dijalankan langsung');
+assert(/\bdrawContent\b/.test(genAndroidIcons) && /drawContent/.test(genIcons),
+  'gen-android-icons.mjs harus memakai seni prosedural drawContent yang sama');
+
+// 27g. Script npm pengemasan & Capacitor tetap hanya devDependency (runtime zero-dependency).
+assert(/node tools\/build-www\.mjs/.test(pkgJson.scripts['build:www'] || ''),
+  'package.json harus punya skrip build:www');
+assert(/cap sync android/.test(pkgJson.scripts['cap:sync'] || ''),
+  'package.json harus punya skrip cap:sync');
+assert(/assembleDebug/.test(pkgJson.scripts['apk:debug'] || ''),
+  'package.json harus punya skrip apk:debug');
+assert(/node tools\/gen-android-icons\.mjs/.test(pkgJson.scripts['icons:android'] || ''),
+  'package.json harus punya skrip icons:android');
+const devDeps = pkgJson.devDependencies || {};
+['@capacitor/cli', '@capacitor/core', '@capacitor/android'].forEach(pkg =>
+  assert(/^\d+\.\d+\.\d+$/.test(devDeps[pkg] || ''),
+    'Capacitor harus dipin di devDependencies (versi pasti): ' + pkg));
+assert(!pkgJson.dependencies || Object.keys(pkgJson.dependencies).length === 0,
+  'Capacitor tidak boleh masuk dependencies (runtime aplikasi tetap zero-dependency)');
+
+console.log('✓ TEST 27 LULUS: Kontrak pengemasan Android (Capacitor/APK) terverifikasi.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (26/26)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (27/27)');
 console.log('=========================================');
