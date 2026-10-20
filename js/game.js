@@ -6235,7 +6235,7 @@ function updatePlayer() {
     }
 
     // Check Wrecked BMPT Prototype Robot Inspection (Sector 10)
-    if (wreckedRobot && currentLevel === 9 && !wreckedRobot.inspected && dist(player, wreckedRobot) < 28) {
+    if (wreckedRobot && currentLevel === 9 && !wreckedRobot.inspected && dist(player, wreckedRobot) < 45) {
         wreckedRobot.inspected = true;
         openRobotMemoryModal();
     }
@@ -10411,6 +10411,15 @@ function openRobotMemoryModal() {
     try {
         if (typeof sOccultTone === 'function') sOccultTone(60, 45, 1.8, 0.4, 'sine');
     } catch (_) {}
+    const spkEl = document.getElementById('robotMemorySpeaker');
+    const txtEl = document.getElementById('robotMemoryText');
+    const curLang = (typeof settings !== 'undefined' && settings && settings.lang) ? settings.lang : 'id';
+    if (spkEl) spkEl.textContent = '***';
+    if (txtEl) {
+        txtEl.textContent = curLang === 'en'
+            ? '"thats...... bot..... the bot-7 . That was one of our failures while attacking this sector......"'
+            : '"itu...... bot..... BOT-7. Itu salah satu kegagalan kami saat menyerang sektor ini......"';
+    }
     modal.style.display = 'flex';
     if (typeof hideHUD === 'function') hideHUD();
     if (typeof showCursor === 'function') showCursor();

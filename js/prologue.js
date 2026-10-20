@@ -242,25 +242,120 @@ const EPILOGUE_SCRIPT = {
 // INTERLUDE SINEMATIK LATAR GELAP TANPA BOX (ALTERISHA)
 // ============================================================
 const NARRATIVE_INTERLUDES = {
-    10: { // Muncul setelah Sektor 11 selesai (currentLevel === 10) menuju Sektor 12
-        speaker: 'ALTERISHA',
-        signal_id: '(jaringan lemah menguat).......',
-        signal_en: '(signal strengthens from static).......',
-        body_id: '"Sebelum orang itu menghilang dari jaringan kami, kita menerima pesan atau bisa disebut paket data terakhir mengenai sektor sekarang yang kita masuki, dan dasar bentuk sektor lain yang dikuasai dan terbengkalai oleh makhluk-makhluk tersebut."',
-        body_en: '"Before that person disappeared from our network, we received a final transmission—or what could be called the last data packet regarding the sector we are currently entering, and the fundamental structure of other sectors overtaken and forsaken by those creatures."',
-        tail_id: '"Entah dia dapat dari mana......"',
-        tail_en: '"Wherever they got it from......"'
+    9: { // Sektor 10 selesai (currentLevel === 9) menuju Sektor 11
+        slides: [
+            {
+                speaker: '***',
+                speakerRevealed: false,
+                signal_id: '(frekuensi transmisi radio tak dikenal tersambung).......',
+                signal_en: '(incoming unverified radio frequency).......',
+                body_id: '"itu...... bot..... BOT-7."',
+                body_en: '"thats...... bot..... the bot-7 ."',
+                tail_id: '',
+                tail_en: ''
+            },
+            {
+                speaker: '*** ➔ ALTERISHA',
+                speakerRevealed: true,
+                signal_id: '(identitas transmisi terungkap: ALTERISHA // KOMANDO SEKTOR LUAR).......',
+                signal_en: '(transmission decrypted: ALTERISHA // OUTER SECTOR COMMAND).......',
+                body_id: '"itu salah satu kegagalan kami saat menyerang sektor ini......"',
+                body_en: '"thats one of our failure on attacking this sector......"',
+                tail_id: '"Entah bagaimana kau bisa selamat sampai sejauh ini, Prototype-19...... Tetap waspada di sektor berikutnya."',
+                tail_en: '"Somehow you managed to survive this far, Prototype-19...... Stay alert in the upcoming sectors."'
+            }
+        ]
     },
-    11: { // Muncul setelah Sektor 12 selesai (currentLevel === 11) menuju Sektor 13
-        speaker: 'ALTERISHA',
-        signal_id: '(frekuensi transmisi terhubung dari Sektor Luar).......',
-        signal_en: '(incoming transmission frequency from Outer Perimeter).......',
-        body_id: '"Kami telah mengerahkan berbagai unit drone ke seluruh tujuh sektor awal. Namun, sama seperti unit sebelumnya—BOT-7—tidak ada satu pun yang berhasil menembus barisan pertahanan mereka."',
-        body_en: '"We deployed multiple drone units across all seven outer sectors. Yet, just like the previous unit—BOT-7—none managed to breach their offensive lines."',
-        tail_id: '"Karena itulah aku meneliti kembali setiap rekaman data... mencari potensi kemampuan dan peningkatan apa saja yang masih bisa kita maksimalkan untuk unitmu."',
-        tail_en: '"Which is why I\'m dissecting their data logs... researching any operational capability and combat augmentations we can still enhance for your chassis."'
+    10: { // Sektor 11 selesai (currentLevel === 10) menuju Sektor 12
+        slides: [
+            {
+                speaker: 'ALTERISHA',
+                speakerRevealed: true,
+                signal_id: '(jaringan lemah menguat).......',
+                signal_en: '(signal strengthens from static).......',
+                body_id: '"Sebelum orang itu menghilang dari jaringan kami, kita menerima pesan atau bisa disebut paket data terakhir mengenai sektor sekarang yang kita masuki, dan dasar bentuk sektor lain yang dikuasai dan terbengkalai oleh makhluk-makhluk tersebut."',
+                body_en: '"Before that person disappeared from our network, we received a final transmission—or what could be called the last data packet regarding the sector we are currently entering, and the fundamental structure of other sectors overtaken and forsaken by those creatures."',
+                tail_id: '"Entah dia dapat dari mana......"',
+                tail_en: '"Wherever they got it from......"'
+            }
+        ]
+    },
+    11: { // Sektor 12 selesai (currentLevel === 11) menuju Sektor 13
+        slides: [
+            {
+                speaker: 'ALTERISHA',
+                speakerRevealed: true,
+                signal_id: '(frekuensi transmisi terhubung dari Sektor Luar).......',
+                signal_en: '(incoming transmission frequency from Outer Perimeter).......',
+                body_id: '"Kami telah mengerahkan berbagai unit drone ke seluruh tujuh sektor awal. Namun, sama seperti unit sebelumnya—BOT-7—tidak ada satu pun yang berhasil menembus barisan pertahanan mereka."',
+                body_en: '"We deployed multiple drone units across all seven outer sectors. Yet, just like the previous unit—BOT-7—none managed to breach their offensive lines."',
+                tail_id: '"Karena itulah aku meneliti kembali setiap rekaman data... mencari potensi kemampuan dan peningkatan apa saja yang masih bisa kita maksimalkan untuk unitmu."',
+                tail_en: '"Which is why I\'m dissecting their data logs... researching any operational capability and combat augmentations we can still enhance for your chassis."'
+            }
+        ]
+    },
+    12: { // Sektor 13 selesai (currentLevel === 12) menuju Sektor 14
+        slides: [
+            {
+                speaker: 'ALTERISHA',
+                speakerRevealed: true,
+                signal_id: '(interferensi biomassa melonjak drastis).......',
+                signal_en: '(biomass interference surging violently).......',
+                body_id: '"Struktur labirin di depan bukan lagi sekadar baja dan beton. Dinding-dinding fasilitas mulai berdenyut dan menyatu dengan biomassa The Monolith. Prototype-19... kau sudah semakin dekat ke inti kehancuran ini."',
+                body_en: '"The labyrinth structure ahead is no longer mere steel and concrete. The facility walls are pulsing, fusing directly into the biomass of The Monolith. Prototype-19... you are drawing closer to the core of this cataclysm."',
+                tail_id: '"Tetap waspada. Setiap sudut koridor kini menjadi perangkap hidup."',
+                tail_en: '"Stay vigilant. Every corner of the corridor is now a living death trap."'
+            }
+        ]
+    },
+    13: { // Sektor 14 selesai (currentLevel === 13) menuju Sektor 15 (Puncak Pertarungan)
+        slides: [
+            {
+                speaker: 'ALTERISHA',
+                speakerRevealed: true,
+                signal_id: '(distorsi medan psionik mendekati batas kritis).......',
+                signal_en: '(psionic field distortion nearing critical threshold).......',
+                body_id: '"Semua frekuensi komunikasi dari Sektor Luar mulai terputus oleh medan psionik The Monolith. Ini adalah transmisi terakhir yang bisa kukirimkan sebelum jaringan padam total. Hancurkan jantung biomekanik mereka, Prototype-19. Buktikan pengorbanan unit-unit terdahulu tidak sia-sia!"',
+                body_en: '"All external comm channels are collapsing under The Monolith\'s psionic jamming. This is the final transmission I can send before total blackout. Shatter their biomechanical core, Prototype-19. Prove that the sacrifice of every preceding unit was not in vain!"',
+                tail_id: '"Bawa fajar baru bagi umat manusia......"',
+                tail_en: '"Bring a new dawn to humanity......"'
+            }
+        ]
     }
 };
+
+function playTypingSound() {
+    try {
+        const ac = (typeof ensureAudio === 'function') ? ensureAudio() : null;
+        if (!ac) return;
+        const vol = (typeof settings !== 'undefined' && settings && Number(settings.volume)) ? Number(settings.volume) : 70;
+        if (vol <= 0) return;
+        const master = (vol / 100);
+        const now = ac.currentTime;
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        const filter = ac.createBiquadFilter();
+
+        osc.type = 'triangle';
+        const baseFreq = 720 + Math.random() * 260;
+        osc.frequency.setValueAtTime(baseFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.02);
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1500, now);
+        filter.Q.setValueAtTime(2.2, now);
+
+        gain.gain.setValueAtTime(0.08 * master, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.024);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect((typeof masterGain !== 'undefined' && masterGain) ? masterGain : ac.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.026);
+    } catch (_) {}
+}
 
 function playNarrativeInterlude(levelIndex, onComplete) {
     const data = NARRATIVE_INTERLUDES[levelIndex];
@@ -281,12 +376,15 @@ function playNarrativeInterlude(levelIndex, onComplete) {
         return;
     }
 
+    const slides = Array.isArray(data.slides) ? data.slides : [data];
+    let slideIdx = 0;
+    let isTyping = false;
+    let typingTimer = null;
+    let currentFullBody = '';
+    let currentFullTail = '';
+    let lastTypeSoundTime = 0;
+
     const currentLang = (typeof settings !== 'undefined' && settings && settings.lang) ? settings.lang : 'id';
-    if (speakerEl) speakerEl.textContent = data.speaker;
-    if (signalEl) signalEl.textContent = currentLang === 'en' ? data.signal_en : data.signal_id;
-    if (bodyEl) bodyEl.textContent = currentLang === 'en' ? data.body_en : data.body_id;
-    if (tailEl) tailEl.textContent = currentLang === 'en' ? data.tail_en : data.tail_id;
-    if (promptEl) promptEl.textContent = currentLang === 'en' ? '[ CLICK / PRESS ANY KEY TO CONTINUE ]' : '[ KLIK / TEKAN APA SAJA UNTUK MELANJUTKAN ]';
 
     screen.style.display = 'flex';
     void screen.offsetWidth;
@@ -296,15 +394,112 @@ function playNarrativeInterlude(levelIndex, onComplete) {
         if (typeof sStaticBurst === 'function') sStaticBurst();
     } catch (_) {}
 
-    let finished = false;
-    function finishInterlude(e) {
-        if (finished) return;
-        finished = true;
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function renderSlide(idx) {
+        if (idx >= slides.length) {
+            closeInterlude();
+            return;
+        }
+
+        const s = slides[idx];
+        if (typingTimer) {
+            clearTimeout(typingTimer);
+            typingTimer = null;
+        }
+
+        if (speakerEl) {
+            speakerEl.textContent = s.speaker;
+            speakerEl.classList.toggle('revealed', !!s.speakerRevealed);
+        }
+        if (signalEl) {
+            signalEl.textContent = currentLang === 'en' ? s.signal_en : s.signal_id;
+        }
+        if (tailEl) {
+            tailEl.textContent = '';
+        }
+        if (promptEl) {
+            promptEl.style.opacity = '0';
+            promptEl.textContent = currentLang === 'en' ? '[ CLICK / PRESS ANY KEY TO CONTINUE ]' : '[ KLIK / TEKAN APA SAJA UNTUK MELANJUTKAN ]';
+        }
+
+        currentFullBody = currentLang === 'en' ? s.body_en : s.body_id;
+        currentFullTail = currentLang === 'en' ? (s.tail_en || '') : (s.tail_id || '');
+
+        let charIdx = 0;
+        isTyping = true;
+        if (bodyEl) bodyEl.innerHTML = '<span class="interlude-cursor"></span>';
+
+        function typeNext() {
+            if (!isTyping) return;
+            if (charIdx < currentFullBody.length) {
+                charIdx++;
+                const visible = currentFullBody.slice(0, charIdx);
+                const char = currentFullBody[charIdx - 1];
+                if (char && char.trim() !== '') {
+                    const now = Date.now();
+                    if (now - lastTypeSoundTime >= 35) {
+                        lastTypeSoundTime = now;
+                        playTypingSound();
+                    }
+                }
+                if (bodyEl) {
+                    bodyEl.innerHTML = escapeHtml(visible) + '<span class="interlude-cursor"></span>';
+                }
+                const charDelay = (char === '.' || char === '!' || char === '?') ? 130 : (char === ',') ? 70 : 25;
+                typingTimer = setTimeout(typeNext, charDelay);
+            } else {
+                finishTyping();
+            }
+        }
+
+        typeNext();
+    }
+
+    function finishTyping() {
+        if (typingTimer) {
+            clearTimeout(typingTimer);
+            typingTimer = null;
+        }
+        isTyping = false;
+        if (bodyEl) {
+            bodyEl.innerHTML = escapeHtml(currentFullBody) + '<span class="interlude-cursor idle"></span>';
+        }
+        if (tailEl && currentFullTail) {
+            tailEl.textContent = currentFullTail;
+            tailEl.style.opacity = '0';
+            tailEl.style.transition = 'opacity 0.6s ease';
+            setTimeout(() => { if (tailEl) tailEl.style.opacity = '0.92'; }, 60);
+        }
+        if (promptEl) {
+            promptEl.style.opacity = '1';
+        }
+    }
+
+    function handleInteraction(e) {
         if (e) {
             try { e.preventDefault(); e.stopPropagation(); } catch (_) {}
         }
+        if (isTyping) {
+            finishTyping();
+        } else {
+            slideIdx++;
+            renderSlide(slideIdx);
+        }
+    }
+
+    let closed = false;
+    function closeInterlude() {
+        if (closed) return;
+        closed = true;
         window.removeEventListener('keydown', onKey);
-        screen.removeEventListener('click', finishInterlude);
+        screen.removeEventListener('click', handleInteraction);
 
         screen.classList.remove('active');
         setTimeout(() => {
@@ -315,12 +510,13 @@ function playNarrativeInterlude(levelIndex, onComplete) {
 
     function onKey(e) {
         if (e.key === 'Tab') return;
-        finishInterlude(e);
+        handleInteraction(e);
     }
 
     setTimeout(() => {
-        window.addEventListener('keydown', onKey, { once: true });
-        screen.addEventListener('click', finishInterlude, { once: true });
-    }, 400);
+        window.addEventListener('keydown', onKey);
+        screen.addEventListener('click', handleInteraction);
+        renderSlide(0);
+    }, 200);
 }
 

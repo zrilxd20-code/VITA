@@ -157,7 +157,27 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 > 
 > *Tulis draf ide Lore Bomb di bawah ini saat kamu sudah siap:*
 
-### 🌑 Transisi Khusus Sektor 11 — Interlude Gelap: ALTERISHA
+### 🌑 Transisi Khusus Sektor 10 (Menuju Sektor 11) — Penemuan BOT-7 & Reveal Nama ALTERISHA
+*(Layar menjadi hitam pekat, tanpa kotak HUD. Animasi ketik typewriter bersuara mekanik retro di tengah kehampaan)*
+
+> **Bagian 1 — Suara Misterius:**  
+> **\*\*\***  
+> *(sinyal transmisi tak dikenal terhubung).......*  
+> 🇮🇩 *"itu...... bot..... BOT-7."*  
+> 🇬🇧 *"thats...... bot..... the bot-7 ."*  
+
+> **Bagian 2 — Pengungkapan Identitas (Reveal Nama):**  
+> **\*\*\* ➔ ALTERISHA**  
+> *(identitas transmisi terungkap: ALTERISHA // KOMANDO SEKTOR LUAR)*  
+> 🇮🇩 *"itu salah satu kegagalan kami saat menyerang sektor ini......"*  
+> 🇬🇧 *"thats one of our failure on attacking this sector......"*  
+>  
+> 🇮🇩 *"Entah bagaimana kau bisa selamat sampai sejauh ini, Prototype-19......"*  
+> 🇬🇧 *"Somehow you managed to survive this far, Prototype-19......"*
+
+---
+
+### 🌑 Transisi Khusus Sektor 11 (Menuju Sektor 12) — Interlude Gelap: ALTERISHA
 *(Layar menjadi hitam pekat, tanpa kotak HUD. Teks putih berukuran besar muncul di tengah kehampaan)*
 
 > **ALTERISHA**  
@@ -180,6 +200,32 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 >  
 > 🇮🇩 *"Karena itulah aku meneliti kembali setiap rekaman data... mencari potensi kemampuan dan peningkatan apa saja yang masih bisa kita maksimalkan untuk unitmu."*  
 > 🇬🇧 *"Which is why I'm dissecting their data logs... researching any operational capability and combat augmentations we can still enhance for your chassis."*
+
+---
+
+### 🌑 Transisi Khusus Sektor 13 (Menuju Sektor 14) — Interlude Gelap: ALTERISHA
+*(Layar menjadi hitam pekat, tanpa kotak HUD. Teks putih berukuran besar muncul di tengah kehampaan)*
+
+> **ALTERISHA**  
+> *(interferensi biomassa meningkat drastis).......*  
+> 🇮🇩 *"Struktur labirin di depan bukan lagi sekadar baja dan beton. Dinding-dinding fasilitas mulai berdenyut dan menyatu dengan biomassa The Monolith. Prototype-19... kau sudah semakin dekat ke inti kehancuran ini."*  
+> 🇬🇧 *"The labyrinth structure ahead is no longer mere steel and concrete. The facility walls are pulsing, fusing directly into the biomass of The Monolith. Prototype-19... you are drawing closer to the core of this cataclysm."*  
+>  
+> 🇮🇩 *"Tetap waspada. Setiap sudut koridor kini menjadi perangkap hidup."*  
+> 🇬🇧 *"Stay vigilant. Every corner of the corridor is now a living death trap."*
+
+---
+
+### 🌑 Transisi Khusus Sektor 14 (Menuju Sektor 15 — Puncak Pertarungan) — Interlude Gelap: ALTERISHA
+*(Layar menjadi hitam pekat, tanpa kotak HUD. Teks putih berukuran besar muncul di tengah kehampaan)*
+
+> **ALTERISHA**  
+> *(distorsi medan psionik mendekati kritis).......*  
+> 🇮🇩 *"Semua frekuensi komunikasi dari Sektor Luar mulai terputus oleh medan psionik The Monolith. Ini adalah transmisi terakhir yang bisa kukirimkan sebelum jaringan padam total. Hancurkan jantung biomekanik mereka, Prototype-19. Buktikan pengorbanan unit-unit terdahulu tidak sia-sia!"*  
+> 🇬🇧 *"All external comm channels are collapsing under The Monolith's psionic jamming. This is the final transmission I can send before total blackout. Shatter their biomechanical core, Prototype-19. Prove that the sacrifice of every preceding unit was not in vain!"*  
+>  
+> 🇮🇩 *"Bawa fajar baru bagi umat manusia......"*  
+> 🇬🇧 *"Bring a new dawn to humanity......"*
 
 ---
 
