@@ -5,7 +5,7 @@
         }
 body {
             background: #06020a;
-            font-family: 'Courier New', Consolas, 'Segoe UI', monospace;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
             letter-spacing: 0.5px;
         }
 /* Kunci scroll hanya saat main game; halaman home tetap bisa di-scroll. */
@@ -310,7 +310,7 @@ body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opaci
             cursor: pointer !important;
         }
 #gameView #startScreen h1, #gameView #deathScreen h2, #gameView #winScreen h2 {
-            font-family: 'Courier New', Consolas, monospace;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
             font-weight: 700;
             font-size: 50px;
             margin-bottom: 18px;
@@ -513,7 +513,7 @@ body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opaci
             margin-top: 25px;
             padding: 14px 40px;
             font-size: 17px;
-            font-family: 'Courier New', Consolas, monospace;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
             font-weight: 700;
             letter-spacing: 3px;
             text-transform: uppercase;
@@ -547,7 +547,7 @@ body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opaci
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 72px;
-            font-family: 'Courier New', Consolas, monospace;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
             font-weight: 700;
             letter-spacing: 10px;
             color: #ff3b3b;
@@ -604,7 +604,7 @@ body.hud-hidden #ui, body.hud-hidden #controls, body.hud-hidden #minimap { opaci
             letter-spacing: 8px;
             color: #ff3b3b;
             text-shadow: 0 0 24px rgba(255, 40, 40, 0.6);
-            font-family: 'Courier New', Consolas, monospace;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
             text-transform: uppercase;
         }
 #gameView #pauseScreen .btn { margin-top: 10px; }
@@ -853,7 +853,7 @@ body.game-on.touch-on #gameView #touchUI { display: block; }
     font-size: 9px;
     font-weight: 800;
     letter-spacing: 1px;
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     background: #00f0ff;
     color: #050a10;
     padding: 1px 5px;
@@ -921,7 +921,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     top: 2px;
     left: 4px;
     font-size: 9px;
-    font-family: 'Courier New', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.6);
 }
@@ -956,7 +956,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
 }
 #gameView .weapon-active-title {
     font-size: 11px;
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-weight: 700;
     letter-spacing: 1.5px;
     color: #00f0ff;
@@ -985,7 +985,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     font-size: 9px;
     color: rgba(255, 255, 255, 0.4);
     letter-spacing: 0.5px;
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* Inter-Level Weapon Select Screen (Arsenal Modal) */
@@ -1015,12 +1015,12 @@ body.hud-hidden #gameView .weapon-hud-bar {
     color: #f39c12;
     font-size: 12px;
     letter-spacing: 5px;
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     margin-bottom: 6px;
     font-weight: 700;
 }
 #gameView #weaponSelectScreen h2 {
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-size: 38px;
     font-weight: 700;
     margin: 0 0 8px 0;
@@ -1092,7 +1092,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     top: 10px;
     left: 12px;
     font-size: 10px;
-    font-family: 'Courier New', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-weight: 700;
     color: #f39c12;
     letter-spacing: 1px;
@@ -1114,7 +1114,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6));
 }
 #gameView .weapon-card h3 {
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-size: 18px;
     margin: 0 0 6px 0;
     letter-spacing: 2px;
@@ -1151,7 +1151,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     display: flex;
     justify-content: space-between;
     font-size: 11px;
-    font-family: 'Courier New', monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
 }
 #gameView .spec-label { color: rgba(255, 255, 255, 0.5); }
 #gameView .spec-val { color: #fff; font-weight: 700; }
@@ -1161,7 +1161,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
 #gameView .btn-choose-weapon {
     width: 100%;
     padding: 10px;
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 1.5px;
@@ -1230,7 +1230,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     overflow-y: auto;
     overflow-x: hidden;
     scroll-behavior: smooth;
@@ -1455,7 +1455,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.12);
     color: rgba(200,195,185,0.5);
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-size: 11px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -1566,7 +1566,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     padding: 0;
 }
 #narrativeInterludeScreen .interlude-speaker {
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-size: clamp(16px, 2.2vw, 22px);
     font-weight: 800;
     letter-spacing: 6px;
@@ -1575,7 +1575,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     margin-bottom: 12px;
 }
 #narrativeInterludeScreen .interlude-signal {
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-size: clamp(13px, 1.6vw, 16px);
     font-style: italic;
     color: #94a3b8;
@@ -1606,7 +1606,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     opacity: 0.9;
 }
 #narrativeInterludeScreen .interlude-prompt {
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-size: clamp(11px, 1.4vw, 13px);
     letter-spacing: 3px;
     color: #64748b;
@@ -2056,7 +2056,7 @@ body.low-health-warning #gameView .vignette {
     background: rgba(0, 240, 255, 0.07);
     border: 1px solid rgba(0, 240, 255, 0.3);
     border-radius: 6px;
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
 }
 #gameView #pauseScreen .pause-stat {
     display: flex;
@@ -2726,7 +2726,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   width: 100%;
 }
 .robot-memory-speaker {
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
   font-size: clamp(20px, 3.5vw, 26px);
   font-weight: 900;
   letter-spacing: 8px;
@@ -2738,7 +2738,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   font-size: clamp(15px, 2.8vw, 19px);
   line-height: 1.8;
   color: #f1e2dd;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: 1.5px;
   background: transparent;
   border: none;
@@ -2828,7 +2828,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   font-weight: 700;
 }
 .coop-code-display {
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: Consolas, 'Cascadia Code', 'Segoe UI Mono', monospace;
   font-size: 28px;
   font-weight: 900;
   letter-spacing: 8px;
@@ -2886,7 +2886,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
 .coop-input-code {
   width: 220px;
   text-align: center;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: Consolas, 'Cascadia Code', 'Segoe UI Mono', monospace;
   font-size: 22px;
   letter-spacing: 6px;
   padding: 10px;
@@ -2924,7 +2924,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
 .coop-input-relay {
   flex: 1;
   min-width: 0;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
   letter-spacing: 1px;
   padding: 8px 10px;
@@ -2958,7 +2958,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
 .coop-input-invite {
   flex: 1;
   min-width: 0;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
   font-size: 12px;
   padding: 8px 10px;
   background: #090d16;
@@ -3348,7 +3348,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   border: 0;
   border-radius: 3px;
   cursor: pointer;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -3430,7 +3430,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   border-radius: 3px;
   color: #7dd3fc;
   cursor: pointer;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -3471,7 +3471,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   background: rgba(0, 229, 255, 0.05);
   color: #b9d8e2;
   cursor: pointer;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.6px;
@@ -3578,7 +3578,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   color: #e6edf3;
   border: 1px solid rgba(0, 229, 255, 0.35);
   border-radius: 4px;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif;
   font-size: 11.5px;
   letter-spacing: 0.4px;
   cursor: pointer;
