@@ -5,19 +5,19 @@
 const SUPABASE_CONFIG_KEY = 'vita_supabase_config';
 // v2.0: no hardcoded credentials in source. User pastes URL+anon key
 // via Supabase Cloud DB modal; stored only in this browser's localStorage.
-const DEFAULT_SUPABASE_URL = '';
-const DEFAULT_SUPABASE_KEY = '';
+const DEFAULT_SUPABASE_URL = 'https://msribsirdpovuegligcx.supabase.co';
+const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zcmlic2lyZHBvdnVlZ2xpZ2N4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzgxNjgsImV4cCI6MjEwNTAxNDE2OH0.zxjpGcBnphJG5bCkVH__Ez204obVowIQV4q6Cewl_O4';
 
 function getSupabaseConfig() {
   try {
     const raw = JSON.parse(localStorage.getItem(SUPABASE_CONFIG_KEY) || '{}');
     if (raw && typeof raw === 'object') {
-      const url = (typeof raw.url === 'string') ? raw.url : '';
-      const anonKey = (typeof raw.anonKey === 'string') ? raw.anonKey : '';
+      const url = (typeof raw.url === 'string' && raw.url) ? raw.url : DEFAULT_SUPABASE_URL;
+      const anonKey = (typeof raw.anonKey === 'string' && raw.anonKey) ? raw.anonKey : DEFAULT_SUPABASE_KEY;
       if (url && anonKey) return { url, anonKey };
     }
   } catch (e) {}
-  return { url: '', anonKey: '' };
+  return { url: DEFAULT_SUPABASE_URL, anonKey: DEFAULT_SUPABASE_KEY };
 }
 
 function setSupabaseConfig(url, anonKey) {

@@ -157,11 +157,16 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 > 
 > *Tulis draf ide Lore Bomb di bawah ini saat kamu sudah siap:*
 
-- **Ide Sektor 11:** [Tulis di sini...]
-- **Ide Sektor 12:** [Tulis di sini...]
-- **Ide Sektor 13:** [Tulis di sini...]
-- **Ide Sektor 14:** [Tulis di sini...]
-- **Ide Sektor 15 (Final Boss & Climax):** [Tulis di sini...]
+### 🌑 Transisi Khusus Sektor 11 — Interlude Gelap: ALTERISHA
+*(Layar menjadi hitam pekat, tanpa kotak HUD. Teks putih berukuran besar muncul di tengah kehampaan)*
+
+> **ALTERISHA**  
+> *(jaringan lemah menguat).......*  
+> 🇮🇩 *"Sebelum orang itu menghilang dari jaringan kami, kita menerima pesan atau bisa disebut paket data terakhir mengenai sektor sekarang yang kita masuki, dan dasar bentuk sektor lain yang dikuasai dan terbengkalai oleh makhluk-makhluk tersebut."*  
+> 🇬🇧 *"Before that person disappeared from our network, we received a final transmission—or what could be called the last data packet regarding the sector we are currently entering, and the fundamental structure of other sectors overtaken and forsaken by those creatures."*  
+>  
+> 🇮🇩 *"Entah dia dapat dari mana......"*  
+> 🇬🇧 *"Wherever they got it from......"*
 
 ---
 

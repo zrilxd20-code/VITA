@@ -228,3 +228,81 @@ const EPILOGUE_SCRIPT = {
         'Kau berdiri di ambang pintu dunia luar. Seorang prajurit yang lahir di kegelapan, demi memberi fajar baru bagi umat manusia.'
     ]
 };
+
+// ============================================================
+// INTERLUDE SINEMATIK LATAR GELAP TANPA BOX (ALTERISHA)
+// ============================================================
+const NARRATIVE_INTERLUDES = {
+    10: { // Muncul setelah Sektor 11 selesai (currentLevel === 10) menuju Sektor 12
+        speaker: 'ALTERISHA',
+        signal_id: '(jaringan lemah menguat).......',
+        signal_en: '(signal strengthens from static).......',
+        body_id: '"Sebelum orang itu menghilang dari jaringan kami, kita menerima pesan atau bisa disebut paket data terakhir mengenai sektor sekarang yang kita masuki, dan dasar bentuk sektor lain yang dikuasai dan terbengkalai oleh makhluk-makhluk tersebut."',
+        body_en: '"Before that person disappeared from our network, we received a final transmission—or what could be called the last data packet regarding the sector we are currently entering, and the fundamental structure of other sectors overtaken and forsaken by those creatures."',
+        tail_id: '"Entah dia dapat dari mana......"',
+        tail_en: '"Wherever they got it from......"'
+    }
+};
+
+function playNarrativeInterlude(levelIndex, onComplete) {
+    const data = NARRATIVE_INTERLUDES[levelIndex];
+    if (!data) {
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
+
+    const screen = document.getElementById('narrativeInterludeScreen');
+    const speakerEl = document.getElementById('interludeSpeaker');
+    const signalEl = document.getElementById('interludeSignal');
+    const bodyEl = document.getElementById('interludeBody');
+    const tailEl = document.getElementById('interludeTail');
+    const promptEl = document.getElementById('interludePrompt');
+
+    if (!screen) {
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
+
+    const currentLang = (typeof settings !== 'undefined' && settings && settings.lang) ? settings.lang : 'id';
+    if (speakerEl) speakerEl.textContent = data.speaker;
+    if (signalEl) signalEl.textContent = currentLang === 'en' ? data.signal_en : data.signal_id;
+    if (bodyEl) bodyEl.textContent = currentLang === 'en' ? data.body_en : data.body_id;
+    if (tailEl) tailEl.textContent = currentLang === 'en' ? data.tail_en : data.tail_id;
+    if (promptEl) promptEl.textContent = currentLang === 'en' ? '[ CLICK / PRESS ANY KEY TO CONTINUE ]' : '[ KLIK / TEKAN APA SAJA UNTUK MELANJUTKAN ]';
+
+    screen.style.display = 'flex';
+    void screen.offsetWidth;
+    screen.classList.add('active');
+
+    try {
+        if (typeof sStaticBurst === 'function') sStaticBurst();
+    } catch (_) {}
+
+    let finished = false;
+    function finishInterlude(e) {
+        if (finished) return;
+        finished = true;
+        if (e) {
+            try { e.preventDefault(); e.stopPropagation(); } catch (_) {}
+        }
+        window.removeEventListener('keydown', onKey);
+        screen.removeEventListener('click', finishInterlude);
+
+        screen.classList.remove('active');
+        setTimeout(() => {
+            screen.style.display = 'none';
+            if (typeof onComplete === 'function') onComplete();
+        }, 500);
+    }
+
+    function onKey(e) {
+        if (e.key === 'Tab') return;
+        finishInterlude(e);
+    }
+
+    setTimeout(() => {
+        window.addEventListener('keydown', onKey, { once: true });
+        screen.addEventListener('click', finishInterlude, { once: true });
+    }, 400);
+}
+

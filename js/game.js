@@ -5426,6 +5426,17 @@ function nextLevel() {
 
     levelTransition = true;
 
+    // Cek apakah ada narasi interlude khusus setelah level ini (misal Sektor 11: currentLevel === 10)
+    if (typeof playNarrativeInterlude === 'function' && typeof NARRATIVE_INTERLUDES !== 'undefined' && NARRATIVE_INTERLUDES[currentLevel]) {
+        setTimeout(() => {
+            playNarrativeInterlude(currentLevel, () => {
+                levelTransition = false;
+                initLevel(currentLevel + 1);
+            });
+        }, 500);
+        return;
+    }
+
     // Transisi setiap 2 level (LV 2->3: idx 1, LV 4->5: idx 3, LV 6->7: idx 5, LV 8->9: idx 7, LV 10->11: idx 9, LV 12->13: idx 11, LV 14->15: idx 13)
     const isArsenalMilestone = (currentLevel === 1 || currentLevel === 3 || currentLevel === 5 || currentLevel === 7 || currentLevel === 9 || currentLevel === 11 || currentLevel === 13);
 

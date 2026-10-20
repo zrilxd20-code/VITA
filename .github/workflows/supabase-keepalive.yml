@@ -1,0 +1,32 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Berjalan otomatis setiap 3 hari pada jam 04:00 UTC (11:00 WIB)
+    - cron: '0 4 */3 * *'
+  workflow_dispatch: # Bisa dijalankan manual lewat tombol 'Run workflow'
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://msribsirdpovuegligcx.supabase.co' }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zcmlic2lyZHBvdnVlZ2xpZ2N4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzgxNjgsImV4cCI6MjEwNTAxNDE2OH0.zxjpGcBnphJG5bCkVH__Ez204obVowIQV4q6Cewl_O4' }}
+        run: |
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_KEY" ]; then
+            echo "Mengirim ping keep-alive ke Supabase..."
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "apikey: $SUPABASE_KEY" \
+              -H "Authorization: Bearer $SUPABASE_KEY" \
+              "$SUPABASE_URL/rest/v1/profiles?select=count")
+            echo "HTTP Status Response: $STATUS"
+            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 300 ]; then
+              echo "✅ Supabase berhasil diping! Database tetap aktif 24/7."
+            else
+              echo "⚠️ Peringatan: Status respons $STATUS. Cek URL/Key di GitHub Secrets."
+            fi
+          else
+            echo "ℹ️ SUPABASE_URL atau SUPABASE_ANON_KEY belum diisi di GitHub Secrets (opsional)."
+          fi
