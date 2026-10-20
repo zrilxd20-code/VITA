@@ -86,6 +86,13 @@ const PLAYER_COLORS = [
     { name: 'rose', hex: '#f43f5e', glow: 'rgba(244, 63, 94, 0.4)' }
 ];
 
+// Co-op session state lives up here on purpose: buildLevelWorld() runs during
+// the initial menu-demo initLevel(0) call at the bottom of this file, which is
+// evaluated BEFORE the co-op lobby section. Declaring these further down made
+// that first call throw a temporal-dead-zone ReferenceError.
+let coopRoomId = null;
+let isCoopHost = false;
+
 function getLocalPlayer() {
     return (players && players[localPlayerIndex]) ? players[localPlayerIndex] : player;
 }
@@ -13028,13 +13035,14 @@ function openPauseSettings() {
     const m = document.getElementById('inGameSettingsModal');
     if (!m) return;
     syncPauseSettingsInputs();
+    m.classList.add('open');
     m.style.display = 'flex';
     sCinematicUI('open');
 }
 
 function closePauseSettings() {
     const m = document.getElementById('inGameSettingsModal');
-    if (m) m.style.display = 'none';
+    if (m) { m.classList.remove('open'); m.style.display = 'none'; }
     sCinematicUI('close');
 }
 
@@ -13423,8 +13431,6 @@ function drawDebugDiagnostics() {
 // FASE 2 CO-OP ONLINE: LOBBY & TRANSPORT RELAY WEBSOCKET
 // ============================================================
 let coopWs = null;
-let coopRoomId = null;
-let isCoopHost = false;
 let coopPeers = [];
 let coopRelayUrl = 'ws://localhost:8080';
 // Tautan undangan (parameter ?coop=KODE & relay=ALAMAT) hanya boleh dipakai

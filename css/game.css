@@ -1528,6 +1528,96 @@ body.hud-hidden #gameView .weapon-hud-bar {
     100% { opacity: 0; }
 }
 
+/* ============================================================
+   NARRATIVE INTERLUDE SCREEN (Sinematik Latar Hitam Tanpa Box)
+   ============================================================ */
+#narrativeInterludeScreen {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(24px, 5vw, 64px);
+    box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+#narrativeInterludeScreen.active {
+    display: flex;
+    opacity: 1;
+}
+#narrativeInterludeScreen .interlude-inner {
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+#narrativeInterludeScreen .interlude-speaker {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: clamp(16px, 2.2vw, 22px);
+    font-weight: 800;
+    letter-spacing: 6px;
+    color: #ff3b30;
+    text-shadow: 0 0 16px rgba(255, 59, 48, 0.6);
+    margin-bottom: 12px;
+}
+#narrativeInterludeScreen .interlude-signal {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: clamp(13px, 1.6vw, 16px);
+    font-style: italic;
+    color: #94a3b8;
+    letter-spacing: 2.5px;
+    margin-bottom: 34px;
+    opacity: 0.85;
+}
+#narrativeInterludeScreen .interlude-body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: clamp(20px, 3.2vw, 32px);
+    font-weight: 500;
+    line-height: 1.65;
+    letter-spacing: 1.2px;
+    color: #ffffff;
+    text-shadow: 0 0 18px rgba(255, 255, 255, 0.25);
+    margin-bottom: 18px;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+#narrativeInterludeScreen .interlude-tail {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: clamp(18px, 2.6vw, 26px);
+    font-style: italic;
+    color: #cbd5e1;
+    letter-spacing: 2px;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+#narrativeInterludeScreen .interlude-prompt {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: clamp(11px, 1.4vw, 13px);
+    letter-spacing: 3px;
+    color: #64748b;
+    margin-top: 52px;
+    animation: interludePromptPulse 2.2s infinite alternate;
+}
+@keyframes interludePromptPulse {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.85; color: #9ca3af; }
+}
+
 @media (max-width: 640px) {
     .prologue-content { padding: 20px 14px; }
     .prologue-line { font-size: 13px; margin-bottom: 10px; }
@@ -2883,4 +2973,716 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
 .coop-input-invalid {
   border-color: #f87171 !important;
   box-shadow: 0 0 12px rgba(248, 113, 113, 0.4);
+}
+
+/* ==========================================================================
+   [POLISH 2.5] START SCREEN & PAUSE MENU
+   Appended AFTER the unified action-list rules so `!important` overrides win
+   by source order. Every button, ID, data-i18n key, role/tabindex contract and
+   handler stays intact — only rhythm, emphasis and column layout change.
+   `#btnContinue` keeps its JS-owned inline `display`, so this block only ever
+   touches its `grid-column` / `order`.
+   ========================================================================== */
+
+/* --- 1. Start screen: tighter vertical rhythm --------------------------- */
+#gameView #startScreen .eyebrow {
+  margin-bottom: 12px;
+}
+#gameView #startScreen .subtitle {
+  margin-bottom: 14px;
+}
+#gameView #startScreen .ambient {
+  /* Duplicate flavour line; the subtitle already carries the tagline. */
+  display: none !important;
+}
+
+/* Meta chips (operative identity + control mode) share one quiet row. */
+#gameView #startScreen .start-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: min(720px, 94vw);
+  margin: 0 0 16px;
+}
+#gameView #startScreen .start-meta > * {
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+}
+#gameView #startScreen .start-meta .start-operative-banner,
+#gameView #startScreen .start-meta .start-device-pill {
+  margin: 0;
+}
+/* The operative emblem is an SVG injected at runtime. An SVG without intrinsic
+   dimensions falls back to 300x150, which inflated the banner to 560px and
+   wrapped the meta chips onto two rows. Pin the box here. */
+#gameView #startScreen .start-meta .start-operative-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+#gameView #startScreen .start-meta .start-operative-icon svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+#gameView #startScreen .start-operative-banner {
+  padding: 5px 12px;
+  font-size: 10.5px;
+  letter-spacing: 1.2px;
+  box-shadow: none;
+}
+#gameView #startScreen .start-operative-badge {
+  padding: 1px 5px;
+  font-size: 8px;
+}
+#gameView #startScreen .start-device-pill {
+  padding: 5px 12px;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  box-shadow: none;
+}
+#gameView #startScreen .start-device-pill .device-pill-btn {
+  margin-left: 2px;
+}
+
+/* --- 2. Start screen actions: 2 primary CTAs + utility chips ------------ */
+#gameView #startScreen .menu-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: min(430px, 92vw) !important;
+  margin: 0 auto !important;
+}
+#gameView #startScreen .menu-actions .btn {
+  min-height: 42px !important;
+  padding: 9px 14px !important;
+  font-size: 12.5px !important;
+  letter-spacing: 1.4px !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+#gameView #startScreen .menu-actions .btn .btn-icon {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+/* Primary CTA — PLAY. */
+#gameView #startScreen .menu-actions #btnStart {
+  grid-column: 1 / -1 !important;
+  order: 1;
+  min-height: 52px !important;
+  font-size: 15px !important;
+  letter-spacing: 3px !important;
+}
+/* Secondary CTA — CO-OP, same weight, cyan identity. */
+#gameView #startScreen .menu-actions #btnCoopLobby {
+  grid-column: 1 / -1 !important;
+  order: 2;
+  min-height: 46px !important;
+  font-size: 12.5px !important;
+  letter-spacing: 1.6px !important;
+  background: rgba(4, 20, 28, 0.62) !important;
+  border: 1px solid rgba(0, 240, 255, 0.45) !important;
+  color: #00f0ff !important;
+}
+#gameView #startScreen .menu-actions #btnCoopLobby:hover {
+  background: rgba(8, 36, 50, 0.9) !important;
+  border-color: #00f0ff !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.35) !important;
+}
+/* Resume-save CTA — display is owned by JS, layout only here. */
+#gameView #startScreen .menu-actions #btnContinue {
+  grid-column: 1 / -1 !important;
+  order: 3;
+  min-height: 46px !important;
+  font-size: 12.5px !important;
+}
+/* The legacy unified-action block sets `display: inline-flex !important` on
+   every `.menu-actions .btn`, which used to beat checkContinueBtn()'s inline
+   `display:none` and show a dead Continue button on fresh saves. Re-assert the
+   hidden state only while the inline style still says so; JS removes the
+   inline property when a save exists. */
+#gameView #startScreen .menu-actions #btnContinue[style*="display: none"],
+#gameView #startScreen .menu-actions #btnContinue[style*="display:none"] {
+  display: none !important;
+}
+/* Utility chips: auth / settings / codex / controls. */
+#gameView #startScreen .menu-actions #btnStartAuth,
+#gameView #startScreen .menu-actions #btnSettings,
+#gameView #startScreen .menu-actions #btnCodex,
+#gameView #startScreen .menu-actions #btnControls {
+  min-height: 38px !important;
+  padding: 8px 10px !important;
+  font-size: 11px !important;
+  letter-spacing: 0.8px !important;
+  border-radius: 6px !important;
+  background: rgba(20, 7, 10, 0.55) !important;
+  border: 1px solid rgba(255, 90, 70, 0.22) !important;
+  color: #c9b3ad !important;
+  box-shadow: none !important;
+}
+#gameView #startScreen .menu-actions #btnStartAuth:hover,
+#gameView #startScreen .menu-actions #btnSettings:hover,
+#gameView #startScreen .menu-actions #btnCodex:hover,
+#gameView #startScreen .menu-actions #btnControls:hover {
+  background: rgba(40, 12, 18, 0.85) !important;
+  border-color: rgba(255, 90, 70, 0.5) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
+}
+#gameView #startScreen .menu-actions #btnStartAuth .btn-icon,
+#gameView #startScreen .menu-actions #btnSettings .btn-icon,
+#gameView #startScreen .menu-actions #btnCodex .btn-icon {
+  width: 13px !important;
+  height: 13px !important;
+  opacity: 0.85;
+}
+#gameView #startScreen .menu-actions #btnStartAuth { order: 4; }
+#gameView #startScreen .menu-actions #btnSettings  { order: 5; }
+#gameView #startScreen .menu-actions #btnCodex     { order: 6; }
+#gameView #startScreen .menu-actions #btnControls  { order: 7; }
+
+/* Low-emphasis full-width utility links. */
+#gameView #startScreen .menu-actions #btnAdmin {
+  grid-column: 1 / -1 !important;
+  order: 8;
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  font-size: 10.5px !important;
+  letter-spacing: 1.2px !important;
+  border-radius: 6px !important;
+  background: rgba(4, 16, 24, 0.5) !important;
+  border: 1px solid rgba(0, 229, 255, 0.28) !important;
+  color: rgba(0, 229, 255, 0.78) !important;
+  box-shadow: none !important;
+}
+#gameView #startScreen .menu-actions #btnAdmin:hover {
+  background: rgba(8, 30, 44, 0.85) !important;
+  border-color: rgba(0, 229, 255, 0.6) !important;
+  color: #00f0ff !important;
+  box-shadow: none !important;
+}
+#gameView #startScreen .menu-actions #btnBackToHome {
+  grid-column: 1 / -1 !important;
+  order: 9;
+  min-height: 34px !important;
+  padding: 6px 10px !important;
+  font-size: 10.5px !important;
+  letter-spacing: 1.2px !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: rgba(231, 214, 207, 0.62) !important;
+  box-shadow: none !important;
+}
+#gameView #startScreen .menu-actions #btnBackToHome:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #e7d6cf !important;
+  box-shadow: none !important;
+}
+
+/* --- 3. Pause menu: denser stats + two-column action grid --------------- */
+#gameView #pauseScreen h2 {
+  margin-bottom: 18px;
+}
+#gameView #pauseScreen .pause-stats-box {
+  gap: 14px;
+  margin: 4px auto 16px auto;
+  padding: 7px 14px;
+  background: rgba(0, 240, 255, 0.05);
+  border-color: rgba(0, 240, 255, 0.22);
+}
+#gameView #pauseScreen .pause-stat {
+  min-width: 54px;
+}
+#gameView #pauseScreen .pause-actions-list {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  justify-items: stretch !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: min(430px, 92vw) !important;
+  margin: 0 auto !important;
+}
+#gameView #pauseScreen .pause-actions-list .btn {
+  min-height: 42px !important;
+  padding: 9px 14px !important;
+  font-size: 12px !important;
+  letter-spacing: 1.2px !important;
+  border-radius: 7px !important;
+  box-shadow: none !important;
+}
+#gameView #pauseScreen .pause-actions-list #pauseResume {
+  grid-column: 1 / -1 !important;
+  order: 1;
+  min-height: 50px !important;
+  font-size: 15px !important;
+  letter-spacing: 3px !important;
+}
+#gameView #pauseScreen .pause-actions-list #pauseCodex   { order: 2; }
+#gameView #pauseScreen .pause-actions-list #pauseSettings { order: 3; }
+#gameView #pauseScreen .pause-actions-list #pauseRestart  { order: 4; }
+#gameView #pauseScreen .pause-actions-list #pauseMenu     { order: 5; }
+#gameView #pauseScreen .pause-actions-list #pauseCustomizeTouchBtn {
+  grid-column: 1 / -1 !important;
+  order: 6;
+  min-height: 34px !important;
+  padding: 6px 10px !important;
+  font-size: 10.5px !important;
+  letter-spacing: 1px !important;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: rgba(231, 214, 207, 0.66) !important;
+  box-shadow: none !important;
+}
+#gameView #pauseScreen .pause-actions-list #pauseCustomizeTouchBtn:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #e7d6cf !important;
+  box-shadow: none !important;
+}
+#gameView #pauseScreen .pause-actions-list #pauseAdminArsenal {
+  grid-column: 1 / -1 !important;
+  order: 7;
+  min-height: 36px !important;
+  padding: 7px 12px !important;
+  font-size: 10.5px !important;
+  letter-spacing: 1.1px !important;
+  background: rgba(4, 16, 24, 0.5) !important;
+  border: 1px solid rgba(0, 229, 255, 0.28) !important;
+  color: rgba(0, 229, 255, 0.78) !important;
+  box-shadow: none !important;
+}
+#gameView #pauseScreen .pause-actions-list #pauseAdminArsenal:hover {
+  background: rgba(8, 30, 44, 0.85) !important;
+  border-color: rgba(0, 229, 255, 0.6) !important;
+  color: #00f0ff !important;
+  box-shadow: none !important;
+}
+
+/* --- 4. Compact screens ------------------------------------------------- */
+@media (max-width: 560px) {
+  #gameView #startScreen .menu-actions,
+  #gameView #pauseScreen .pause-actions-list {
+    width: min(380px, 94vw) !important;
+  }
+  #gameView #startScreen .start-meta {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  #gameView #pauseScreen .pause-stats-box {
+    gap: 10px;
+    padding: 6px 10px;
+  }
+}
+
+/* --- 5. Motion guards for the new hover treatments ---------------------- */
+@media (prefers-reduced-motion: reduce) {
+  #gameView #startScreen .menu-actions #btnCoopLobby:hover,
+  #gameView #startScreen .menu-actions #btnStartAuth:hover,
+  #gameView #startScreen .menu-actions #btnSettings:hover,
+  #gameView #startScreen .menu-actions #btnCodex:hover,
+  #gameView #startScreen .menu-actions #btnControls:hover {
+    transform: none !important;
+  }
+}
+
+/* --- 6. Device-mode dialog (now a body-level dialog) -------------------- */
+/* The markup moved out of #homeView: the start screen lives in #gameView, so
+   a dialog nested inside the hidden home view could never be painted. These
+   rules restore the title/button spacing it used to inherit from the
+   `#homeView .modal …` selectors. */
+#deviceModeModal .modal-header-row h3 {
+  font-size: 20px;
+  margin-bottom: 6px;
+  color: var(--red);
+  letter-spacing: 3px;
+}
+#deviceModeModal .device-modal-footer .btn {
+  margin-top: 6px;
+}
+
+/* --- 7. Body-level dialogs must paint above the start/pause screens ----- */
+/* .modal-backdrop uses z-index 95 (home.css). The start screen is 100 and the
+   pause screen 120, so a dialog opened from either was rendered underneath
+   them: it measured non-zero but was visually buried (and unclickable).
+   These three dialogs are opened from both the hub and the in-game menus, so
+   they need to sit above the whole game overlay stack. In-game modals keep
+   their own higher inline z-index (10002/10003) and are unaffected. */
+#deviceModeModal,
+#coopLobbyModal,
+#authModal {
+  z-index: 9000;
+}
+
+/* --- 8. Missing .btn base in body-level dialogs -------------------------- */
+/* #authModal, #coopLobbyModal and #deviceModeModal are siblings of #homeView
+   and #gameView. Every .btn rule in this project is view-scoped, so inside
+   these dialogs the CTAs had no base style at all and fell back to the
+   browser default (flat red slab in the terminal, grey box in the device
+   picker, raw text buttons in the lobby). Restore one shared primary plus
+   the .ghost / .secondary variants the auth terminal already uses. */
+#authModal .btn,
+#coopLobbyModal .btn,
+#deviceModeModal .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 30px;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #1b0202;
+  background: linear-gradient(135deg, #ff3b3b, #8f0d0d);
+  clip-path: polygon(
+    8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px),
+    calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px
+  );
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  transition: transform 0.15s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+#authModal .btn:hover,
+#coopLobbyModal .btn:hover,
+#deviceModeModal .btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 0 22px rgba(255, 40, 40, 0.38), 0 10px 30px rgba(0, 0, 0, 0.55);
+}
+#authModal .btn:active,
+#coopLobbyModal .btn:active,
+#deviceModeModal .btn:active { transform: translateY(0) scale(0.99); }
+#authModal .btn:focus-visible,
+#coopLobbyModal .btn:focus-visible,
+#deviceModeModal .btn:focus-visible { outline: 2px solid #ff3b3b; outline-offset: 3px; }
+
+/* Flat variants: no octagon cut, thinner weight, quieter surface. */
+#authModal .btn.ghost,
+#authModal .btn.secondary {
+  clip-path: none;
+  border-radius: 4px;
+  box-shadow: none;
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  padding: 11px 16px;
+}
+#authModal .btn.ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 90, 70, 0.32);
+  color: #e8d5ce;
+}
+#authModal .btn.ghost:hover {
+  background: rgba(255, 60, 40, 0.14);
+  border-color: #ff3b3b;
+  color: #fff;
+  filter: none;
+  box-shadow: none;
+}
+#authModal .btn.secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #9d8680;
+}
+#authModal .btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #d8c6c0;
+  filter: none;
+  box-shadow: none;
+}
+
+/* Inline icons inside these CTAs: size + inherit the label colour instead of
+   the SVG default fill. */
+#authModal .btn .btn-icon,
+#coopLobbyModal .btn .btn-icon,
+#deviceModeModal .btn .btn-icon {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+/* Micro buttons in the lobby were scoped to #homeView only. */
+#coopLobbyModal .btn-micro {
+  background: rgba(0, 240, 255, 0.07);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 3px;
+  color: #7dd3fc;
+  cursor: pointer;
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 7px 12px;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+#coopLobbyModal .btn-micro:hover {
+  background: rgba(0, 240, 255, 0.16);
+  border-color: #00f0ff;
+  color: #e6feff;
+}
+#coopLobbyModal .btn-micro:focus-visible { outline: 2px solid #00f0ff; outline-offset: 2px; }
+
+/* Give the two lobby CTAs a deliberate presence instead of shrink-to-fit. */
+#coopLobbyModal .coop-action-footer .btn,
+#coopLobbyModal .coop-join-form .btn {
+  min-width: 260px;
+  max-width: 100%;
+}
+#coopLobbyModal .coop-join-form .btn { margin-top: 16px; }
+
+/* The device picker footer is right aligned; keep the CTA readable there. */
+#deviceModeModal .device-action-row .btn { min-width: 200px; }
+/* --- 9. In-game micro buttons + arsenal dialog ---------------------------- */
+/* #gameView has no .btn-micro base either, so the tactical arsenal, the pause
+   settings panel and the touch HUD editor all fell back to the browser's
+   default grey button. One shared micro style keeps those consoles readable. */
+#gameView .btn-micro {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 10px;
+  min-height: 26px;
+  border: 1px solid rgba(0, 229, 255, 0.28);
+  border-radius: 3px;
+  background: rgba(0, 229, 255, 0.05);
+  color: #b9d8e2;
+  cursor: pointer;
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  line-height: 1.25;
+  text-align: center;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+#gameView .btn-micro:hover {
+  background: rgba(0, 229, 255, 0.14);
+  border-color: rgba(0, 229, 255, 0.7);
+  color: #eafcff;
+}
+#gameView .btn-micro:focus-visible { outline: 2px solid #00e5ff; outline-offset: 2px; }
+#gameView .btn-micro.danger {
+  background: rgba(255, 60, 60, 0.07);
+  border-color: rgba(255, 80, 80, 0.42);
+  color: #ff9a9a;
+}
+#gameView .btn-micro.danger:hover {
+  background: rgba(255, 60, 60, 0.2);
+  border-color: #ff4d4d;
+  color: #fff;
+}
+#gameView .btn-micro.primary {
+  background: rgba(0, 229, 255, 0.16);
+  border-color: #00e5ff;
+  color: #041417;
+}
+#gameView .btn-micro.primary:hover { background: #00e5ff; color: #041417; }
+
+/* The arsenal packs buttons into tight 5/3/2 column grids: the base .btn
+   spacing (14px 40px, 25px top margin) does not fit there. */
+#adminArsenalModal .btn {
+  margin-top: 0;
+  padding: 9px 18px;
+  min-height: 36px;
+  font-size: 12px;
+  letter-spacing: 1.6px;
+}
+#adminArsenalModal .btn.secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(0, 229, 255, 0.32);
+  border-radius: 4px;
+  clip-path: none;
+  box-shadow: none;
+  color: #cfe3ea;
+  font-weight: 600;
+}
+#adminArsenalModal .btn.secondary:hover {
+  background: rgba(0, 229, 255, 0.12);
+  border-color: #00e5ff;
+  color: #ffffff;
+  filter: none;
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+#adminArsenalModal .btn:active { transform: translateY(0) scale(0.99); }
+#adminArsenalModal .btn-micro { padding: 5px 8px; min-height: 24px; }
+/* --- 10. In-game settings dialog ------------------------------------------ */
+/* The settings markup predates the design system: every control sat in an
+   unstyled div and the labels are inline elements, so rows collided and the
+   percentage badges overlapped the sliders. Give the block a real single
+   column rhythm and skin the native form controls. */
+#inGameSettingsModal .settings-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  align-items: start;
+}
+#inGameSettingsModal .settings-grid > label:not(.settings-check-row) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3px 10px;
+  font-size: 11.5px;
+  letter-spacing: 0.6px;
+  color: #cbd5e1;
+}
+#inGameSettingsModal .settings-grid > label > span:first-child {
+  grid-column: 1;
+  min-width: 0;
+}
+#inGameSettingsModal .settings-grid > label > span[id$="Val"] {
+  grid-column: 2;
+  float: none !important;
+  font-size: 11px;
+  color: #00e5ff !important;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+#inGameSettingsModal .settings-grid input[type="range"] {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  accent-color: #00e5ff;
+  cursor: pointer;
+}
+#inGameSettingsModal .settings-grid select {
+  grid-column: 1 / -1;
+  width: 100%;
+  padding: 6px 26px 6px 9px;
+  background-color: #0b1119;
+  color: #e6edf3;
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  border-radius: 4px;
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #00e5ff 50%),
+    linear-gradient(135deg, #00e5ff 50%, transparent 50%);
+  background-position: calc(100% - 15px) 12px, calc(100% - 10px) 12px;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+#inGameSettingsModal .settings-grid select:focus-visible {
+  outline: 1px solid #00e5ff;
+  outline-offset: 2px;
+}
+#inGameSettingsModal .settings-grid select option {
+  background: #0b1119;
+  color: #e6edf3;
+}
+#inGameSettingsModal .settings-grid input[type="checkbox"] {
+  accent-color: #00e5ff;
+}
+#inGameSettingsModal .settings-check-row {
+  grid-column: 1 / -1;
+  gap: 9px;
+  font-size: 11.5px;
+  letter-spacing: 0.4px;
+  padding: 2px 0;
+}
+#inGameSettingsModal .settings-actions-span {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+  margin-top: 3px;
+}
+#inGameSettingsModal .settings-actions-span .btn {
+  margin-top: 0;
+  min-width: 0;
+  padding: 9px 10px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  line-height: 1.35;
+  white-space: normal;
+  text-align: center;
+  clip-path: none;
+  border-radius: 4px;
+  box-shadow: none;
+}
+#inGameSettingsModal .settings-actions-span .btn.secondary {
+  background: rgba(0, 229, 255, 0.06);
+  background-image: none;
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  color: #9fe9f4;
+}
+#inGameSettingsModal .settings-actions-span .btn.secondary:hover {
+  background: rgba(0, 229, 255, 0.14);
+  border-color: rgba(0, 229, 255, 0.7);
+  filter: none;
+  transform: none;
+  box-shadow: none;
+}
+#inGameSettingsModal .settings-grid .btn-micro {
+  margin-top: 0;
+  padding: 9px 12px;
+  font-size: 11px;
+}
+#inGameSettingsModal .settings-sec-head {
+  margin-top: 2px;
+}
+
+/* The close affordance is an "X", not a destructive action. */
+#inGameSettingsModal .btn-micro.danger[aria-label="Close"],
+#adminArsenalModal .btn-micro.danger[aria-label="Close"] {
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 1;
+  color: #eaf7fa;
+  background: rgba(0, 229, 255, 0.1);
+  border-color: rgba(0, 229, 255, 0.55);
+}
+#inGameSettingsModal .btn-micro.danger[aria-label="Close"]:hover,
+#adminArsenalModal .btn-micro.danger[aria-label="Close"]:hover {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: #00e5ff;
+}
+/* Wide screens: the settings column was 1x-content tall and required
+   scrolling to reach the final section. Split the four sections into a
+   two-column board so the whole dialog fits without a scrollbar. */
+@media (min-width: 1100px) {
+  #inGameSettingsModal .settings-dialog-card {
+    max-width: 760px !important;
+  }
+  #inGameSettingsModal .settings-sections {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, auto);
+    grid-auto-flow: column;
+    column-gap: 30px;
+    row-gap: 13px;
+    align-items: start;
+  }
+  #inGameSettingsModal .settings-grid {
+    margin-top: -7px;
+  }
 }

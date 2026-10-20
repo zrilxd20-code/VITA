@@ -93,7 +93,7 @@
   <div class="hero-play-box">
     <button class="btn btn-hero-play" id="btnHeroPlay" type="button" onclick="playWebGame(false)">
       <svg class="btn-icon play-icon-lg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      <span>ENTER THE LABYRINTH &mdash; PLAY NOW</span>
+      <span>ENTER THE LABYRINTH</span>
     </button>
     <button class="btn btn-hero-coop" id="btnHeroCoop" type="button" onclick="openCoopLobbyModal()">
       <svg class="btn-icon play-icon-lg" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
@@ -498,57 +498,6 @@
   </div>
 </div>
 
-<!-- MODAL: SELECT CONTROL / DEVICE MODE (PC OR MOBILE) -->
-<div class="modal-backdrop" id="deviceModeModal" style="display:none">
-  <div class="modal device-modal-card">
-    <div class="modal-header-row">
-      <h3>
-        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M4 6h16v10H4zm16 12H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2zm-8-1c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1z"/></svg>
-        <span id="deviceModalTitle">SELECT CONTROL MODE</span>
-      </h3>
-      <button class="btn-sidebar-close" type="button" onclick="closeDeviceModeModal()">✕</button>
-    </div>
-    <p class="device-modal-intro" id="deviceModalDesc">Before entering the sector, choose the control scheme suited for your device:</p>
-    <div class="device-choices-grid">
-      <!-- Card PC -->
-      <div class="device-choice-card" id="deviceChoicePc" role="button" tabindex="0" aria-pressed="false" onclick="selectDeviceChoice('pc')">
-        <div class="device-choice-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg></div>
-        <div class="device-choice-body">
-          <div class="device-choice-head">
-            <h4 id="devicePcTitle">PC / DESKTOP (KEYBOARD &amp; MOUSE)</h4>
-            <span class="device-tag-rec" id="devicePcRec">Keyboard &amp; Mouse</span>
-          </div>
-          <p id="devicePcDesc">WASD / Arrows to navigate, Left Click / Space to strike, Shift to Dash. Clean screen without virtual buttons.</p>
-        </div>
-        <div class="device-select-indicator"></div>
-      </div>
-      <!-- Card Mobile -->
-      <div class="device-choice-card" id="deviceChoiceMobile" role="button" tabindex="0" aria-pressed="false" onclick="selectDeviceChoice('mobile')">
-        <div class="device-choice-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg></div>
-        <div class="device-choice-body">
-          <div class="device-choice-head">
-            <h4 id="deviceMobileTitle">MOBILE / TABLET (TOUCHSCREEN)</h4>
-            <span class="device-tag-rec" id="deviceMobileRec">Touchscreen</span>
-          </div>
-          <p id="deviceMobileDesc">Virtual Analog Joystick on left &amp; Action Buttons on right. Button positions can be freely customized.</p>
-        </div>
-        <div class="device-select-indicator"></div>
-      </div>
-    </div>
-    <div class="device-modal-footer">
-      <label class="device-remember-label">
-        <input type="checkbox" id="chkRememberDevice">
-        <span id="deviceRememberText">Remember this choice (can be changed anytime in Settings)</span>
-      </label>
-      <div class="device-action-row">
-        <button class="btn" id="btnLaunchWithDevice" type="button" onclick="confirmDeviceChoiceAndPlay()">
-          <span id="deviceBtnEnter">ENTER MISSION</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- MODAL 4: FACILITY NETWORK UPLINK CONFIG -->
 <div class="modal-backdrop" id="databaseModal">
   <div class="modal">
@@ -598,8 +547,59 @@
 </div>
 
 <footer>
-  <b>VITA</b> &mdash; BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR &bull; WEB EDITION v2.4 &bull; 100% STANDALONE OFFLINE READY
+  <b>VITA</b> &mdash; BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR &bull; WEB EDITION v2.5.0 &bull; 100% STANDALONE OFFLINE READY
 </footer>
+</div>
+
+<!-- MODAL: SELECT CONTROL / DEVICE MODE (PC OR MOBILE) -->
+<div class="modal-backdrop" id="deviceModeModal" style="display:none">
+  <div class="modal device-modal-card">
+    <div class="modal-header-row">
+      <h3>
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M4 6h16v10H4zm16 12H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2zm-8-1c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1z"/></svg>
+        <span id="deviceModalTitle">SELECT CONTROL MODE</span>
+      </h3>
+      <button class="btn-sidebar-close" type="button" onclick="closeDeviceModeModal()">✕</button>
+    </div>
+    <p class="device-modal-intro" id="deviceModalDesc">Before entering the sector, choose the control scheme suited for your device:</p>
+    <div class="device-choices-grid">
+      <!-- Card PC -->
+      <div class="device-choice-card" id="deviceChoicePc" role="button" tabindex="0" aria-pressed="false" onclick="selectDeviceChoice('pc')">
+        <div class="device-choice-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg></div>
+        <div class="device-choice-body">
+          <div class="device-choice-head">
+            <h4 id="devicePcTitle">PC / DESKTOP (KEYBOARD &amp; MOUSE)</h4>
+            <span class="device-tag-rec" id="devicePcRec">Keyboard &amp; Mouse</span>
+          </div>
+          <p id="devicePcDesc">WASD / Arrows to navigate, Left Click / Space to strike, Shift to Dash. Clean screen without virtual buttons.</p>
+        </div>
+        <div class="device-select-indicator"></div>
+      </div>
+      <!-- Card Mobile -->
+      <div class="device-choice-card" id="deviceChoiceMobile" role="button" tabindex="0" aria-pressed="false" onclick="selectDeviceChoice('mobile')">
+        <div class="device-choice-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg></div>
+        <div class="device-choice-body">
+          <div class="device-choice-head">
+            <h4 id="deviceMobileTitle">MOBILE / TABLET (TOUCHSCREEN)</h4>
+            <span class="device-tag-rec" id="deviceMobileRec">Touchscreen</span>
+          </div>
+          <p id="deviceMobileDesc">Virtual Analog Joystick on left &amp; Action Buttons on right. Button positions can be freely customized.</p>
+        </div>
+        <div class="device-select-indicator"></div>
+      </div>
+    </div>
+    <div class="device-modal-footer">
+      <label class="device-remember-label">
+        <input type="checkbox" id="chkRememberDevice">
+        <span id="deviceRememberText">Remember this choice (can be changed anytime in Settings)</span>
+      </label>
+      <div class="device-action-row">
+        <button class="btn" id="btnLaunchWithDevice" type="button" onclick="confirmDeviceChoiceAndPlay()">
+          <span id="deviceBtnEnter">ENTER MISSION</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL: CO-OP MULTIPLAYER LOBBY (4 PLAYERS) -->
@@ -707,6 +707,17 @@
     <button class="prologue-skip-btn" id="prologueSkipBtn" type="button">SKIP ▸▸</button>
     <div class="prologue-continue" id="prologueContinue">
         <span class="prologue-continue-text" id="prologueContinueText">PRESS ANY KEY TO CONTINUE</span>
+    </div>
+</div>
+
+<!-- NARRATIVE INTERLUDE SCREEN (Sinematik Latar Hitam Tanpa Box) -->
+<div id="narrativeInterludeScreen" style="display:none;" class="narrative-interlude">
+    <div class="interlude-inner">
+        <div class="interlude-speaker" id="interludeSpeaker">ALTERISHA</div>
+        <div class="interlude-signal" id="interludeSignal">(jaringan lemah menguat).......</div>
+        <div class="interlude-body" id="interludeBody"></div>
+        <div class="interlude-tail" id="interludeTail"></div>
+        <div class="interlude-prompt" id="interludePrompt">[ KLIK / TEKAN APA SAJA UNTUK MELANJUTKAN ]</div>
     </div>
 </div>
 
@@ -946,7 +957,7 @@
   <div class="modal-card" style="max-width:540px;width:100%;border:1px solid rgba(0,229,255,0.45);background:rgba(10,12,20,0.96);box-shadow:0 0 35px rgba(0,229,255,0.25);border-radius:8px;padding:20px;color:#e6edf3;">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.25);padding-bottom:10px;margin-bottom:12px;">
       <h3 style="color:#00f0ff;margin:0;font-size:16px;letter-spacing:1px;" id="adminModalTitle" data-i18n="admin_modal_title">ADMIN TACTICAL ARSENAL</h3>
-      <button class="btn-micro danger" type="button" onclick="closeAdminArsenalModal()" style="padding:4px 10px;font-size:14px;">✕</button>
+      <button class="btn-micro danger" type="button" onclick="closeAdminArsenalModal()" style="padding:4px 10px;font-size:14px;" aria-label="Close">&#10005;</button>
     </div>
     <p style="font-size:12px;opacity:0.8;margin-bottom:12px;" id="adminModalSub" data-i18n="admin_modal_sub">Jump to any sector or requisition test equipment:</p>
 
@@ -988,7 +999,7 @@
   <div class="modal-card settings-dialog-card" style="max-width:520px;width:100%;border:1px solid rgba(0,229,255,0.45);background:rgba(10,12,20,0.97);box-shadow:0 0 35px rgba(0,229,255,0.25);border-radius:10px;padding:20px;color:#e6edf3;max-height:90vh;overflow-y:auto;">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.25);padding-bottom:10px;margin-bottom:14px;">
       <h3 style="color:#00f0ff;margin:0;font-size:16px;letter-spacing:1px;" id="pauseSettingsModalTitle" data-i18n="pause_settings_title">PENGATURAN FASILITAS</h3>
-      <button class="btn-micro danger" type="button" onclick="closePauseSettings()" style="padding:4px 10px;font-size:14px;">✕</button>
+      <button class="btn-micro danger" type="button" onclick="closePauseSettings()" style="padding:4px 10px;font-size:14px;" aria-label="Close">&#10005;</button>
     </div>
     <div class="settings-sections">
       <!-- SUARA & AUDIO -->
@@ -1094,6 +1105,7 @@
 <div class="eyebrow" id="startEyebrow" title="Classified Archive Repository">CLASSIFIED&nbsp;ARCHIVES</div>
     <h1>VITA</h1>
     <p class="subtitle" id="startSubtitle">Forgotten Sector &mdash; 15 Roguelite Sectors</p>
+    <div class="start-meta">
     <div class="start-operative-banner" id="startOperativeBanner" role="button" tabindex="0" onclick="openAuthModal()" title="Click to Login / Switch Operative Identity">
         <span class="start-operative-icon" id="startOperativeIcon"></span>
         <span class="start-operative-text" id="startOperativeText">OPERATIVE: ANONYMOUS [CLICK TO LOGIN]</span>
@@ -1103,6 +1115,7 @@
         <span id="startScreenDeviceIcon"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg></span>
         <span id="startScreenDeviceText">CONTROL MODE: PC (KEYBOARD)</span>
         <span class="device-pill-btn">[SWITCH]</span>
+    </div>
     </div>
     <p class="ambient" id="startAmbient">NO ONE REMEMBERS THIS PLACE</p>
     <div class="menu-actions">
@@ -1330,6 +1343,8 @@
     </div>
 </div>
 
+</div><!-- /#gameView -->
+
 <!-- Modal Otorisasi Akun Operatif - Global -->
 <div class="modal-backdrop" id="authModal">
   <div class="modal auth-modal profile-modal">
@@ -1430,7 +1445,6 @@
       </button>
     </div>
   </div>
-</div>
 </div>
 
 <script src="js/supabase.js?v=2.5.0"></script>
