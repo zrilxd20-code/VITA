@@ -348,6 +348,11 @@ const T = {
         admin_modal_perks: 'SKILL & PERK OPERATIF',
         admin_modal_close: 'TUTUP [ESC]',
         admin_chapter_fmt: 'Sektor {n}',
+        admin_banner_title: 'OTORISASI ADMIN PENUH // ARSENAL & SKILL MAKSIMAL',
+        admin_banner_sub: 'Semua 15 Sektor Fasilitas terbuka & 6 senjata aktif. Pilih sektor untuk langsung meluncur:',
+        admin_select_sector: 'PILIH SEKTOR OPERASI (1 - 15)',
+        admin_advanced_tools: 'OPSI TAMBAHAN // UJI SENJATA & SKILL SATUAN',
+        admin_full_loadout_msg: '⚡ ARSENAL & SKILL MAKSIMAL DIAKTIFKAN!',
         settings_reset_default: 'KEMBALIKAN PENGATURAN KE BAWAAN',
         boss_threat: 'PREDATOR PUNCAK TERDETEKSI',
         settings_sec_audio: 'SUARA & AUDIO',
@@ -604,6 +609,11 @@ const T = {
         admin_modal_perks: 'OPERATIVE SKILLS & PERKS',
         admin_modal_close: 'CLOSE [ESC]',
         admin_chapter_fmt: 'Sector {n}',
+        admin_banner_title: 'FULL ADMIN AUTHORIZATION // ALL WEAPONS & MAX SKILLS',
+        admin_banner_sub: 'All 15 Facility Sectors unlocked & 6 weapons active. Select a sector to deploy immediately:',
+        admin_select_sector: 'SELECT OPERATION SECTOR (1 - 15)',
+        admin_advanced_tools: 'ADVANCED OPTIONS // TEST INDIVIDUAL WEAPONS & SKILLS',
+        admin_full_loadout_msg: '⚡ FULL ARSENAL & MAX SKILLS ENGAGED!',
         settings_reset_default: 'RESET ALL SETTINGS TO DEFAULT',
         boss_threat: 'APEX PREDATOR DETECTED',
         settings_sec_audio: 'AUDIO & SOUND',
@@ -1097,6 +1107,14 @@ function applyLang() {
     if (aPT) aPT.textContent = tt('admin_panel_title');
     const aPD = document.getElementById('adminPanelDesc');
     if (aPD) aPD.textContent = tt('admin_panel_desc');
+    const aBT = document.getElementById('adminBannerTitle');
+    if (aBT) aBT.textContent = tt('admin_banner_title');
+    const aBS = document.getElementById('adminBannerSub');
+    if (aBS) aBS.textContent = tt('admin_banner_sub');
+    const aSS = document.getElementById('adminSelectSectorLbl');
+    if (aSS) aSS.textContent = tt('admin_select_sector');
+    const aAT = document.getElementById('adminAdvancedToolsSummary');
+    if (aAT) aAT.textContent = tt('admin_advanced_tools');
     const aBB = document.getElementById('adminBossBtn');
     if (aBB) aBB.textContent = tt('admin_boss');
     const aUB = document.getElementById('adminUnlockBtn');
@@ -3902,6 +3920,10 @@ function buildLevelWorld(level) {
     players[coopLocalIdx] = player;
     localPlayerIndex = coopLocalIdx;
 
+    if (isAdmin && typeof grantAdminFullArsenal === 'function') {
+        grantAdminFullArsenal(player);
+    }
+
     // Save run progress & equipment state
     if (!menuDemo) {
         try {
@@ -3914,6 +3936,12 @@ function buildLevelWorld(level) {
             high.savedPLevel = player.plevel;
             saveHigh(high);
             checkContinueBtn();
+            if (typeof syncProfileToSupabase === 'function' && typeof getProfile === 'function') {
+                const curProf = getProfile();
+                if (curProf && curProf.isLoggedIn && curProf.provider !== 'guest') {
+                    syncProfileToSupabase(curProf).catch(() => {});
+                }
+            }
         } catch(e){}
     }
 
@@ -12362,6 +12390,49 @@ const ADMIN_CODE = '123';
 let isAdmin = false;
 let godmode = false;
 
+const ADMIN_WEAPONS_FULL = ['knife', 'rifle', 'grenade', 'bazooka', 'shield', 'minigun'];
+const ADMIN_PERKS_FULL = [
+    'nano_plating', 'nano_plating',
+    'adrenaline', 'adrenaline',
+    'plasma', 'plasma',
+    'cryo_vent',
+    'vampiric',
+    'ricochet',
+    'kinetic_emp',
+    'thermal_trail'
+];
+
+function grantAdminFullArsenal(target) {
+    if (!target) return;
+    target.weapons = [...ADMIN_WEAPONS_FULL];
+    if (!target.currentWeapon || !ADMIN_WEAPONS_FULL.includes(target.currentWeapon) || target.currentWeapon === 'knife') {
+        target.currentWeapon = 'rifle';
+    }
+    target.perks = [...ADMIN_PERKS_FULL];
+    target.perkNano = 2;
+    target.perkAdrenaline = 2;
+    target.perkPlasma = 2;
+    target.perkCryo = 1;
+    target.perkVampire = 1;
+    target.perkRicochet = 1;
+    target.perkEmp = 1;
+    target.perkThermal = 1;
+
+    target.maxHp = Math.max(target.maxHp || 100, 300);
+    target.hp = target.maxHp;
+    target.atk = Math.max(target.atk || 20, 55);
+    target.speed = Math.max(target.speed || 3.5, 4.8);
+    target.dashSpeed = Math.max(target.dashSpeed || 8, 11);
+    target.plevel = Math.max(target.plevel || 1, 15);
+    target.shieldTimer = 0;
+    target.minigunHeat = 0;
+    target.minigunOverheat = 0;
+    target.weaponCooldowns = {};
+    ADMIN_WEAPONS_FULL.forEach(w => {
+        target.weaponCooldowns[w] = 0;
+    });
+}
+
 function openAdminLogin() {
     if (isAdmin) {
         renderAdminLevels();
@@ -12383,10 +12454,30 @@ function submitAdminLogin() {
         isAdmin = true;
         if (err) { err.style.display = 'none'; err.textContent = ''; }
         if (inp) inp.value = '';
+
+        // Otomatis buka seluruh 15 sektor & bekali senjata serta augmentasi maksimal
+        try {
+            const high = loadHigh();
+            high.highestLevel = 15;
+            high.lastLevel = 14;
+            high.savedWeapons = [...ADMIN_WEAPONS_FULL];
+            high.savedCurrentWeapon = 'rifle';
+            high.savedPerks = [...ADMIN_PERKS_FULL];
+            high.savedExp = 9999;
+            high.savedPLevel = 15;
+            saveHigh(high);
+            checkContinueBtn();
+        } catch (e) {}
+
+        if (player) {
+            grantAdminFullArsenal(player);
+        }
+
         renderAdminLevels();
         toggleHomePanel('adminPanel');
         applyLang();
         announceAdmin(tt('admin_welcome'));
+        sWeaponUnlock();
     } else {
         if (err) { err.textContent = tt('admin_wrong'); err.style.display = 'block'; }
         sLocked();
@@ -12408,9 +12499,21 @@ function renderAdminLevels() {
     for (let i = 0; i < LEVELS; i++) {
         const b = document.createElement('button');
         b.type = 'button';
-        const isBoss = (i === LEVELS - 1);
-        b.textContent = isBoss ? ('CH 15 (APEX)') : ('CH ' + (i + 1));
-        b.title = isBoss ? tt('admin_boss') : tt('admin_chapter_fmt', { n: i + 1 });
+        const isApex = (i === LEVELS - 1);
+        const isHarvester = (i === 9);
+        if (isApex) {
+            b.textContent = 'CH 15 (APEX)';
+            b.className = 'admin-lvl-btn admin-lvl-apex';
+            b.title = 'CH 15: The Monolith';
+        } else if (isHarvester) {
+            b.textContent = 'CH 10 (BOSS)';
+            b.className = 'admin-lvl-btn admin-lvl-boss';
+            b.title = 'CH 10: Mother Harvester';
+        } else {
+            b.textContent = 'CH ' + String(i + 1).padStart(2, '0');
+            b.className = 'admin-lvl-btn';
+            b.title = tt('admin_chapter_fmt', { n: i + 1 });
+        }
         b.addEventListener('click', () => adminJump(i));
         wrap.appendChild(b);
     }
@@ -12431,7 +12534,22 @@ function adminStartAt(level) {
     showHUD();
     hideCursor();
     initLevel(level);
+    if (player) {
+        grantAdminFullArsenal(player);
+    }
+    sWeaponUnlock();
+    if (typeof floatingTexts !== 'undefined' && player) {
+        floatingTexts.push({
+            x: player.x,
+            y: player.y - 34,
+            text: tt('admin_full_loadout_msg') + ' (CH ' + (level + 1) + ')',
+            color: '#00f0ff',
+            life: 140,
+            maxLife: 140
+        });
+    }
     announceAdmin(tt('admin_jump_msg') + (level + 1));
+    updateUI();
 }
 
 function adminJump(level) {

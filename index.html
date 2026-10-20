@@ -320,6 +320,10 @@
             <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
             <span>Save Profile</span>
           </button>
+          <button class="btn secondary" id="btnManualCloudSync" type="button" onclick="handleManualCloudSync()" style="border-color:rgba(0,240,255,0.5);color:#00f0ff;">
+            <svg class="btn-icon" viewBox="0 0 24 24" style="fill:#00f0ff;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+            <span>Sync Cloud Data</span>
+          </button>
           <button class="btn secondary" id="btnResetProfile" type="button" onclick="openAuthModal('login')">
             Switch Account / Login
           </button>
@@ -676,6 +680,83 @@
         <div id="coopJoinError" class="coop-error-msg" style="display:none;"></div>
         <button class="btn" id="coopConnectBtn" type="button" onclick="submitJoinCoopRoom()">
           <span data-i18n="coop_connect_btn">HUBUNGKAN KE REGU ▸</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: OPERATIVE AUTHENTICATION (LOGIN & REGISTER) -->
+<div class="modal-backdrop" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" style="display:none;" onclick="if(event.target===this)closeAuthModal()">
+  <div class="modal auth-modal-card" style="max-width:480px;width:92%;" onclick="event.stopPropagation()">
+    <div class="modal-header-row">
+      <h3>
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span id="authModalTitle">OPERATIVE TERMINAL &bull; AUTHENTICATION</span>
+      </h3>
+      <button class="btn-sidebar-close" type="button" onclick="closeAuthModal()" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Mode Tabs: Login vs Register -->
+    <div class="coop-tabs-bar" style="margin-bottom:16px;">
+      <button class="btn-coop-tab active" id="authTabLoginBtn" type="button" onclick="switchAuthMode('login')">
+        <span>MASUK AKUN (LOGIN)</span>
+      </button>
+      <button class="btn-coop-tab" id="authTabRegisterBtn" type="button" onclick="switchAuthMode('register')">
+        <span>DAFTAR BARU (REGISTER)</span>
+      </button>
+    </div>
+
+    <!-- Section 1: Login -->
+    <div id="authLoginSection">
+      <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;">
+        Masuk dengan akun terdaftar untuk menyinkronkan foto profil, level tertinggi, senjata, dan rekor langsung dari Supabase Database.
+      </p>
+      <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
+        <label for="loginCallsignInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;">Operative Callsign / Handle:</label>
+        <input type="text" id="loginCallsignInput" placeholder="Contoh: OPERATIVE-01" autocomplete="username" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){var p=document.getElementById('loginPasscodeInput');if(p)p.focus();}">
+      </div>
+      <div class="profile-form-group" style="margin-bottom:16px;text-align:left;">
+        <label for="loginPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;">Security Passcode (PIN/Sandi):</label>
+        <input type="password" id="loginPasscodeInput" placeholder="Masukkan sandi akun Anda" autocomplete="current-password" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){handlePerformLogin();}">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn" id="btnPerformLogin" type="button" onclick="handlePerformLogin()" style="width:100%;">
+          <span>MASUK KE SISTEM FASILITAS ▸</span>
+        </button>
+        <button class="btn secondary" id="btnQuickGuest" type="button" onclick="handleQuickGuest()" style="width:100%;font-size:11px;">
+          Lanjut sebagai Tamu (Guest Mode)
+        </button>
+      </div>
+    </div>
+
+    <!-- Section 2: Register -->
+    <div id="authRegisterSection" style="display:none;">
+      <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;">
+        Daftarkan Callsign baru untuk mengamankan identitas, foto profil, dan seluruh pencapaian roguilite Anda ke cloud database.
+      </p>
+      <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
+        <label for="modalUsernameInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Pilih Operative Callsign (3-24 karakter):</label>
+        <input type="text" id="modalUsernameInput" placeholder="Contoh: CARNIS_HUNTER" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;">
+      </div>
+      <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
+        <label for="modalPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Buat Passcode / Sandi Akun (min. 4 karakter):</label>
+        <input type="password" id="modalPasscodeInput" placeholder="Sandi aman akun baru" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;">
+      </div>
+      <div class="profile-form-group" style="margin-bottom:16px;text-align:left;">
+        <label for="modalRoleSelect" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Divisi Fasilitas:</label>
+        <select id="modalRoleSelect" style="width:100%;box-sizing:border-box;background:#12060a;color:#e7d6cf;border:1px solid rgba(0,255,136,0.4);padding:8px;font-family:inherit;font-size:13px;border-radius:4px;">
+          <option value="Field Operative">Field Operative</option>
+          <option value="Anomaly Investigator">Anomaly Investigator</option>
+          <option value="Containment Specialist">Containment Specialist</option>
+          <option value="Biohazard Medic">Biohazard Medic</option>
+          <option value="Sector Commander">Sector Commander</option>
+        </select>
+      </div>
+      <div style="display:none;" id="modalAutoSaveIndicator"></div>
+      <div>
+        <button class="btn" id="modalSaveProfileBtn" type="button" onclick="handleModalRegisterProfile()" style="width:100%;background:linear-gradient(135deg,#00ff88,#008855);color:#021a0e;">
+          <span>DAFTAR AKUN OPERATIF BARU ▸</span>
         </button>
       </div>
     </div>
@@ -1178,40 +1259,61 @@
         </div>
     </div>
     <div id="adminPanel" style="display:none">
-        <h3 id="adminPanelTitle" style="margin-bottom:6px">ADMIN PANEL // FACILITY</h3>
-        <p id="adminPanelDesc" style="font-size:13px;opacity:.8;margin-bottom:10px">Jump to sector / test anomalies.</p>
+        <h3 id="adminPanelTitle" style="margin-bottom:6px">ADMIN PANEL // SECTOR SELECT</h3>
+        <p id="adminPanelDesc" style="font-size:13px;opacity:.8;margin-bottom:8px">Jump to sector / test anomalies.</p>
+        <div id="adminStatusBanner" style="background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.4);border-radius:4px;padding:8px 12px;margin:6px 0 12px;font-size:12px;color:#00ff88;line-height:1.4;text-align:left;">
+            <div style="font-weight:bold;letter-spacing:1px;display:flex;align-items:center;gap:6px;">
+                <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;"></span>
+                <span id="adminBannerTitle">OTORISASI ADMIN PENUH // ARSENAL &amp; SKILL MAKSIMAL</span>
+            </div>
+            <div id="adminBannerSub" style="color:#d8f8e8;font-size:11px;margin-top:3px;opacity:0.9;">
+                Semua 15 Sektor Fasilitas terbuka &amp; 6 senjata aktif. Pilih sektor untuk langsung meluncur:
+            </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:12px;font-weight:bold;color:#00e5ff;letter-spacing:1px;" id="adminSelectSectorLbl">PILIH SEKTOR OPERASI (1 - 15)</span>
+            <span style="font-size:11px;color:#888;">KLIK UNTUK MASUK</span>
+        </div>
         <div id="adminLevels" class="admin-levels"></div>
-        <!-- WEAPON ARSENAL TESTING -->
-        <div style="margin-top:14px;color:#00f0ff;font-size:12px;font-weight:bold;letter-spacing:1px;text-align:left;" id="adminWeaponsTitle">UJI PERSENJATAAN (ARSENAL)</div>
-        <div id="adminWeaponsGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;">
-            <button class="btn-micro" type="button" data-i18n="weapon_knife" onclick="adminEquipWeapon('knife')">Tactical Knife</button>
-            <button class="btn-micro" type="button" data-i18n="weapon_rifle" onclick="adminEquipWeapon('rifle')">Tactical Rifle</button>
-            <button class="btn-micro" type="button" data-i18n="weapon_grenade" onclick="adminEquipWeapon('grenade')">EMP Grenade</button>
-            <button class="btn-micro" type="button" data-i18n="weapon_bazooka" onclick="adminEquipWeapon('bazooka')">Rocket Launcher</button>
-            <button class="btn-micro" type="button" data-i18n="weapon_shield" onclick="adminEquipWeapon('shield')">Kinetic Shield</button>
-            <button class="btn-micro" type="button" data-i18n="weapon_minigun" onclick="adminEquipWeapon('minigun')">Minigun</button>
-        </div>
 
-        <!-- PERK / SKILL TESTING -->
-        <div style="margin-top:14px;color:#ffd700;font-size:12px;font-weight:bold;letter-spacing:1px;text-align:left;" id="adminPerksTitle">UJI SKILL &amp; PERK OPERATIF</div>
-        <button class="btn secondary" style="width:100%;margin-top:6px;border-color:rgba(255,215,0,0.5);color:#ffd700;" id="adminUnlockAllBtn" onclick="adminUnlockAllPerks()">UNLOCK ALL SKILLS (MAX)</button>
-        <div id="adminPerksGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px;">
-            <button class="btn-micro" type="button" data-i18n="perk_nano_name" onclick="adminAddPerk('nano_plating')">Nanite Armor Plating</button>
-            <button class="btn-micro" type="button" data-i18n="perk_adren_name" onclick="adminAddPerk('adrenaline')">Adrenaline Servo Injector</button>
-            <button class="btn-micro" type="button" data-i18n="perk_plasma_name" onclick="adminAddPerk('plasma')">Hyper-Charge Plasma Munitions</button>
-            <button class="btn-micro" type="button" data-i18n="perk_cryo_name" onclick="adminAddPerk('cryo_vent')">Cryo-Vent Heat Sinks</button>
-            <button class="btn-micro" type="button" data-i18n="perk_vamp_name" onclick="adminAddPerk('vampiric')">Nanite Bio-Siphon</button>
-            <button class="btn-micro" type="button" data-i18n="perk_rico_name" onclick="adminAddPerk('ricochet')">Plasma Deflection Matrix</button>
-            <button class="btn-micro" type="button" data-i18n="perk_emp_name" onclick="adminAddPerk('kinetic_emp')">Kinetic EMP Discharge</button>
-            <button class="btn-micro" type="button" data-i18n="perk_therm_name" onclick="adminAddPerk('thermal_trail')">Thermal Exhaust Trail</button>
-        </div>
-
-        <div style="display:grid;gap:8px;margin-top:14px">
-            <button class="btn" id="adminBossBtn" onclick="adminTestBoss()">TEST THE MONOLITH (LV 15)</button>
-            <button class="btn secondary" id="adminUnlockBtn" onclick="adminUnlockExit()">UNLOCK EXIT AIRLOCK</button>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+            <button class="btn secondary" id="adminBossBtn" onclick="adminTestBoss()" style="border-color:rgba(255,70,70,0.6);color:#ff6060;">THE MONOLITH (LV 15)</button>
             <button class="btn secondary" id="adminGodBtn" onclick="adminToggleGod()">INVULNERABLE: OFF</button>
+            <button class="btn secondary" id="adminUnlockBtn" onclick="adminUnlockExit()">UNLOCK EXIT AIRLOCK</button>
             <button class="btn secondary" id="adminKillBtn" onclick="adminKillAll()">PURGE ALL MONSTERS</button>
-            <button class="btn secondary" id="adminLogoutBtn" onclick="adminLogout()">LOGOUT ADMIN</button>
+        </div>
+
+        <details style="margin-top:12px;border:1px dashed rgba(255,255,255,0.15);border-radius:4px;padding:8px;text-align:left;">
+            <summary style="font-size:11px;color:#999;cursor:pointer;user-select:none;" id="adminAdvancedToolsSummary">OPSI TAMBAHAN // UJI SENJATA &amp; SKILL SATUAN</summary>
+            <!-- WEAPON ARSENAL TESTING -->
+            <div style="margin-top:10px;color:#00f0ff;font-size:11px;font-weight:bold;letter-spacing:1px;" id="adminWeaponsTitle">UJI PERSENJATAAN (ARSENAL)</div>
+            <div id="adminWeaponsGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;">
+                <button class="btn-micro" type="button" data-i18n="weapon_knife" onclick="adminEquipWeapon('knife')">Tactical Knife</button>
+                <button class="btn-micro" type="button" data-i18n="weapon_rifle" onclick="adminEquipWeapon('rifle')">Tactical Rifle</button>
+                <button class="btn-micro" type="button" data-i18n="weapon_grenade" onclick="adminEquipWeapon('grenade')">EMP Grenade</button>
+                <button class="btn-micro" type="button" data-i18n="weapon_bazooka" onclick="adminEquipWeapon('bazooka')">Rocket Launcher</button>
+                <button class="btn-micro" type="button" data-i18n="weapon_shield" onclick="adminEquipWeapon('shield')">Kinetic Shield</button>
+                <button class="btn-micro" type="button" data-i18n="weapon_minigun" onclick="adminEquipWeapon('minigun')">Minigun</button>
+            </div>
+
+            <!-- PERK / SKILL TESTING -->
+            <div style="margin-top:10px;color:#ffd700;font-size:11px;font-weight:bold;letter-spacing:1px;" id="adminPerksTitle">UJI SKILL &amp; PERK OPERATIF</div>
+            <button class="btn secondary" style="width:100%;margin-top:6px;border-color:rgba(255,215,0,0.5);color:#ffd700;padding:6px;font-size:11px;" id="adminUnlockAllBtn" onclick="adminUnlockAllPerks()">UNLOCK ALL SKILLS (MAX)</button>
+            <div id="adminPerksGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px;">
+                <button class="btn-micro" type="button" data-i18n="perk_nano_name" onclick="adminAddPerk('nano_plating')">Nanite Armor Plating</button>
+                <button class="btn-micro" type="button" data-i18n="perk_adren_name" onclick="adminAddPerk('adrenaline')">Adrenaline Servo Injector</button>
+                <button class="btn-micro" type="button" data-i18n="perk_plasma_name" onclick="adminAddPerk('plasma')">Hyper-Charge Plasma Munitions</button>
+                <button class="btn-micro" type="button" data-i18n="perk_cryo_name" onclick="adminAddPerk('cryo_vent')">Cryo-Vent Heat Sinks</button>
+                <button class="btn-micro" type="button" data-i18n="perk_vamp_name" onclick="adminAddPerk('vampiric')">Nanite Bio-Siphon</button>
+                <button class="btn-micro" type="button" data-i18n="perk_rico_name" onclick="adminAddPerk('ricochet')">Plasma Deflection Matrix</button>
+                <button class="btn-micro" type="button" data-i18n="perk_emp_name" onclick="adminAddPerk('kinetic_emp')">Kinetic EMP Discharge</button>
+                <button class="btn-micro" type="button" data-i18n="perk_therm_name" onclick="adminAddPerk('thermal_trail')">Thermal Exhaust Trail</button>
+            </div>
+        </details>
+
+        <div style="margin-top:12px">
+            <button class="btn secondary" id="adminLogoutBtn" onclick="adminLogout()" style="width:100%;">LOGOUT ADMIN</button>
         </div>
     </div>
     <div id="homeSettings">

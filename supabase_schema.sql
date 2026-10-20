@@ -21,6 +21,16 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- Migrasi kolom jika tabel sudah ada sebelumnya
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS passcode TEXT DEFAULT '';
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS total_play_time INTEGER DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS highest_level INTEGER DEFAULT 1;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS total_kills INTEGER DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS best_time INTEGER DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS high_score INTEGER DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS saved_weapons JSONB DEFAULT '["knife"]'::jsonb;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS saved_perks JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS saved_plevel INTEGER DEFAULT 1;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS saved_exp INTEGER DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS games_played INTEGER DEFAULT 0;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS games_won INTEGER DEFAULT 0;
 
 -- Bersihkan data duplikat lama sebelum membuat unique index (pertahankan data paling baru)
 DELETE FROM public.profiles
@@ -185,6 +195,14 @@ BEGIN
             'preset_emoji', v_prof.preset_emoji,
             'provider', v_prof.provider,
             'clearance', v_prof.clearance,
+            'highest_level', COALESCE(v_prof.highest_level, 1),
+            'total_kills', COALESCE(v_prof.total_kills, 0),
+            'best_time', COALESCE(v_prof.best_time, 0),
+            'high_score', COALESCE(v_prof.high_score, 0),
+            'saved_weapons', COALESCE(v_prof.saved_weapons, '["knife"]'::jsonb),
+            'saved_perks', COALESCE(v_prof.saved_perks, '[]'::jsonb),
+            'saved_plevel', COALESCE(v_prof.saved_plevel, 1),
+            'saved_exp', COALESCE(v_prof.saved_exp, 0),
             'updated_at', v_prof.updated_at
         )
     );

@@ -1018,22 +1018,30 @@ async function handlePerformLogin() {
             return;
           }
 
-          const prof = {
-            isLoggedIn: true,
-            name: remote.username,
-            role: remote.role || 'Field Operative',
-            avatar: remote.avatar || '',
-            presetEmoji: remote.preset_emoji || 'biohazard',
-            passcode: remote.passcode || passcode,
-            provider: remote.provider || 'facility',
-            status: `${(remote.role || 'OPERATIVE').toUpperCase()} // CLOUD VERIFIED`
-          };
+          let syncRes = null;
+          if (typeof syncAccountDataFromCloud === 'function') {
+            syncRes = syncAccountDataFromCloud(remote);
+          } else {
+            const prof = {
+              isLoggedIn: true,
+              name: remote.username,
+              role: remote.role || 'Field Operative',
+              avatar: remote.avatar || '',
+              presetEmoji: remote.preset_emoji || 'biohazard',
+              passcode: remote.passcode || passcode,
+              provider: remote.provider || 'facility',
+              status: `${(remote.role || 'OPERATIVE').toUpperCase()} // CLOUD VERIFIED`
+            };
+            setProfile(prof);
+            syncRes = { prof, high: { highestLevel: 1 } };
+          }
 
-          setProfile(prof);
           resetBtn();
           closeAuthModal();
           homeBeep('save');
-          alert('[CLOUD AUTHORIZATION GRANTED]\nWelcome back, Operative ' + prof.name + '!\nProfile & clearance credentials synced from facility database.');
+          const finalProf = (syncRes && syncRes.prof) || { name: remote.username };
+          const finalHigh = (syncRes && syncRes.high) || { highestLevel: 1 };
+          alert('[CLOUD AUTHORIZATION GRANTED]\nWelcome back, Operative ' + finalProf.name + '!\nProfile, Avatar, and Sector Progress (CH ' + finalHigh.highestLevel + '/15) fully synced from facility database.');
           return;
         }
       } catch (err) {
@@ -1197,6 +1205,13 @@ async function handleModalRegisterProfile() {
     };
 
     setProfile(newProf);
+    if (typeof syncProfileToSupabase === 'function' && typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
+      try {
+        await syncProfileToSupabase(newProf);
+      } catch (syncErr) {
+        console.warn('Sync registrasi ke Supabase:', syncErr);
+      }
+    }
     resetRegBtn();
     closeAuthModal();
     homeBeep('save');
@@ -1246,6 +1261,53 @@ function handleSaveFullProfile() {
   setProfile(prof);
   homeBeep('save');
   showSaveIndicator('Profile Saved Successfully');
+}
+
+async function handleManualCloudSync() {
+  const prof = getProfile();
+  if (!prof || !prof.isLoggedIn || prof.provider === 'guest' || prof.name === 'GUEST-77') {
+    homeBeep('denied');
+    alert('[SINKRONISASI DIBATALKAN]\nAnda saat ini dalam mode Tamu (Guest).\nSilakan LOGIN atau DAFTAR AKUN terlebih dahulu untuk mengamankan data ke database Supabase.');
+    openAuthModal('login');
+    return;
+  }
+
+  homeBeep('click');
+  const syncBtn = document.getElementById('btnManualCloudSync');
+  const origHtml = syncBtn ? syncBtn.innerHTML : '';
+  if (syncBtn) {
+    syncBtn.disabled = true;
+    syncBtn.innerHTML = '<span>Mengunggah ke Cloud...</span>';
+  }
+
+  try {
+    if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
+      if (typeof syncProfileToSupabase === 'function') {
+        await syncProfileToSupabase(prof);
+      }
+      if (typeof fetchOperativeByCallsign === 'function') {
+        const remote = await fetchOperativeByCallsign(prof.name);
+        if (remote && typeof syncAccountDataFromCloud === 'function') {
+          syncAccountDataFromCloud(remote);
+        }
+      }
+      homeBeep('save');
+      showSaveIndicator('Cloud Synced');
+      alert(`[SINKRONISASI DATABASE BERHASIL]\nAkun Operatif: ${prof.name}\nFoto Profil (PP), kredensial, senjata yang didapat, dan pencapaian level telah disinkronkan sempurna dengan Supabase.`);
+    } else {
+      homeBeep('denied');
+      alert('[UPLINK OFFLINE]\nKoneksi fasilitas belum terhubung.');
+    }
+  } catch (err) {
+    homeBeep('denied');
+    console.error('Gagal sinkron manual:', err);
+    alert('Gagal sinkronisasi: ' + err.message);
+  } finally {
+    if (syncBtn) {
+      syncBtn.disabled = false;
+      syncBtn.innerHTML = origHtml;
+    }
+  }
 }
 
 function handleLogout() {

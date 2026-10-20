@@ -146,7 +146,7 @@ async function verifyOperativePasscode(username, passcode) {
   return passOk ? { ok: true, profile: remote } : { ok: false, reason: 'invalid_passcode' };
 }
 
-// 1. Simpan atau perbarui profil ke Supabase (Smart UPSERT & Schema Fallback)
+// 1. Simpan atau perbarui profil & pencapaian akun ke Supabase (Smart UPSERT & Schema Fallback)
 async function syncProfileToSupabase(prof) {
   if (!isSupabaseConfigured() || !prof || !prof.name || prof.provider === 'guest' || !prof.isLoggedIn) {
     return null;
@@ -157,6 +157,32 @@ async function syncProfileToSupabase(prof) {
       ? (isHashedPasscode(prof.passcode) ? prof.passcode : await hashPasscode(prof.name, prof.passcode))
       : '';
 
+    // Ambil data progres & pencapaian operatif dari storage lokal
+    let high = {};
+    try { high = JSON.parse(localStorage.getItem('vita_high') || '{}'); } catch (e) {}
+    const safeHighLevel = Math.max(1, Math.min(15, Math.round(Number(high.highestLevel) || 1)));
+    const safeKills = Math.max(0, Math.round(Number(high.totalKills) || 0));
+    const safeTime = Math.max(0, Math.round(Number(high.bestTime) || 0));
+    const safeScore = Math.max(0, Math.round(Number(high.score) || 0));
+    const safeWeapons = (Array.isArray(high.savedWeapons) && high.savedWeapons.length) ? high.savedWeapons : ['knife'];
+    const safePerks = Array.isArray(high.savedPerks) ? high.savedPerks : [];
+    const safePLevel = Math.max(1, Math.round(Number(high.savedPLevel) || 1));
+    const safeExp = Math.max(0, Math.round(Number(high.savedExp) || 0));
+
+    // Serialisasi progress ke metadata clearance sebagai jaminan anti-gagal
+    const metaObj = {
+      lvl: safeHighLevel,
+      kills: safeKills,
+      time: safeTime,
+      score: safeScore,
+      wpns: safeWeapons,
+      prks: safePerks,
+      plvl: safePLevel,
+      exp: safeExp
+    };
+    const baseClearance = String(prof.status || 'LEVEL-1').split('#M:')[0].trim();
+    const compositeClearance = `${baseClearance}#M:${JSON.stringify(metaObj)}`;
+
     // 1. Coba jalankan Secure RPC Upsert terlebih dahulu (Anti-Hijack & Proteksi Sandi)
     try {
       const rpcPayload = {
@@ -166,7 +192,7 @@ async function syncProfileToSupabase(prof) {
         p_avatar: (prof.avatar && prof.avatar.length < 50000) ? prof.avatar : '',
         p_preset_emoji: prof.presetEmoji || 'biohazard',
         p_provider: prof.provider || 'facility',
-        p_clearance: prof.status || 'LEVEL-1'
+        p_clearance: compositeClearance
       };
       const rpcResult = await supabaseFetch('rpc/upsert_operative_profile', {
         method: 'POST',
@@ -179,14 +205,12 @@ async function syncProfileToSupabase(prof) {
         throw new Error(rpcResult.message || 'Passcode tidak cocok.');
       }
     } catch (rpcErr) {
-      // Jika error adalah unauthorized dari RPC, lempar error asli
       if (rpcErr.message && rpcErr.message.includes('Passcode')) {
         throw rpcErr;
       }
-      // Jika 404 / RPC belum ada di database remote, lanjut ke metode fallback tabel langsung
     }
 
-    // 2. Fallback: Direct Table Upsert
+    // 2. Direct Table Upsert
     const existing = await fetchOperativeByCallsign(prof.name);
 
     const payload = {
@@ -194,8 +218,16 @@ async function syncProfileToSupabase(prof) {
       role: prof.role || 'Operatif Lapangan',
       preset_emoji: prof.presetEmoji || 'biohazard',
       provider: prof.provider || 'facility',
-      clearance: prof.status || 'LEVEL-1',
+      clearance: compositeClearance,
       avatar: (prof.avatar && prof.avatar.length < 50000) ? prof.avatar : '',
+      highest_level: safeHighLevel,
+      total_kills: safeKills,
+      best_time: safeTime,
+      high_score: safeScore,
+      saved_weapons: safeWeapons,
+      saved_perks: safePerks,
+      saved_plevel: safePLevel,
+      saved_exp: safeExp,
       updated_at: new Date().toISOString()
     };
 
@@ -217,10 +249,18 @@ async function syncProfileToSupabase(prof) {
         body: JSON.stringify(payload)
       });
     } catch (err) {
-      // Fallback jika server Supabase belum memiliki kolom passcode (PGRST204)
-      if (err.message && (err.message.includes('passcode') || err.message.includes('PGRST204'))) {
-        console.warn('[UPLINK FALLBACK] Kolom passcode belum ada di database remote. Mengirim tanpa passcode...');
-        delete payload.passcode;
+      // Fallback jika database Supabase remote belum memiliki kolom-kolom baru (PGRST204)
+      if (err.message && err.message.includes('PGRST204')) {
+        console.warn('[UPLINK FALLBACK] Kolom baru belum ada di schema remote. Mengirim via core payload...');
+        delete payload.highest_level;
+        delete payload.total_kills;
+        delete payload.best_time;
+        delete payload.high_score;
+        delete payload.saved_weapons;
+        delete payload.saved_perks;
+        delete payload.saved_plevel;
+        delete payload.saved_exp;
+        if (err.message.includes('passcode')) delete payload.passcode;
         return await supabaseFetch(targetEndpoint, {
           method,
           body: JSON.stringify(payload)
@@ -229,9 +269,81 @@ async function syncProfileToSupabase(prof) {
       throw err;
     }
   } catch (err) {
-    console.warn('Gagal sinkron profil ke facility network:', err.message);
+    console.warn('Gagal sinkron profil & pencapaian ke facility network:', err.message);
     return null;
   }
+}
+
+// Sinkronkan data akun & seluruh pencapaian dari remote profile ke sistem lokal
+function syncAccountDataFromCloud(remote) {
+  if (!remote || !remote.username) return null;
+
+  let meta = null;
+  if (typeof remote.clearance === 'string' && remote.clearance.includes('#M:')) {
+    try {
+      const parts = remote.clearance.split('#M:');
+      meta = JSON.parse(parts[1]);
+    } catch (e) {}
+  }
+
+  const highestLevel = Math.max(1, Math.min(15, Math.round(Number(remote.highest_level || (meta && meta.lvl) || 1))));
+  const totalKills = Math.max(0, Math.round(Number(remote.total_kills || (meta && meta.kills) || 0)));
+  const bestTime = Math.max(0, Math.round(Number(remote.best_time || (meta && meta.time) || 0)));
+  const score = Math.max(0, Math.round(Number(remote.high_score || (meta && meta.score) || 0)));
+  const savedWeapons = (Array.isArray(remote.saved_weapons) && remote.saved_weapons.length)
+    ? remote.saved_weapons
+    : ((meta && Array.isArray(meta.wpns) && meta.wpns.length) ? meta.wpns : ['knife']);
+  const savedPerks = Array.isArray(remote.saved_perks)
+    ? remote.saved_perks
+    : ((meta && Array.isArray(meta.prks)) ? meta.prks : []);
+  const savedPLevel = Math.max(1, Math.round(Number(remote.saved_plevel || (meta && meta.plvl) || 1)));
+  const savedExp = Math.max(0, Math.round(Number(remote.saved_exp || (meta && meta.exp) || 0)));
+
+  // Update vita_high (save data roguelite)
+  let high = {};
+  try { high = JSON.parse(localStorage.getItem('vita_high') || '{}'); } catch (e) {}
+  high.highestLevel = Math.max(Number(high.highestLevel) || 1, highestLevel);
+  high.lastLevel = Math.max(0, highestLevel - 1);
+  high.totalKills = Math.max(Number(high.totalKills) || 0, totalKills);
+  if (bestTime > 0) high.bestTime = (!high.bestTime || bestTime < high.bestTime) ? bestTime : high.bestTime;
+  if (score > 0) high.score = Math.max(Number(high.score) || 0, score);
+  high.savedWeapons = [...new Set([...(high.savedWeapons || ['knife']), ...savedWeapons])];
+  high.savedPerks = savedPerks.length ? savedPerks : (high.savedPerks || []);
+  high.savedPLevel = Math.max(Number(high.savedPLevel) || 1, savedPLevel);
+  high.savedExp = Math.max(Number(high.savedExp) || 0, savedExp);
+
+  try {
+    localStorage.setItem('vita_high', JSON.stringify(high));
+  } catch (e) {}
+
+  // Update vita_profile
+  const cleanStatus = String(remote.clearance || `${(remote.role || 'OPERATIVE').toUpperCase()} // CLOUD SYNCED`).split('#M:')[0].trim();
+  const prof = {
+    isLoggedIn: true,
+    name: remote.username,
+    role: remote.role || 'Field Operative',
+    avatar: (remote.avatar && remote.avatar.length < 50000) ? remote.avatar : '',
+    presetEmoji: remote.preset_emoji || 'biohazard',
+    passcode: remote.passcode || '',
+    provider: 'facility',
+    status: cleanStatus || `${(remote.role || 'OPERATIVE').toUpperCase()} // CLOUD SYNCED`
+  };
+
+  try {
+    localStorage.setItem('vita_profile', JSON.stringify(prof));
+  } catch (e) {}
+
+  if (typeof saveLocalAccount === 'function') {
+    saveLocalAccount(prof);
+  }
+  if (typeof applyProfileUI === 'function') {
+    applyProfileUI();
+  }
+  if (typeof checkContinueBtn === 'function') {
+    checkContinueBtn();
+  }
+
+  return { prof, high };
 }
 
 // Ambil profil operatif berdasarkan username dari Supabase (Case-Insensitive & Terkini)
