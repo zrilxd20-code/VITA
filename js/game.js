@@ -10310,71 +10310,127 @@ function drawExit() {
     const sx = exitPos.x - cameraX + W / 2;
     const sy = exitPos.y - cameraY + H / 2;
 
-    if (sx < -80 || sx > W + 80 || sy < -80 || sy > H + 80) return;
-    if (!fogOfWar[exitPos.gy] || !fogOfWar[exitPos.gx]) return;
-
     const unlocked = coinsCollected >= artifacts.length;
+    // Jika belum dibuka dan belum terjelajah, baru lewati render
+    if (!unlocked && (!fogOfWar[exitPos.gy] || !fogOfWar[exitPos.gx])) return;
+    if (sx < -120 || sx > W + 120 || sy < -120 || sy > H + 120) return;
+
     const time = Date.now() / 1000;
-    const pulse = 1 + Math.sin(time * 3) * 0.1;
+    const pulse = 1 + Math.sin(time * 3.5) * 0.15;
+    const portalColor = unlocked ? '#00ff88' : '#7f8c8d';
 
     ctx.save();
     ctx.translate(sx, sy);
 
-    const portalColor = unlocked ? '#2ecc71' : '#7f8c8d';
-
-    ctx.globalAlpha = 0.2 + Math.sin(time * 2) * 0.1;
-    ctx.fillStyle = portalColor;
-    ctx.shadowColor = portalColor;
-    ctx.shadowBlur = 30;
-    ctx.beginPath();
-    ctx.arc(0, 0, 30 * pulse, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = unlocked ? '#27ae60' : '#95a5a6';
-    ctx.beginPath();
-    ctx.arc(0, 0, 18 * pulse, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.globalAlpha = 0.9;
-    ctx.fillStyle = unlocked ? '#a8f5c3' : '#bdc3c7';
-    ctx.beginPath();
-    ctx.arc(0, 0, 10 * pulse, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.shadowBlur = 0;
-    ctx.globalAlpha = 1;
-
     if (unlocked) {
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 16px Arial';
+        // Efek Suar Beacon Vertikal & Cincin Gelombang Menembus Labirin
+        const waveRadius = ((time * 35) % 65);
+        const waveAlpha = Math.max(0, 0.45 * (1 - waveRadius / 65));
+        ctx.strokeStyle = '#00ff88';
+        ctx.lineWidth = 2.5;
+        ctx.globalAlpha = waveAlpha;
+        ctx.beginPath();
+        ctx.arc(0, 0, waveRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Cahaya Pendar Luar Kuat (Beacon Glow)
+        ctx.globalAlpha = 0.28 + Math.sin(time * 4) * 0.12;
+        ctx.fillStyle = '#00ff88';
+        ctx.shadowColor = '#00ff88';
+        ctx.shadowBlur = 38;
+        ctx.beginPath();
+        ctx.arc(0, 0, 42 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cincin Berputar (Rotating Portal Energy Ring)
+        ctx.save();
+        ctx.rotate(time * 1.8);
+        ctx.strokeStyle = '#a8f5c3';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.arc(0, 0, 24 * pulse, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // Inti Portal Evakuasi
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = '#00e676';
+        ctx.beginPath();
+        ctx.arc(0, 0, 16 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(0, 0, 8 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Label Teks Kontras Tinggi dengan Pill Background
+        const labelText = tt('arrow_exit') || 'EVACUATION GATE';
+        ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
+        const tw = ctx.measureText(labelText).width;
+        ctx.fillStyle = 'rgba(5, 12, 10, 0.85)';
+        ctx.strokeStyle = '#00ff88';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(-tw / 2 - 8, -48, tw + 16, 22, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#00ff88';
+        ctx.shadowColor = '#00ff88';
+        ctx.shadowBlur = 8;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = '#2ecc71';
-        ctx.shadowBlur = 12;
-        ctx.fillText(tt('arrow_exit'), 0, -38);
+        ctx.fillText(labelText, 0, -37);
         ctx.shadowBlur = 0;
-        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+
+        // Panah animasi ke bawah menunjuk tepat ke pusat portal
+        const arrowBob = Math.sin(time * 6) * 3;
+        ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.moveTo(-10, -5);
-        ctx.lineTo(2, -5);
-        ctx.lineTo(2, -10);
-        ctx.lineTo(12, 0);
-        ctx.lineTo(2, 10);
-        ctx.lineTo(2, 5);
-        ctx.lineTo(-10, 5);
+        ctx.moveTo(0, -22 + arrowBob);
+        ctx.lineTo(-6, -28 + arrowBob);
+        ctx.lineTo(-2, -28 + arrowBob);
+        ctx.lineTo(-2, -34 + arrowBob);
+        ctx.lineTo(2, -34 + arrowBob);
+        ctx.lineTo(2, -28 + arrowBob);
+        ctx.lineTo(6, -28 + arrowBob);
         ctx.closePath();
         ctx.fill();
     } else {
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 14px Arial';
+        // Pintu Terkunci
+        ctx.globalAlpha = 0.25;
+        ctx.fillStyle = '#7f8c8d';
+        ctx.beginPath();
+        ctx.arc(0, 0, 26 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.globalAlpha = 0.6;
+        ctx.fillStyle = '#95a5a6';
+        ctx.beginPath();
+        ctx.arc(0, 0, 14 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = '#bdc3c7';
+        ctx.beginPath();
+        ctx.arc(0, 0, 6 * pulse, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = 'bold 11px system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(tt('exit_locked_label'), 0, -42);
+        ctx.fillText(tt('exit_locked_label'), 0, -36);
 
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        ctx.font = 'bold 12px Arial';
-        ctx.fillText(tt('need_more_artifacts').replace('{n}', artifacts.length - coinsCollected), 0, 42);
+        const rem = Math.max(0, artifacts.length - coinsCollected);
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.9)';
+        ctx.font = 'bold 10px system-ui, sans-serif';
+        ctx.fillText(tt('need_more_artifacts').replace('{n}', rem), 0, 36);
     }
 
     ctx.restore();
@@ -10565,7 +10621,8 @@ function drawFloatingTexts() {
 
 function drawDirectionArrow() {
     let target = null;
-    if (coinsCollected < artifacts.length) {
+    const isExit = coinsCollected >= artifacts.length;
+    if (!isExit) {
         let bestDist = Infinity;
         artifacts.forEach(a => {
             if (!a.collected && dist(a, player) < bestDist) {
@@ -10580,42 +10637,52 @@ function drawDirectionArrow() {
 
     const dx = target.x - player.x;
     const dy = target.y - player.y;
+    const distanceMeters = Math.max(1, Math.round(Math.hypot(dx, dy) / 32));
     const angle = Math.atan2(dy, dx);
 
-    const margin = 60;
+    const margin = 68;
     const ex = player.x - cameraX + W / 2;
     const ey = player.y - cameraY + H / 2;
 
-    let sx = ex + Math.cos(angle) * 120;
-    let sy = ey + Math.sin(angle) * 120;
+    let sx = ex + Math.cos(angle) * (isExit ? 135 : 120);
+    let sy = ey + Math.sin(angle) * (isExit ? 135 : 120);
 
     sx = Math.max(margin, Math.min(W - margin, sx));
     sy = Math.max(margin, Math.min(H - margin, sy));
 
-    const pulse = 1 + Math.sin(Date.now() / 200) * 0.15;
-    const size = 14 * pulse;
-    const color = coinsCollected < artifacts.length ? '#f1c40f' : '#2ecc71';
+    const pulse = 1 + Math.sin(Date.now() / (isExit ? 150 : 200)) * (isExit ? 0.22 : 0.15);
+    const size = (isExit ? 18 : 14) * pulse;
+    const color = isExit ? '#00ff88' : '#f1c40f';
 
     ctx.save();
     ctx.translate(sx, sy);
     ctx.rotate(angle + Math.PI / 2);
     ctx.fillStyle = color;
     ctx.shadowColor = color;
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = isExit ? 18 : 10;
     ctx.beginPath();
     ctx.moveTo(0, -size);
-    ctx.lineTo(size * 0.8, size * 0.6);
-    ctx.lineTo(0, size * 0.3);
-    ctx.lineTo(-size * 0.8, size * 0.6);
+    ctx.lineTo(size * 0.85, size * 0.65);
+    ctx.lineTo(0, size * 0.32);
+    ctx.lineTo(-size * 0.85, size * 0.65);
     ctx.closePath();
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 10px Arial';
+    // Label Teks & Jarak Meteran
+    const label = (isExit ? (tt('arrow_exit') || 'EXIT') : tt('arrow_artifact')) + ' ' + distanceMeters + 'm';
+    ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
+    const textW = ctx.measureText(label).width;
+
+    ctx.fillStyle = 'rgba(5, 12, 10, 0.82)';
+    ctx.beginPath();
+    ctx.roundRect(-textW / 2 - 6, size + 4, textW + 12, 18, 5);
+    ctx.fill();
+
+    ctx.fillStyle = isExit ? '#ffffff' : '#fef08a';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(coinsCollected < artifacts.length ? tt('arrow_artifact') : tt('arrow_exit'), 0, size + 8);
+    ctx.fillText(label, 0, size + 13);
     ctx.restore();
 }
 
@@ -10736,11 +10803,11 @@ function drawSpawnHoloPrompts() {
     ctx.restore();
 }
 
-// Pulsa kompas samar di sekitar pemain saat seluruh artefak Sektor 1 sudah diambil.
-// Melengkapi drawDirectionArrow() (panah tepi layar) dengan isyarat jarak dekat.
+// Pulsa kompas terarah di sekitar pemain saat seluruh artefak sektor sudah diambil (Sektor 1 s.d. 15).
+// Melengkapi drawDirectionArrow() (panah tepi layar) dengan isyarat gelombang radar langsung dari tubuh pemain.
 function drawExitCompassPulse() {
-    if (currentLevel !== 0 || menuDemo || !exitPos) return;
-    if (!exitPos || !artifacts || !artifacts.length || coinsCollected < artifacts.length) return;
+    if (menuDemo || !exitPos) return;
+    if (!artifacts || !artifacts.length || coinsCollected < artifacts.length) return;
     const p = getLocalPlayer();
     if (!p || p.hp <= 0) return;
 
@@ -10748,23 +10815,23 @@ function drawExitCompassPulse() {
     const sy = p.y - cameraY + H / 2;
     const angle = Math.atan2(exitPos.y - p.y, exitPos.x - p.x);
     const t = Date.now() / 1000;
-    const pulse = REDUCE_MOTION ? 0.5 : (Math.sin(t * 3.4) * 0.5 + 0.5);
+    const pulse = REDUCE_MOTION ? 0.5 : (Math.sin(t * 4.2) * 0.5 + 0.5);
 
     ctx.save();
     ctx.translate(sx, sy);
     ctx.rotate(angle);
-    ctx.strokeStyle = '#2ecc71';
-    ctx.shadowColor = '#2ecc71';
-    ctx.shadowBlur = 8;
+    ctx.strokeStyle = '#00ff88';
+    ctx.shadowColor = '#00ff88';
+    ctx.shadowBlur = 10;
     ctx.lineCap = 'round';
     for (let i = 0; i < 3; i++) {
-        const r = 24 + i * 8 + pulse * 3;
-        ctx.globalAlpha = (0.30 - i * 0.07) * (0.55 + pulse * 0.45);
-        ctx.lineWidth = 1.6;
+        const r = 28 + i * 11 + pulse * 4;
+        ctx.globalAlpha = (0.42 - i * 0.1) * (0.6 + pulse * 0.4);
+        ctx.lineWidth = 2.2;
         ctx.beginPath();
-        ctx.moveTo(r - 4, -5);
-        ctx.lineTo(r + 1, 0);
-        ctx.lineTo(r - 4, 5);
+        ctx.moveTo(r - 6, -7);
+        ctx.lineTo(r + 2, 0);
+        ctx.lineTo(r - 6, 7);
         ctx.stroke();
     }
     ctx.restore();
@@ -10944,16 +11011,23 @@ function drawMinimap() {
         }
     });
 
-    // Pintu Keluar
+    // Pintu Keluar (Langsung terungkap dan berkedip neon di Minimap begitu semua artefak terkumpul)
     const exitOpen = coinsCollected >= artifacts.length;
-    if (exitPos && fogOfWar[exitPos.gy] && fogOfWar[exitPos.gx]) {
-        minimapCtx.fillStyle = exitOpen ? '#2ecc71' : '#7f8c8d';
-        minimapCtx.fillRect(ox + exitPos.gx * scale - 2, oy + exitPos.gy * scale - 2, 5, 5);
+    if (exitPos && (exitOpen || (fogOfWar[exitPos.gy] && fogOfWar[exitPos.gx]))) {
+        if (exitOpen) {
+            const blink = Math.sin(Date.now() / 150) > 0;
+            minimapCtx.fillStyle = blink ? '#00ff88' : '#ffffff';
+            const sz = blink ? 7 : 5;
+            minimapCtx.fillRect(ox + exitPos.gx * scale - Math.floor(sz / 2), oy + exitPos.gy * scale - Math.floor(sz / 2), sz, sz);
+        } else {
+            minimapCtx.fillStyle = '#7f8c8d';
+            minimapCtx.fillRect(ox + exitPos.gx * scale - 2, oy + exitPos.gy * scale - 2, 5, 5);
+        }
     }
 
-    // 2. Indikator Arah Ping (Edge Chevrons)
+    // 2. Indikator Arah Ping di Tepi Minimap (Edge Chevrons)
     if (exitOpen && exitPos) {
-        drawMinimapEdgeChevron(exitPos.gx, exitPos.gy, '#2ecc71', true, scale, ox, oy);
+        drawMinimapEdgeChevron(exitPos.gx, exitPos.gy, '#00ff88', true, scale, ox, oy);
     } else if (nearestUncollected) {
         drawMinimapEdgeChevron(nearestUncollected.gx, nearestUncollected.gy, '#f1c40f', false, scale, ox, oy);
     }
