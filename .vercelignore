@@ -1,27 +1,10 @@
-# Vercel only needs the runtime web app (the files listed in sw.js CORE,
-# plus sw.js and version.json). Everything below is tooling, packaging or
-# repo metadata and must not be uploaded to the public deployment.
-
-# Dependencies / build output
-node_modules/
-dist/
-
-# Native shell, tooling, tests, CI
-android/
-tools/
-tests/
-js/modules/
-.github/
-
-# Non-runtime repo files
-package.json
-capacitor.config.json
+# Tell Vercel to ignore backend container configurations and non-web toolchains
+# This ensures Vercel deploys VITA as a fast, rock-solid static web application.
 Dockerfile
 .dockerignore
 render.yaml
-script.md
-supabase_schema.sql
-AGENTS.md
-README.md
-MAIN_VITA.bat
-.gitignore
+android/
+src-tauri/
+tests/
+tools/
+.github/
