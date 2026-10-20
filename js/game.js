@@ -12480,6 +12480,30 @@ function adminKillAll() {
     updateUI();
 }
 
+function adminHealFull() {
+    if (!isAdmin) { openAdminLogin(); return; }
+    if (!player) return;
+    player.hp = player.maxHp;
+    sMedkit();
+    addParticle(player.x, player.y, '#2ecc71', 25, 5, 30);
+    announceAdmin('HEALTH RESTORED 100%');
+    updateUI();
+}
+
+function adminRevealMap() {
+    if (!isAdmin) { openAdminLogin(); return; }
+    if (!fogOfWar) return;
+    for (let y = 0; y < mazeH; y++) {
+        for (let x = 0; x < mazeW; x++) {
+            fogOfWar[y][x] = true;
+            if (visitedTiles && visitedTiles[y]) visitedTiles[y][x] = true;
+        }
+    }
+    sRadarPing();
+    announceAdmin('FULL MAP REVEALED');
+    updateUI();
+}
+
 function adminEquipWeapon(key) {
     if (!isAdmin) { openAdminLogin(); return; }
     if (!WEAPONS[key]) return;

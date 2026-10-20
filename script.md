@@ -186,7 +186,11 @@ Dokumen rahasia yang dapat ditemukan pemain di terminal koridor labirin:
 * **Penulis:** COMMAND CENTRAL
 * **Isi:** *"Unit tempur biasa tak tahan asimilasi biologis. Hanya sasis titanium sintetis yang dipadu prosesor saraf stabil yang mampu menembus kabut nekrotik. Mereka menamainya Prototype-19."*
 
-### Log 04 (Sektor 11) — MANIFESTO APEX // COELUM CARNIS
+### Log 04 (Sektor 9) — ANALISIS MORFOLOGI // MIMIKRI KETAKUTAN
+* **Penulis:** DR. K. REEVES // DIVISI NEURO-BIOLOGI
+* **Isi:** *"Sampel jaringan Carnis yang mengasimilasi subjek manusia tidak hanya menyerap materi organik, tetapi juga jejak impuls pada korteks serebral. Organisme ini mencetak ulang struktur fisiknya berdasarkan memori dan ketakutan terkuat inangnya—mulai dari figur bertopeng, predator bersayap, hingga rasa takut diawasi. Mereka mengadaptasi bentuk yang paling efektif memicu kelumpuhan reaksi pada mangsanya."*
+
+### Log 05 (Sektor 11) — MANIFESTO APEX // COELUM CARNIS
 * **Penulis:** RECOVERED AUDIO FRAGMENT
 * **Isi:** *"Monolith bukanlah senjata. Mereka adalah antena. Saat ke-7 pilar menyatukan frekuensi sarafnya, kesadaran manusia akan melebur dari individu menjadi daging abadi."*
 

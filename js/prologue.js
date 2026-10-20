@@ -200,6 +200,15 @@ const LORE_DATA_LOGS = [
     },
     {
         id: 'log_04',
+        level: 8, // Appears in Sector 9
+        title_en: 'MORPHOLOGY ANALYSIS // FEAR MIMICRY',
+        title_id: 'ANALISIS MORFOLOGI // MIMIKRI KETAKUTAN',
+        author: 'DR. K. REEVES // NEURO-BIOLOGY',
+        body_en: '"Carnis tissue assimilating human subjects does not merely absorb organic mass, but also residual neural impulses in the cerebral cortex. The organism reconstructs its form based on the host\'s strongest phobias—masked humanoids, winged predators, and the dread of being watched. They adapt into forms best suited to paralyze their prey."',
+        body_id: '"Sampel jaringan Carnis yang mengasimilasi subjek manusia tidak hanya menyerap materi organik, tetapi juga jejak impuls pada korteks serebral. Organisme ini mencetak ulang bentuk fisiknya berdasarkan ketakutan terkuat inangnya—figur bertopeng, predator bersayap, hingga rasa takut diawasi. Mereka mengadaptasi bentuk yang paling efektif memicu kelumpuhan reaksi pada mangsanya."'
+    },
+    {
+        id: 'log_05',
         level: 10, // Appears in Sector 11
         title_en: 'THE APEX MANIFESTO // COELUM CARNIS',
         title_id: 'MANIFESTO APEX // COELUM CARNIS',
