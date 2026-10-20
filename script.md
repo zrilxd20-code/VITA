@@ -94,10 +94,10 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 
 ---
 
-### 🔵 Sektor 3 (Level 3) — Anomali Crawler & Taktik Backstab
+### 🔵 Sektor 3 (Level 3) — Anomali Crawl-Morph & Taktik Backstab
 * **Pengirim:** LT. VAD // SEC-OPS
-* **Pesan (ID):** *"Sektor 3 dipenuhi sarang Crawl. Mereka mendeteksi getaran langkah kaki. Manfaatkan kelincahanmu untuk serangan tusukan belakang (backstab) mematikan atau tembak dari jarak jauh!"*
-* **Pesan (EN):** *"Sector 3 is infested with Crawler nests. They track footstep vibrations. Use your agility to land lethal backstabs from behind or keep your firing distance!"*
+* **Pesan (ID):** *"Sektor 3 dipenuhi sarang Crawl-Morph. Mereka mendeteksi getaran langkah kaki. Manfaatkan kelincahanmu untuk serangan tusukan belakang (backstab) mematikan atau tembak dari jarak jauh!"*
+* **Pesan (EN):** *"Sector 3 is infested with Crawl-Morph nests. They track footstep vibrations. Use your agility to land lethal backstabs from behind or keep your firing distance!"*
 
 ---
 
@@ -108,10 +108,10 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 
 ---
 
-### 🔴 Sektor 5 (Level 5) — Peringatan Bio-Hazard Harvester
+### 🔴 Sektor 5 (Level 5) — Peringatan Bio-Harvester
 * **Pengirim:** DR. RAINSER // ENG
-* **Pesan (ID):** *"Anomali Harvester berukuran besar berpatroli di sektor ini! Jangan bertarung di lorong sempit satu arah. Pancing mereka ke ruang terbuka agar kamu tidak terpojok!"*
-* **Pesan (EN):** *"A massive Harvester anomaly is patrolling this sector! Avoid engaging in narrow bottlenecks. Lure them into open junctions so you don't get cornered!"*
+* **Pesan (ID):** *"Anomali Bio-Harvester berukuran besar berpatroli di sektor ini! Jangan bertarung di lorong sempit satu arah. Pancing mereka ke ruang terbuka agar kamu tidak terpojok!"*
+* **Pesan (EN):** *"A massive Bio-Harvester anomaly is patrolling this sector! Avoid engaging in narrow bottlenecks. Lure them into open junctions so you don't get cornered!"*
 
 ---
 
@@ -122,17 +122,17 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 
 ---
 
-### 🟣 Sektor 7 (Level 7) — Anomali Ghost & Penetrasi Dinding
+### 🟣 Sektor 7 (Level 7) — Anomali Phantasm & Penetrasi Dinding
 * **Pengirim:** DR. SARA // RES-01
-* **Pesan (ID):** *"Spektrometri mendeteksi anomali Ghost. Dinding labirin tidak dapat menahan mereka—mereka meluncur menembus sekat beton! Jangan berdiam diri di satu ruangan!"*
-* **Pesan (EN):** *"Spectrometry detects Ghost anomalies. Labyrinth walls cannot hold them—they phase straight through concrete bulkheads! Do not remain stationary in a room!"*
+* **Pesan (ID):** *"Spektrometri mendeteksi anomali Phantasm. Dinding labirin tidak dapat menahan mereka—mereka meluncur menembus sekat beton! Jangan berdiam diri di satu ruangan!"*
+* **Pesan (EN):** *"Spectrometry detects Phantasm anomalies. Labyrinth walls cannot hold them—they phase straight through concrete bulkheads! Do not remain stationary in a room!"*
 
 ---
 
-### 🟠 Sektor 8 (Level 8) — Waspada Peti Mimic (Kamuflase)
+### 🟠 Sektor 8 (Level 8) — Waspada Decoy Mimic (Kamuflase)
 * **Pengirim:** DR. RAINSER // ENG
-* **Pesan (ID):** *"Sensor mencatat sinyal aneh dari wadah suplai. Hati-hati saat membuka peti logistik—sebagian adalah Mimic pemburu yang menyamar! Uji dengan serangan dari jauh terlebih dahulu!"*
-* **Pesan (EN):** *"Sensors detect irregular frequencies from supply caches. Stay cautious—some containers are camouflaged Mimic ambushers! Test them with a strike from range first!"*
+* **Pesan (ID):** *"Sensor mencatat sinyal aneh dari wadah suplai. Hati-hati saat membuka peti logistik—sebagian adalah Decoy Mimic yang menyamar! Uji dengan serangan dari jauh terlebih dahulu!"*
+* **Pesan (EN):** *"Sensors detect irregular frequencies from supply caches. Stay cautious—some containers are camouflaged Decoy Mimic ambushers! Test them with a strike from range first!"*
 
 ---
 

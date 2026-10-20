@@ -108,8 +108,8 @@ const SECTOR_TRANSMISSIONS = {
         callsign: 'LT. VAD // SEC-OPS',
         icon: 'shield',
         color: '#3498db',
-        text_en: 'Sector 3 is infested with Crawler nests. They track footstep vibrations. Use your agility to land lethal backstabs from behind or keep your firing distance!',
-        text_id: 'Sektor 3 dipenuhi sarang Crawl. Mereka mendeteksi getaran langkah kaki. Manfaatkan kelincahanmu untuk serangan tusukan belakang (backstab) mematikan atau tembak dari jarak jauh!'
+        text_en: 'Sector 3 is infested with Crawl-Morph nests. They track footstep vibrations. Use your agility to land lethal backstabs from behind or keep your firing distance!',
+        text_id: 'Sektor 3 dipenuhi sarang Crawl-Morph. Mereka mendeteksi getaran langkah kaki. Manfaatkan kelincahanmu untuk serangan tusukan belakang (backstab) mematikan atau tembak dari jarak jauh!'
     },
     3: {
         speaker: 'LT. VAD — HAZARD',
@@ -124,8 +124,8 @@ const SECTOR_TRANSMISSIONS = {
         callsign: 'DR. RAINSER // ENG',
         icon: 'biohazard',
         color: '#e74c3c',
-        text_en: 'A massive Harvester anomaly is patrolling this sector! Avoid engaging in narrow bottlenecks. Lure them into open junctions so you don\'t get cornered!',
-        text_id: 'Anomali Harvester berukuran besar berpatroli di sektor ini! Jangan bertarung di lorong sempit satu arah. Pancing mereka ke ruang terbuka agar kamu tidak terpojok!'
+        text_en: 'A massive Bio-Harvester anomaly is patrolling this sector! Avoid engaging in narrow bottlenecks. Lure them into open junctions so you don\'t get cornered!',
+        text_id: 'Anomali Bio-Harvester berukuran besar berpatroli di sektor ini! Jangan bertarung di lorong sempit satu arah. Pancing mereka ke ruang terbuka agar kamu tidak terpojok!'
     },
     5: {
         speaker: 'LT. VAD — ARMORY',
@@ -140,16 +140,16 @@ const SECTOR_TRANSMISSIONS = {
         callsign: 'DR. SARA // RES-01',
         icon: 'dna',
         color: '#9b59b6',
-        text_en: 'Spectrometry detects Ghost anomalies. Labyrinth walls cannot hold them—they phase straight through concrete bulkheads! Do not remain stationary in a room!',
-        text_id: 'Spektrometri mendeteksi anomali Ghost. Dinding labirin tidak dapat menahan mereka—mereka meluncur menembus sekat beton! Jangan berdiam diri di satu ruangan!'
+        text_en: 'Spectrometry detects Phantasm anomalies. Labyrinth walls cannot hold them—they phase straight through concrete bulkheads! Do not remain stationary in a room!',
+        text_id: 'Spektrometri mendeteksi anomali Phantasm. Dinding labirin tidak dapat menahan mereka—mereka meluncur menembus sekat beton! Jangan berdiam diri di satu ruangan!'
     },
     7: {
         speaker: 'DR. RAINSER — WARNING',
         callsign: 'DR. RAINSER // ENG',
         icon: 'biohazard',
         color: '#e67e22',
-        text_en: 'Sensors detect irregular frequencies from supply caches. Stay cautious—some containers are camouflaged Mimic ambushers! Test them with a strike from range first!',
-        text_id: 'Sensor mencatat sinyal aneh dari wadah suplai. Hati-hati saat membuka peti logistik—sebagian adalah Mimic pemburu yang menyamar! Uji dengan serangan dari jauh terlebih dahulu!'
+        text_en: 'Sensors detect irregular frequencies from supply caches. Stay cautious—some containers are camouflaged Decoy Mimic ambushers! Test them with a strike from range first!',
+        text_id: 'Sensor mencatat sinyal aneh dari wadah suplai. Hati-hati saat membuka peti logistik—sebagian adalah Decoy Mimic yang menyamar! Uji dengan serangan dari jauh terlebih dahulu!'
     },
     8: {
         speaker: 'DR. SARA — BIOMETRICS',
