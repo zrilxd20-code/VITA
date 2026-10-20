@@ -2552,14 +2552,21 @@ function initHubPlatformView() {
   const switchRow = document.getElementById('webPlatformSwitchRow');
   if (!platSec || !heroBox) return;
 
-  if (isNativeApp()) {
-    // Pada aplikasi yang diunduh (PC Windows .exe atau Android APK):
+  // Cek parameter URL: jika dibuka via tab baru (?play=web atau ?play=1 atau tautan co-op)
+  let hasPlayParam = false;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    hasPlayParam = params.get('play') === 'web' || params.get('play') === '1' || params.has('coop') || params.get('action') === 'play';
+  } catch (_) {}
+
+  if (isNativeApp() || hasPlayParam) {
+    // Pada aplikasi yang diunduh (PC/APK) atau saat membuka tab game (?play=web):
     // Lewati gerbang pemilihan platform dan langsung tampilkan menu awal game normal.
     platSec.style.display = 'none';
     heroBox.style.display = 'flex';
-    if (switchRow) switchRow.style.display = 'none';
+    if (switchRow) switchRow.style.display = isNativeApp() ? 'none' : 'block';
   } else {
-    // Pada web browser (Vercel / Online):
+    // Pada halaman web portal awal (tanpa parameter ?play=web):
     // Cek apakah pemain sudah memilih "MAINKAN DI WEB" pada sesi ini
     let entered = false;
     try {

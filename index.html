@@ -108,10 +108,10 @@
         </div>
         <h3 class="platform-title" data-i18n="plat_web_title">MAIN DI WEB (VERCEL)</h3>
         <p class="platform-desc" data-i18n="plat_web_desc">Bermain langsung tanpa instalasi di browser modern. Mendukung Co-op 4 Pemain &amp; Cloud Save.</p>
-        <button class="btn btn-plat-action btn-plat-web" type="button" onclick="enterWebHub()">
+        <a href="?play=web" target="_blank" rel="noopener" class="btn btn-plat-action btn-plat-web" onclick="if(typeof homeBeep==='function')homeBeep('open');">
           <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span data-i18n="plat_web_btn">MAINKAN DI WEB ▸</span>
-        </button>
+          <span data-i18n="plat_web_btn">MAINKAN DI WEB (TAB BARU) ▸</span>
+        </a>
       </div>
 
       <!-- PLATFORM 2: PC WINDOWS STANDALONE -->
