@@ -1,0 +1,67 @@
+name: VITA Windows Desktop (Tauri)
+
+# Membangun aplikasi mandiri PC Windows (.exe dan .msi) menggunakan Tauri di cloud.
+# Hasil: artifact "vita-windows-x64" di tab Actions run (berisi vita.exe dan installer MSI).
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'index.html'
+      - 'manifest.webmanifest'
+      - 'sw.js'
+      - 'version.json'
+      - 'icon.svg'
+      - 'icon-*.png'
+      - 'apple-touch-icon.png'
+      - 'screenshot-*.png'
+      - 'css/**'
+      - 'js/*.js'
+      - 'src-tauri/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tools/build-www.mjs'
+      - 'tools/gen-desktop-icons.mjs'
+      - '.github/workflows/desktop.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-desktop:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: x86_64-pc-windows-msvc
+          cache: true
+
+      - name: Build web bundle (dist/)
+        run: |
+          npm ci
+          npm run build:www
+
+      - name: Build Tauri Windows Executable & MSI Installer
+        run: |
+          npx -y @tauri-apps/cli@1.5.14 build
+
+      - name: Upload Windows Artifacts (.exe & .msi)
+        uses: actions/upload-artifact@v4
+        with:
+          name: vita-windows-x64
+          path: |
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/vita.exe
+          if-no-files-found: error
+          retention-days: 30

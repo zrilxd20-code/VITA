@@ -147,6 +147,20 @@ vita/
 6. **Dependency**: Capacitor hanya `devDependencies` (versi dipin). Tidak ada `dependencies`
    runtime — dijaga oleh TEST 27.
 
+### E. Pengemasan Desktop PC (Tauri, Windows .EXE / .MSI di CI)
+1. **Shell native desktop**: `src-tauri/` (`tauri.conf.json`, `Cargo.toml`, `src/main.rs`, `build.rs`).
+   Menghasilkan aplikasi mandiri Windows ultra-ringan menggunakan runtime native WebView2.
+   Jendela berdimensi 1280×800 (resizable, min 800×600, center).
+2. **Bundel web**: Menggunakan direktori `dist/` hasil `npm run build:www` (`distDir: "../dist"`).
+3. **Aset ikon**: `tools/gen-desktop-icons.mjs` memakai ulang seni prosedural dari `tools/gen-icons.mjs`
+   menghasilkan `32x32.png`, `128x128.png`, `128x128@2x.png` (256px), `icon.png` (512px), dan `icon.ico`
+   tanpa dependensi eksternal (`npm run icons:desktop`).
+4. **CI**: `.github/workflows/desktop.yml` — Windows runner (`windows-latest`) + Rust stable + Node 22
+   → `npm ci` → `npm run build:www` → `npx @tauri-apps/cli@1.5.14 build` → mengunggah artifact
+   **`vita-windows-x64`** (`vita.exe` dan installer `.msi`).
+5. **Aturan Dual Platform**: Jika user menyebut "versi apk" atau "apk" tanpa menspesifikasikan mobile
+   atau PC, instruksi berlaku untuk **keduanya (Mobile APK & PC/Tauri)**.
+
 ---
 
 ## 🚨 4. Aturan Penting untuk AI Agent (Golden Rules)
@@ -244,5 +258,18 @@ vita/
   `https://localhost`; relay **wajib** `wss://` (tunnel TLS), plain `ws://` LAN tidak didukung.
   Tautan undangan `?coop=…` tidak berguna di APK — masukkan kode kamar secara manual.
   Capacitor adalah `devDependencies` saja; runtime web tetap zero-dependency (dijaga TEST 27).
+
+* **Membangun Aplikasi PC Windows (Tauri, tanpa toolchain lokal)**:
+  ```bash
+  npm run icons:desktop # regenerasi aset icon src-tauri/icons jika seni berubah
+  npm run build:www     # dist/ whitelist runtime
+  # Opsi utama: push ke GitHub → Actions → "VITA Windows Desktop (Tauri)" → Run workflow
+  #   → unduh artifact "vita-windows-x64" (vita.exe & installer .msi)
+  # Opsi lokal (butuh Rust stable): npx @tauri-apps/cli@1.5.14 build
+  ```
+  `src-tauri/` dikonfigurasi membaca langsung dari `dist/`. Runner GitHub Actions mengompilasi
+  kode biner native x64 Windows dengan WebView2 runtime, menghasilkan installer `.msi` dan `.exe`
+  mandiri tanpa membutuhkan compiler lokal di mesin pengembang.
+
 
 

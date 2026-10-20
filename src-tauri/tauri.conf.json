@@ -1,0 +1,72 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+  "build": {
+    "beforeBuildCommand": "",
+    "beforeDevCommand": "",
+    "devPath": "http://localhost:8000",
+    "distDir": "../dist"
+  },
+  "package": {
+    "productName": "VITA",
+    "version": "2.5.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "category": "Game",
+      "copyright": "Copyright (c) 2026 zrilxd20-code. MIT License.",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": [],
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.png",
+        "icons/icon.ico"
+      ],
+      "identifier": "com.zrilxd20.vita",
+      "longDescription": "VITA — Forgotten Sector. Top-down survival horror maze roguelite. Procedural zero external assets.",
+      "macOS": {
+        "exceptionDomain": "",
+        "frameworks": [],
+        "minimumSystemVersion": "",
+        "signingIdentity": null
+      },
+      "resources": [],
+      "shortDescription": "Top-down survival horror maze roguelite",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      }
+    },
+    "security": {
+      "csp": null
+    },
+    "updater": {
+      "active": false
+    },
+    "windows": [
+      {
+        "center": true,
+        "fullscreen": false,
+        "height": 800,
+        "minHeight": 600,
+        "minWidth": 800,
+        "resizable": true,
+        "title": "VITA — Forgotten Sector",
+        "width": 1280
+      }
+    ]
+  }
+}

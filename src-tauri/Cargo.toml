@@ -1,0 +1,20 @@
+[package]
+name = "vita"
+version = "2.5.0"
+description = "VITA — Forgotten Sector. Top-down survival horror maze roguelite."
+authors = ["zrilxd20-code"]
+license = "MIT"
+repository = "https://github.com/zrilxd20-code/VITA"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "1.5", features = [] }
+
+[dependencies]
+tauri = { version = "1.5", features = [ "shell-open" ] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

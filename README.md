@@ -198,13 +198,16 @@ vita/
 │   ├── check_html.cjs      # HTML well-formedness (unclosed-tag) verification
 │   ├── gen-icons.mjs       # Reproducible PWA icon generator (fs+zlib only)
 │   ├── gen-android-icons.mjs # Android launcher icons + dark splash (reuses gen-icons art)
+│   ├── gen-desktop-icons.mjs # Desktop launcher icons (.ico, multi-dim PNGs, reuses gen-icons art)
 │   ├── build-www.mjs       # dist/ builder — explicit runtime whitelist, no repo metadata
 │   └── bump-version.mjs    # Single-command release version sync
 ├── .github/workflows/
 │   ├── ci.yml              # CI pipeline: npm run check + npm test on push/PR
-│   └── android.yml         # Cloud APK build (JDK 21 + Android SDK) → artifact vita-debug-apk
+│   ├── android.yml         # Cloud APK build (JDK 21 + Android SDK) → artifact vita-debug-apk
+│   └── desktop.yml         # Cloud Windows Desktop build (Tauri + Rust) → artifact vita-windows-x64
 ├── capacitor.config.json   # Capacitor shell config (appId, webDir=dist, androidScheme=https)
 ├── android/                # Committed Capacitor Android studio project (icons/splash themed)
+├── src-tauri/              # Committed Tauri Windows desktop project (native WebView2 runtime)
 ├── Dockerfile              # Minimal relay image (node:20-alpine, COPY relay only, USER node)
 ├── .dockerignore           # Whitelist: only tools/relay.mjs enters the build context
 ├── render.yaml             # Render Blueprint: free-tier Node relay (auto-deploy + health check)
@@ -223,7 +226,7 @@ vita/
 ├── script.md               # Narrative script, characters, and dialogue canon
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # 27-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup with consistent in-game menu titles (start/pause/death/win) & reduced-motion guard, zero-dependency relay protocol contract & client wiring, co-op relay address normalization & invite-link parsing/building, relay deploy artifacts (Docker/Render) & MIT license contract, Android/Capacitor packaging contract — whitelist bundle, procedural icons/splash, cloud APK CI)
+│   └── test_web_security_qa.js # 28-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup with consistent in-game menu titles (start/pause/death/win) & reduced-motion guard, zero-dependency relay protocol contract & client wiring, co-op relay address normalization & invite-link parsing/building, relay deploy artifacts (Docker/Render) & MIT license contract, Android/Capacitor packaging contract, PC Desktop/Tauri Windows packaging contract)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```

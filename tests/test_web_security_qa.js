@@ -18,7 +18,8 @@
  * konsisten ke seluruh judul menu in-game (mulai/jeda/gugur/menang) beserta guard prefers-reduced-motion,
  * kontrak protokol relay tanpa dependency, konfigurasi alamat relay & tautan undangan co-op
  * (dengan penolakan input tak terpercaya), kontrak artefak deploy relay (Docker/Render) & lisensi MIT,
- * serta kontrak pengemasan Android/Capacitor (bundel web whitelist, ikon/splash prosedural, CI APK).
+ * kontrak pengemasan Android/Capacitor (bundel web whitelist, ikon/splash prosedural, CI APK),
+ * serta kontrak pengemasan PC Desktop/Tauri (konfigurasi native, ikon prosedural multi-dimensi, CI Windows .exe/.msi).
  */
 
 const fs = require('fs');
@@ -1377,6 +1378,64 @@ assert(!pkgJson.dependencies || Object.keys(pkgJson.dependencies).length === 0,
 
 console.log('✓ TEST 27 LULUS: Kontrak pengemasan Android (Capacitor/APK) terverifikasi.');
 
+// TEST 28: Kontrak Pengemasan PC Desktop (Tauri / Windows Standalone .exe & .msi)
+console.log('\n[TEST 28] Pengujian kontrak pengemasan PC Desktop (Tauri/Windows)...');
+
+// 28a. Konfigurasi Tauri & Cargo
+const tauriConfPath = path.join(__dirname, '../src-tauri/tauri.conf.json');
+assert(fs.existsSync(tauriConfPath), 'src-tauri/tauri.conf.json harus ada');
+const tauriConf = JSON.parse(fs.readFileSync(tauriConfPath, 'utf8'));
+assert(tauriConf.package?.productName === 'VITA', 'Nama produk Tauri harus VITA');
+assert(tauriConf.package?.version === '2.5.0', 'Versi Tauri harus 2.5.0');
+assert(tauriConf.build?.distDir === '../dist', 'Tauri distDir harus menunjuk ke ../dist');
+assert(tauriConf.tauri?.bundle?.identifier === 'com.zrilxd20.vita', 'Identifier bundle harus com.zrilxd20.vita');
+assert(tauriConf.tauri?.windows?.[0]?.width === 1280 && tauriConf.tauri?.windows?.[0]?.height === 800,
+  'Jendela Tauri harus berdimensi 1280x800');
+
+const cargoTomlPath = path.join(__dirname, '../src-tauri/Cargo.toml');
+assert(fs.existsSync(cargoTomlPath), 'src-tauri/Cargo.toml harus ada');
+const cargoToml = fs.readFileSync(cargoTomlPath, 'utf8');
+assert(cargoToml.includes('name = "vita"'), 'Cargo.toml harus memuat package vita');
+assert(cargoToml.includes('version = "2.5.0"'), 'Cargo.toml harus memuat versi 2.5.0');
+assert(cargoToml.includes('tauri = { version = "1.5"'), 'Cargo.toml harus memakai tauri 1.5');
+
+// 28b. Kode sumber Rust (main.rs & build.rs)
+const mainRsPath = path.join(__dirname, '../src-tauri/src/main.rs');
+assert(fs.existsSync(mainRsPath), 'src-tauri/src/main.rs harus ada');
+const mainRs = fs.readFileSync(mainRsPath, 'utf8');
+assert(mainRs.includes('windows_subsystem = "windows"'), 'main.rs harus menyembunyikan console window');
+assert(mainRs.includes('tauri::Builder::default()'), 'main.rs harus menjalankan tauri::Builder');
+
+const buildRsPath = path.join(__dirname, '../src-tauri/build.rs');
+assert(fs.existsSync(buildRsPath), 'src-tauri/build.rs harus ada');
+
+// 28c. Aset Ikon Desktop (32, 128, 256, 512, .ico)
+const TAURI_ICONS = path.join(__dirname, '../src-tauri/icons/');
+['32x32.png', '128x128.png', '128x128@2x.png', 'icon.png', 'icon.ico'].forEach(iconFile => {
+  const p = path.join(TAURI_ICONS, iconFile);
+  assert(fs.existsSync(p), 'Ikon desktop harus ada: ' + iconFile);
+  assert(fs.statSync(p).size > 100, 'Ikon desktop tidak boleh kosong: ' + iconFile);
+});
+
+// 28d. Generator Ikon Desktop & Script npm
+const genDesktopPath = path.join(__dirname, '../tools/gen-desktop-icons.mjs');
+assert(fs.existsSync(genDesktopPath), 'tools/gen-desktop-icons.mjs harus ada');
+const genDesktop = fs.readFileSync(genDesktopPath, 'utf8');
+assert(genDesktop.includes("from './gen-icons.mjs'"), 'gen-desktop-icons.mjs harus memakai ulang seni gen-icons.mjs');
+assert(/node tools\/gen-desktop-icons\.mjs/.test(pkgJson.scripts['icons:desktop'] || ''),
+  'package.json harus punya skrip icons:desktop');
+
+// 28e. Workflow CI Desktop (desktop.yml)
+const desktopYmlPath = path.join(__dirname, '../.github/workflows/desktop.yml');
+assert(fs.existsSync(desktopYmlPath), '.github/workflows/desktop.yml harus ada');
+const desktopYml = fs.readFileSync(desktopYmlPath, 'utf8');
+assert(desktopYml.includes('windows-latest'), 'desktop.yml harus berjalan di runner windows-latest');
+assert(desktopYml.includes('npm run build:www'), 'desktop.yml harus membangun web bundle dist/');
+assert(desktopYml.includes('npx -y @tauri-apps/cli'), 'desktop.yml harus membangun Tauri bundle');
+assert(desktopYml.includes('vita-windows-x64'), 'desktop.yml harus mengunggah artifact vita-windows-x64');
+
+console.log('✓ TEST 28 LULUS: Kontrak pengemasan PC Desktop (Tauri/Windows) terverifikasi.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (27/27)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (28/28)');
 console.log('=========================================');

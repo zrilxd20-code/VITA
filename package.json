@@ -14,6 +14,7 @@
     "test": "node tests/test_web_security_qa.js",
     "icons": "node tools/gen-icons.mjs",
     "icons:android": "node tools/gen-android-icons.mjs",
+    "icons:desktop": "node tools/gen-desktop-icons.mjs",
     "bump": "node tools/bump-version.mjs",
     "build:www": "node tools/build-www.mjs",
     "cap:sync": "cap sync android",
