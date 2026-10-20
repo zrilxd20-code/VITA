@@ -2235,9 +2235,20 @@ function proceedToWebGame(autoStart = false) {
 //   3) naikkan CACHE di sw.js (mis. vita-v3 -> vita-v4).
 // App yang sudah ter-install otomatis menampilkan spanduk update.
 const APP_VERSION = '2.5.0';
+const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
-  id: { msg: 'Pembaruan tersedia!', btn: 'Update Sekarang', later: 'Nanti' },
-  en: { msg: 'Update available!', btn: 'Update Now', later: 'Later' }
+  id: { 
+    msg: 'Pembaruan VITA tersedia!', 
+    btn: 'Update Sekarang', 
+    btn_app: 'Unduh Pembaruan',
+    later: 'Nanti' 
+  },
+  en: { 
+    msg: 'VITA update available!', 
+    btn: 'Update Now', 
+    btn_app: 'Download Update',
+    later: 'Later' 
+  }
 };
 let vitaSwReg = null;
 let vitaUpdateShown = false;
@@ -2256,22 +2267,25 @@ function ensureUpdateBanner() {
   if (bar) return bar;
   bar = document.createElement('div');
   bar.id = 'updateBanner';
-  bar.style.cssText = 'display:none;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;background:#14101c;border:1px solid #f1c40f;border-radius:12px;padding:10px 14px;font-family:inherit;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.6);max-width:min(92vw,420px);text-align:center;';
+  bar.style.cssText = 'display:none;position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;background:#14101c;border:1px solid #00f0ff;border-radius:12px;padding:12px 18px;font-family:inherit;color:#fff;box-shadow:0 8px 32px rgba(0,240,255,.25),0 12px 40px rgba(0,0,0,.7);max-width:min(92vw,460px);text-align:center;backdrop-filter:blur(8px);';
   const msg = document.createElement('span');
   msg.id = 'updateBannerMsg';
-  msg.style.cssText = 'font-size:14px;margin-right:10px;';
+  msg.style.cssText = 'font-size:13px;margin-right:12px;font-weight:600;color:#e6edf3;display:inline-block;margin-bottom:6px;';
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:inline-flex;align-items:center;gap:8px;';
   const go = document.createElement('button');
   go.id = 'updateBannerGo';
-  go.style.cssText = 'background:#f1c40f;border:0;border-radius:8px;padding:8px 14px;font-weight:bold;cursor:pointer;margin-right:8px;';
+  go.style.cssText = 'background:linear-gradient(135deg,#00f0ff,#0070f3);border:0;border-radius:8px;padding:8px 16px;font-weight:bold;color:#0a0a12;cursor:pointer;font-size:12px;';
   go.addEventListener('click', applyVitaUpdate);
   const later = document.createElement('button');
   later.id = 'updateBannerLater';
-  later.style.cssText = 'background:transparent;border:1px solid #888;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;';
+  later.style.cssText = 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);color:#a0a0b0;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;';
   later.addEventListener('click', () => {
     try { localStorage.setItem('vita_update_dismissed', pendingVersion); } catch (e) {}
     bar.style.display = 'none';
   });
-  bar.appendChild(msg); bar.appendChild(go); bar.appendChild(later);
+  btnRow.appendChild(go); btnRow.appendChild(later);
+  bar.appendChild(msg); bar.appendChild(document.createElement('br')); bar.appendChild(btnRow);
   document.body.appendChild(bar);
   return bar;
 }
@@ -2282,17 +2296,25 @@ function showUpdateBanner(ver) {
   pendingVersion = ver;
   const L = UPDATE_TXT[updateLang()] || UPDATE_TXT.id;
   const bar = ensureUpdateBanner();
-  document.getElementById('updateBannerMsg').textContent = L.msg + ' (v' + ver + ')';
-  document.getElementById('updateBannerGo').textContent = L.btn;
+  const isApp = typeof isNativeApp === 'function' && isNativeApp();
+  document.getElementById('updateBannerMsg').textContent = L.msg + ' (v' + ver + ' | ' + (isApp ? (navigator.userAgent.toLowerCase().includes('android') ? 'Android' : 'PC') : 'Web') + ')';
+  document.getElementById('updateBannerGo').textContent = isApp ? (L.btn_app || L.btn) : L.btn;
   document.getElementById('updateBannerLater').textContent = L.later;
   bar.style.display = 'block';
 }
 
 async function checkVitaUpdate() {
   if (vitaUpdateShown) return;
-  if (window.location.protocol.indexOf('http') !== 0) return;
   try {
-    const res = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
+    // Di web: fetch relative 'version.json?t=...'
+    // Di aplikasi native (PC/APK): fetch dari cloud endpoint Vercel agar selalu tahu rilis terbaru
+    let versionUrl = 'version.json?t=' + Date.now();
+    const isApp = (typeof isNativeApp === 'function' && isNativeApp()) || (window.location.protocol.indexOf('http') !== 0);
+    if (isApp) {
+      versionUrl = VITA_CLOUD_HOST + '/version.json?t=' + Date.now();
+    }
+
+    const res = await fetch(versionUrl, { cache: 'no-store' });
     if (!res || !res.ok) return;
     const data = await res.json();
     if (!data || typeof data.version !== 'string') return;
@@ -2333,6 +2355,22 @@ const hadControllerOnLoad = Boolean('serviceWorker' in navigator && navigator.se
 let vitaUpdateTriggeredByUser = false;
 
 function applyVitaUpdate() {
+  const isApp = typeof isNativeApp === 'function' && isNativeApp();
+  if (isApp) {
+    const isAndroid = (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) || navigator.userAgent.toLowerCase().includes('android');
+    const updateUrl = isAndroid 
+      ? VITA_CLOUD_HOST + '/downloads/vita.apk'
+      : VITA_CLOUD_HOST + '/downloads/vita.exe';
+
+    try {
+      if (window.open) window.open(updateUrl, '_blank');
+      else window.location.href = updateUrl;
+    } catch (_) {
+      window.location.href = updateUrl;
+    }
+    return;
+  }
+
   vitaUpdateTriggeredByUser = true;
   const done = () => { setTimeout(() => safeVitaReload('user update applied'), 800); };
   try {
