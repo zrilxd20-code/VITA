@@ -250,6 +250,15 @@ const NARRATIVE_INTERLUDES = {
         body_en: '"Before that person disappeared from our network, we received a final transmission—or what could be called the last data packet regarding the sector we are currently entering, and the fundamental structure of other sectors overtaken and forsaken by those creatures."',
         tail_id: '"Entah dia dapat dari mana......"',
         tail_en: '"Wherever they got it from......"'
+    },
+    11: { // Muncul setelah Sektor 12 selesai (currentLevel === 11) menuju Sektor 13
+        speaker: 'ALTERISHA',
+        signal_id: '(frekuensi transmisi terhubung dari Sektor Luar).......',
+        signal_en: '(incoming transmission frequency from Outer Perimeter).......',
+        body_id: '"Kami telah mengerahkan berbagai unit drone ke seluruh tujuh sektor awal. Namun, sama seperti unit sebelumnya—BOT-7—tidak ada satu pun yang berhasil menembus barisan pertahanan mereka."',
+        body_en: '"We deployed multiple drone units across all seven outer sectors. Yet, just like the previous unit—BOT-7—none managed to breach their offensive lines."',
+        tail_id: '"Karena itulah aku meneliti kembali setiap rekaman data... mencari potensi kemampuan dan peningkatan apa saja yang masih bisa kita maksimalkan untuk unitmu."',
+        tail_en: '"Which is why I\'m dissecting their data logs... researching any operational capability and combat augmentations we can still enhance for your chassis."'
     }
 };
 

@@ -5454,12 +5454,17 @@ function nextLevel() {
 
     levelTransition = true;
 
-    // Cek apakah ada narasi interlude khusus setelah level ini (misal Sektor 11: currentLevel === 10)
+    // Cek apakah ada narasi interlude khusus setelah level ini (misal Sektor 11: currentLevel === 10, Sektor 12: currentLevel === 11)
     if (typeof playNarrativeInterlude === 'function' && typeof NARRATIVE_INTERLUDES !== 'undefined' && NARRATIVE_INTERLUDES[currentLevel]) {
         setTimeout(() => {
             playNarrativeInterlude(currentLevel, () => {
                 levelTransition = false;
-                initLevel(currentLevel + 1);
+                const isMilestone = (currentLevel === 1 || currentLevel === 3 || currentLevel === 5 || currentLevel === 7 || currentLevel === 9 || currentLevel === 11 || currentLevel === 13);
+                if (isMilestone) {
+                    openWeaponSelectModal(currentLevel + 1);
+                } else {
+                    initLevel(currentLevel + 1);
+                }
             });
         }, 500);
         return;

@@ -170,6 +170,19 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 
 ---
 
+### 🌑 Transisi Khusus Sektor 12 (Menuju Sektor 13) — Interlude Gelap: ALTERISHA
+*(Layar menjadi hitam pekat, tanpa kotak HUD. Teks putih berukuran besar muncul di tengah kehampaan)*
+
+> **ALTERISHA**  
+> *(frekuensi transmisi terhubung dari Sektor Luar).......*  
+> 🇮🇩 *"Kami telah mengerahkan berbagai unit drone ke seluruh tujuh sektor awal. Namun, sama seperti unit sebelumnya—BOT-7—tidak ada satu pun yang berhasil menembus barisan pertahanan mereka."*  
+> 🇬🇧 *"We deployed multiple drone units across all seven outer sectors. Yet, just like the previous unit—BOT-7—none managed to breach their offensive lines."*  
+>  
+> 🇮🇩 *"Karena itulah aku meneliti kembali setiap rekaman data... mencari potensi kemampuan dan peningkatan apa saja yang masih bisa kita maksimalkan untuk unitmu."*  
+> 🇬🇧 *"Which is why I'm dissecting their data logs... researching any operational capability and combat augmentations we can still enhance for your chassis."*
+
+---
+
 ## 🗄️ 5. Data Terminal Rahasia (Blackbox Lore Terminals)
 
 Dokumen rahasia yang dapat ditemukan pemain di terminal koridor labirin:
