@@ -257,8 +257,8 @@ const NARRATIVE_INTERLUDES = {
             {
                 speaker: '*** ➔ ALTERISHA',
                 speakerRevealed: true,
-                signal_id: '(identitas transmisi terungkap: ALTERISHA // KOMANDO SEKTOR LUAR).......',
-                signal_en: '(transmission decrypted: ALTERISHA // OUTER SECTOR COMMAND).......',
+                signal_id: '(identitas transmisi terungkap: ALTERISHA).......',
+                signal_en: '(transmission decrypted: ALTERISHA).......',
                 body_id: '"itu salah satu kegagalan kami saat menyerang sektor ini......"',
                 body_en: '"thats one of our failure on attacking this sector......"',
                 tail_id: '"Entah bagaimana kau bisa selamat sampai sejauh ini, Prototype-19...... Tetap waspada di sektor berikutnya."',

@@ -168,7 +168,7 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 
 > **Bagian 2 — Pengungkapan Identitas (Reveal Nama):**  
 > **\*\*\* ➔ ALTERISHA**  
-> *(identitas transmisi terungkap: ALTERISHA // KOMANDO SEKTOR LUAR)*  
+> *(identitas transmisi terungkap: ALTERISHA)*  
 > 🇮🇩 *"itu salah satu kegagalan kami saat menyerang sektor ini......"*  
 > 🇬🇧 *"thats one of our failure on attacking this sector......"*  
 >  
