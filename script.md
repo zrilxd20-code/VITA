@@ -178,15 +178,28 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 ---
 
 ### 🌑 Transisi Khusus Sektor 11 (Menuju Sektor 12) — Interlude Gelap: ALTERISHA
-*(Layar menjadi hitam pekat, tanpa kotak HUD. Teks putih berukuran besar muncul di tengah kehampaan)*
+*(Layar menjadi hitam pekat ala Genshin/HSR, tanpa kotak HUD. Teks putih elegan memudar perlahan di tengah kehampaan)*
 
+> **Bagian 1 — Jejak yang Hilang:**  
 > **ALTERISHA**  
-> *(jaringan lemah menguat).......*  
-> 🇮🇩 *"Sebelum orang itu menghilang dari jaringan kami, kita menerima pesan atau bisa disebut paket data terakhir mengenai sektor sekarang yang kita masuki, dan dasar bentuk sektor lain yang dikuasai dan terbengkalai oleh makhluk-makhluk tersebut."*  
-> 🇬🇧 *"Before that person disappeared from our network, we received a final transmission—or what could be called the last data packet regarding the sector we are currently entering, and the fundamental structure of other sectors overtaken and forsaken by those creatures."*  
+> *(suara Alterisha terdengar hening di tengah frekuensi radio).......*  
+> 🇮🇩 *"Orang itu telah hilang dari jejak kami entah kemana, APA yang dia lakukan aku tidak tahu.... aku mencoba mencarinya ke mana mana."*  
+> 🇬🇧 *"That person has vanished from our traces without a trace, what they were doing I have no idea.... I tried searching for them everywhere."*  
+
+> **Bagian 2 — Wasiat Terakhir:**  
+> **ALTERISHA**  
+> *(kenangan lama berderau samar).......*  
+> 🇮🇩 *"Terakhir kali kami bertemu dengan dia ia telah membuat dan meneliti serta mempelajari makhluk itu dengan sangat serius, terakhir kali aku bertemu dengannya ia memberi tahuku 'Kau akan melanjutkan suatu hari nanti' ."*  
+> 🇬🇧 *"The last time we met them, they were creating, researching, and studying those creatures with utmost obsession. The last time I saw them, they told me 'You will carry this on one day' ."*  
+
+> **Bagian 3 — Pertanyaan Tanpa Jawaban:**  
+> **ALTERISHA**  
+> *(frekuensi radio terdiam sejenak).......*  
+> 🇮🇩 *"Aku tidak mengerti apa yang dia katakan sebelum menghilang......."*  
+> 🇬🇧 *"I never understood what they meant before they vanished......."*  
 >  
-> 🇮🇩 *"Entah dia dapat dari mana......"*  
-> 🇬🇧 *"Wherever they got it from......"*
+> 🇮🇩 *"Apakah kata-katanya tertuju padamu, Prototype-19......?"*  
+> 🇬🇧 *"Were those words meant for you, Prototype-19......?"*
 
 ---
 

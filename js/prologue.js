@@ -271,12 +271,32 @@ const NARRATIVE_INTERLUDES = {
             {
                 speaker: 'ALTERISHA',
                 speakerRevealed: true,
-                signal_id: '(jaringan lemah menguat).......',
-                signal_en: '(signal strengthens from static).......',
-                body_id: '"Sebelum orang itu menghilang dari jaringan kami, kita menerima pesan atau bisa disebut paket data terakhir mengenai sektor sekarang yang kita masuki, dan dasar bentuk sektor lain yang dikuasai dan terbengkalai oleh makhluk-makhluk tersebut."',
-                body_en: '"Before that person disappeared from our network, we received a final transmission—or what could be called the last data packet regarding the sector we are currently entering, and the fundamental structure of other sectors overtaken and forsaken by those creatures."',
-                tail_id: '"Entah dia dapat dari mana......"',
-                tail_en: '"Wherever they got it from......"'
+                signal_id: '(suara Alterisha terdengar hening di tengah frekuensi radio).......',
+                signal_en: '(Alterisha\'s voice cuts through the quiet radio static).......',
+                body_id: '"Orang itu telah hilang dari jejak kami entah kemana, APA yang dia lakukan aku tidak tahu.... aku mencoba mencarinya ke mana mana."',
+                body_en: '"That person has vanished from our traces without a trace, what they were doing I have no idea.... I tried searching for them everywhere."',
+                tail_id: '',
+                tail_en: ''
+            },
+            {
+                speaker: 'ALTERISHA',
+                speakerRevealed: true,
+                signal_id: '(kenangan lama berderau samar).......',
+                signal_en: '(distant memory echoes through the stillness).......',
+                body_id: '"Terakhir kali kami bertemu dengan dia ia telah membuat dan meneliti serta mempelajari makhluk itu dengan sangat serius, terakhir kali aku bertemu dengannya ia memberi tahuku \'Kau akan melanjutkan suatu hari nanti\' ."',
+                body_en: '"The last time we met them, they were creating, researching, and studying those creatures with utmost obsession. The last time I saw them, they told me \'You will carry this on one day\' ."',
+                tail_id: '',
+                tail_en: ''
+            },
+            {
+                speaker: 'ALTERISHA',
+                speakerRevealed: true,
+                signal_id: '(frekuensi radio terdiam sejenak).......',
+                signal_en: '(radio frequency lingers in contemplative silence).......',
+                body_id: '"Aku tidak mengerti apa yang dia katakan sebelum menghilang......."',
+                body_en: '"I never understood what they meant before they vanished......."',
+                tail_id: '"Apakah kata-katanya tertuju padamu, Prototype-19......?"',
+                tail_en: '"Were those words meant for you, Prototype-19......?"'
             }
         ]
     },
@@ -336,24 +356,24 @@ function playTypingSound() {
         const gain = ac.createGain();
         const filter = ac.createBiquadFilter();
 
-        osc.type = 'triangle';
-        const baseFreq = 720 + Math.random() * 260;
+        // Delicate, soft resonance chime blip (Genshin/HSR dialogue style)
+        osc.type = 'sine';
+        const baseFreq = 780 + Math.random() * 140;
         osc.frequency.setValueAtTime(baseFreq, now);
-        osc.frequency.exponentialRampToValueAtTime(110, now + 0.02);
+        osc.frequency.exponentialRampToValueAtTime(280, now + 0.026);
 
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(1500, now);
-        filter.Q.setValueAtTime(2.2, now);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1600, now);
 
-        gain.gain.setValueAtTime(0.08 * master, now);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.024);
+        gain.gain.setValueAtTime(0.045 * master, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.028);
 
         osc.connect(filter);
         filter.connect(gain);
         gain.connect((typeof masterGain !== 'undefined' && masterGain) ? masterGain : ac.destination);
 
         osc.start(now);
-        osc.stop(now + 0.026);
+        osc.stop(now + 0.03);
     } catch (_) {}
 }
 
@@ -370,6 +390,7 @@ function playNarrativeInterlude(levelIndex, onComplete) {
     const bodyEl = document.getElementById('interludeBody');
     const tailEl = document.getElementById('interludeTail');
     const promptEl = document.getElementById('interludePrompt');
+    const innerEl = screen ? screen.querySelector('.interlude-inner') : null;
 
     if (!screen) {
         if (typeof onComplete === 'function') onComplete();
@@ -379,6 +400,7 @@ function playNarrativeInterlude(levelIndex, onComplete) {
     const slides = Array.isArray(data.slides) ? data.slides : [data];
     let slideIdx = 0;
     let isTyping = false;
+    let isTransitioning = false;
     let typingTimer = null;
     let currentFullBody = '';
     let currentFullTail = '';
@@ -414,6 +436,10 @@ function playNarrativeInterlude(levelIndex, onComplete) {
             typingTimer = null;
         }
 
+        if (innerEl) {
+            innerEl.classList.remove('fade-out');
+        }
+
         if (speakerEl) {
             speakerEl.textContent = s.speaker;
             speakerEl.classList.toggle('revealed', !!s.speakerRevealed);
@@ -423,10 +449,11 @@ function playNarrativeInterlude(levelIndex, onComplete) {
         }
         if (tailEl) {
             tailEl.textContent = '';
+            tailEl.style.opacity = '0';
         }
         if (promptEl) {
-            promptEl.style.opacity = '0';
-            promptEl.textContent = currentLang === 'en' ? '[ CLICK / PRESS ANY KEY TO CONTINUE ]' : '[ KLIK / TEKAN APA SAJA UNTUK MELANJUTKAN ]';
+            promptEl.classList.remove('visible');
+            promptEl.textContent = currentLang === 'en' ? '[ CLICK / SPACE TO CONTINUE ]' : '[ KLIK / SPASI UNTUK MELANJUTKAN ]';
         }
 
         currentFullBody = currentLang === 'en' ? s.body_en : s.body_id;
@@ -434,6 +461,7 @@ function playNarrativeInterlude(levelIndex, onComplete) {
 
         let charIdx = 0;
         isTyping = true;
+        isTransitioning = false;
         if (bodyEl) bodyEl.innerHTML = '<span class="interlude-cursor"></span>';
 
         function typeNext() {
@@ -444,7 +472,7 @@ function playNarrativeInterlude(levelIndex, onComplete) {
                 const char = currentFullBody[charIdx - 1];
                 if (char && char.trim() !== '') {
                     const now = Date.now();
-                    if (now - lastTypeSoundTime >= 35) {
+                    if (now - lastTypeSoundTime >= 45) {
                         lastTypeSoundTime = now;
                         playTypingSound();
                     }
@@ -452,14 +480,15 @@ function playNarrativeInterlude(levelIndex, onComplete) {
                 if (bodyEl) {
                     bodyEl.innerHTML = escapeHtml(visible) + '<span class="interlude-cursor"></span>';
                 }
-                const charDelay = (char === '.' || char === '!' || char === '?') ? 130 : (char === ',') ? 70 : 25;
+                // Genshin/HSR deliberate, slow pacing with punctuation pauses
+                const charDelay = (char === '.' || char === '!' || char === '?') ? 280 : (char === ',') ? 160 : (char === ':') ? 180 : 44;
                 typingTimer = setTimeout(typeNext, charDelay);
             } else {
                 finishTyping();
             }
         }
 
-        typeNext();
+        typingTimer = setTimeout(typeNext, 200);
     }
 
     function finishTyping() {
@@ -473,12 +502,10 @@ function playNarrativeInterlude(levelIndex, onComplete) {
         }
         if (tailEl && currentFullTail) {
             tailEl.textContent = currentFullTail;
-            tailEl.style.opacity = '0';
-            tailEl.style.transition = 'opacity 0.6s ease';
-            setTimeout(() => { if (tailEl) tailEl.style.opacity = '0.92'; }, 60);
+            setTimeout(() => { if (tailEl) tailEl.style.opacity = '0.9'; }, 80);
         }
         if (promptEl) {
-            promptEl.style.opacity = '1';
+            setTimeout(() => { if (promptEl) promptEl.classList.add('visible'); }, 200);
         }
     }
 
@@ -486,11 +513,33 @@ function playNarrativeInterlude(levelIndex, onComplete) {
         if (e) {
             try { e.preventDefault(); e.stopPropagation(); } catch (_) {}
         }
+        if (isTransitioning) return;
+
         if (isTyping) {
+            // Selesaikan kalimat yang sedang diketik
             finishTyping();
         } else {
-            slideIdx++;
-            renderSlide(slideIdx);
+            // Hilang perlahan (fade out bertahap) sebelum masuk ke slide berikutnya atau selesai
+            isTransitioning = true;
+            if (innerEl) {
+                innerEl.classList.add('fade-out');
+            }
+            if (typingTimer) {
+                clearTimeout(typingTimer);
+                typingTimer = null;
+            }
+
+            setTimeout(() => {
+                slideIdx++;
+                if (slideIdx >= slides.length) {
+                    closeInterlude();
+                } else {
+                    // Jeda hening dalam kegelapan (pacing lambat ala Genshin/HSR)
+                    setTimeout(() => {
+                        renderSlide(slideIdx);
+                    }, 240);
+                }
+            }, 550);
         }
     }
 
@@ -504,8 +553,9 @@ function playNarrativeInterlude(levelIndex, onComplete) {
         screen.classList.remove('active');
         setTimeout(() => {
             screen.style.display = 'none';
+            if (innerEl) innerEl.classList.remove('fade-out');
             if (typeof onComplete === 'function') onComplete();
-        }, 500);
+        }, 800);
     }
 
     function onKey(e) {
@@ -517,6 +567,6 @@ function playNarrativeInterlude(levelIndex, onComplete) {
         window.addEventListener('keydown', onKey);
         screen.addEventListener('click', handleInteraction);
         renderSlide(0);
-    }, 200);
+    }, 240);
 }
 
