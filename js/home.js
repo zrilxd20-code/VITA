@@ -2529,3 +2529,89 @@ window.openAndroidDownloadModal = openAndroidDownloadModal;
 window.closeAndroidDownloadModal = closeAndroidDownloadModal;
 window.installPwaFromHub = installPwaFromHub;
 
+// ============================================================
+// DETEKSI PLATFORM NATIVE (PC WINDOWS TAURI & ANDROID CAPACITOR)
+// ============================================================
+function isNativeApp() {
+  try {
+    if (typeof window !== 'undefined') {
+      // 1. Desktop Standalone Tauri (Windows / Mac / Linux)
+      if (typeof window.__TAURI__ !== 'undefined' || typeof window.__TAURI_METADATA__ !== 'undefined' || typeof window.__TAURI_IPC__ !== 'undefined') return true;
+      if (window.location && (window.location.protocol === 'tauri:' || window.location.hostname === 'tauri.localhost' || window.location.host === 'tauri.localhost')) return true;
+      // 2. Mobile Android APK Capacitor
+      if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) return true;
+      if (window.location && (window.location.origin === 'https://localhost' || (window.location.hostname === 'localhost' && window.Capacitor))) return true;
+    }
+  } catch (_) {}
+  return false;
+}
+
+function initHubPlatformView() {
+  const platSec = document.getElementById('platformSelectorSection');
+  const heroBox = document.getElementById('heroPlayBox');
+  const switchRow = document.getElementById('webPlatformSwitchRow');
+  if (!platSec || !heroBox) return;
+
+  if (isNativeApp()) {
+    // Pada aplikasi yang diunduh (PC Windows .exe atau Android APK):
+    // Lewati gerbang pemilihan platform dan langsung tampilkan menu awal game normal.
+    platSec.style.display = 'none';
+    heroBox.style.display = 'flex';
+    if (switchRow) switchRow.style.display = 'none';
+  } else {
+    // Pada web browser (Vercel / Online):
+    // Cek apakah pemain sudah memilih "MAINKAN DI WEB" pada sesi ini
+    let entered = false;
+    try {
+      entered = (typeof sessionStorage !== 'undefined') && sessionStorage.getItem('vita_hub_entered') === '1';
+    } catch (_) {}
+
+    if (entered) {
+      platSec.style.display = 'none';
+      heroBox.style.display = 'flex';
+      if (switchRow) switchRow.style.display = 'block';
+    } else {
+      platSec.style.display = 'block';
+      heroBox.style.display = 'none';
+    }
+  }
+}
+
+function enterWebHub() {
+  const platSec = document.getElementById('platformSelectorSection');
+  const heroBox = document.getElementById('heroPlayBox');
+  const switchRow = document.getElementById('webPlatformSwitchRow');
+  try {
+    if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('vita_hub_entered', '1');
+  } catch (_) {}
+
+  if (platSec) platSec.style.display = 'none';
+  if (heroBox) heroBox.style.display = 'flex';
+  if (switchRow) switchRow.style.display = 'block';
+  if (typeof homeBeep === 'function') homeBeep('open');
+}
+
+function showPlatformSelector() {
+  const platSec = document.getElementById('platformSelectorSection');
+  const heroBox = document.getElementById('heroPlayBox');
+  try {
+    if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('vita_hub_entered');
+  } catch (_) {}
+
+  if (platSec) platSec.style.display = 'block';
+  if (heroBox) heroBox.style.display = 'none';
+  if (typeof homeBeep === 'function') homeBeep('close');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initHubPlatformView);
+} else {
+  initHubPlatformView();
+}
+
+window.isNativeApp = isNativeApp;
+window.initHubPlatformView = initHubPlatformView;
+window.enterWebHub = enterWebHub;
+window.showPlatformSelector = showPlatformSelector;
+
+

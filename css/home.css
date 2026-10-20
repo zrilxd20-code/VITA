@@ -1862,6 +1862,14 @@ body {
   max-width: 980px;
   margin: 18px auto 26px;
   text-align: center;
+  animation: hubBoxFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#homeView .hero-play-box {
+  animation: hubBoxFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes hubBoxFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 #homeView .platform-selector-header {
   margin-bottom: 16px;
