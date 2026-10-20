@@ -554,7 +554,39 @@ const T = {
         coop_copy_invite_btn: 'SALIN TAUTAN',
         coop_invite_copied: 'TAUTAN DISALIN!',
         coop_invite_hint: 'Kirim tautan ini ke rekan; kode kamar & relay terisi otomatis.',
-        coop_invite_prefilled: 'KODE UNDANGAN TERISI OTOMATIS. TEKAN HUBUNGKAN.'
+        coop_invite_prefilled: 'KODE UNDANGAN TERISI OTOMATIS. TEKAN HUBUNGKAN.',
+        orient_title: 'PUTAR KE MODE LANDSCAPE',
+        orient_desc: 'Miringkan ponsel ke posisi horizontal (landscape) agar tombol joystick & serang leluasa serta pandangan labirin maksimal.',
+        orient_btn_fullscreen: 'KUNCI LAYAR PENUH (AUTO)',
+        orient_btn_dismiss: 'TETAP MAIN TEGAK (ABAIKAN)',
+        plat_selector_title: 'PILIH PLATFORM OPERASI VITA',
+        plat_selector_sub: 'Pilih metode bermain yang Anda inginkan: Browser Web, Klien PC Windows, atau APK Android.',
+        plat_web_badge: 'ONLINE BROWSER // VERCEL',
+        plat_web_title: 'MAIN DI WEB (VERCEL)',
+        plat_web_desc: 'Bermain langsung tanpa instalasi di browser modern. Mendukung Co-op 4 Pemain & Cloud Save.',
+        plat_web_btn: 'MAINKAN DI WEB ▸',
+        plat_pc_badge: 'WINDOWS 10/11 // STANDALONE',
+        plat_pc_title: 'EDISI PC (WINDOWS)',
+        plat_pc_desc: 'Aplikasi mandiri offline ultra-ringan tanpa tab browser. Kontrol presisi keyboard & mouse.',
+        plat_pc_btn: 'PILIH / UNDUH PC ▸',
+        plat_android_badge: 'NATIVE APK // SENTUH HP',
+        plat_android_title: 'EDISI ANDROID (APK)',
+        plat_android_desc: 'File installer APK smartphone. Tampilan layar penuh & kontrol sentuh horizontal yang nyaman.',
+        plat_android_btn: 'PILIH / UNDUH ANDROID ▸',
+        pc_modal_title: 'UNDUH & JALANKAN VITA DI PC WINDOWS',
+        pc_modal_desc: 'Pilih metode instalasi PC. Versi standalone berjalan offline di jendela aplikasi tersendiri tanpa gangguan tab browser.',
+        pc_dl_bat_btn: 'UNDUH LAUNCHER PC (MAIN_VITA.bat)',
+        pc_dl_zip_btn: 'UNDUH KODE SUMBER LENGKAP (ZIP)',
+        pc_step_1: '1. Unduh file MAIN_VITA.bat atau arsip ZIP proyek.',
+        pc_step_2: '2. Simpan di folder komputer Anda (ekstrak jika mengunduh ZIP).',
+        pc_step_3: '3. Klik dua kali MAIN_VITA.bat untuk langsung bermain di PC!',
+        apk_modal_title: 'UNDUH & PASANG VITA DI ANDROID (APK)',
+        apk_modal_desc: 'Unduh file APK resmi VITA untuk ponsel Android atau pasang langsung sebagai Progressive Web App (PWA).',
+        apk_dl_btn: 'UNDUH FILE APK ANDROID (GITHUB ACTIONS)',
+        apk_pwa_btn: 'PASANG APLIKASI WEB DI HP (PWA)',
+        apk_step_1: '1. Unduh file APK Android ke perangkat ponsel Anda.',
+        apk_step_2: '2. Buka berkas unduhan, izinkan "Instal dari sumber tak dikenal" jika diminta.',
+        apk_step_3: '3. Ketuk Pasang (Install) lalu buka VITA di layar ponsel Anda!'
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
@@ -815,7 +847,39 @@ const T = {
         coop_copy_invite_btn: 'COPY LINK',
         coop_invite_copied: 'LINK COPIED!',
         coop_invite_hint: 'Send this link to your squad; room code & relay auto-fill.',
-        coop_invite_prefilled: 'INVITE CODE PREFILLED. PRESS CONNECT.'
+        coop_invite_prefilled: 'INVITE CODE PREFILLED. PRESS CONNECT.',
+        orient_title: 'ROTATE TO LANDSCAPE',
+        orient_desc: 'Tilt your device horizontally (landscape) for spacious dual-thumb controls and maximum sector visibility.',
+        orient_btn_fullscreen: 'FULLSCREEN LANDSCAPE (AUTO)',
+        orient_btn_dismiss: 'CONTINUE PORTRAIT (DISMISS)',
+        plat_selector_title: 'SELECT VITA OPERATIONAL PLATFORM',
+        plat_selector_sub: 'Choose your preferred deployment: Instant Web Browser, Windows PC Client, or Android APK.',
+        plat_web_badge: 'ONLINE BROWSER // VERCEL',
+        plat_web_title: 'WEB PLAY (VERCEL)',
+        plat_web_desc: 'Play instantly in your browser with zero installation. Supports 4-Player Co-op & Cloud Sync.',
+        plat_web_btn: 'PLAY IN BROWSER ▸',
+        plat_pc_badge: 'WINDOWS 10/11 // STANDALONE',
+        plat_pc_title: 'PC EDITION (WINDOWS)',
+        plat_pc_desc: 'Ultra-lightweight offline standalone window without browser tabs. Precision keyboard & mouse.',
+        plat_pc_btn: 'SELECT / DOWNLOAD PC ▸',
+        plat_android_badge: 'NATIVE APK // TOUCH MOBILE',
+        plat_android_title: 'ANDROID EDITION (APK)',
+        plat_android_desc: 'Smartphone installer APK package. Clean fullscreen interface & responsive horizontal touch controls.',
+        plat_android_btn: 'SELECT / DOWNLOAD ANDROID ▸',
+        pc_modal_title: 'DOWNLOAD & RUN VITA ON WINDOWS PC',
+        pc_modal_desc: 'Select your preferred PC installation. Standalone edition runs offline in a dedicated window without browser interference.',
+        pc_dl_bat_btn: 'DOWNLOAD PC LAUNCHER (MAIN_VITA.bat)',
+        pc_dl_zip_btn: 'DOWNLOAD FULL SOURCE ARCHIVE (ZIP)',
+        pc_step_1: '1. Download MAIN_VITA.bat or the project ZIP archive.',
+        pc_step_2: '2. Save to your computer (extract if using ZIP).',
+        pc_step_3: '3. Double-click MAIN_VITA.bat to immediately launch in PC mode!',
+        apk_modal_title: 'DOWNLOAD & INSTALL VITA ON ANDROID (APK)',
+        apk_modal_desc: 'Download the official VITA Android APK package or install directly as a Progressive Web App (PWA).',
+        apk_dl_btn: 'DOWNLOAD ANDROID APK (GITHUB ACTIONS)',
+        apk_pwa_btn: 'INSTALL WEB APP ON MOBILE (PWA)',
+        apk_step_1: '1. Download the Android APK package to your smartphone.',
+        apk_step_2: '2. Open downloaded file, enable "Install unknown apps" if prompted.',
+        apk_step_3: '3. Tap Install and launch VITA from your phone app drawer!'
     }
 };
 
@@ -12880,6 +12944,7 @@ function continueGame(bypassDeviceCheck = false) {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('deathScreen').style.display = 'none';
     document.getElementById('winScreen').style.display = 'none';
+    if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
     gameState = 'playing';
     menuDemo = false;
     totalKills = 0;
@@ -13112,6 +13177,7 @@ function startGame(bypassDeviceCheck = false) {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('deathScreen').style.display = 'none';
     document.getElementById('winScreen').style.display = 'none';
+    if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
 
     try {
         const high = loadHigh();
@@ -14459,6 +14525,90 @@ function launchCoopMission() {
         startGame(true);
     }
 }
+
+// --- MOBILE ORIENTATION PROMPT (ROTATE TO LANDSCAPE FOR TOUCH CONTROLS) ---
+let orientationPromptDismissed = false;
+
+function isMobileOrTouchEnvironment() {
+    const hasTouchClass = document.body && document.body.classList.contains('touch-on');
+    const isTouchHardware = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    const isMobileWidth = window.innerWidth <= 960 && window.innerHeight > window.innerWidth;
+    return hasTouchClass || (isTouchHardware && isMobileWidth) || (typeof settings !== 'undefined' && settings && settings.deviceMode === 'mobile');
+}
+
+function checkDeviceOrientationPrompt(forceCheck = false) {
+    const promptEl = document.getElementById('orientationPrompt');
+    if (!promptEl) return;
+
+    const isGameActive = document.body && document.body.classList.contains('game-on');
+    const isPortrait = window.innerHeight > window.innerWidth;
+
+    if (!isGameActive) {
+        promptEl.style.display = 'none';
+        return;
+    }
+
+    if (!isPortrait) {
+        // Pemain sudah memutar HP ke landscape -> sembunyikan otomatis
+        promptEl.style.display = 'none';
+        return;
+    }
+
+    if (orientationPromptDismissed && !forceCheck) {
+        return;
+    }
+
+    if (isMobileOrTouchEnvironment()) {
+        promptEl.style.display = 'flex';
+    } else {
+        promptEl.style.display = 'none';
+    }
+}
+
+function dismissOrientationPrompt() {
+    orientationPromptDismissed = true;
+    const promptEl = document.getElementById('orientationPrompt');
+    if (promptEl) promptEl.style.display = 'none';
+}
+
+function lockLandscapeFullscreen() {
+    const el = document.documentElement;
+    const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+
+    const tryLock = () => {
+        if (screen.orientation && typeof screen.orientation.lock === 'function') {
+            screen.orientation.lock('landscape').catch(() => {});
+        }
+    };
+
+    if (rfs) {
+        try {
+            const p = rfs.call(el);
+            if (p && typeof p.then === 'function') {
+                p.then(tryLock).catch(tryLock);
+            } else {
+                tryLock();
+            }
+        } catch (_) {
+            tryLock();
+        }
+    } else {
+        tryLock();
+    }
+
+    setTimeout(checkDeviceOrientationPrompt, 400);
+}
+
+// Pasang listener event rotasi / resize layar
+window.addEventListener('resize', () => { checkDeviceOrientationPrompt(); });
+window.addEventListener('orientationchange', () => { setTimeout(checkDeviceOrientationPrompt, 250); });
+if (window.screen && window.screen.orientation && typeof window.screen.orientation.addEventListener === 'function') {
+    window.screen.orientation.addEventListener('change', () => { setTimeout(checkDeviceOrientationPrompt, 250); });
+}
+
+window.checkDeviceOrientationPrompt = checkDeviceOrientationPrompt;
+window.dismissOrientationPrompt = dismissOrientationPrompt;
+window.lockLandscapeFullscreen = lockLandscapeFullscreen;
 
 window.openCoopLobbyModal = openCoopLobbyModal;
 window.closeCoopLobbyModal = closeCoopLobbyModal;

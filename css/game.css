@@ -3697,3 +3697,187 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   color: #ff5555;
   box-shadow: 0 0 10px rgba(255, 60, 60, 0.35);
 }
+
+/* ============================================================
+   MOBILE ORIENTATION PROMPT (ROTATE TO LANDSCAPE) & TOUCH UI POLISH
+   ============================================================ */
+@media (orientation: landscape) {
+  #orientationPrompt { display: none !important; }
+}
+
+.orientation-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(4, 6, 12, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: promptFadeIn 0.3s ease-out;
+}
+@keyframes promptFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.orientation-prompt-card {
+  position: relative;
+  max-width: 440px;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(14, 18, 30, 0.96), rgba(8, 10, 18, 0.98));
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 10px;
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.25), inset 0 0 20px rgba(0, 240, 255, 0.08);
+  padding: 26px 22px;
+  text-align: center;
+  overflow: hidden;
+}
+.orient-scanner-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00f0ff, transparent);
+  animation: orientScanSweep 2.5s ease-in-out infinite alternate;
+}
+@keyframes orientScanSweep {
+  0% { transform: translateY(0); opacity: 0.2; }
+  100% { transform: translateY(320px); opacity: 0.8; }
+}
+.orient-phone-anim {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.orient-phone-body {
+  width: 44px;
+  height: 80px;
+  border: 2.5px solid #00f0ff;
+  border-radius: 9px;
+  background: rgba(10, 20, 32, 0.85);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: vitaRotatePhoneAnimation 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: center center;
+}
+@keyframes vitaRotatePhoneAnimation {
+  0%, 15% { transform: rotate(0deg); }
+  45%, 75% { transform: rotate(-90deg); }
+  90%, 100% { transform: rotate(0deg); }
+}
+.orient-phone-screen {
+  width: 32px;
+  height: 60px;
+  background: rgba(0, 240, 255, 0.12);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.orient-phone-radar {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 240, 255, 0.4) 0%, transparent 70%);
+}
+.orient-phone-hud .hud-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  bottom: 8px;
+}
+.orient-phone-hud .hud-dot.left { left: 4px; background: #ff8a3d; }
+.orient-phone-hud .hud-dot.right { right: 4px; background: #00ff88; }
+.orient-rotate-arrow {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.orient-arrow-svg {
+  width: 110px;
+  height: 110px;
+  opacity: 0.65;
+  animation: orientArrowPulse 3.2s ease-in-out infinite;
+}
+@keyframes orientArrowPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.95); }
+  50% { opacity: 0.85; transform: scale(1.05); }
+}
+.orient-badge {
+  font-size: 10px;
+  color: #00f0ff;
+  letter-spacing: 2px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+#orientPromptTitle {
+  color: #fff;
+  font-size: 18px;
+  margin: 0 0 8px;
+  letter-spacing: 1.5px;
+}
+#orientPromptDesc {
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.orient-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.orient-actions .btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* Touch Controls Visual Upgrade */
+#gameView #stickBase {
+  border: 2px solid rgba(0, 240, 255, 0.55);
+  background: radial-gradient(circle at center, rgba(0, 240, 255, 0.12) 0%, rgba(10, 2, 6, 0.65) 100%);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+}
+#gameView #stickKnob {
+  background: radial-gradient(circle at 35% 30%, #00f0ff, #005577);
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+#gameView #touchBtns button {
+  background: linear-gradient(135deg, rgba(20, 26, 40, 0.85), rgba(8, 12, 22, 0.92));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+#gameView #btnTouchAtk {
+  border-color: rgba(255, 54, 54, 0.85);
+  background: radial-gradient(circle at 35% 30%, rgba(255, 70, 70, 0.9), rgba(120, 10, 10, 0.92));
+  box-shadow: 0 0 22px rgba(255, 54, 54, 0.55);
+}
+#gameView #btnTouchAtk:active {
+  box-shadow: 0 0 35px rgba(255, 54, 54, 0.85);
+}
+#gameView #btnTouchDash {
+  border-color: rgba(0, 240, 255, 0.8);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+}
+#gameView #btnTouchWeapon {
+  border-color: rgba(255, 215, 0, 0.8);
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
+}
+#gameView #btnTouchPause {
+  border-color: rgba(255, 255, 255, 0.4);
+}

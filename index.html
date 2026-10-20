@@ -89,16 +89,74 @@
   <p class="ambient">BIOLOGICAL SENSOR ANOMALY: UNSTABLE &bull; PROCEED WITH CAUTION</p>
   <div class="divider"></div>
 
-  <!-- Big Play Button Area -->
-  <div class="hero-play-box">
-    <button class="btn btn-hero-play" id="btnHeroPlay" type="button" onclick="playWebGame(false)">
-      <svg class="btn-icon play-icon-lg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      <span>ENTER THE LABYRINTH</span>
-    </button>
-    <button class="btn btn-hero-coop" id="btnHeroCoop" type="button" onclick="openCoopLobbyModal()">
-      <svg class="btn-icon play-icon-lg" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      <span data-i18n="coop_lobby_btn">OPERASI CO-OP (4 PEMAIN)</span>
-    </button>
+  <!-- 3 PLATFORM DEPLOYMENT SELECTOR (WEB, PC, ANDROID) -->
+  <div class="platform-selector-section">
+    <div class="platform-selector-header">
+      <span class="platform-selector-badge" data-i18n="plat_selector_title">PILIH PLATFORM OPERASI VITA</span>
+      <p class="platform-selector-desc" data-i18n="plat_selector_sub">Pilih metode bermain yang Anda inginkan: Browser Web, Klien PC Windows, atau APK Android.</p>
+    </div>
+
+    <div class="platform-cards-grid">
+      <!-- PLATFORM 1: WEB VERSION (INSTANT VERCEL) -->
+      <div class="platform-card card-web">
+        <div class="platform-card-glow"></div>
+        <div class="platform-card-header">
+          <span class="platform-card-pill pill-web" data-i18n="plat_web_badge">ONLINE BROWSER // VERCEL</span>
+          <div class="platform-icon-box">
+            <svg class="plat-svg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm-1 17.93V18a1 1 0 0 1-2 0v-1.07A8 8 0 0 1 4.07 13H5a1 1 0 0 1 0-2h-.93A8 8 0 0 1 11 4.07V5a1 1 0 0 1 2 0v-.93A8 8 0 0 1 19.93 11H19a1 1 0 0 1 0 2h.93A8 8 0 0 1 13 19.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"/></svg>
+          </div>
+        </div>
+        <h3 class="platform-title" data-i18n="plat_web_title">MAIN DI WEB (VERCEL)</h3>
+        <p class="platform-desc" data-i18n="plat_web_desc">Bermain langsung tanpa instalasi di browser modern. Mendukung Co-op 4 Pemain &amp; Cloud Save.</p>
+        <button class="btn btn-plat-action btn-plat-web" type="button" onclick="playWebGame(false)">
+          <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span data-i18n="plat_web_btn">MAINKAN DI WEB ▸</span>
+        </button>
+      </div>
+
+      <!-- PLATFORM 2: PC WINDOWS STANDALONE -->
+      <div class="platform-card card-pc">
+        <div class="platform-card-glow"></div>
+        <div class="platform-card-header">
+          <span class="platform-card-pill pill-pc" data-i18n="plat_pc_badge">WINDOWS 10/11 // STANDALONE</span>
+          <div class="platform-icon-box">
+            <svg class="plat-svg" viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg>
+          </div>
+        </div>
+        <h3 class="platform-title" data-i18n="plat_pc_title">EDISI PC (WINDOWS)</h3>
+        <p class="platform-desc" data-i18n="plat_pc_desc">Aplikasi mandiri offline ultra-ringan tanpa tab browser. Kontrol presisi keyboard &amp; mouse.</p>
+        <button class="btn btn-plat-action btn-plat-pc" type="button" onclick="openPcDownloadModal()">
+          <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+          <span data-i18n="plat_pc_btn">PILIH / UNDUH PC ▸</span>
+        </button>
+      </div>
+
+      <!-- PLATFORM 3: ANDROID APK MOBILE -->
+      <div class="platform-card card-android">
+        <div class="platform-card-glow"></div>
+        <div class="platform-card-header">
+          <span class="platform-card-pill pill-android" data-i18n="plat_android_badge">NATIVE APK // SENTUH HP</span>
+          <div class="platform-icon-box">
+            <svg class="plat-svg" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+          </div>
+        </div>
+        <h3 class="platform-title" data-i18n="plat_android_title">EDISI ANDROID (APK)</h3>
+        <p class="platform-desc" data-i18n="plat_android_desc">File installer APK smartphone. Tampilan layar penuh &amp; kontrol sentuh horizontal yang nyaman.</p>
+        <button class="btn btn-plat-action btn-plat-android" type="button" onclick="openAndroidDownloadModal()">
+          <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+          <span data-i18n="plat_android_btn">PILIH / UNDUH ANDROID ▸</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Multiplayer Co-op Trigger Button -->
+    <div style="margin-top:16px;text-align:center;">
+      <button class="btn btn-hero-coop" id="btnHeroCoop" type="button" onclick="openCoopLobbyModal()">
+        <svg class="btn-icon play-icon-lg" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        <span data-i18n="coop_lobby_btn">OPERASI CO-OP (4 PEMAIN)</span>
+      </button>
+    </div>
+  </div>
     <div class="hero-quick-row">
       <button class="btn btn-hero-sub" type="button" onclick="openProfileModal()">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
@@ -117,7 +175,6 @@
         <span>Field Manual &amp; Info</span>
       </button>
     </div>
-  </div>
 
   <!-- Monster & Maze Bestiary Showcase -->
   <section class="teaser">
@@ -550,6 +607,82 @@
   </div>
 </div>
 
+<!-- MODAL: UNDUH PC WINDOWS -->
+<div class="modal-backdrop" id="pcDownloadModal" role="dialog" aria-modal="true" aria-labelledby="pcModalTitle" onclick="if(event.target===this)closePcDownloadModal()">
+  <div class="modal auth-modal-card" style="max-width:540px;width:92%;" onclick="event.stopPropagation()">
+    <div class="modal-header-row">
+      <h3>
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg>
+        <span id="pcModalTitle" data-i18n="pc_modal_title">UNDUH &amp; JALANKAN VITA DI PC WINDOWS</span>
+      </h3>
+      <button class="btn-sidebar-close" type="button" onclick="closePcDownloadModal()" aria-label="Close">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin:8px 0 14px;line-height:1.4;" data-i18n="pc_modal_desc">
+      Pilih metode instalasi PC. Versi standalone berjalan offline di jendela aplikasi tersendiri tanpa gangguan tab browser.
+    </p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+      <a href="MAIN_VITA.bat" download="MAIN_VITA.bat" class="btn" style="display:flex;align-items:center;justify-content:center;text-decoration:none;gap:8px;padding:12px;">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+        <span data-i18n="pc_dl_bat_btn">UNDUH LAUNCHER PC (MAIN_VITA.bat)</span>
+      </a>
+      <a href="https://github.com/zrilxd20-code/VITA/archive/refs/heads/main.zip" target="_blank" rel="noopener" class="btn secondary" style="display:flex;align-items:center;justify-content:center;text-decoration:none;gap:8px;padding:12px;">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        <span data-i18n="pc_dl_zip_btn">UNDUH KODE SUMBER LENGKAP (ZIP)</span>
+      </a>
+    </div>
+
+    <div style="background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.25);border-radius:6px;padding:12px;font-size:12px;line-height:1.6;color:#e6edf3;">
+      <div style="font-weight:bold;color:#00f0ff;margin-bottom:6px;">PANDUAN MENJALANKAN DI PC:</div>
+      <div data-i18n="pc_step_1">1. Unduh file MAIN_VITA.bat atau arsip ZIP proyek.</div>
+      <div data-i18n="pc_step_2">2. Simpan di folder komputer Anda (ekstrak jika mengunduh ZIP).</div>
+      <div data-i18n="pc_step_3">3. Klik dua kali MAIN_VITA.bat untuk langsung bermain di PC!</div>
+    </div>
+
+    <div style="margin-top:14px;text-align:right;">
+      <button class="btn secondary" type="button" onclick="closePcDownloadModal()" style="width:100%;">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: UNDUH ANDROID APK -->
+<div class="modal-backdrop" id="androidDownloadModal" role="dialog" aria-modal="true" aria-labelledby="apkModalTitle" onclick="if(event.target===this)closeAndroidDownloadModal()">
+  <div class="modal auth-modal-card" style="max-width:540px;width:92%;" onclick="event.stopPropagation()">
+    <div class="modal-header-row">
+      <h3>
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+        <span id="apkModalTitle" data-i18n="apk_modal_title">UNDUH &amp; PASANG VITA DI ANDROID (APK)</span>
+      </h3>
+      <button class="btn-sidebar-close" type="button" onclick="closeAndroidDownloadModal()" aria-label="Close">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin:8px 0 14px;line-height:1.4;" data-i18n="apk_modal_desc">
+      Unduh file APK resmi VITA untuk ponsel Android atau pasang langsung sebagai Progressive Web App (PWA).
+    </p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+      <a href="https://github.com/zrilxd20-code/VITA/actions/workflows/android.yml" target="_blank" rel="noopener" class="btn" style="display:flex;align-items:center;justify-content:center;text-decoration:none;gap:8px;padding:12px;background:linear-gradient(135deg,rgba(255,138,61,0.8),rgba(200,40,40,0.85));border-color:#ff8a3d;">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+        <span data-i18n="apk_dl_btn">UNDUH FILE APK ANDROID (GITHUB ACTIONS)</span>
+      </a>
+      <button class="btn secondary" id="btnInstallPwa" type="button" onclick="installPwaFromHub()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm2 4h12v2H6zm-3 4h18v2H3zm5 4h8v2H8z"/></svg>
+        <span data-i18n="apk_pwa_btn">PASANG APLIKASI WEB DI HP (PWA)</span>
+      </button>
+    </div>
+
+    <div style="background:rgba(255,138,61,0.06);border:1px solid rgba(255,138,61,0.3);border-radius:6px;padding:12px;font-size:12px;line-height:1.6;color:#e6edf3;">
+      <div style="font-weight:bold;color:#ff8a3d;margin-bottom:6px;">PANDUAN INSTALASI DI ANDROID:</div>
+      <div data-i18n="apk_step_1">1. Unduh file APK Android ke perangkat ponsel Anda.</div>
+      <div data-i18n="apk_step_2">2. Buka berkas unduhan, izinkan "Instal dari sumber tak dikenal" jika diminta.</div>
+      <div data-i18n="apk_step_3">3. Ketuk Pasang (Install) lalu buka VITA di layar ponsel Anda!</div>
+    </div>
+
+    <div style="margin-top:14px;text-align:right;">
+      <button class="btn secondary" type="button" onclick="closeAndroidDownloadModal()" style="width:100%;">Tutup</button>
+    </div>
+  </div>
+</div>
+
 <footer>
   <b>VITA</b> &mdash; BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR &bull; WEB EDITION v2.5.0 &bull; 100% STANDALONE OFFLINE READY
 </footer>
@@ -800,6 +933,45 @@
         <div class="interlude-tail" id="interludeTail"></div>
         <div class="interlude-prompt" id="interludePrompt">[ KLIK / TEKAN APA SAJA UNTUK MELANJUTKAN ]</div>
     </div>
+</div>
+
+<!-- OVERLAY OTOMATIS: PUTAR KE MODE LANDSCAPE (HP / TABLET) -->
+<div id="orientationPrompt" class="orientation-prompt-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="orientPromptTitle">
+  <div class="orientation-prompt-card">
+    <div class="orient-scanner-line"></div>
+    <div class="orient-phone-anim">
+      <div class="orient-phone-body">
+        <div class="orient-phone-screen">
+          <div class="orient-phone-radar"></div>
+          <div class="orient-phone-hud">
+            <span class="hud-dot left"></span>
+            <span class="hud-dot right"></span>
+          </div>
+        </div>
+        <div class="orient-phone-speaker"></div>
+      </div>
+      <div class="orient-rotate-arrow">
+        <svg viewBox="0 0 48 48" class="orient-arrow-svg">
+          <path d="M24 8 A16 16 0 1 1 8 24" fill="none" stroke="#00f0ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 2"/>
+          <polyline points="4 20 8 24 12 20" fill="none" stroke="#00f0ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    
+    <div class="orient-badge">VITA // TACTICAL DISPLAY CALIBRATION</div>
+    <h3 id="orientPromptTitle" data-i18n="orient_title">PUTAR KE MODE LANDSCAPE</h3>
+    <p id="orientPromptDesc" data-i18n="orient_desc">Miringkan ponsel ke posisi horizontal (landscape) agar tombol joystick &amp; serang leluasa serta pandangan labirin maksimal.</p>
+
+    <div class="orient-actions">
+      <button class="btn" id="btnOrientFullscreen" type="button" onclick="lockLandscapeFullscreen()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        <span data-i18n="orient_btn_fullscreen">KUNCI LAYAR PENUH (AUTO)</span>
+      </button>
+      <button class="btn secondary" id="btnOrientDismiss" type="button" onclick="dismissOrientationPrompt()">
+        <span data-i18n="orient_btn_dismiss">TETAP MAIN TEGAK (ABAIKAN)</span>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- IN-MISSION ENCRYPTED COMMS TRANSCEIVER -->

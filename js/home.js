@@ -2222,6 +2222,7 @@ function proceedToWebGame(autoStart = false) {
   }
   if (typeof resize === 'function') resize();
   if (typeof checkContinueBtn === 'function') checkContinueBtn();
+  if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
   if (autoStart && typeof startGame === 'function') {
     startGame(true);
   }
@@ -2473,3 +2474,58 @@ setInterval(checkVitaUpdate, 30 * 60 * 1000);
   }
   if (!HOME_REDUCE_MOTION && typeof requestAnimationFrame === 'function') requestAnimationFrame(vita2PulseFoes);
 })();
+
+// ============================================================
+// MODAL PLATFORM DOWNLOADER (PC & ANDROID)
+// ============================================================
+function openPcDownloadModal() {
+  const m = document.getElementById('pcDownloadModal');
+  if (m) m.classList.add('open');
+  if (typeof homeBeep === 'function') homeBeep('open');
+}
+
+function closePcDownloadModal() {
+  const m = document.getElementById('pcDownloadModal');
+  if (m) m.classList.remove('open');
+  if (typeof homeBeep === 'function') homeBeep('close');
+}
+
+function openAndroidDownloadModal() {
+  const m = document.getElementById('androidDownloadModal');
+  if (m) m.classList.add('open');
+  if (typeof homeBeep === 'function') homeBeep('open');
+}
+
+function closeAndroidDownloadModal() {
+  const m = document.getElementById('androidDownloadModal');
+  if (m) m.classList.remove('open');
+  if (typeof homeBeep === 'function') homeBeep('close');
+}
+
+let deferredPwaPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+  const pwaBtn = document.getElementById('btnInstallPwa');
+  if (pwaBtn) pwaBtn.style.display = 'inline-flex';
+});
+
+function installPwaFromHub() {
+  if (deferredPwaPrompt) {
+    deferredPwaPrompt.prompt();
+    deferredPwaPrompt.userChoice.then(() => {
+      deferredPwaPrompt = null;
+    }).catch(() => {});
+  } else {
+    alert(homeSettings.lang === 'en' ? 
+      'PWA is already installed or open your browser menu and choose "Add to Home Screen".' : 
+      'Aplikasi sudah terpasang atau buka menu browser Anda lalu pilih "Tambahkan ke Layar Utama".');
+  }
+}
+
+window.openPcDownloadModal = openPcDownloadModal;
+window.closePcDownloadModal = closePcDownloadModal;
+window.openAndroidDownloadModal = openAndroidDownloadModal;
+window.closeAndroidDownloadModal = closeAndroidDownloadModal;
+window.installPwaFromHub = installPwaFromHub;
+
