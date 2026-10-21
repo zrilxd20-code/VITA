@@ -152,15 +152,37 @@
 
   <!-- HOMESCREEN NORMAL AWAL (ENTER THE LABYRINTH + COOP + AKUN + DOSSIER + SETTINGS) -->
   <div class="hero-play-box" id="heroPlayBox">
+    <!-- Game Mode Directive Selector (Campaign vs Endless Survival) -->
+    <div class="mode-directive-row" id="modeDirectiveRow" style="display:flex;gap:8px;margin-bottom:12px;justify-content:center;width:100%;">
+      <button class="btn-micro active" id="btnDirectiveCampaign" type="button" onclick="selectGameDirective('campaign')" style="flex:1;padding:8px 12px;border:1px solid var(--accent,#ff3b3b);background:rgba(255,59,59,0.22);color:#fff;font-weight:bold;letter-spacing:1px;font-size:12px;cursor:pointer;border-radius:4px;">
+        <span data-i18n="mode_campaign_btn">KAMPANYE // 15 SEKTOR</span>
+      </button>
+      <button class="btn-micro" id="btnDirectiveEndless" type="button" onclick="selectGameDirective('endless')" style="flex:1;padding:8px 12px;border:1px solid rgba(0,229,255,0.3);background:rgba(0,229,255,0.08);color:#00e5ff;font-weight:bold;letter-spacing:1px;font-size:12px;cursor:pointer;border-radius:4px;">
+        <span data-i18n="mode_endless_btn">ARENA SURVIVAL // HORDE</span>
+      </button>
+    </div>
+
     <button class="btn btn-hero-play" id="btnHeroPlay" type="button" onclick="playWebGame(false)">
       <svg class="btn-icon play-icon-lg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      <span data-i18n="hero_enter_btn">ENTER THE LABYRINTH</span>
+      <span id="btnHeroPlayText" data-i18n="hero_enter_btn">ENTER THE LABYRINTH</span>
     </button>
     <button class="btn btn-hero-coop" id="btnHeroCoop" type="button" onclick="openCoopLobbyModal()">
       <svg class="btn-icon play-icon-lg" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
       <span data-i18n="coop_lobby_btn">OPERASI CO-OP (4 PEMAIN)</span>
     </button>
     <div class="hero-quick-row">
+      <button class="btn btn-hero-sub" type="button" onclick="openTalentTreeModal()" style="border-color:rgba(0,240,255,0.45);color:#00f0ff;">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93l1.86 3.72A5.99 5.99 0 0 1 18 13a6 6 0 1 1-12 0c0-.23.01-.46.04-.68L8 8.6A4 4 0 0 1 12 2zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-4.7 9.14A4 4 0 1 0 16 13c0-.36-.05-.71-.14-1.04l-2.02 4.04a2 2 0 1 1-3.68 0L8.14 11.96c-.33.37-.58.82-.72 1.32l-.12-.14z"/></svg>
+        <span data-i18n="talent_btn">Pohon Talenta (Skill Tree)</span>
+      </button>
+      <button class="btn btn-hero-sub" type="button" onclick="openBestiaryModal()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.03 1.35 5.75 3.5 7.6V22h13v-2.4c2.15-1.85 3.5-4.57 3.5-7.6 0-5.52-4.48-10-10-10zm-3 12c-.83 0-1.5-.67-1.5-1.5S8.17 11 9 11s1.5.67 1.5 1.5S9.83 14 9 14zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+        <span data-i18n="bestiary_btn">Arsip Anomali (Bestiary)</span>
+      </button>
+      <button class="btn btn-hero-sub" type="button" onclick="openWorkbenchModal()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+        <span data-i18n="workbench_btn">Bengkel Senjata (Modifikasi)</span>
+      </button>
       <button class="btn btn-hero-sub" type="button" onclick="openProfileModal()">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         <span data-i18n="hero_dossier_btn">Operative Dossier</span>
@@ -258,6 +280,11 @@
     <button class="sidebar-nav-item" id="tabBtnCoop" type="button" onclick="closeSidebar(); openCoopLobbyModal();" style="border-left:2px solid #00f0ff;">
       <svg class="btn-icon" viewBox="0 0 24 24" style="color:#00f0ff;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
       <span data-i18n="coop_lobby_btn" style="color:#00f0ff;">OPERASI CO-OP (4 PEMAIN)</span>
+    </button>
+
+    <button class="sidebar-nav-item" id="tabBtnTalents" type="button" onclick="closeSidebar(); openTalentTreeModal();" style="border-left:2px solid #00e5ff;">
+      <svg class="btn-icon" viewBox="0 0 24 24" style="color:#00e5ff;"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93l1.86 3.72A5.99 5.99 0 0 1 18 13a6 6 0 1 1-12 0c0-.23.01-.46.04-.68L8 8.6A4 4 0 0 1 12 2zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-4.7 9.14A4 4 0 1 0 16 13c0-.36-.05-.71-.14-1.04l-2.02 4.04a2 2 0 1 1-3.68 0L8.14 11.96c-.33.37-.58.82-.72 1.32l-.12-.14z"/></svg>
+      <span data-i18n="talent_btn" style="color:#00e5ff;">Pohon Talenta (Skill Tree)</span>
     </button>
 
     <button class="sidebar-nav-item" id="tabBtnProfile" type="button" onclick="openProfileModal()">
@@ -1105,48 +1132,54 @@
 
 <div id="ui">
     <div class="ui-header"><span class="ui-badge" id="uiBadge">BIO-CONTAINMENT // SEC-07</span></div>
-    <div>
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
-        <span id="lblLevel">Level:</span> <span id="levelText">1</span> / 15
+    <div class="hud-sector-strip">
+        <div class="hud-stat-cell">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+            <span id="lblLevel">Level:</span> <span id="levelText">1</span> / 15
+        </div>
+        <div class="hud-stat-cell hud-cell-mode">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 17.93V18a1 1 0 0 1-2 0v-1.07A8 8 0 0 1 4.07 13H5a1 1 0 0 1 0-2h-.93A8 8 0 0 1 11 4.07V5a1 1 0 0 1 2 0v-.93A8 8 0 0 1 19.93 11H19a1 1 0 0 1 0 2h.93A8 8 0 0 1 13 19.93z"/></svg>
+            <span id="lblMode">Mode:</span> <span id="modeText">LIGHT</span>
+        </div>
+        <div class="hud-stat-cell hud-cell-diff">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93z"/></svg>
+            <span id="lblDiff">Difficulty:</span> <span id="diffText">NORMAL</span>
+        </div>
     </div>
-    <div>
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 17.93V18a1 1 0 0 1-2 0v-1.07A8 8 0 0 1 4.07 13H5a1 1 0 0 1 0-2h-.93A8 8 0 0 1 11 4.07V5a1 1 0 0 1 2 0v-.93A8 8 0 0 1 19.93 11H19a1 1 0 0 1 0 2h.93A8 8 0 0 1 13 19.93z"/></svg>
-        <span id="lblMode">Mode:</span> <span id="modeText">LIGHT</span>
+    <div class="hud-vitals-wrap">
+        <div class="hud-stat-cell hud-hp-row">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <span id="lblHp">HP:</span> <span id="hpText">100</span>
+            <div class="hp-bar-container"><div class="hp-bar" id="hpBar" style="width:100%"></div></div>
+        </div>
+        <div id="bioRow" class="bio-row hud-stat-cell">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            <span id="lblBpm">BIOMETRICS:</span>
+            <span id="bpmText" class="bpm-val">74 BPM</span>
+            <canvas id="ekgCanvas" width="76" height="16"></canvas>
+        </div>
     </div>
-    <div>
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93z"/></svg>
-        <span id="lblDiff">Difficulty:</span> <span id="diffText">NORMAL</span>
-    </div>
-    <div>
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        <span id="lblHp">HP:</span> <span id="hpText">100</span>
-        <div class="hp-bar-container"><div class="hp-bar" id="hpBar" style="width:100%"></div></div>
-    </div>
-    <div id="bioRow" class="bio-row">
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-        <span id="lblBpm">BIOMETRICS:</span>
-        <span id="bpmText" class="bpm-val">74 BPM</span>
-        <canvas id="ekgCanvas" width="76" height="16"></canvas>
-    </div>
-    <div>
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M6.92 5H5l9 9 1.42-1.42L6.92 5zm11.78 1.08l-2.41-2.41c-.39-.39-1.02-.39-1.41 0l-2.12 2.12 3.83 3.83 2.12-2.12c.38-.4.38-1.03-.01-1.42zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
-        <span id="lblAtk">Attack:</span> <span id="atkText">20</span>
-    </div>
-    <div>
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.03 1.35 5.75 3.5 7.6V22h13v-2.4c2.15-1.85 3.5-4.57 3.5-7.6 0-5.52-4.48-10-10-10zm-3 12c-.83 0-1.5-.67-1.5-1.5S8.17 11 9 11s1.5.67 1.5 1.5S9.83 14 9 14zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-        <span id="lblMonster">Monsters:</span> <span id="monsterCount">0</span>
-    </div>
-    <div>
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M17.21 9l-4.38-6.56a1 1 0 0 0-1.66 0L6.79 9H2l8.4 12.6a2 2 0 0 0 3.2 0L22 9h-4.79zM12 4.69L14.87 9H9.13L12 4.69z"/></svg>
-        <span id="lblArtifact">Artifacts:</span> <span id="artifactText">0 / 0</span>
-    </div>
-    <div>
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v3l-5-4 5-4v3h4v2z"/></svg>
-        <span id="lblExit">Exit:</span> <span id="exitText">LOCKED</span>
-    </div>
-    <div>
-        <svg class="hud-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-        <span id="lblTime">Time:</span> <span id="timeText">0</span>s
+    <div class="hud-tactical-grid">
+        <div class="hud-stat-cell">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M6.92 5H5l9 9 1.42-1.42L6.92 5zm11.78 1.08l-2.41-2.41c-.39-.39-1.02-.39-1.41 0l-2.12 2.12 3.83 3.83 2.12-2.12c.38-.4.38-1.03-.01-1.42zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+            <span id="lblAtk">Attack:</span> <span id="atkText">20</span>
+        </div>
+        <div class="hud-stat-cell">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.03 1.35 5.75 3.5 7.6V22h13v-2.4c2.15-1.85 3.5-4.57 3.5-7.6 0-5.52-4.48-10-10-10zm-3 12c-.83 0-1.5-.67-1.5-1.5S8.17 11 9 11s1.5.67 1.5 1.5S9.83 14 9 14zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            <span id="lblMonster">Monsters:</span> <span id="monsterCount">0</span>
+        </div>
+        <div class="hud-stat-cell">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M17.21 9l-4.38-6.56a1 1 0 0 0-1.66 0L6.79 9H2l8.4 12.6a2 2 0 0 0 3.2 0L22 9h-4.79zM12 4.69L14.87 9H9.13L12 4.69z"/></svg>
+            <span id="lblArtifact">Artifacts:</span> <span id="artifactText">0 / 0</span>
+        </div>
+        <div class="hud-stat-cell">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v3l-5-4 5-4v3h4v2z"/></svg>
+            <span id="lblExit">Exit:</span> <span id="exitText">LOCKED</span>
+        </div>
+        <div class="hud-stat-cell">
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+            <span id="lblTime">Time:</span> <span id="timeText">0</span>s
+        </div>
     </div>
 </div>
 
@@ -1202,6 +1235,18 @@
       <button class="btn secondary" id="pauseCodex" onclick="openCodexModal()">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
         <span id="pauseCodexText">CLASSIFIED ARCHIVES</span>
+      </button>
+      <button class="btn secondary" id="pauseTalents" onclick="openTalentTreeFromGame()" style="border-color:rgba(0,240,255,0.45);color:#00f0ff;">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93l1.86 3.72A5.99 5.99 0 0 1 18 13a6 6 0 1 1-12 0c0-.23.01-.46.04-.68L8 8.6A4 4 0 0 1 12 2zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-4.7 9.14A4 4 0 1 0 16 13c0-.36-.05-.71-.14-1.04l-2.02 4.04a2 2 0 1 1-3.68 0L8.14 11.96c-.33.37-.58.82-.72 1.32l-.12-.14z"/></svg>
+        <span id="pauseTalentsText" data-i18n="pause_talent_btn">POHON TALENTA</span>
+      </button>
+      <button class="btn secondary" id="pauseBestiary" onclick="openBestiaryFromGame()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.03 1.35 5.75 3.5 7.6V22h13v-2.4c2.15-1.85 3.5-4.57 3.5-7.6 0-5.52-4.48-10-10-10zm-3 12c-.83 0-1.5-.67-1.5-1.5S8.17 11 9 11s1.5.67 1.5 1.5S9.83 14 9 14zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+        <span id="pauseBestiaryText" data-i18n="pause_bestiary_btn">ARSIP ANOMALI (BESTIARY)</span>
+      </button>
+      <button class="btn secondary" id="pauseWorkbench" onclick="openWorkbenchFromGame()">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+        <span id="pauseWorkbenchText" data-i18n="pause_workbench_btn">BENGKEL SENJATA</span>
       </button>
       <button class="btn secondary" id="pauseSettings" onclick="openPauseSettings()">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
@@ -1395,6 +1440,155 @@
     <div style="margin-top:16px;text-align:right;">
       <button class="btn" type="button" onclick="closePauseSettings()"><span data-i18n="settings_save_close">SIMPAN &amp; TUTUP</span></button>
     </div>
+  </div>
+</div>
+
+<!-- BESTIARY / SPECIMEN ANOMALY ARCHIVES MODAL -->
+<div id="bestiaryModal" class="modal-backdrop" style="display:none;z-index:10004;position:fixed;inset:0;background:rgba(5,7,12,0.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;">
+  <div class="modal-card bestiary-card" style="max-width:820px;width:100%;max-height:92vh;border:1px solid rgba(255,59,59,0.35);background:rgba(12,10,18,0.98);box-shadow:0 0 45px rgba(255,59,59,0.25);border-radius:12px;padding:20px;color:#f2e9e4;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,59,59,0.25);padding-bottom:12px;margin-bottom:14px;">
+      <div>
+        <div style="font-size:11px;font-family:monospace;color:#ff3b3b;letter-spacing:2px;font-weight:bold;" data-i18n="bestiary_specimen_count">12 ANOMALI TERDETEKSI</div>
+        <h3 style="color:#fff;margin:2px 0 0 0;font-size:18px;letter-spacing:1px;" data-i18n="bestiary_title">ARSIP ANOMALI &amp; PREDATOR FASILITAS</h3>
+      </div>
+      <button class="btn-sidebar-close" type="button" onclick="closeBestiaryModal()" style="font-size:18px;">✕</button>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;flex:1;overflow:hidden;min-height:0;">
+      <!-- Specimen List -->
+      <div id="bestiaryRoster" style="overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:6px;border-right:1px solid rgba(255,255,255,0.08);">
+        <!-- Injected dynamically -->
+      </div>
+      <!-- Specimen Detail Dossier -->
+      <div id="bestiaryDossier" style="overflow-y:auto;padding-left:8px;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:16px;align-items:center;">
+          <div style="border:1px solid rgba(255,59,59,0.4);border-radius:8px;background:#05070c;padding:6px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 20px rgba(255,59,59,0.15);">
+            <canvas id="bestiaryPreviewCanvas" width="160" height="130" style="border-radius:4px;display:block;"></canvas>
+          </div>
+          <div style="flex:1;">
+            <div id="bestiaryThreatBadge" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-family:monospace;font-weight:bold;margin-bottom:4px;background:rgba(255,59,59,0.2);color:#ff3b3b;border:1px solid rgba(255,59,59,0.5);">CLASS-I</div>
+            <h4 id="bestiaryMonsterName" style="margin:2px 0;font-size:18px;color:#fff;letter-spacing:1px;">Amoeboid Slime</h4>
+            <div id="bestiaryMonsterCode" style="font-size:11px;font-family:monospace;color:#00f0ff;margin-bottom:8px;">SPECIMEN #01 // VITA-CARNIS</div>
+            <div style="display:flex;gap:14px;font-size:12px;">
+              <div><span style="color:var(--text-dim,#a0a0b0);" data-i18n="bestiary_kills_lbl">DIELIMINASI:</span> <b id="bestiaryStatKills" style="color:#2ecc71;">0</b></div>
+              <div><span style="color:var(--text-dim,#a0a0b0);" data-i18n="bestiary_deaths_lbl">KORBAN OPERATIF:</span> <b id="bestiaryStatDeaths" style="color:#ff4757;">0</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:1px dashed rgba(255,255,255,0.1);padding-top:10px;">
+          <div style="font-size:11px;color:#ffd700;font-weight:bold;letter-spacing:1px;margin-bottom:4px;" data-i18n="bestiary_weakness_lbl">KELEMAHAN TAKTIS:</div>
+          <p id="bestiaryWeaknessText" style="font-size:13px;line-height:1.5;margin:0 0 10px 0;color:#f2e9e4;background:rgba(255,215,0,0.06);padding:8px 12px;border-radius:6px;border-left:3px solid #ffd700;"></p>
+        </div>
+
+        <div>
+          <div style="font-size:11px;color:#00f0ff;font-weight:bold;letter-spacing:1px;margin-bottom:4px;" data-i18n="bestiary_bio_lbl">CATATAN BIOLOGI:</div>
+          <p id="bestiaryBioText" style="font-size:13px;line-height:1.6;margin:0;color:#c0c0d0;background:rgba(0,229,255,0.04);padding:10px 12px;border-radius:6px;border-left:3px solid #00f0ff;"></p>
+        </div>
+      </div>
+    </div>
+    
+    <div style="margin-top:12px;text-align:right;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">
+      <button class="btn" type="button" onclick="closeBestiaryModal()" style="padding:8px 20px;font-size:13px;"><span data-i18n="close">TUTUP</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- WEAPON WORKBENCH / ARSENAL MODIFICATION MODAL -->
+<div id="workbenchModal" class="modal-backdrop" style="display:none;z-index:10004;position:fixed;inset:0;background:rgba(5,7,12,0.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;">
+  <div class="modal-card workbench-card" style="max-width:820px;width:100%;max-height:92vh;border:1px solid rgba(0,229,255,0.35);background:rgba(10,12,20,0.98);box-shadow:0 0 45px rgba(0,229,255,0.22);border-radius:12px;padding:20px;color:#e6edf3;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.25);padding-bottom:12px;margin-bottom:14px;">
+      <div>
+        <div style="font-size:11px;font-family:monospace;color:#00f0ff;letter-spacing:2px;font-weight:bold;" data-i18n="workbench_title">TERMINAL MODIFIKASI ARSENAL</div>
+        <h3 style="color:#fff;margin:2px 0 0 0;font-size:18px;letter-spacing:1px;" data-i18n="workbench_sub">Tingkatkan persenjataan taktis ke Tier II dengan kemampuan khusus</h3>
+      </div>
+      <button class="btn-sidebar-close" type="button" onclick="closeWorkbenchModal()" style="font-size:18px;">✕</button>
+    </div>
+
+    <div id="workbenchGrid" style="overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px;padding-right:4px;">
+      <!-- Injected dynamically by renderWorkbenchModal() -->
+    </div>
+
+    <div style="margin-top:14px;text-align:right;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">
+      <button class="btn" type="button" onclick="closeWorkbenchModal()" style="padding:8px 20px;font-size:13px;"><span data-i18n="close">TUTUP</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- OPERATIVE TALENT TREE & NEURAL TRACES MODAL (HSR / GENSHIN STYLE) -->
+<div id="talentTreeModal" class="modal-backdrop" style="display:none;z-index:10005;position:fixed;inset:0;background:rgba(4,6,12,0.94);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:16px;">
+  <div class="modal-card talent-tree-card" style="max-width:940px;width:100%;max-height:94vh;border:1px solid rgba(0,240,255,0.38);background:radial-gradient(circle at 50% 20%, rgba(15,22,40,0.98), rgba(7,9,16,0.99));box-shadow:0 0 50px rgba(0,240,255,0.18), inset 0 0 20px rgba(0,0,0,0.6);border-radius:14px;padding:20px;color:#e6edf3;display:flex;flex-direction:column;overflow:hidden;">
+    
+    <!-- Modal Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,240,255,0.22);padding-bottom:12px;margin-bottom:12px;">
+      <div>
+        <div style="font-size:11px;font-family:monospace;color:#00f0ff;letter-spacing:2px;font-weight:bold;" data-i18n="talent_title">POHON TALENTA &amp; PROTOKOL JEJAK</div>
+        <h3 style="color:#fff;margin:2px 0 0 0;font-size:17px;letter-spacing:0.8px;" data-i18n="talent_sub">Sistem peningkatan saraf &amp; modul bionik permanen // Persisten antar-misi</h3>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div class="talent-currency-pill" style="display:flex;align-items:center;gap:8px;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.4);border-radius:20px;padding:6px 14px;box-shadow:0 0 15px rgba(0,240,255,0.15);">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#00f0ff;filter:drop-shadow(0 0 4px #00f0ff);"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg>
+          <span style="font-size:11px;letter-spacing:1px;font-family:monospace;color:#a0e0ff;" data-i18n="talent_nanites_lbl">INTI NANIT:</span>
+          <b id="talentNaniteVal" style="font-size:15px;color:#00f0ff;font-family:monospace;text-shadow:0 0 8px rgba(0,240,255,0.6);">0</b>
+        </div>
+        <button class="btn-sidebar-close" type="button" onclick="closeTalentTreeModal()" style="font-size:18px;">✕</button>
+      </div>
+    </div>
+
+    <!-- Main Talent Area: Interactive Visual Tree + Inspector Panel -->
+    <div style="display:grid;grid-template-columns:1fr 310px;gap:16px;flex:1;overflow:hidden;min-height:0;">
+      <!-- Tree Visual Canvas Container -->
+      <div id="talentCanvasContainer" style="position:relative;background:rgba(5,7,14,0.92);border:1px solid rgba(0,240,255,0.2);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 35px rgba(0,0,0,0.85);">
+        <canvas id="talentTreeCanvas" width="580" height="420" style="width:100%;height:100%;display:block;touch-action:none;cursor:pointer;"></canvas>
+      </div>
+
+      <!-- Inspector Detail Panel -->
+      <div id="talentInspector" style="background:rgba(12,16,28,0.85);border:1px solid rgba(0,240,255,0.22);border-radius:10px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto;">
+        <div>
+          <div id="talentNodeBranchBadge" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-family:monospace;font-weight:bold;margin-bottom:8px;background:rgba(255,59,59,0.18);color:#ff5555;border:1px solid rgba(255,59,59,0.4);">
+            JALUR TEMPUR
+          </div>
+          <h4 id="talentNodeTitle" style="margin:0 0 4px 0;font-size:16px;color:#fff;letter-spacing:0.5px;">Penajaman Nanit</h4>
+          <div id="talentNodeRank" style="font-size:12px;font-family:monospace;color:#00f0ff;margin-bottom:12px;">Tingkat: 0 / 3</div>
+
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:10px;margin-bottom:10px;">
+            <div style="font-size:10px;color:var(--text-dim,#8892b0);letter-spacing:1px;font-weight:bold;margin-bottom:4px;">EFEK SAAT INI:</div>
+            <p id="talentNodeCurrentDesc" style="font-size:12px;line-height:1.5;margin:0;color:#ccd6f6;">-</p>
+          </div>
+
+          <div id="talentNodeNextBox" style="background:rgba(0,240,255,0.04);border:1px solid rgba(0,240,255,0.15);border-radius:6px;padding:10px;margin-bottom:12px;">
+            <div style="font-size:10px;color:#00f0ff;letter-spacing:1px;font-weight:bold;margin-bottom:4px;">EFEK TINGKAT BERIKUTNYA:</div>
+            <p id="talentNodeNextDesc" style="font-size:12px;line-height:1.5;margin:0;color:#e6f1ff;">+10% Serangan Dasar (Base ATK)</p>
+          </div>
+
+          <div id="talentNodeReqBox" style="font-size:11px;color:#ff9f43;margin-bottom:10px;display:none;">
+            <span data-i18n="talent_req_lbl">Prasyarat:</span> <span id="talentNodeReqText">-</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:8px 10px;background:rgba(0,0,0,0.3);border-radius:6px;border:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:12px;color:var(--text-dim,#8892b0);" data-i18n="talent_cost_lbl">Biaya:</span>
+            <b id="talentNodeCost" style="font-size:14px;color:#ffd700;font-family:monospace;">25 Nanit</b>
+          </div>
+
+          <button class="btn" id="btnTalentUpgrade" type="button" onclick="upgradeSelectedTalent()" style="width:100%;padding:10px 0;font-size:13px;letter-spacing:1px;background:linear-gradient(135deg, #00b4d8, #0077b6);border-color:#00f0ff;box-shadow:0 0 15px rgba(0,180,216,0.3);">
+            <span id="btnTalentUpgradeText" data-i18n="talent_upgrade_btn">TINGKATKAN PROTOKOL</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">
+      <button class="btn ghost danger" type="button" onclick="resetAllTalents()" style="font-size:11px;padding:6px 14px;border:1px solid rgba(255,59,59,0.3);color:#ff5555;">
+        <span data-i18n="talent_reset_btn">RESET PROTOKOL (PENGEMBALIAN 100%)</span>
+      </button>
+      <button class="btn" type="button" onclick="closeTalentTreeModal()" style="padding:6px 22px;font-size:12px;">
+        <span data-i18n="close">TUTUP</span>
+      </button>
+    </div>
+
   </div>
 </div>
 

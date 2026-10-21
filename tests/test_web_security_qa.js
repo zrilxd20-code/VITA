@@ -1436,6 +1436,80 @@ assert(desktopYml.includes('vita-windows-x64'), 'desktop.yml harus mengunggah ar
 
 console.log('✓ TEST 28 LULUS: Kontrak pengemasan PC Desktop (Tauri/Windows) terverifikasi.');
 
+// ============================================================================
+// TEST 29: Sistem Pohon Talenta & Jejak Operatif (HSR / Genshin Style Traces)
+// ============================================================================
+console.log('\n[TEST 29] Pengujian Sistem Pohon Talenta & Traces Operatif...');
+
+// 29a. Audit tidak ada penambahan monster baru (Golden Rule: roster tetap 12 monster)
+const monsterMatch = gameJs.match(/const MONSTER_TYPES = \[([\s\S]*?)\];/);
+assert(monsterMatch, 'MONSTER_TYPES harus terdefinisi');
+const monsterCount = (monsterMatch[1].match(/name:\s*['"]/g) || []).length;
+assert(monsterCount === 12, `Roster monster harus tetap tepat 12 jenis (ditemukan: ${monsterCount}). Tidak boleh menambah monster baru.`);
+
+// 29b. Verifikasi definisi TALENT_NODES dan fungsi manajemen talenta
+assert(gameJs.includes('const TALENT_NODES = ['), 'TALENT_NODES harus terdefinisi di game.js');
+assert(gameJs.includes('function getTalentTreeData()'), 'getTalentTreeData() harus terdefinisi');
+assert(gameJs.includes('function saveTalentTreeData('), 'saveTalentTreeData() harus terdefinisi');
+assert(gameJs.includes('function addNaniteShards('), 'addNaniteShards() harus terdefinisi');
+assert(gameJs.includes('function upgradeSelectedTalent()'), 'upgradeSelectedTalent() harus terdefinisi');
+assert(gameJs.includes('function resetAllTalents()'), 'resetAllTalents() harus terdefinisi');
+assert(gameJs.includes('function renderTalentTree()'), 'renderTalentTree() harus terdefinisi');
+
+// 29c. Uji logika logika prasyarat dan refund talenta
+const talentScope = new Function(`
+    let storage = {};
+    const localStorage = {
+        getItem: k => storage[k] || null,
+        setItem: (k, v) => { storage[k] = String(v); }
+    };
+    const tt = k => k;
+    const homeBeep = () => {};
+    const confirm = () => true;
+    const updateTalentUIHeader = () => {};
+    ${(gameJs.match(/const TALENT_NODES = \[[\s\S]*?\];/) || [''])[0]}
+    const VITA_TALENTS_KEY = 'vita_talents';
+    ${(gameJs.match(/function getTalentTreeData\(\)\s*\{[\s\S]*?\n\}/) || [''])[0]}
+    ${(gameJs.match(/function saveTalentTreeData\(data\)\s*\{[\s\S]*?\n\}/) || [''])[0]}
+    ${(gameJs.match(/function addNaniteShards\(amount, x, y\)\s*\{[\s\S]*?\n\}/) || [''])[0]}
+    ${(gameJs.match(/function isTalentNodeAvailable\(node, ranks\)\s*\{[\s\S]*?\n\}/) || [''])[0]}
+    ${(gameJs.match(/function isTalentNodeUnlocked\(nodeId, ranks\)\s*\{[\s\S]*?\n\}/) || [''])[0]}
+    return {
+        getData: getTalentTreeData,
+        saveData: saveTalentTreeData,
+        addNanites: addNaniteShards,
+        isAvail: isTalentNodeAvailable,
+        nodes: TALENT_NODES
+    };
+`)();
+
+// Verifikasi starter nanite
+const initialData = talentScope.getData();
+assert(initialData.nanites >= 50, 'Operatif baru harus memperoleh starter Nanite (minimal 50) untuk mencoba upgrade');
+assert(initialData.ranks.core === 1, 'Core node harus otomatis aktif');
+
+// Verifikasi prasyarat (crit_surge butuh atk_boost)
+const critNode = talentScope.nodes.find(n => n.id === 'crit_surge');
+assert(!talentScope.isAvail(critNode, initialData.ranks), 'crit_surge harus terkunci jika atk_boost belum memiliki rank >= 1');
+
+// Tambah rank atk_boost -> crit_surge terbuka
+initialData.ranks.atk_boost = 1;
+assert(talentScope.isAvail(critNode, initialData.ranks), 'crit_surge harus terbuka setelah atk_boost dinaikkan ke rank 1');
+
+// Uji akumulasi nanites
+talentScope.addNanites(45);
+const updatedData = talentScope.getData();
+assert(updatedData.nanites === initialData.nanites + 45, 'Penambahan Nanite Shards harus tersimpan persisten');
+
+// 29d. Verifikasi tombol UI dan modal di HTML
+assert(indexHtml.includes('id="talentTreeModal"'), 'index.html harus memuat #talentTreeModal');
+assert(indexHtml.includes('id="talentTreeCanvas"'), '#talentTreeModal harus memiliki canvas interaktif');
+assert(indexHtml.includes('id="talentNaniteVal"'), '#talentTreeModal harus menampilkan saldo Inti Nanit');
+assert(indexHtml.includes('openTalentTreeModal()'), 'Tombol buka talent tree harus terpasang di index.html');
+
+console.log('✓ TEST 29 LULUS: Sistem Pohon Talenta & Traces Operatif terverifikasi (prasyarat, nanite & audit 12 monster).');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (28/28)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (29/29)');
 console.log('=========================================');
+

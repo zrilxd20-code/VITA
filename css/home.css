@@ -2033,3 +2033,17 @@ body {
   background: linear-gradient(135deg, rgba(255, 138, 61, 0.35), rgba(200, 80, 30, 0.45));
   box-shadow: 0 0 20px rgba(255, 138, 61, 0.5);
 }
+
+/* Operative Talent Tree (Traces) Responsive & Animations */
+.talent-tree-card {
+  transition: all 0.25s ease;
+}
+@media (max-width: 768px) {
+  .talent-tree-card {
+    padding: 12px !important;
+  }
+  .talent-tree-card > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 240px auto !important;
+  }
+}

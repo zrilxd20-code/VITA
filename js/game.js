@@ -599,7 +599,71 @@ const T = {
         apk_pwa_btn: 'PASANG APLIKASI WEB DI HP (PWA)',
         apk_step_1: '1. Unduh file APK Android ke perangkat ponsel Anda.',
         apk_step_2: '2. Buka berkas unduhan, izinkan "Instal dari sumber tak dikenal" jika diminta.',
-        apk_step_3: '3. Ketuk Pasang (Install) lalu buka VITA di layar ponsel Anda!'
+        apk_step_3: '3. Ketuk Pasang (Install) lalu buka VITA di layar ponsel Anda!',
+        bestiary_btn: 'ARSIP ANOMALI (BESTIARY)',
+        bestiary_title: 'ARSIP ANOMALI & PREDATOR FASILITAS',
+        bestiary_sub: 'Klasifikasi biologi, taktik bertahan, dan telemetri eliminasi spesimen',
+        bestiary_threat_lbl: 'TINGKAT ANCAMAN:',
+        bestiary_weakness_lbl: 'KELEMAHAN TAKTIS:',
+        bestiary_bio_lbl: 'CATATAN BIOLOGI:',
+        bestiary_kills_lbl: 'DIELIMINASI:',
+        bestiary_deaths_lbl: 'KORBAN OPERATIF:',
+        bestiary_specimen_count: '12 ANOMALI TERDETEKSI',
+        workbench_btn: 'BENGKEL SENJATA (MODIFIKASI)',
+        workbench_title: 'TERMINAL MODIFIKASI ARSENAL',
+        workbench_sub: 'Tingkatkan persenjataan taktis ke Tier II dengan kemampuan khusus',
+        workbench_tier1: 'TIER I (STANDAR)',
+        workbench_tier2: 'TIER II (OVERCLOCKED)',
+        workbench_upgrade_btn: 'PASANG MODIFIKASI TIER II',
+        workbench_upgraded_tag: 'MODIFIKASI TERPASANG ✓',
+        mode_campaign_btn: 'KAMPANYE // 15 SEKTOR',
+        mode_endless_btn: 'ARENA SURVIVAL // HORDE',
+        mode_active_campaign: 'MODE: KAMPANYE (SEKTOR 1-15)',
+        mode_active_endless: 'MODE: ARENA SURVIVAL (HORDE DEFENSE)',
+        endless_wave_banner: 'GELOMBANG {w} DIMULAI!',
+        endless_wave_clear: 'GELOMBANG {w} DIBERSIHKAN!',
+        endless_respite_lbl: 'JEDA PASOKAN: {s}s',
+        endless_highest_wave_lbl: 'Rekor Gelombang Tertinggi:',
+        endless_survival_time_lbl: 'Waktu Bertahan Terbaik:',
+        pause_bestiary_btn: 'ARSIP ANOMALI (BESTIARY)',
+        pause_workbench_btn: 'BENGKEL SENJATA',
+        talent_btn: 'POHON TALENTA (SKILL TREE)',
+        talent_title: 'POHON TALENTA & PROTOKOL JEJAK',
+        talent_sub: 'Sistem peningkatan saraf & modul bionik permanen // Persisten antar-misi',
+        talent_nanites_lbl: 'INTI NANIT:',
+        talent_branch_combat: 'JALUR TEMPUR (OFFENSE)',
+        talent_branch_defense: 'JALUR KETAHANAN (SURVIVAL)',
+        talent_branch_tactical: 'JALUR TAKTIS (MOBILITY)',
+        talent_branch_core: 'INTI OPERATIF PUSAT',
+        talent_rank_lbl: 'Tingkat:',
+        talent_cost_lbl: 'Biaya:',
+        talent_upgrade_btn: 'TINGKATKAN PROTOKOL',
+        talent_maxed_lbl: 'TINGKAT MAKSIMAL',
+        talent_locked_lbl: 'TERKUNCI',
+        talent_req_lbl: 'Prasyarat:',
+        talent_reset_btn: 'RESET PROTOKOL (PENGEMBALIAN 100%)',
+        talent_reset_confirm: 'Apakah Anda yakin ingin me-reset semua talenta? Seluruh Inti Nanit akan dikembalikan 100%.',
+        pause_talent_btn: 'POHON TALENTA',
+        talent_core_name: 'Inti Tautan Saraf Operatif',
+        talent_core_desc: 'Pusat integrasi prostetik bionik & pengontrol telemetri nanit.',
+        talent_atk_name: 'Penajaman Nanit',
+        talent_atk_desc: 'Meningkatkan Serangan Dasar (Base ATK) sebesar +10% per tingkat.',
+        talent_crit_name: 'Lonjakan Kritis',
+        talent_crit_desc: 'Meningkatkan Peluang Kritis +10% dan Kerusakan Kritis +30% per tingkat.',
+        talent_plasma_name: 'Busur Plasma Sabit (Talenta Utama)',
+        talent_plasma_desc: 'Tebasan ke-3 melepaskan proyektil sabit energi plasma yang menembus musuh.',
+        talent_hp_name: 'Karapas Baja Bionik',
+        talent_hp_desc: 'Meningkatkan HP Maksimal sebesar +30 / +65 / +100 secara permanen.',
+        talent_regen_name: 'Nano-Perbaikan Seluler',
+        talent_regen_desc: 'Saat HP di bawah 40%, meregenerasi 1 / 2 / 3 HP setiap 2.5 detik.',
+        talent_aegis_name: 'Perisai Aegis Kinetik (Talenta Utama)',
+        talent_aegis_desc: 'Mendapatkan perisai energi yang meniadakan 1 serangan monster sepenuhnya (isi ulang tiap 25 detik).',
+        talent_speed_name: 'Piston Kaki Overclock',
+        talent_speed_desc: 'Meningkatkan kecepatan gerak & dash sebesar +8% per tingkat.',
+        talent_flux_name: 'Kapasitor Fotonik',
+        talent_flux_desc: 'Radius senter +20% dan jeda cooldown Dash berkurang -15% per tingkat.',
+        talent_phantom_name: 'Bayangan Listrik Phantom (Talenta Utama)',
+        talent_phantom_desc: 'Melakukan Dash meninggalkan medan kejut listrik statis yang melumpuhkan monster.'
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
@@ -905,7 +969,71 @@ const T = {
         apk_pwa_btn: 'INSTALL WEB APP ON MOBILE (PWA)',
         apk_step_1: '1. Download the Android APK package to your smartphone.',
         apk_step_2: '2. Open downloaded file, enable "Install unknown apps" if prompted.',
-        apk_step_3: '3. Tap Install and launch VITA from your phone app drawer!'
+        apk_step_3: '3. Tap Install and launch VITA from your phone app drawer!',
+        bestiary_btn: 'ANOMALY ARCHIVE (BESTIARY)',
+        bestiary_title: 'FACILITY ANOMALY & PREDATOR ARCHIVES',
+        bestiary_sub: 'Biological classification, survival tactics, and specimen elimination telemetry',
+        bestiary_threat_lbl: 'THREAT LEVEL:',
+        bestiary_weakness_lbl: 'TACTICAL WEAKNESS:',
+        bestiary_bio_lbl: 'BIOLOGICAL NOTES:',
+        bestiary_kills_lbl: 'PURGED:',
+        bestiary_deaths_lbl: 'OPERATIVE CASUALTIES:',
+        bestiary_specimen_count: '12 ANOMALIES DETECTED',
+        workbench_btn: 'WEAPON WORKBENCH (MODS)',
+        workbench_title: 'ARSENAL MODIFICATION TERMINAL',
+        workbench_sub: 'Upgrade tactical weaponry to Tier II with specialized abilities',
+        workbench_tier1: 'TIER I (STANDARD)',
+        workbench_tier2: 'TIER II (OVERCLOCKED)',
+        workbench_upgrade_btn: 'INSTALL TIER II MODIFICATION',
+        workbench_upgraded_tag: 'MODIFICATION INSTALLED ✓',
+        mode_campaign_btn: 'CAMPAIGN // 15 SECTORS',
+        mode_endless_btn: 'SURVIVAL ARENA // HORDE',
+        mode_active_campaign: 'MODE: CAMPAIGN (SECTORS 1-15)',
+        mode_active_endless: 'MODE: SURVIVAL ARENA (HORDE DEFENSE)',
+        endless_wave_banner: 'WAVE {w} INCOMING!',
+        endless_wave_clear: 'WAVE {w} PURGED!',
+        endless_respite_lbl: 'SUPPLY RESPITE: {s}s',
+        endless_highest_wave_lbl: 'Highest Wave Record:',
+        endless_survival_time_lbl: 'Best Survival Time:',
+        pause_bestiary_btn: 'ANOMALY ARCHIVE (BESTIARY)',
+        pause_workbench_btn: 'WEAPON WORKBENCH',
+        talent_btn: 'TALENT TREE (TRACES)',
+        talent_title: 'OPERATIVE TALENT TREE & TRACES',
+        talent_sub: 'Permanent neural upgrades & bionic modules // Persistent across runs',
+        talent_nanites_lbl: 'NANITE CORES:',
+        talent_branch_combat: 'COMBAT BRANCH (OFFENSE)',
+        talent_branch_defense: 'DEFENSE BRANCH (SURVIVAL)',
+        talent_branch_tactical: 'TACTICAL BRANCH (MOBILITY)',
+        talent_branch_core: 'CENTRAL OPERATIVE CORE',
+        talent_rank_lbl: 'Rank:',
+        talent_cost_lbl: 'Cost:',
+        talent_upgrade_btn: 'UPGRADE PROTOCOL',
+        talent_maxed_lbl: 'MAX RANK REACHED',
+        talent_locked_lbl: 'LOCKED',
+        talent_req_lbl: 'Prerequisite:',
+        talent_reset_btn: 'RESET PROTOCOL (100% REFUND)',
+        talent_reset_confirm: 'Are you sure you want to reset all talents? 100% of invested Nanite Cores will be refunded.',
+        pause_talent_btn: 'TALENT TREE',
+        talent_core_name: 'Operative Neural Link Core',
+        talent_core_desc: 'Central integration hub for bionic prosthetics & nanite telemetry control.',
+        talent_atk_name: 'Nanite Edge',
+        talent_atk_desc: 'Increases Base Attack (ATK) by +10% per rank.',
+        talent_crit_name: 'Critical Surge',
+        talent_crit_desc: 'Increases Critical Hit Chance by +10% and Critical Damage by +30% per rank.',
+        talent_plasma_name: 'Plasma Arc Wave (Major Talent)',
+        talent_plasma_desc: 'Every 3rd attack unleashes a penetrating plasma energy wave slicing through foes.',
+        talent_hp_name: 'Bionic Carapace',
+        talent_hp_desc: 'Permanently increases Maximum HP by +30 / +65 / +100.',
+        talent_regen_name: 'Cellular Nano-Repair',
+        talent_regen_desc: 'When HP falls below 40%, passively regenerates 1 / 2 / 3 HP every 2.5 seconds.',
+        talent_aegis_name: 'Kinetic Aegis Barrier (Major Talent)',
+        talent_aegis_desc: 'Grants an energy barrier that completely nullifies 1 monster strike (recharges every 25s).',
+        talent_speed_name: 'Overclocked Servos',
+        talent_speed_desc: 'Increases movement speed & dash speed by +8% per rank.',
+        talent_flux_name: 'Photonic Capacitor',
+        talent_flux_desc: 'Expands torch radius by +20% and reduces Dash cooldown by -15% per rank.',
+        talent_phantom_name: 'Phantom Phase Shock (Major Talent)',
+        talent_phantom_desc: 'Dashing leaves behind a static electric field that slows and zaps nearby monsters.'
     }
 };
 
@@ -3960,6 +4088,21 @@ function buildLevelWorld(level) {
     let baseSpeed = 3.5 + (perkAdren * 0.55);
     let baseDashSpeed = 8 + (perkAdren * 1.5);
 
+    // Integrasi Talenta Operatif (HSR / Genshin Style Traces)
+    const tData = (typeof getTalentTreeData === 'function') ? getTalentTreeData() : null;
+    if (tData && tData.ranks) {
+        if (tData.ranks.hp_boost > 0) {
+            baseMaxHp += [0, 30, 65, 100][tData.ranks.hp_boost] || 0;
+        }
+        if (tData.ranks.atk_boost > 0) {
+            baseAtk = Math.round(baseAtk * (1 + tData.ranks.atk_boost * 0.10));
+        }
+        if (tData.ranks.speed_boost > 0) {
+            baseSpeed *= (1 + tData.ranks.speed_boost * 0.08);
+            baseDashSpeed *= (1 + tData.ranks.speed_boost * 0.08);
+        }
+    }
+
     const startX = (level === LEVELS - 1) ? (Math.floor(mazeW / 2) + 0.5) * CELL : 1.5 * CELL;
     const startY = (level === LEVELS - 1) ? (mazeH - 2.5) * CELL : 1.5 * CELL;
 
@@ -3995,6 +4138,17 @@ function buildLevelWorld(level) {
         minigunHeat: 0,
         minigunOverheat: 0,
         weaponCooldowns: {},
+        talentCritBonus: (tData && tData.ranks && tData.ranks.crit_surge) ? (tData.ranks.crit_surge * 0.10) : 0,
+        talentCritDmg: (tData && tData.ranks && tData.ranks.crit_surge) ? (1.5 + tData.ranks.crit_surge * 0.30) : 1.5,
+        talentRegen: (tData && tData.ranks && tData.ranks.nano_repair) ? tData.ranks.nano_repair : 0,
+        talentRegenTimer: 0,
+        talentAegis: (tData && tData.ranks && tData.ranks.aegis_shield) ? 1 : 0,
+        aegisShield: (tData && tData.ranks && tData.ranks.aegis_shield) ? 1 : 0,
+        aegisCooldown: 0,
+        talentFlux: (tData && tData.ranks && tData.ranks.flux_capacitor) ? tData.ranks.flux_capacitor : 0,
+        talentPhantom: (tData && tData.ranks && tData.ranks.phantom_dash) ? 1 : 0,
+        talentPlasma: (tData && tData.ranks && tData.ranks.plasma_arc) ? 1 : 0,
+        plasmaArcHits: 0,
         afterimages: [],
         id: 'p0',
         peerIndex: 0,
@@ -5103,6 +5257,26 @@ function attackPlayer(monster) {
         dmg *= Math.max(0.5, 1 - player.perkNano * 0.25);
     }
 
+    // Talenta Aegis Kinetic Barrier: Menyerap 1 serangan penuh
+    if (player && player.aegisShield > 0) {
+        player.aegisShield = 0;
+        player.aegisCooldown = 1500; // 25s pada 60fps
+        player.invincible = 35;
+        addShake(6);
+        addShockwave(player.x, player.y, 45, '#00f0ff', 18);
+        addParticle(player.x, player.y, '#00f0ff', 16, 5, 24);
+        sHit();
+        floatingTexts.push({
+            x: player.x,
+            y: player.y - 20,
+            text: (lang === 'en' ? 'AEGIS SHIELD ABSORBED!' : 'PERISAI AEGIS MENAHAN!'),
+            color: '#00f0ff',
+            life: 45,
+            maxLife: 45
+        });
+        return;
+    }
+
     player.hp -= dmg;
     player.invincible = 30;
     addShake(8);
@@ -5224,6 +5398,10 @@ function attackMonster(m, customDmg) {
     addShake(4);
 
     // Floating combat damage numbers with crit distinction
+    if (player && player.talentCritBonus > 0 && Math.random() < player.talentCritBonus) {
+        dmg *= (player.talentCritDmg || 1.8);
+        customDmg = dmg;
+    }
     const isCrit = (typeof customDmg === 'number' && customDmg > player.atk * 1.35);
     if (isCrit) {
         sCritHit(m);
@@ -5251,6 +5429,13 @@ function attackMonster(m, customDmg) {
     if (m.hp <= 0) {
         totalKills++;
         registerComboKill();
+
+        // 4b) Nanite Shards Drop (HSR / Genshin Style Traces currency)
+        let naniteDrop = 2;
+        if (m.name === 'The Monolith' || m.isBoss) naniteDrop = 60;
+        else if (m.size >= 15 || m.name === 'Dark Knight' || m.name === 'Dragon' || m.name === 'Lich' || m.name === 'Beholder') naniteDrop = 12;
+        else if (m.name === 'Mimic' || m.name === 'Crawl' || m.name === 'Harvester') naniteDrop = 5;
+        if (typeof addNaniteShards === 'function') addNaniteShards(naniteDrop, m.x, m.y);
 
         if (m.isBoss || m.isMonolith || m.name === 'The Monolith' || m.name === 'Mother Harvester') {
             const bh = document.getElementById('bossHud');
@@ -5979,9 +6164,68 @@ function playerAttack(fromTouch) {
         addParticle(player.x + Math.cos(aimAngle) * 18, player.y + Math.sin(aimAngle) * 18, '#ffeaa7', 3, 2, 6);
         addBrassCasing(player.x, player.y, player.facing);
     }
+
+    // Major Talent: Plasma Arc Wave (Setiap 3 serangan melepaskan gelombang busur sabit plasma)
+    if (player && player.talentPlasma > 0) {
+        player.plasmaArcHits = (player.plasmaArcHits || 0) + 1;
+        if (player.plasmaArcHits >= 3) {
+            player.plasmaArcHits = 0;
+            const arcSpeed = 12;
+            projectiles.push({
+                x: player.x + Math.cos(player.facing) * 16,
+                y: player.y + Math.sin(player.facing) * 16,
+                dx: Math.cos(player.facing) * arcSpeed,
+                dy: Math.sin(player.facing) * arcSpeed,
+                life: 36,
+                isPlayer: true,
+                kind: 'plasma_arc',
+                color: '#c084fc',
+                dmg: player.atk * 1.5,
+                hitRadius: 18,
+                pierce: 6,
+                hitMonsters: []
+            });
+            sEMPBlast();
+            addParticle(player.x, player.y, '#c084fc', 8, 3, 14);
+            floatingTexts.push({
+                x: player.x, y: player.y - 20,
+                text: 'PLASMA ARC!',
+                color: '#c084fc', life: 35, maxLife: 35
+            });
+        }
+    }
 }
 
 function updatePlayer() {
+    // Talenta Nano-Repair: Regenerasi perlahan saat HP kritis
+    if (player.talentRegen > 0 && player.hp > 0 && player.hp < player.maxHp * 0.40) {
+        player.talentRegenTimer = (player.talentRegenTimer || 0) + 1;
+        if (player.talentRegenTimer >= 150) { // 2.5s
+            player.talentRegenTimer = 0;
+            player.hp = Math.min(player.maxHp, player.hp + player.talentRegen);
+            addParticle(player.x, player.y, '#2ecc71', 4, 1.5, 12);
+            updateUI();
+        }
+    }
+    // Talenta Aegis Kinetic Barrier: Pengisian ulang perisai
+    if (player.talentAegis && player.aegisShield === 0) {
+        if (player.aegisCooldown > 0) {
+            player.aegisCooldown--;
+            if (player.aegisCooldown <= 0) {
+                player.aegisShield = 1;
+                addParticle(player.x, player.y, '#00f0ff', 14, 3, 20);
+                floatingTexts.push({
+                    x: player.x,
+                    y: player.y - 24,
+                    text: (lang === 'en' ? 'AEGIS BARRIER ONLINE!' : 'PERISAI AEGIS AKTIF!'),
+                    color: '#00f0ff',
+                    life: 40,
+                    maxLife: 40
+                });
+            }
+        }
+    }
+
     let dx = 0, dy = 0;
     if (keys['w'] || keys['arrowup']) dy = -1;
     if (keys['s'] || keys['arrowdown']) dy = 1;
@@ -7502,6 +7746,25 @@ function updateProjectiles() {
                 if (p.life <= 0) {
                     triggerExplosion(p.x, p.y, p.radius || 95, p.dmg, true);
                     return false;
+                }
+                return p.life > 0;
+            }
+
+            // Major Talent: Plasma Arc Wave (Menembus monster dalam jalurnya)
+            if (p.kind === 'plasma_arc') {
+                if (monsters) {
+                    p.hitMonsters = p.hitMonsters || [];
+                    for (let i = 0; i < monsters.length; i++) {
+                        const m = monsters[i];
+                        if (m && m.hp > 0 && !p.hitMonsters.includes(m)) {
+                            if (dist(p, m) < p.hitRadius + m.size) {
+                                p.hitMonsters.push(m);
+                                attackMonster(m, p.dmg);
+                                addParticle(m.x, m.y, '#c084fc', 8, 3, 14);
+                                if (p.hitMonsters.length >= (p.pierce || 6)) return false;
+                            }
+                        }
+                    }
                 }
                 return p.life > 0;
             }
@@ -9819,7 +10082,22 @@ function drawProjectiles() {
         if (p.isPlayer) {
             ctx.save();
             ctx.translate(sx, sy);
-            if (p.kind === 'rifle') {
+            if (p.kind === 'plasma_arc') {
+                const angle = Math.atan2(p.dy, p.dx);
+                ctx.rotate(angle);
+                ctx.strokeStyle = '#c084fc';
+                ctx.shadowColor = '#a855f7';
+                ctx.shadowBlur = 14;
+                ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                ctx.arc(-6, 0, 16, -Math.PI / 3, Math.PI / 3);
+                ctx.stroke();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(-6, 0, 15, -Math.PI / 4, Math.PI / 4);
+                ctx.stroke();
+            } else if (p.kind === 'rifle') {
                 const angle = Math.atan2(p.dy, p.dx);
                 ctx.rotate(angle);
                 ctx.fillStyle = '#00f0ff';
@@ -11911,11 +12189,27 @@ function doDash() {
     if (gameState !== 'playing' || dashCooldown > 0 || !player) return;
     player.dashing = true;
     player.dashTimer = 8;
-    const baseDashCd = (player && player.perkAdrenaline) ? 24 : 45;
+    const fluxDiscount = (player && player.talentFlux) ? (player.talentFlux * 0.15) : 0;
+    const baseDashCd = Math.round(((player && player.perkAdrenaline) ? 24 : 45) * (1 - fluxDiscount));
     dashCooldown = baseDashCd;
     sDash();
     triggerHaptic('dash');
     addParticle(player.x, player.y, '#3498db', 8, 4, 15);
+
+    // Major Talent: Phantom Phase Shockwave
+    if (player && player.talentPhantom) {
+        addShockwave(player.x, player.y, 60, '#00e5ff', 18);
+        if (monsters) {
+            monsters.forEach(m => {
+                if (m && m.hp > 0 && dist(m, player) < 70) {
+                    m.stunTimer = Math.max(m.stunTimer || 0, 150);
+                    attackMonster(m, player.atk * 0.5);
+                    addParticle(m.x, m.y, '#00e5ff', 6, 2, 12);
+                }
+            });
+        }
+    }
+
     if (tutorialActive && tutorialStep === 1) {
         advanceTutorialStep(1);
     }
@@ -14651,3 +14945,817 @@ window.switchCoopTab = switchCoopTab;
 window.copyCoopRoomCode = copyCoopRoomCode;
 window.submitJoinCoopRoom = submitJoinCoopRoom;
 window.launchCoopMission = launchCoopMission;
+
+// ============================================================================
+// MODUL TALENTA OPERATIF (HSR / GENSHIN STYLE TRACES & TALENT TREE)
+// ============================================================================
+const VITA_TALENTS_KEY = 'vita_talents';
+
+const TALENT_NODES = [
+    {
+        id: 'core',
+        branch: 'core',
+        parent: null,
+        x: 0.50, y: 0.54,
+        maxRank: 1,
+        nameKey: 'talent_core_name',
+        descKey: 'talent_core_desc',
+        cost: [0]
+    },
+    // Jalur Tempur (Combat / Offense - Kiri/Merah)
+    {
+        id: 'atk_boost',
+        branch: 'combat',
+        parent: 'core',
+        x: 0.28, y: 0.44,
+        maxRank: 3,
+        nameKey: 'talent_atk_name',
+        descKey: 'talent_atk_desc',
+        cost: [25, 50, 100],
+        descVals: ['+10% Base ATK', '+20% Base ATK', '+30% Base ATK']
+    },
+    {
+        id: 'crit_surge',
+        branch: 'combat',
+        parent: 'atk_boost',
+        x: 0.16, y: 0.30,
+        maxRank: 3,
+        nameKey: 'talent_crit_name',
+        descKey: 'talent_crit_desc',
+        cost: [40, 80, 140],
+        descVals: ['+10% Crit Chance & +30% Crit DMG', '+20% Crit Chance & +60% Crit DMG', '+30% Crit Chance & +90% Crit DMG']
+    },
+    {
+        id: 'plasma_arc',
+        branch: 'combat',
+        parent: 'crit_surge',
+        x: 0.08, y: 0.15,
+        maxRank: 1,
+        isMajor: true,
+        nameKey: 'talent_plasma_name',
+        descKey: 'talent_plasma_desc',
+        cost: [160],
+        descVals: ['Busur Sabit Plasma setiap 3 tebasan']
+    },
+    // Jalur Ketahanan (Defense / Survival - Atas/Biru-Hijau)
+    {
+        id: 'hp_boost',
+        branch: 'defense',
+        parent: 'core',
+        x: 0.50, y: 0.34,
+        maxRank: 3,
+        nameKey: 'talent_hp_name',
+        descKey: 'talent_hp_desc',
+        cost: [25, 50, 100],
+        descVals: ['+30 Max HP', '+65 Max HP', '+100 Max HP']
+    },
+    {
+        id: 'nano_repair',
+        branch: 'defense',
+        parent: 'hp_boost',
+        x: 0.50, y: 0.20,
+        maxRank: 3,
+        nameKey: 'talent_regen_name',
+        descKey: 'talent_regen_desc',
+        cost: [40, 80, 140],
+        descVals: ['Regen 1 HP / 2.5s jika HP < 40%', 'Regen 2 HP / 2.5s jika HP < 40%', 'Regen 3 HP / 2.5s jika HP < 40%']
+    },
+    {
+        id: 'aegis_shield',
+        branch: 'defense',
+        parent: 'nano_repair',
+        x: 0.50, y: 0.07,
+        maxRank: 1,
+        isMajor: true,
+        nameKey: 'talent_aegis_name',
+        descKey: 'talent_aegis_desc',
+        cost: [160],
+        descVals: ['Perisai menyerap 1 serangan (cooldown 25s)']
+    },
+    // Jalur Taktis (Tactical / Mobility - Kanan/Cyan-Gold)
+    {
+        id: 'speed_boost',
+        branch: 'tactical',
+        parent: 'core',
+        x: 0.72, y: 0.44,
+        maxRank: 3,
+        nameKey: 'talent_speed_name',
+        descKey: 'talent_speed_desc',
+        cost: [25, 50, 100],
+        descVals: ['+8% Move & Dash Speed', '+16% Move & Dash Speed', '+24% Move & Dash Speed']
+    },
+    {
+        id: 'flux_capacitor',
+        branch: 'tactical',
+        parent: 'speed_boost',
+        x: 0.84, y: 0.30,
+        maxRank: 3,
+        nameKey: 'talent_flux_name',
+        descKey: 'talent_flux_desc',
+        cost: [40, 80, 140],
+        descVals: ['+20% Senter, -15% Dash Cooldown', '+40% Senter, -30% Dash Cooldown', '+60% Senter, -45% Dash Cooldown']
+    },
+    {
+        id: 'phantom_dash',
+        branch: 'tactical',
+        parent: 'flux_capacitor',
+        x: 0.92, y: 0.15,
+        maxRank: 1,
+        isMajor: true,
+        nameKey: 'talent_phantom_name',
+        descKey: 'talent_phantom_desc',
+        cost: [160],
+        descVals: ['Dash memicu medan kejut listrik statis']
+    }
+];
+
+let selectedTalentNodeId = 'atk_boost';
+let talentTreePulseTime = 0;
+let talentTreeAnimReq = null;
+
+function getTalentTreeData() {
+    try {
+        const raw = JSON.parse(localStorage.getItem(VITA_TALENTS_KEY) || '{}');
+        const ranks = (raw && typeof raw.ranks === 'object' && raw.ranks !== null) ? raw.ranks : {};
+        const safeRanks = { core: 1 };
+        TALENT_NODES.forEach(n => {
+            const r = Math.max(0, Math.min(n.maxRank, Number(ranks[n.id]) || 0));
+            safeRanks[n.id] = (n.id === 'core') ? 1 : r;
+        });
+        const nanites = Math.max(0, Number(raw.nanites) || (raw.nanites === undefined ? 50 : 0));
+        return { nanites, ranks: safeRanks };
+    } catch (_) {
+        return {
+            nanites: 50,
+            ranks: { core: 1, atk_boost: 0, crit_surge: 0, plasma_arc: 0, hp_boost: 0, nano_repair: 0, aegis_shield: 0, speed_boost: 0, flux_capacitor: 0, phantom_dash: 0 }
+        };
+    }
+}
+
+function saveTalentTreeData(data) {
+    try {
+        localStorage.setItem(VITA_TALENTS_KEY, JSON.stringify(data));
+    } catch (_) {}
+}
+
+function addNaniteShards(amount, x, y) {
+    if (!amount || amount <= 0) return;
+    const data = getTalentTreeData();
+    data.nanites = (data.nanites || 0) + amount;
+    saveTalentTreeData(data);
+    if (typeof updateTalentUIHeader === 'function') updateTalentUIHeader();
+    if (typeof x === 'number' && typeof y === 'number' && typeof floatingTexts !== 'undefined') {
+        floatingTexts.push({
+            x: x, y: y - 20,
+            text: `+${amount} ${tt('talent_nanites_lbl')}`,
+            color: '#00f0ff',
+            life: 45, maxLife: 45
+        });
+    }
+}
+
+function updateTalentUIHeader() {
+    const el = document.getElementById('talentNaniteVal');
+    if (el) {
+        const d = getTalentTreeData();
+        el.textContent = String(d.nanites);
+    }
+}
+
+function isTalentNodeUnlocked(nodeId, ranks) {
+    if (nodeId === 'core') return true;
+    return (ranks[nodeId] || 0) > 0;
+}
+
+function isTalentNodeAvailable(node, ranks) {
+    if (node.id === 'core') return true;
+    if (!node.parent) return true;
+    if (node.parent === 'core') return true;
+    const parentNode = TALENT_NODES.find(n => n.id === node.parent);
+    if (!parentNode) return true;
+    return (ranks[parentNode.id] || 0) >= 1;
+}
+
+function selectTalentNode(nodeId) {
+    const node = TALENT_NODES.find(n => n.id === nodeId);
+    if (!node) return;
+    selectedTalentNodeId = nodeId;
+    updateTalentInspector();
+    if (typeof homeBeep === 'function') homeBeep('click');
+}
+
+function updateTalentInspector() {
+    const node = TALENT_NODES.find(n => n.id === selectedTalentNodeId) || TALENT_NODES[1];
+    const data = getTalentTreeData();
+    const curRank = data.ranks[node.id] || 0;
+    const isAvail = isTalentNodeAvailable(node, data.ranks);
+    const isMax = curRank >= node.maxRank;
+
+    // Branch Badge
+    const badgeEl = document.getElementById('talentNodeBranchBadge');
+    if (badgeEl) {
+        const branchKey = `talent_branch_${node.branch}`;
+        badgeEl.textContent = tt(branchKey);
+        if (node.branch === 'combat') {
+            badgeEl.style.background = 'rgba(255, 59, 59, 0.2)';
+            badgeEl.style.color = '#ff5555';
+            badgeEl.style.borderColor = 'rgba(255, 59, 59, 0.5)';
+        } else if (node.branch === 'defense') {
+            badgeEl.style.background = 'rgba(46, 204, 113, 0.2)';
+            badgeEl.style.color = '#2ecc71';
+            badgeEl.style.borderColor = 'rgba(46, 204, 113, 0.5)';
+        } else if (node.branch === 'tactical') {
+            badgeEl.style.background = 'rgba(0, 229, 255, 0.2)';
+            badgeEl.style.color = '#00e5ff';
+            badgeEl.style.borderColor = 'rgba(0, 229, 255, 0.5)';
+        } else {
+            badgeEl.style.background = 'rgba(255, 215, 0, 0.2)';
+            badgeEl.style.color = '#ffd700';
+            badgeEl.style.borderColor = 'rgba(255, 215, 0, 0.5)';
+        }
+    }
+
+    // Title & Rank
+    const titleEl = document.getElementById('talentNodeTitle');
+    if (titleEl) titleEl.textContent = tt(node.nameKey);
+
+    const rankEl = document.getElementById('talentNodeRank');
+    if (rankEl) {
+        if (node.id === 'core') {
+            rankEl.textContent = `${tt('talent_rank_lbl')} 1 / 1 (ONLINE)`;
+        } else if (isMax) {
+            rankEl.textContent = `${tt('talent_rank_lbl')} ${curRank}/${node.maxRank} [${tt('talent_maxed_lbl')}]`;
+            rankEl.style.color = '#ffd700';
+        } else if (!isAvail) {
+            rankEl.textContent = `${tt('talent_rank_lbl')} ${curRank}/${node.maxRank} [${tt('talent_locked_lbl')}]`;
+            rankEl.style.color = '#8892b0';
+        } else {
+            rankEl.textContent = `${tt('talent_rank_lbl')} ${curRank} / ${node.maxRank}`;
+            rankEl.style.color = '#00f0ff';
+        }
+    }
+
+    // Current Effect Desc
+    const curDescEl = document.getElementById('talentNodeCurrentDesc');
+    if (curDescEl) {
+        if (node.id === 'core') {
+            curDescEl.textContent = tt(node.descKey);
+        } else if (curRank === 0) {
+            curDescEl.textContent = '-';
+        } else if (node.descVals && node.descVals[curRank - 1]) {
+            curDescEl.textContent = `${node.descVals[curRank - 1]} (${tt(node.descKey)})`;
+        } else {
+            curDescEl.textContent = tt(node.descKey);
+        }
+    }
+
+    // Next Effect Box
+    const nextBox = document.getElementById('talentNodeNextBox');
+    const nextDescEl = document.getElementById('talentNodeNextDesc');
+    if (nextBox && nextDescEl) {
+        if (isMax || node.id === 'core') {
+            nextBox.style.display = 'none';
+        } else {
+            nextBox.style.display = 'block';
+            const nextVal = (node.descVals && node.descVals[curRank]) ? node.descVals[curRank] : tt(node.descKey);
+            nextDescEl.textContent = `${nextVal} (${tt(node.descKey)})`;
+        }
+    }
+
+    // Requirements Box
+    const reqBox = document.getElementById('talentNodeReqBox');
+    const reqText = document.getElementById('talentNodeReqText');
+    if (reqBox && reqText) {
+        if (!isAvail && node.parent && node.parent !== 'core') {
+            reqBox.style.display = 'block';
+            const pNode = TALENT_NODES.find(n => n.id === node.parent);
+            reqText.textContent = `${tt(pNode?.nameKey || node.parent)} >= 1`;
+        } else {
+            reqBox.style.display = 'none';
+        }
+    }
+
+    // Cost & Upgrade Button
+    const costEl = document.getElementById('talentNodeCost');
+    const btnUpgrade = document.getElementById('btnTalentUpgrade');
+    const btnUpgradeText = document.getElementById('btnTalentUpgradeText');
+
+    if (node.id === 'core' || isMax) {
+        if (costEl) costEl.textContent = isMax ? tt('talent_maxed_lbl') : '-';
+        if (btnUpgrade) {
+            btnUpgrade.disabled = true;
+            btnUpgrade.style.opacity = '0.5';
+            btnUpgrade.style.cursor = 'not-allowed';
+        }
+        if (btnUpgradeText) btnUpgradeText.textContent = tt('talent_maxed_lbl');
+    } else {
+        const cost = node.cost[curRank] || node.cost[0] || 50;
+        if (costEl) costEl.textContent = `${cost} ${tt('talent_nanites_lbl')}`;
+        const canAfford = data.nanites >= cost;
+        const canUpgrade = isAvail && canAfford;
+
+        if (btnUpgrade) {
+            btnUpgrade.disabled = !canUpgrade;
+            btnUpgrade.style.opacity = canUpgrade ? '1' : '0.5';
+            btnUpgrade.style.cursor = canUpgrade ? 'pointer' : 'not-allowed';
+        }
+        if (btnUpgradeText) {
+            if (!isAvail) btnUpgradeText.textContent = tt('talent_locked_lbl');
+            else if (!canAfford) btnUpgradeText.textContent = `${tt('talent_upgrade_btn')} (${cost})`;
+            else btnUpgradeText.textContent = tt('talent_upgrade_btn');
+        }
+    }
+}
+
+function upgradeSelectedTalent() {
+    const node = TALENT_NODES.find(n => n.id === selectedTalentNodeId);
+    if (!node || node.id === 'core') return;
+    const data = getTalentTreeData();
+    const curRank = data.ranks[node.id] || 0;
+    if (curRank >= node.maxRank) return;
+    if (!isTalentNodeAvailable(node, data.ranks)) return;
+
+    const cost = node.cost[curRank] || node.cost[0] || 50;
+    if (data.nanites < cost) {
+        if (typeof sLocked === 'function') sLocked();
+        return;
+    }
+
+    data.nanites -= cost;
+    data.ranks[node.id] = curRank + 1;
+    saveTalentTreeData(data);
+
+    if (typeof sWin === 'function') sWin();
+    else if (typeof homeBeep === 'function') homeBeep('open');
+
+    updateTalentUIHeader();
+    updateTalentInspector();
+
+    // Spawn canvas ripple particles
+    const cvs = document.getElementById('talentTreeCanvas');
+    if (cvs) {
+        const ctx = cvs.getContext('2d');
+        if (ctx) {
+            ctx.save();
+            ctx.fillStyle = '#00f0ff';
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(node.x * cvs.width, node.y * cvs.height, 35, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+}
+
+function resetAllTalents() {
+    if (!confirm(tt('talent_reset_confirm'))) return;
+    const data = getTalentTreeData();
+    let refund = 0;
+    TALENT_NODES.forEach(n => {
+        if (n.id === 'core') return;
+        const r = data.ranks[n.id] || 0;
+        for (let i = 0; i < r; i++) {
+            refund += n.cost[i] || 0;
+        }
+        data.ranks[n.id] = 0;
+    });
+    data.nanites = (data.nanites || 0) + refund;
+    saveTalentTreeData(data);
+
+    if (typeof homeBeep === 'function') homeBeep('close');
+    updateTalentUIHeader();
+    updateTalentInspector();
+}
+
+function renderTalentTree() {
+    const canvas = document.getElementById('talentTreeCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    talentTreePulseTime += 0.04;
+    const pulse = 0.5 + 0.5 * Math.sin(talentTreePulseTime);
+
+    const data = getTalentTreeData();
+    const ranks = data.ranks;
+
+    // 1) Background Sci-Fi Tech Grid & Concentric Rings
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
+    ctx.lineWidth = 1;
+    const gridSize = 32;
+    for (let x = 0; x < w; x += gridSize) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+    }
+    for (let y = 0; y < h; y += gridSize) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    }
+
+    const coreX = w * 0.50, coreY = h * 0.54;
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
+    [70, 140, 210, 280].forEach(r => {
+        ctx.beginPath();
+        ctx.arc(coreX, coreY, r, 0, Math.PI * 2);
+        ctx.stroke();
+    });
+    ctx.restore();
+
+    // 2) Conduits / Connecting Cables between nodes
+    TALENT_NODES.forEach(n => {
+        if (!n.parent) return;
+        const pNode = TALENT_NODES.find(p => p.id === n.parent);
+        if (!pNode) return;
+
+        const x1 = pNode.x * w, y1 = pNode.y * h;
+        const x2 = n.x * w, y2 = n.y * h;
+        const isUnlocked = (ranks[n.id] || 0) > 0;
+        const isAvail = isTalentNodeAvailable(n, ranks);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+
+        if (isUnlocked) {
+            ctx.strokeStyle = (n.branch === 'combat') ? '#ff4d4d' : ((n.branch === 'defense') ? '#2ecc71' : '#00e5ff');
+            ctx.shadowColor = ctx.strokeStyle;
+            ctx.shadowBlur = 8;
+            ctx.lineWidth = 2.8;
+        } else if (isAvail) {
+            ctx.strokeStyle = `rgba(0, 229, 255, ${0.3 + 0.3 * pulse})`;
+            ctx.lineWidth = 1.8;
+            ctx.setLineDash([4, 4]);
+        } else {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1.2;
+        }
+        ctx.stroke();
+        ctx.restore();
+    });
+
+    // 3) Draw Nodes
+    TALENT_NODES.forEach(n => {
+        const nx = n.x * w, ny = n.y * h;
+        const curRank = ranks[n.id] || 0;
+        const isUnlocked = curRank > 0;
+        const isAvail = isTalentNodeAvailable(n, ranks);
+        const isSelected = n.id === selectedTalentNodeId;
+        const radius = (n.id === 'core') ? 22 : (n.isMajor ? 18 : 14);
+
+        ctx.save();
+        ctx.translate(nx, ny);
+
+        // Selection HUD Bracket
+        if (isSelected) {
+            ctx.strokeStyle = '#ffd700';
+            ctx.shadowColor = '#ffd700';
+            ctx.shadowBlur = 12;
+            ctx.lineWidth = 2;
+            const bR = radius + 7 + 2 * pulse;
+            ctx.beginPath();
+            ctx.arc(0, 0, bR, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // Outer Node Circle
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+
+        if (n.id === 'core') {
+            ctx.fillStyle = '#0a192f';
+            ctx.fill();
+            ctx.strokeStyle = '#00f0ff';
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 14;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Core Symbol
+            ctx.fillStyle = '#00f0ff';
+            ctx.beginPath();
+            ctx.arc(0, 0, 8, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            let nodeColor = (n.branch === 'combat') ? '#ff4d4d' : ((n.branch === 'defense') ? '#2ecc71' : '#00e5ff');
+            if (isUnlocked) {
+                ctx.fillStyle = '#0a101d';
+                ctx.fill();
+                ctx.strokeStyle = (curRank >= n.maxRank) ? '#ffd700' : nodeColor;
+                ctx.shadowColor = ctx.strokeStyle;
+                ctx.shadowBlur = 12;
+                ctx.lineWidth = (curRank >= n.maxRank) ? 3 : 2.2;
+                ctx.stroke();
+
+                // Inner Dot / Diamond
+                ctx.fillStyle = ctx.strokeStyle;
+                ctx.beginPath();
+                ctx.arc(0, 0, n.isMajor ? 6.5 : 4.5, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (isAvail) {
+                ctx.fillStyle = 'rgba(10, 16, 29, 0.8)';
+                ctx.fill();
+                ctx.strokeStyle = `rgba(0, 229, 255, ${0.4 + 0.5 * pulse})`;
+                ctx.shadowColor = '#00e5ff';
+                ctx.shadowBlur = 8 * pulse;
+                ctx.lineWidth = 1.8;
+                ctx.stroke();
+            } else {
+                ctx.fillStyle = 'rgba(8, 10, 16, 0.9)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+
+        // Rank Badge under node
+        if (n.id !== 'core') {
+            ctx.font = 'bold 9px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            if (curRank >= n.maxRank) {
+                ctx.fillStyle = '#ffd700';
+                ctx.fillText('MAX', 0, radius + 11);
+            } else if (curRank > 0) {
+                ctx.fillStyle = '#00f0ff';
+                ctx.fillText(`${curRank}/${n.maxRank}`, 0, radius + 11);
+            } else if (isAvail) {
+                ctx.fillStyle = '#a0e0ff';
+                ctx.fillText(`${curRank}/${n.maxRank}`, 0, radius + 11);
+            } else {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fillText('🔒', 0, radius + 11);
+            }
+        }
+
+        ctx.restore();
+    });
+}
+
+function handleTalentCanvasClick(e) {
+    const canvas = document.getElementById('talentTreeCanvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clickX = (e.clientX - rect.left) * scaleX;
+    const clickY = (e.clientY - rect.top) * scaleY;
+
+    for (let i = 0; i < TALENT_NODES.length; i++) {
+        const n = TALENT_NODES[i];
+        const nx = n.x * canvas.width;
+        const ny = n.y * canvas.height;
+        const hitR = (n.id === 'core' ? 25 : 20);
+        if (Math.hypot(clickX - nx, clickY - ny) <= hitR) {
+            selectTalentNode(n.id);
+            break;
+        }
+    }
+}
+
+function openTalentTreeModal() {
+    const modal = document.getElementById('talentTreeModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.add('open');
+    updateTalentUIHeader();
+    updateTalentInspector();
+
+    const canvas = document.getElementById('talentTreeCanvas');
+    if (canvas && !canvas._talentWired) {
+        canvas._talentWired = true;
+        canvas.addEventListener('click', handleTalentCanvasClick);
+    }
+
+    if (talentTreeAnimReq) cancelAnimationFrame(talentTreeAnimReq);
+    function loop() {
+        if (modal.classList.contains('open') && modal.style.display !== 'none') {
+            renderTalentTree();
+            talentTreeAnimReq = requestAnimationFrame(loop);
+        }
+    }
+    talentTreeAnimReq = requestAnimationFrame(loop);
+    if (typeof homeBeep === 'function') homeBeep('open');
+}
+
+function closeTalentTreeModal() {
+    const modal = document.getElementById('talentTreeModal');
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+    if (talentTreeAnimReq) cancelAnimationFrame(talentTreeAnimReq);
+    if (typeof homeBeep === 'function') homeBeep('close');
+}
+
+function openTalentTreeFromGame() {
+    openTalentTreeModal();
+}
+
+// ============================================================================
+// MODUL ARSIP ANOMALI (BESTIARY) & BENGKEL SENJATA (WORKBENCH)
+// ============================================================================
+let bestiarySelectedIdx = 0;
+let bestiaryAnimReq = null;
+
+const BESTIARY_SPECIMENS = [
+    { name: 'Slime', threat: 'CLASS-I', code: 'SPECIMEN #01', killKey: 'Slime', weakness: 'Rentan terhadap tebasan pisau cepat & api spora.', bio: 'Amoeboid gelatin sel tunggal yang mencerna materi organik di lantai fasilitas.' },
+    { name: 'Bat', threat: 'CLASS-II', code: 'SPECIMEN #02', killKey: 'Bat', weakness: 'Sonar rapuh terhadap semburan shotgun & EMP.', bio: 'Mamalia terbang yang bermutasi di terowongan gelap, bergerak cepat dan membidik mangsa dari atas.' },
+    { name: 'Crawl', threat: 'CLASS-II', code: 'SPECIMEN #03', killKey: 'Crawl', weakness: 'Jarak serang pendek; mudah diatasi dari jarak jauh.', bio: 'Spesimen berkaki banyak yang merayap di dinding dengan capit kitin tajam.' },
+    { name: 'Ghost', threat: 'CLASS-III', code: 'SPECIMEN #04', killKey: 'Ghost', weakness: 'Fokus energi cahaya senter memecah kamuflase fasanya.', bio: 'Anomali semi-eter yang mampu menembus rintangan dan menyerap energi biologis manusia.' },
+    { name: 'Harvester', threat: 'CLASS-IV', code: 'SPECIMEN #05', killKey: 'Harvester', weakness: 'Titik saraf di pangkal sungut rentan ledakan granat.', bio: 'Organisme pemanen biomassa berakar kuat yang menarik operatif ke dalam kantung pencernaannya.' },
+    { name: 'Dark Knight', threat: 'CLASS-IV', code: 'SPECIMEN #06', killKey: 'Dark Knight', weakness: 'Serangan penetrasi Railgun menembus armor zirah tebalnya.', bio: 'Pelindung fasilitas yang terinfeksi dan termutasi menjadi automata pembunuh berperisai.' },
+    { name: 'Dragon', threat: 'CLASS-V', code: 'SPECIMEN #07', killKey: 'Dragon', weakness: 'Pendinginan Cryo melumpuhkan kelenjar pembakar di tenggorokannya.', bio: 'Reptil karnivora bersayap yang menyemburkan plasma organik panas.' },
+    { name: 'Lich', threat: 'CLASS-V', code: 'SPECIMEN #08', killKey: 'Lich', weakness: 'Hancurkan proyektil jiwanya sebelum mencapai sasaran.', bio: 'Anomali purba yang memancarkan aura nekrotik dan melepaskan proyektil pencari.' },
+    { name: 'Beholder', threat: 'CLASS-V', code: 'SPECIMEN #09', killKey: 'Beholder', weakness: 'Kebutaan sesaat saat terkena kilatan granat EMP.', bio: 'Mata melayang raksasa yang memancarkan sinar desintegrasi jarak jauh.' },
+    { name: 'Mimic', threat: 'CLASS-VI', code: 'SPECIMEN #10', killKey: 'Mimic', weakness: 'Kelemahan terhadap serangan kejutan saat fase kamuflasenya terbuka.', bio: 'Predator metamorfis yang meniru peti pasokan fasilitas untuk menjebak penyelidik.' },
+    { name: 'Final Boss', threat: 'APEX-VII', code: 'SPECIMEN #11', killKey: 'Final Boss', weakness: 'Dodge serangannya lalu serang inti saat fase jeda.', bio: 'Titan hibrida eksperimen bio-senjata prototipe puncak fasilitas.' },
+    { name: 'The Monolith', threat: 'APEX PREDATOR', code: 'SPECIMEN #12', killKey: 'The Monolith', weakness: 'Konsentrasikan seluruh persenjataan berat pada cincin mahkota.', bio: 'Entitas anomali kosmik primordial yang menjadi pusat kegelapan Sektor Terlupakan.' }
+];
+
+function selectBestiarySpecimen(idx) {
+    bestiarySelectedIdx = Math.max(0, Math.min(BESTIARY_SPECIMENS.length - 1, idx));
+    const s = BESTIARY_SPECIMENS[bestiarySelectedIdx];
+    const nameEl = document.getElementById('bestiaryMonsterName');
+    if (nameEl) nameEl.textContent = s.name;
+    const codeEl = document.getElementById('bestiaryMonsterCode');
+    if (codeEl) codeEl.textContent = s.code;
+    const badgeEl = document.getElementById('bestiaryThreatBadge');
+    if (badgeEl) badgeEl.textContent = s.threat;
+    const weakEl = document.getElementById('bestiaryWeaknessText');
+    if (weakEl) weakEl.textContent = s.weakness;
+    const bioEl = document.getElementById('bestiaryBioText');
+    if (bioEl) bioEl.textContent = s.bio;
+
+    const killsEl = document.getElementById('bestiaryStatKills');
+    if (killsEl) {
+        const h = loadHigh();
+        const kills = (h && h.bestiaryKills && h.bestiaryKills[s.name]) ? h.bestiaryKills[s.name] : (s.name === 'Slime' ? 12 : 3);
+        killsEl.textContent = String(kills);
+    }
+    const deathsEl = document.getElementById('bestiaryStatDeaths');
+    if (deathsEl) deathsEl.textContent = '1';
+
+    // Highlight roster button
+    const roster = document.getElementById('bestiaryRoster');
+    if (roster) {
+        const btns = roster.querySelectorAll('button');
+        btns.forEach((b, i) => {
+            if (i === bestiarySelectedIdx) {
+                b.style.background = 'rgba(255, 59, 59, 0.25)';
+                b.style.borderColor = '#ff3b3b';
+                b.style.color = '#ffffff';
+            } else {
+                b.style.background = 'rgba(255, 255, 255, 0.03)';
+                b.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                b.style.color = 'var(--text-dim, #a0a0b0)';
+            }
+        });
+    }
+
+    renderBestiaryPreviewCanvas(s.name);
+}
+
+function renderBestiaryPreviewCanvas(monsterName) {
+    const cvs = document.getElementById('bestiaryPreviewCanvas');
+    if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+    const cx = cvs.width / 2, cy = cvs.height / 2;
+    const m = MONSTER_TYPES.find(mt => mt.name === monsterName) || MONSTER_TYPES[0];
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = m.color || '#ff3b3b';
+    ctx.shadowColor = m.color || '#ff3b3b';
+    ctx.shadowBlur = 12;
+
+    const r = Math.min(38, m.size * 1.8);
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyes
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.35, -r * 0.2, r * 0.2, 0, Math.PI * 2);
+    ctx.arc(r * 0.35, -r * 0.2, r * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(-r * 0.35, -r * 0.2, r * 0.1, 0, Math.PI * 2);
+    ctx.arc(r * 0.35, -r * 0.2, r * 0.1, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+}
+
+function renderBestiaryModal() {
+    const roster = document.getElementById('bestiaryRoster');
+    if (!roster) return;
+    roster.innerHTML = '';
+    BESTIARY_SPECIMENS.forEach((s, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.cssText = 'padding:8px 10px;text-align:left;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 0.15s ease;';
+        btn.innerHTML = `<span style="font-weight:bold;font-size:12px;">${s.name}</span><span style="font-size:9px;font-family:monospace;color:#ff3b3b;">${s.threat}</span>`;
+        btn.onclick = () => selectBestiarySpecimen(idx);
+        roster.appendChild(btn);
+    });
+    selectBestiarySpecimen(0);
+}
+
+function openBestiaryModal() {
+    const m = document.getElementById('bestiaryModal');
+    if (!m) return;
+    renderBestiaryModal();
+    m.style.display = 'flex';
+    m.classList.add('open');
+    if (typeof homeBeep === 'function') homeBeep('open');
+}
+
+function closeBestiaryModal() {
+    const m = document.getElementById('bestiaryModal');
+    if (!m) return;
+    m.classList.remove('open');
+    m.style.display = 'none';
+    if (typeof homeBeep === 'function') homeBeep('close');
+}
+
+function openBestiaryFromGame() {
+    openBestiaryModal();
+}
+
+function renderWorkbenchModal() {
+    const grid = document.getElementById('workbenchGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const keys = Object.keys(WEAPONS);
+    keys.forEach(k => {
+        const w = WEAPONS[k];
+        const card = document.createElement('div');
+        card.style.cssText = 'background:rgba(15,20,35,0.9);border:1px solid rgba(0,229,255,0.25);border-radius:8px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;';
+        card.innerHTML = `
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <span style="font-size:10px;font-family:monospace;color:#00f0ff;">${w.code}</span>
+                    <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,229,255,0.15);color:#00e5ff;">TIER II</span>
+                </div>
+                <h4 style="margin:0 0 6px 0;font-size:14px;color:#fff;">${tt(w.nameKey)}</h4>
+                <div style="font-size:11px;color:var(--text-dim,#a0a0b0);margin-bottom:6px;">${tt(w.descKey)}</div>
+                <div style="font-size:10px;background:rgba(0,0,0,0.3);padding:6px;border-radius:4px;border:1px solid rgba(255,255,255,0.06);color:#ffd700;">
+                    <b>MOD:</b> ${w.specs?.special || 'Overclocked Firepower'}
+                </div>
+            </div>
+            <button class="btn" type="button" onclick="selectWeaponUpgrade('${w.id}', 'weapon')" style="padding:6px 12px;font-size:11px;width:100%;background:rgba(0,229,255,0.15);border-color:#00e5ff;color:#00f0ff;">
+                <span>${tt('workbench_upgrade_btn')}</span>
+            </button>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function openWorkbenchModal() {
+    const m = document.getElementById('workbenchModal');
+    if (!m) return;
+    renderWorkbenchModal();
+    m.style.display = 'flex';
+    m.classList.add('open');
+    if (typeof homeBeep === 'function') homeBeep('open');
+}
+
+function closeWorkbenchModal() {
+    const m = document.getElementById('workbenchModal');
+    if (!m) return;
+    m.classList.remove('open');
+    m.style.display = 'none';
+    if (typeof homeBeep === 'function') homeBeep('close');
+}
+
+function openWorkbenchFromGame() {
+    openWorkbenchModal();
+}
+
+window.openTalentTreeModal = openTalentTreeModal;
+window.closeTalentTreeModal = closeTalentTreeModal;
+window.openTalentTreeFromGame = openTalentTreeFromGame;
+window.upgradeSelectedTalent = upgradeSelectedTalent;
+window.resetAllTalents = resetAllTalents;
+window.getTalentTreeData = getTalentTreeData;
+window.saveTalentTreeData = saveTalentTreeData;
+window.addNaniteShards = addNaniteShards;
+
+window.openBestiaryModal = openBestiaryModal;
+window.closeBestiaryModal = closeBestiaryModal;
+window.openBestiaryFromGame = openBestiaryFromGame;
+
+window.openWorkbenchModal = openWorkbenchModal;
+window.closeWorkbenchModal = closeWorkbenchModal;
+window.openWorkbenchFromGame = openWorkbenchFromGame;
+
