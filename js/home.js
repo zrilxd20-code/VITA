@@ -257,7 +257,7 @@ function drawTeasers(now) {
 
 const HOME_SETTINGS_KEY = 'vita_save';
 const HOME_DIFFS = ['easy', 'normal', 'hard'];
-const HOME_QUALS = ['smooth', 'retro', 'chunky'];
+const HOME_QUALS = ['hd', 'smooth', 'retro', 'chunky'];
 const homeDefaults = {
   volume: 70,
   sfxVolume: 80,

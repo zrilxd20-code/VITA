@@ -558,7 +558,7 @@
       <div class="settings-grid">
         <label for="homeBrightness"><span data-i18n="settings_torch_bright">Kecerahan Obor (Torch)</span> <span id="homeBrightnessVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="homeBrightness" type="range" min="30" max="180"></label>
         <label for="homeQuality"><span data-i18n="settings_visual_style">Gaya Visual Pixel</span>
-          <select id="homeQuality"><option value="smooth">Smooth</option><option value="retro">Retro CRT</option><option value="chunky">Chunky Pixel</option></select>
+          <select id="homeQuality"><option value="hd">HD Sharp</option><option value="smooth">Smooth</option><option value="retro">Retro CRT</option><option value="chunky">Chunky Pixel</option></select>
         </label>
         <label class="settings-check-row" for="homeScreenShake">
           <input type="checkbox" id="homeScreenShake" checked>
@@ -1080,6 +1080,11 @@
 <canvas id="gameCanvas"></canvas>
 
 <canvas id="minimap" width="180" height="180"></canvas>
+<div id="zoomHud" role="group" aria-label="Zoom">
+  <button type="button" id="btnZoomIn" class="zoom-btn" aria-label="Zoom in" title="Zoom in">+</button>
+  <button type="button" id="btnZoomReset" class="zoom-btn zoom-reset" aria-label="Reset zoom" title="Reset zoom"><span id="zoomLevelText">1.00x</span></button>
+  <button type="button" id="btnZoomOut" class="zoom-btn" aria-label="Zoom out" title="Zoom out">&#8722;</button>
+</div>
 <div id="fpsCounter" style="display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);font-family:monospace;font-size:11px;color:#00f0ff;background:rgba(5,7,12,0.75);padding:2px 8px;border-radius:4px;border:1px solid rgba(0,240,255,0.3);z-index:90;pointer-events:none;letter-spacing:1px;">FPS: 60</div>
 <div id="coopNetBadge" style="display:none;position:fixed;top:8px;right:8px;font-family:monospace;font-size:11px;color:#00f0ff;background:rgba(5,7,12,0.75);padding:2px 8px;border-radius:4px;border:1px solid rgba(0,240,255,0.3);z-index:90;pointer-events:none;letter-spacing:1px;">NET: --</div>
 
@@ -1402,7 +1407,7 @@
       <div class="settings-grid">
         <label for="pauseBrightness"><span data-i18n="settings_torch_bright">Kecerahan Obor (Torch)</span> <span id="pauseBrightnessVal" style="float:right;color:#00e5ff;font-weight:bold;">100%</span><input id="pauseBrightness" type="range" min="30" max="180"></label>
         <label for="pauseQuality"><span data-i18n="settings_visual_style">Gaya Visual Pixel</span>
-          <select id="pauseQuality"><option value="smooth">Smooth (Halus)</option><option value="retro">Retro CRT (Klasik)</option><option value="chunky">Chunky Pixel (Ekstra Kasar)</option></select>
+          <select id="pauseQuality"><option value="hd">HD Sharp (Tajam)</option><option value="smooth">Smooth (Halus)</option><option value="retro">Retro CRT (Klasik)</option><option value="chunky">Chunky Pixel (Ekstra Kasar)</option></select>
         </label>
         <label class="settings-check-row" for="pauseScreenShake">
           <input type="checkbox" id="pauseScreenShake" checked>
@@ -1734,6 +1739,7 @@
         </label>
         <label for="gQuality"><span id="sQuality">Quality</span>
             <select id="gQuality">
+                <option value="hd">HD Sharp</option>
                 <option value="smooth">Smooth</option>
                 <option value="retro">Retro</option>
                 <option value="chunky">Chunky</option>

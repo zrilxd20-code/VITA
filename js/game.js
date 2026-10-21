@@ -42,8 +42,19 @@ let W, H;
 // ---- Pixel-art pipeline (100% prosedural, tanpa aset eksternal) ----
 // Dunia digambar ke buffer kecil lalu di-upscale tanpa smoothing,
 // sehingga seluruh art vektor menjadi chunky pixel ala retro.
-const PIXEL_SCALES = { smooth: 2, retro: 3, chunky: 4 }; // 2 = halus, 3 = chunky retro, 4 = ekstra kasar
+// 'hd' (PIXEL = 1) menggambar pada resolusi perangkat (DPR) agar tajam,
+// sementara skala dunia dinormalisasi supaya luas pandang tidak berubah.
+const PIXEL_SCALES = { hd: 1, smooth: 2, retro: 3, chunky: 4 }; // 1 = HD tajam, 2 = halus, 3 = chunky retro, 4 = ekstra kasar
 let PIXEL = 3;
+// Backing store mengikuti DPR (dibatasi 2 agar hemat memori/GPU di HP DPR 3+).
+let RENDER_DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+function readRenderDpr() {
+    return Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+}
+// Hanya mode HD yang memakai resolusi perangkat penuh; mode pixel tetap ringan.
+function getPixelDpr() {
+    return PIXEL === 1 ? RENDER_DPR : 1;
+}
 function applyPixelScale() {
     const q = (settings && PIXEL_SCALES[settings.quality]) ? settings.quality : 'retro';
     PIXEL = PIXEL_SCALES[q];
@@ -53,19 +64,64 @@ const pix = document.createElement('canvas');
 const pctx = pix.getContext('2d');
 let PW = 0, PH = 0;
 function sizePixelBuffer() {
-    PW = Math.max(1, Math.ceil(W / PIXEL));
-    PH = Math.max(1, Math.ceil(H / PIXEL));
-    pix.width = PW;
-    pix.height = PH;
+    const pd = getPixelDpr();
+    PW = Math.max(1, Math.ceil(W * pd / PIXEL));
+    PH = Math.max(1, Math.ceil(H * pd / PIXEL));
+    if (pix.width !== PW) pix.width = PW;
+    if (pix.height !== PH) pix.height = PH;
     pctx.imageSmoothingEnabled = false;
 }
-function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
+// W/H selalu dalam CSS px. Backing canvas = CSS x DPR, lalu transform DPR
+// dipasang sekali agar semua gambar tetap memakai koordinat CSS.
+function applyCanvasSize() {
+    const cssW = Math.max(1, Math.round(window.innerWidth));
+    const cssH = Math.max(1, Math.round(window.innerHeight));
+    RENDER_DPR = readRenderDpr();
+    W = cssW;
+    H = cssH;
+    const bw = Math.max(1, Math.round(cssW * RENDER_DPR));
+    const bh = Math.max(1, Math.round(cssH * RENDER_DPR));
+    if (canvas.width !== bw) canvas.width = bw;
+    if (canvas.height !== bh) canvas.height = bh;
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+    // Setiap perubahan canvas.width/height mereset seluruh state konteks.
+    mainCtx.setTransform(RENDER_DPR, 0, 0, RENDER_DPR, 0, 0);
+    mainCtx.imageSmoothingEnabled = false;
     sizePixelBuffer();
 }
-resize();
-window.addEventListener('resize', resize);
+let _resizeTimer = 0;
+function resize(force) {
+    if (force) {
+        clearTimeout(_resizeTimer);
+        applyCanvasSize();
+        watchRenderDpr();
+        return;
+    }
+    // Debounce singkat: resize address-bar mobile tidak memicu alokasi beruntun.
+    clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(function () {
+        applyCanvasSize();
+        watchRenderDpr();
+    }, 120);
+}
+let _dprMedia = null;
+function onRenderDprChange() {
+    resize(true);
+}
+function watchRenderDpr() {
+    if (!window.matchMedia) return;
+    if (_dprMedia && _dprMedia.removeEventListener) {
+        _dprMedia.removeEventListener('change', onRenderDprChange);
+    }
+    _dprMedia = window.matchMedia('(resolution: ' + (window.devicePixelRatio || 1) + 'dppx)');
+    if (_dprMedia.addEventListener) _dprMedia.addEventListener('change', onRenderDprChange);
+}
+resize(true);
+window.addEventListener('resize', function () { resize(false); });
+window.addEventListener('orientationchange', function () {
+    setTimeout(function () { resize(true); }, 260);
+});
 
 const CELL = 32;
 const LEVELS = 15;
@@ -112,8 +168,51 @@ let totalKills = 0;
 let totalTime = 0;
 let levelStartTime = 0;
 let cameraX = 0, cameraY = 0;
+// ---- Zoom tampilan (aksesibilitas + kenyamanan HP) ----
+// Nilai hanya mengubah luas pandang, bukan ketajaman: quality mengatur resolusi,
+// viewZoom mengatur seberapa jauh kamera melihat dunia.
+const VITA_ZOOM_KEY = 'vita_zoom';
+const ZOOM_MIN = 0.65;
+const ZOOM_MAX = 1.65;
+const ZOOM_STEP = 0.1;
+let viewZoom = 1;
+try {
+    const _savedZoom = parseFloat(localStorage.getItem(VITA_ZOOM_KEY));
+    if (isFinite(_savedZoom) && _savedZoom > 0) {
+        viewZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, _savedZoom));
+    }
+} catch (e) { /* localStorage bisa diblokir (mode privat) */ }
 function getGameZoom() {
-    return (currentLevel === LEVELS - 1) ? 0.60 : 1.0;
+    const levelFactor = (currentLevel === LEVELS - 1) ? 0.60 : 1.0;
+    return ((3 * getPixelDpr()) / PIXEL) * levelFactor * viewZoom;
+}
+// Satuan dunia per 1 CSS px di layar. Dipakai untuk menerjemahkan posisi
+// mouse/touch (CSS px) menjadi koordinat dunia saat membidik.
+function getWorldPerCss() {
+    return getPixelDpr() / (PIXEL * getGameZoom());
+}
+function applyViewZoom(next, persist) {
+    const z = Number(next);
+    if (!isFinite(z)) return;
+    viewZoom = Math.round(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z)) * 100) / 100;
+    const lbl = document.getElementById('zoomLevelText');
+    if (lbl) lbl.textContent = viewZoom.toFixed(2) + 'x';
+    const hud = document.getElementById('zoomHud');
+    if (hud) {
+        const inBtn = document.getElementById('btnZoomIn');
+        const outBtn = document.getElementById('btnZoomOut');
+        if (inBtn) inBtn.disabled = viewZoom >= ZOOM_MAX - 0.001;
+        if (outBtn) outBtn.disabled = viewZoom <= ZOOM_MIN + 0.001;
+    }
+    if (persist) {
+        try { localStorage.setItem(VITA_ZOOM_KEY, String(viewZoom)); } catch (e) {}
+    }
+}
+function adjustViewZoom(delta) {
+    applyViewZoom(viewZoom + delta, true);
+}
+function resetViewZoom() {
+    applyViewZoom(1, true);
 }
 let fogOfWar = [];
 let visitedTiles = [];
@@ -171,7 +270,8 @@ function toggleDebugOverlay() {
 const VITA_SAVE_KEY = 'vita_save';
 const VITA_HIGH_KEY = 'vita_high';
 const VITA_DIFFS = ['easy', 'normal', 'hard'];
-const VITA_QUALS = ['smooth', 'retro', 'chunky'];
+const VITA_QUALS = ['hd', 'smooth', 'retro', 'chunky'];
+const QUAL_I18N_KEY = { hd: 'quality_hd', smooth: 'quality_smooth', retro: 'quality_retro', chunky: 'quality_chunky' };
 // Tabel sentral difficulty (satu sumber kebenaran — Golden Rule #4).
 // speed: easy < normal < hard | stat (HP/ATK): easy < normal < hard
 // detect: radius deteksi monster, hard melihat lebih jauh.
@@ -306,7 +406,8 @@ const T = {
         settings: 'PENGATURAN', how_to_play: 'CARA MAIN',
         volume: 'Volume', brightness: 'Kecerahan', language: 'Bahasa', close: 'Tutup',
         diff_label: 'Kesulitan', diff_easy: 'Mudah', diff_normal: 'Normal', diff_hard: 'Sulit',
-        quality: 'Kualitas', quality_smooth: 'Halus', quality_retro: 'Retro', quality_chunky: 'Kasar',
+        quality: 'Kualitas', quality_hd: 'HD Tajam', quality_smooth: 'Halus', quality_retro: 'Retro', quality_chunky: 'Kasar',
+        zoom_label: 'Perbesaran', zoom_in: 'Perbesar', zoom_out: 'Perkecil', zoom_reset: 'Reset perbesaran',
         ctrl1: 'WASD / Panah: bergerak', ctrl2: 'SPACE / Klik: menyerang', ctrl3: 'SHIFT: dash kebal — tembus jebakan & serangan',
         ctrl4: 'Kumpulkan semua artefak lalu menuju pintu keluar.',
         death_title: '[ SUBJEK TERMINASI // GUGUR ]', death_level_lbl: 'Sektor tercapai:', death_kills_lbl: 'Anomali dinetralisir:',
@@ -676,7 +777,8 @@ const T = {
         settings: 'SETTINGS', how_to_play: 'HOW TO PLAY',
         volume: 'Volume', brightness: 'Brightness', language: 'Language', close: 'Close',
         diff_label: 'Difficulty', diff_easy: 'Easy', diff_normal: 'Normal', diff_hard: 'Hard',
-        quality: 'Quality', quality_smooth: 'Smooth', quality_retro: 'Retro', quality_chunky: 'Chunky',
+        quality: 'Quality', quality_hd: 'HD Sharp', quality_smooth: 'Smooth', quality_retro: 'Retro', quality_chunky: 'Chunky',
+        zoom_label: 'Zoom', zoom_in: 'Zoom in', zoom_out: 'Zoom out', zoom_reset: 'Reset zoom',
         ctrl1: 'WASD / Arrows: move', ctrl2: 'SPACE / Click: attack', ctrl3: 'SHIFT: phase dash — invincible, pass traps & hits',
         ctrl4: 'Collect all artifacts, then reach the exit portal.',
         death_title: '[ SUBJECT TERMINATED // DEAD ]', death_level_lbl: 'Sector reached:', death_kills_lbl: 'Monsters neutralized:',
@@ -1268,11 +1370,32 @@ function applyLang() {
     const sQual = document.getElementById('sQuality');
     if (sQual) sQual.textContent = tt('quality');
     const qualSel = document.getElementById('gQuality');
-    if (qualSel && qualSel.options.length >= 3) {
-        qualSel.options[0].text = tt('quality_smooth');
-        qualSel.options[1].text = tt('quality_retro');
-        qualSel.options[2].text = tt('quality_chunky');
+    if (qualSel) {
+        for (let i = 0; i < qualSel.options.length; i++) {
+            const opt = qualSel.options[i];
+            const qKey = QUAL_I18N_KEY[opt.value];
+            if (qKey) opt.text = tt(qKey);
+        }
     }
+    // Sinkronkan label kualitas di Hub & menu jeda (keduanya punya daftar sama).
+    ['homeQuality', 'pauseQuality'].forEach(function (selId) {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        for (let i = 0; i < sel.options.length; i++) {
+            const opt = sel.options[i];
+            const qKey = QUAL_I18N_KEY[opt.value];
+            if (qKey) opt.text = tt(qKey);
+        }
+    });
+    // Tombol zoom memakai aria-label/title (bukan data-i18n), jadi diset eksplisit.
+    const zoomHudEl = document.getElementById('zoomHud');
+    if (zoomHudEl) zoomHudEl.setAttribute('aria-label', tt('zoom_label'));
+    [['btnZoomIn', 'zoom_in'], ['btnZoomOut', 'zoom_out'], ['btnZoomReset', 'zoom_reset']].forEach(function (pair) {
+        const btn = document.getElementById(pair[0]);
+        if (!btn) return;
+        btn.setAttribute('aria-label', tt(pair[1]));
+        btn.title = tt(pair[1]);
+    });
     document.getElementById('gSettingsClose').textContent = tt('close');
     document.getElementById('controlsClose').textContent = tt('close');
     document.getElementById('ctrl1').textContent = tt('ctrl1');
@@ -5971,15 +6094,15 @@ function playerAttack(fromTouch) {
         if (best) {
             player.facing = Math.atan2(best.y - player.y, best.x - player.x);
         } else if (mouseActive) {
-            const zoom = getGameZoom();
-            const wx = cameraX + (mouseX - W / 2) / zoom;
-            const wy = cameraY + (mouseY - H / 2) / zoom;
+            const wpc = getWorldPerCss();
+            const wx = cameraX + (mouseX - W / 2) * wpc;
+            const wy = cameraY + (mouseY - H / 2) * wpc;
             player.facing = Math.atan2(wy - player.y, wx - player.x);
         }
     } else {
-        const zoom = getGameZoom();
-        const wx = cameraX + (mouseX - W / 2) / zoom;
-        const wy = cameraY + (mouseY - H / 2) / zoom;
+        const wpc = getWorldPerCss();
+        const wx = cameraX + (mouseX - W / 2) * wpc;
+        const wy = cameraY + (mouseY - H / 2) * wpc;
         player.facing = Math.atan2(wy - player.y, wx - player.x);
     }
 
@@ -6340,9 +6463,9 @@ function updatePlayer() {
     }
 
     if (mouseActive) {
-        const zoom = getGameZoom();
-        const wx = cameraX + (mouseX - W / 2) / zoom;
-        const wy = cameraY + (mouseY - H / 2) / zoom;
+        const wpc = getWorldPerCss();
+        const wx = cameraX + (mouseX - W / 2) * wpc;
+        const wy = cameraY + (mouseY - H / 2) * wpc;
         player.facing = Math.atan2(wy - player.y, wx - player.x);
     }
 
@@ -11579,7 +11702,9 @@ function renderGame() {
     // Kembali ke canvas utama + upscale tanpa smoothing = chunky pixel art.
     // Screen shake diterapkan di sini agar gerakannya tetap smooth.
     ctx = mainCtx; W = keepW; H = keepH;
-    ctx.imageSmoothingEnabled = false;
+    // HD: buffer sudah seukuran device px, jadi blit 1:1 (smoothing aman).
+    // Pixel: upscale nearest-neighbour agar tetap tajam & chunky.
+    ctx.imageSmoothingEnabled = (PIXEL === 1);
     ctx.clearRect(0, 0, W, H);
     ctx.drawImage(pix, shakeX, shakeY, W, H);
 
@@ -12123,6 +12248,27 @@ document.addEventListener('keydown', e => {
         return;
     }
 
+    // Zoom tampilan: + / = perbesar, - perkecil, 0 reset. Diabaikan saat mengetik.
+    const _tag = e.target && e.target.tagName;
+    const _typing = _tag === 'INPUT' || _tag === 'TEXTAREA' || _tag === 'SELECT' || (e.target && e.target.isContentEditable);
+    if (!_typing && (gameState === 'playing' || gameState === 'paused')) {
+        if (e.key === '+' || e.key === '=' || e.code === 'NumpadAdd' || e.code === 'Equal') {
+            e.preventDefault();
+            adjustViewZoom(ZOOM_STEP);
+            return;
+        }
+        if (e.key === '-' || e.key === '_' || e.code === 'NumpadSubtract' || e.code === 'Minus') {
+            e.preventDefault();
+            adjustViewZoom(-ZOOM_STEP);
+            return;
+        }
+        if (e.key === '0' || e.code === 'Numpad0' || e.code === 'Digit0') {
+            e.preventDefault();
+            resetViewZoom();
+            return;
+        }
+    }
+
     // Ganti senjata dengan tombol angka 1-5, Q (sebelumnya), E (berikutnya)
     if (gameState === 'playing') {
         if (['1', '2', '3', '4', '5'].includes(e.key)) {
@@ -12654,6 +12800,81 @@ function setupTouchControls() {
         window.removeEventListener('touchstart', onFirstTouch);
     }, { passive: true });
 }
+
+// ---- Kontrol zoom tampilan: tombol HUD, pinch dua jari, keyboard ----
+function setupZoomHud() {
+    const inBtn = document.getElementById('btnZoomIn');
+    const outBtn = document.getElementById('btnZoomOut');
+    const resetBtn = document.getElementById('btnZoomReset');
+    if (inBtn) {
+        inBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            adjustViewZoom(ZOOM_STEP);
+        });
+    }
+    if (outBtn) {
+        outBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            adjustViewZoom(-ZOOM_STEP);
+        });
+    }
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            resetViewZoom();
+        });
+    }
+    applyViewZoom(viewZoom, false);
+}
+const _zoomPointers = new Map();
+let _pinchStartDist = 0;
+let _pinchStartZoom = 1;
+let _pinchActive = false;
+function _zoomPointerDist() {
+    let a = null, b = null;
+    for (const p of _zoomPointers.values()) {
+        if (!a) { a = p; } else { b = p; break; }
+    }
+    if (!a || !b) return 0;
+    return Math.hypot(a.x - b.x, a.y - b.y);
+}
+function setupZoomGesture() {
+    const el = document.getElementById('gameCanvas');
+    if (!el) return;
+    el.addEventListener('pointerdown', function (e) {
+        if (e.pointerType !== 'touch') return;
+        if (gameState !== 'playing') return;
+        _zoomPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (_zoomPointers.size === 2) {
+            _pinchStartDist = _zoomPointerDist();
+            _pinchStartZoom = viewZoom;
+            _pinchActive = _pinchStartDist > 10;
+        }
+    }, { passive: true });
+    el.addEventListener('pointermove', function (e) {
+        const p = _zoomPointers.get(e.pointerId);
+        if (!p) return;
+        p.x = e.clientX;
+        p.y = e.clientY;
+        if (!_pinchActive || _zoomPointers.size < 2) return;
+        const d = _zoomPointerDist();
+        if (d < 10 || _pinchStartDist < 10) return;
+        applyViewZoom(_pinchStartZoom * (d / _pinchStartDist), false);
+    }, { passive: true });
+    function endZoomPointer(e) {
+        if (!_zoomPointers.has(e.pointerId)) return;
+        _zoomPointers.delete(e.pointerId);
+        if (_zoomPointers.size < 2) {
+            if (_pinchActive) applyViewZoom(viewZoom, true);
+            _pinchActive = false;
+            _pinchStartDist = 0;
+        }
+    }
+    el.addEventListener('pointerup', endZoomPointer, { passive: true });
+    el.addEventListener('pointercancel', endZoomPointer, { passive: true });
+}
+setupZoomHud();
+setupZoomGesture();
 
 function drawCrosshair() {
     if (gameState !== 'playing') return;
@@ -14650,9 +14871,9 @@ function sampleAndSendPeerInput() {
         lp.facing = Math.atan2(dy, dx);
     }
     if (mouseActive) {
-        const zoom = getGameZoom();
-        const wx = cameraX + (mouseX - W / 2) / zoom;
-        const wy = cameraY + (mouseY - H / 2) / zoom;
+        const wpc = getWorldPerCss();
+        const wx = cameraX + (mouseX - W / 2) * wpc;
+        const wy = cameraY + (mouseY - H / 2) * wpc;
         lp.facing = Math.atan2(wy - lp.y, wx - lp.x);
     }
 
