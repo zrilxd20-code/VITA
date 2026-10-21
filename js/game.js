@@ -45,7 +45,7 @@ let W, H;
 // 'hd' (PIXEL = 1) menggambar pada resolusi perangkat (DPR) agar tajam,
 // sementara skala dunia dinormalisasi supaya luas pandang tidak berubah.
 const PIXEL_SCALES = { hd: 1, smooth: 2, retro: 3, chunky: 4 }; // 1 = HD tajam, 2 = halus, 3 = chunky retro, 4 = ekstra kasar
-let PIXEL = 3;
+let PIXEL = 1;
 // Backing store mengikuti DPR (dibatasi 2 agar hemat memori/GPU di HP DPR 3+).
 let RENDER_DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 function readRenderDpr() {
@@ -58,7 +58,7 @@ function getPixelDpr() {
     return PIXEL === 1 ? RENDER_DPR : 1;
 }
 function applyPixelScale() {
-    const q = (settings && PIXEL_SCALES[settings.quality]) ? settings.quality : 'retro';
+    const q = (settings && PIXEL_SCALES[settings.quality]) ? settings.quality : 'hd';
     PIXEL = PIXEL_SCALES[q];
     sizePixelBuffer();
 }
@@ -4758,7 +4758,7 @@ function distToSegment(px, py, x1, y1, x2, y2) {
 
 const PARTICLE_BUDGETS = { smooth: 500, retro: 350, chunky: 180 };
 function getMaxParticles() {
-    const q = (settings && settings.quality) || 'retro';
+    const q = (settings && settings.quality) || 'hd';
     let base = PARTICLE_BUDGETS[q] || 350;
     if (typeof perfFps !== 'undefined') {
         if (perfFps < 30) {
@@ -6065,7 +6065,31 @@ function cycleWeapon(reverse = false) {
     switchWeapon(nextIdx);
 }
 
+let isTouchAtkPressed = false;
 function playerAttack(fromTouch) {
+    if (fromTouch || document.body.classList.contains('touch-on')) {
+        // Smart Mobile Auto-Aim: target closest active anomaly within sight radius
+        let closestFoe = null;
+        let closestDistSq = 360 * 360; // ~12 cells radius
+        for (let i = 0; i < monsters.length; i++) {
+            const m = monsters[i];
+            if (!m || m.dead) continue;
+            const ddx = m.x - player.x;
+            const ddy = m.y - player.y;
+            const dsq = ddx * ddx + ddy * ddy;
+            if (dsq < closestDistSq) {
+                closestDistSq = dsq;
+                closestFoe = m;
+            }
+        }
+        if (closestFoe) {
+            player.aimAngle = Math.atan2(closestFoe.y - player.y, closestFoe.x - player.x);
+            player.facingAngle = player.aimAngle;
+        } else if (Math.abs(touchMove.dx) > 0.1 || Math.abs(touchMove.dy) > 0.1) {
+            player.aimAngle = Math.atan2(touchMove.dy, touchMove.dx);
+            player.facingAngle = player.aimAngle;
+        }
+    }
     if (!player || gameState !== 'playing') return;
     const curW = player.currentWeapon || 'knife';
     const wConf = WEAPONS[curW] || WEAPONS.knife;
@@ -13441,7 +13465,7 @@ function openPauseSettings() {
 
     const qualSelect = document.getElementById('pauseQuality');
     if (qualSelect) {
-        qualSelect.value = VITA_QUALS.includes(settings.quality) ? settings.quality : 'retro';
+        qualSelect.value = VITA_QUALS.includes(settings.quality) ? settings.quality : 'hd';
         qualSelect.onchange = (e) => {
             settings.quality = VITA_QUALS.includes(e.target.value) ? e.target.value : 'retro';
             persistSettings();
@@ -13893,7 +13917,7 @@ if (diffSel) {
 
 const qualSelInit = document.getElementById('gQuality');
 if (qualSelInit) {
-    qualSelInit.value = VITA_QUALS.includes(settings.quality) ? settings.quality : 'retro';
+    qualSelInit.value = VITA_QUALS.includes(settings.quality) ? settings.quality : 'hd';
     qualSelInit.addEventListener('change', e => {
         settings.quality = VITA_QUALS.includes(e.target.value) ? e.target.value : 'retro';
         persistSettings();
@@ -13944,7 +13968,7 @@ function syncPauseSettingsInputs() {
     setVal('pauseBrightness', settings.brightness || 100);
     setText('pauseBrightnessVal', (settings.brightness || 100) + '%');
 
-    setVal('pauseQuality', settings.quality || 'retro');
+    setVal('pauseQuality', settings.quality || 'hd');
     setChecked('pauseScreenShake', settings.screenShake !== false);
     setChecked('pauseMinimap', settings.showMinimap !== false);
     setChecked('pauseShowFps', !!settings.showFps);

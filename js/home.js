@@ -324,7 +324,7 @@ const homeDefaults = {
   brightness: 100,
   lang: 'en',
   difficulty: 'normal',
-  quality: 'retro',
+  quality: 'hd',
   deviceMode: 'ask',
   autoAim: true,
   haptic: true,
@@ -907,7 +907,7 @@ function openSettingsModal() {
 
   if (lEl) lEl.value = homeSettings.lang === 'en' ? 'en' : 'id';
   if (dEl) dEl.value = HOME_DIFFS.includes(homeSettings.difficulty) ? homeSettings.difficulty : 'normal';
-  if (qEl) qEl.value = HOME_QUALS.includes(homeSettings.quality) ? homeSettings.quality : 'retro';
+  if (qEl) qEl.value = HOME_QUALS.includes(homeSettings.quality) ? homeSettings.quality : 'hd';
 
   const m = document.getElementById('settingsModal');
   if (m) m.classList.add('open');

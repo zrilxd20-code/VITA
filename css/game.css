@@ -4278,3 +4278,13 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
     margin-bottom: 20px;
     text-shadow: 0 0 16px rgba(255, 59, 59, 0.75);
 }
+
+/* Fix touch exit and pause separation */
+#btnTouchExit {
+    top: 12px !important;
+    right: 58px !important;
+}
+#btnTouchPause {
+    top: 12px !important;
+    right: 12px !important;
+}
