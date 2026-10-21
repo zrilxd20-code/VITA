@@ -23,9 +23,9 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>VITA — Forgotten Sector</title>
-<link rel="stylesheet" href="css/tokens.css?v=2.5.1">
-<link rel="stylesheet" href="css/home.css?v=2.5.1">
-<link rel="stylesheet" href="css/game.css?v=2.5.1">
+<link rel="stylesheet" href="css/tokens.css?v=2.5.2">
+<link rel="stylesheet" href="css/home.css?v=2.5.2">
+<link rel="stylesheet" href="css/game.css?v=2.5.2">
 </head>
 <body class="hud-hidden">
 <div id="homeView">
@@ -101,7 +101,7 @@
       <div class="platform-card card-web">
         <div class="platform-card-glow"></div>
         <div class="platform-card-header">
-          <span class="platform-card-pill pill-web" data-i18n="plat_web_badge">ONLINE BROWSER // VERCEL</span>
+          <span class="platform-card-pill pill-web" data-i18n="plat_web_badge">ONLINE BROWSER — VERCEL</span>
           <div class="platform-icon-box">
             <svg class="plat-svg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm-1 17.93V18a1 1 0 0 1-2 0v-1.07A8 8 0 0 1 4.07 13H5a1 1 0 0 1 0-2h-.93A8 8 0 0 1 11 4.07V5a1 1 0 0 1 2 0v-.93A8 8 0 0 1 19.93 11H19a1 1 0 0 1 0 2h.93A8 8 0 0 1 13 19.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"/></svg>
           </div>
@@ -118,7 +118,7 @@
       <div class="platform-card card-pc">
         <div class="platform-card-glow"></div>
         <div class="platform-card-header">
-          <span class="platform-card-pill pill-pc" data-i18n="plat_pc_badge">WINDOWS 10/11 // STANDALONE</span>
+          <span class="platform-card-pill pill-pc" data-i18n="plat_pc_badge">WINDOWS 10/11 — STANDALONE</span>
           <div class="platform-icon-box">
             <svg class="plat-svg" viewBox="0 0 24 24"><path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z"/></svg>
           </div>
@@ -135,7 +135,7 @@
       <div class="platform-card card-android">
         <div class="platform-card-glow"></div>
         <div class="platform-card-header">
-          <span class="platform-card-pill pill-android" data-i18n="plat_android_badge">NATIVE APK // SENTUH HP</span>
+          <span class="platform-card-pill pill-android" data-i18n="plat_android_badge">NATIVE APK — SENTUH HP</span>
           <div class="platform-icon-box">
             <svg class="plat-svg" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
           </div>
@@ -155,10 +155,10 @@
     <!-- Game Mode Directive Selector (Campaign vs Endless Survival) -->
     <div class="mode-directive-row" id="modeDirectiveRow" style="display:flex;gap:8px;margin-bottom:12px;justify-content:center;width:100%;">
       <button class="btn-micro active" id="btnDirectiveCampaign" type="button" onclick="selectGameDirective('campaign')" style="flex:1;padding:8px 12px;border:1px solid var(--accent,#ff3b3b);background:rgba(255,59,59,0.22);color:#fff;font-weight:bold;letter-spacing:1px;font-size:12px;cursor:pointer;border-radius:4px;">
-        <span data-i18n="mode_campaign_btn">KAMPANYE // 15 SEKTOR</span>
+        <span data-i18n="mode_campaign_btn">KAMPANYE — 15 SEKTOR</span>
       </button>
       <button class="btn-micro" id="btnDirectiveEndless" type="button" onclick="selectGameDirective('endless')" style="flex:1;padding:8px 12px;border:1px solid rgba(0,229,255,0.3);background:rgba(0,229,255,0.08);color:#00e5ff;font-weight:bold;letter-spacing:1px;font-size:12px;cursor:pointer;border-radius:4px;">
-        <span data-i18n="mode_endless_btn">ARENA SURVIVAL // HORDE</span>
+        <span data-i18n="mode_endless_btn">ARENA SURVIVAL — HORDE</span>
       </button>
     </div>
 
@@ -575,9 +575,27 @@
       </div>
 
       <!-- GAMEPLAY & SISTEM -->
+      <!-- VERSI & PEMBARUAN (UPDATE) -->
       <div class="settings-sec-head">
-        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        <span id="lblSecGameplay" data-i18n="settings_sec_gameplay">GAMEPLAY &amp; SISTEM</span>
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+        <span id="lblSecVersion" data-i18n="settings_sec_version">VERSI &amp; PEMBARUAN (UPDATE)</span>
+      </div>
+      <div class="settings-grid" style="margin-bottom:12px;">
+        <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);padding:10px 14px;border-radius:6px;gap:12px;">
+          <div>
+            <div style="font-size:11px;color:#a0a0b0;letter-spacing:1px;" data-i18n="settings_cur_ver_lbl">VERSI APLIKASI SAAT INI</div>
+            <div style="font-size:15px;font-weight:bold;color:#00f0ff;" id="settingsAppVersionDisplay">v2.5.2 (Latest)</div>
+          </div>
+          <button class="btn-micro" type="button" onclick="checkVitaUpdateManual()" style="padding:8px 14px;font-weight:bold;color:#0a0a12;background:linear-gradient(135deg,#00f0ff,#0070f3);border:none;cursor:pointer;">
+            <span data-i18n="settings_check_update_btn">↻ CEK PEMBARUAN</span>
+          </button>
+        </div>
+        <div id="settingsUpdateFeedback" style="grid-column:1/-1;font-size:12px;display:none;padding:8px 12px;border-radius:4px;text-align:center;"></div>
+      </div>
+
+      <div class="settings-sec-head">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span id="lblSecGameplay" data-i18n="settings_sec_gameplay">GAMEPLAY &amp; SISTEM</span>
       </div>
       <div class="settings-grid">
         <label for="homeLanguage"><span data-i18n="settings_interface_lang">Interface Language</span>
@@ -748,7 +766,7 @@
 </div>
 
 <footer>
-  <b>VITA</b> &mdash; BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR &bull; WEB EDITION v2.5.0 &bull; 100% STANDALONE OFFLINE READY
+  <b>VITA</b> &mdash; BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR &bull; WEB EDITION v2.5.2 &bull; 100% STANDALONE OFFLINE READY
 </footer>
 </div>
 
@@ -1022,7 +1040,7 @@
       </div>
     </div>
     
-    <div class="orient-badge">VITA // TACTICAL DISPLAY CALIBRATION</div>
+    <div class="orient-badge">VITA — TACTICAL DISPLAY CALIBRATION</div>
     <h3 id="orientPromptTitle" data-i18n="orient_title">PUTAR KE MODE LANDSCAPE</h3>
     <p id="orientPromptDesc" data-i18n="orient_desc">Miringkan ponsel ke posisi horizontal (landscape) agar tombol joystick &amp; serang leluasa serta pandangan labirin maksimal.</p>
 
@@ -1045,7 +1063,7 @@
             <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
         </div>
         <div class="comms-meta">
-            <div class="comms-sender" id="commsSender">DR. SARA // RES-01</div>
+            <div class="comms-sender" id="commsSender">DR. SARA — RES-01</div>
             <div class="comms-freq" id="commsFreq">FREQ: 142.85 MHz [SECURE CHANNEL]</div>
         </div>
         <div class="comms-signal">● COMMS LIVE</div>
@@ -1058,7 +1076,7 @@
     <div class="boss-hud-header">
         <span class="boss-hud-threat" id="bossHudThreat" data-i18n="boss_threat">PREDATOR PUNCAK TERDETEKSI</span>
         <span class="boss-hud-name" id="bossHudName">THE MONOLITH</span>
-        <span class="boss-hud-phase" id="bossHudPhase">PHASE I // CORE ONLINE</span>
+        <span class="boss-hud-phase" id="bossHudPhase">PHASE I — CORE ONLINE</span>
     </div>
     <div class="boss-bar-track">
         <div class="boss-bar-fill" id="bossBarFill" style="width:100%"></div>
@@ -1139,7 +1157,7 @@
 </div>
 
 <div id="ui">
-    <div class="ui-header"><span class="ui-badge" id="uiBadge">BIO-CONTAINMENT // SEC-07</span></div>
+    <div class="ui-header"><span class="ui-badge" id="uiBadge">BIO-CONTAINMENT — SEC-07</span></div>
     <div class="hud-sector-strip">
         <div class="hud-stat-cell">
             <svg class="hud-icon" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
@@ -1199,7 +1217,7 @@
 <div id="tutorialBanner" class="tutorial-hud-banner" style="display:none">
     <div class="tutorial-hud-content">
         <div class="tutorial-badge-row">
-            <span class="tutorial-badge" id="tutStepBadge">PROTOKOL 01 // LOKOMOSI</span>
+            <span class="tutorial-badge" id="tutStepBadge">PROTOKOL 01 — LOKOMOSI</span>
             <button class="tutorial-skip-btn" type="button" onclick="skipTutorial()" title="Skip tutorial">LEWATI [ESC]</button>
         </div>
         <div class="tutorial-instruction-row">
@@ -1286,7 +1304,7 @@
     <div class="armory-hud-bracket bottom-left"></div>
     <div class="armory-hud-bracket bottom-right"></div>
 
-    <div class="eyebrow" id="armoryEyebrow">OPERATIVE ARSENAL // ANOMALY CONTAINMENT PROTOCOL</div>
+    <div class="eyebrow" id="armoryEyebrow">OPERATIVE ARSENAL — ANOMALY CONTAINMENT PROTOCOL</div>
     <h2 id="armoryTitle">SELECT NEW WEAPON SUPPLY</h2>
     <p class="subtitle" id="armorySubtitle">Sector anomaly level rising! Requisition 1 tactical armament to proceed with the mission:</p>
 
@@ -1476,7 +1494,7 @@
           <div style="flex:1;">
             <div id="bestiaryThreatBadge" style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-family:monospace;font-weight:bold;margin-bottom:4px;background:rgba(255,59,59,0.2);color:#ff3b3b;border:1px solid rgba(255,59,59,0.5);">CLASS-I</div>
             <h4 id="bestiaryMonsterName" style="margin:2px 0;font-size:18px;color:#fff;letter-spacing:1px;">Amoeboid Slime</h4>
-            <div id="bestiaryMonsterCode" style="font-size:11px;font-family:monospace;color:#00f0ff;margin-bottom:8px;">SPECIMEN #01 // VITA-CARNIS</div>
+            <div id="bestiaryMonsterCode" style="font-size:11px;font-family:monospace;color:#00f0ff;margin-bottom:8px;">SPECIMEN #01 — VITA-CARNIS</div>
             <div style="display:flex;gap:14px;font-size:12px;">
               <div><span style="color:var(--text-dim,#a0a0b0);" data-i18n="bestiary_kills_lbl">DIELIMINASI:</span> <b id="bestiaryStatKills" style="color:#2ecc71;">0</b></div>
               <div><span style="color:var(--text-dim,#a0a0b0);" data-i18n="bestiary_deaths_lbl">KORBAN OPERATIF:</span> <b id="bestiaryStatDeaths" style="color:#ff4757;">0</b></div>
@@ -1531,7 +1549,7 @@
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,240,255,0.22);padding-bottom:12px;margin-bottom:12px;">
       <div>
         <div style="font-size:11px;font-family:monospace;color:#00f0ff;letter-spacing:2px;font-weight:bold;" data-i18n="talent_title">POHON TALENTA &amp; PROTOKOL JEJAK</div>
-        <h3 style="color:#fff;margin:2px 0 0 0;font-size:17px;letter-spacing:0.8px;" data-i18n="talent_sub">Sistem peningkatan saraf &amp; modul bionik permanen // Persisten antar-misi</h3>
+        <h3 style="color:#fff;margin:2px 0 0 0;font-size:17px;letter-spacing:0.8px;" data-i18n="talent_sub">Sistem peningkatan saraf &amp; modul bionik permanen — Persisten antar-misi</h3>
       </div>
       <div style="display:flex;align-items:center;gap:14px;">
         <div class="talent-currency-pill" style="display:flex;align-items:center;gap:8px;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.4);border-radius:20px;padding:6px 14px;box-shadow:0 0 15px rgba(0,240,255,0.15);">
@@ -1670,12 +1688,12 @@
         </div>
     </div>
     <div id="adminPanel" style="display:none">
-        <h3 id="adminPanelTitle" style="margin-bottom:6px">ADMIN PANEL // SECTOR SELECT</h3>
+        <h3 id="adminPanelTitle" style="margin-bottom:6px">ADMIN PANEL — SECTOR SELECT</h3>
         <p id="adminPanelDesc" style="font-size:13px;opacity:.8;margin-bottom:8px">Jump to sector / test anomalies.</p>
         <div id="adminStatusBanner" style="background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.4);border-radius:4px;padding:8px 12px;margin:6px 0 12px;font-size:12px;color:#00ff88;line-height:1.4;text-align:left;">
             <div style="font-weight:bold;letter-spacing:1px;display:flex;align-items:center;gap:6px;">
                 <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;"></span>
-                <span id="adminBannerTitle">OTORISASI ADMIN PENUH // ARSENAL &amp; SKILL MAKSIMAL</span>
+                <span id="adminBannerTitle">OTORISASI ADMIN PENUH — ARSENAL &amp; SKILL MAKSIMAL</span>
             </div>
             <div id="adminBannerSub" style="color:#d8f8e8;font-size:11px;margin-top:3px;opacity:0.9;">
                 Semua 15 Sektor Fasilitas terbuka &amp; 6 senjata aktif. Pilih sektor untuk langsung meluncur:
@@ -1696,7 +1714,7 @@
         </div>
 
         <details style="margin-top:12px;border:1px dashed rgba(255,255,255,0.15);border-radius:4px;padding:8px;text-align:left;">
-            <summary style="font-size:11px;color:#999;cursor:pointer;user-select:none;" id="adminAdvancedToolsSummary">OPSI TAMBAHAN // UJI SENJATA &amp; SKILL SATUAN</summary>
+            <summary style="font-size:11px;color:#999;cursor:pointer;user-select:none;" id="adminAdvancedToolsSummary">OPSI TAMBAHAN — UJI SENJATA &amp; SKILL SATUAN</summary>
             <!-- WEAPON ARSENAL TESTING -->
             <div style="margin-top:10px;color:#00f0ff;font-size:11px;font-weight:bold;letter-spacing:1px;" id="adminWeaponsTitle">UJI PERSENJATAAN (ARSENAL)</div>
             <div id="adminWeaponsGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;">
@@ -1763,9 +1781,9 @@
     <div class="dossier-frame">
         <div class="dossier-header">
             <div class="dossier-stamp" id="deathStamp">SUBJECT: TERMINATED</div>
-            <div class="dossier-ref">BIOHAZARD PROTOCOL // INCIDENT REPORT #092</div>
+            <div class="dossier-ref">BIOHAZARD PROTOCOL — INCIDENT REPORT #092</div>
         </div>
-        <h2 id="deathTitle">[ SUBJECT TERMINATION // FALLEN ]</h2>
+        <h2 id="deathTitle">[ SUBJECT TERMINATION — FALLEN ]</h2>
         <div class="dossier-body">
             <p><span id="deathLevelLbl">Sector reached:</span> <span id="deathLevel" class="dossier-val">1</span></p>
             <p><span id="deathKillsLbl">Monsters neutralized:</span> <span id="deathKills" class="dossier-val">0</span></p>
@@ -1842,9 +1860,9 @@
     <div class="dossier-frame win-frame">
         <div class="dossier-header win">
             <div class="dossier-stamp win" id="winStamp">SECTOR PURGED</div>
-            <div class="dossier-ref">QUARANTINE PROTOCOL // ANOMALIES NEUTRALIZED</div>
+            <div class="dossier-ref">QUARANTINE PROTOCOL — ANOMALIES NEUTRALIZED</div>
         </div>
-        <h2 id="winTitle">[ SECTOR PURGED // FACILITY SECURE ]</h2>
+        <h2 id="winTitle">[ SECTOR PURGED — FACILITY SECURE ]</h2>
         <p id="winSub">All 15 sectors conquered &amp; The Monolith neutralized!</p>
         <p id="newBestBadge" style="display:none">[ NEW BEST RECORD ]</p>
         <div class="dossier-body">
@@ -1969,9 +1987,9 @@
   </div>
 </div>
 
-<script src="js/supabase.js?v=2.5.1"></script>
-<script src="js/home.js?v=2.5.1"></script>
-<script src="js/prologue.js?v=2.5.1"></script>
-<script src="js/game.js?v=2.5.1"></script>
+<script src="js/supabase.js?v=2.5.2"></script>
+<script src="js/home.js?v=2.5.2"></script>
+<script src="js/prologue.js?v=2.5.2"></script>
+<script src="js/game.js?v=2.5.2"></script>
 </body>
 </html>

@@ -2299,7 +2299,19 @@ function proceedToWebGame(autoStart = false) {
 //   2) samakan "version" di version.json,
 //   3) naikkan CACHE di sw.js (mis. vita-v3 -> vita-v4).
 // App yang sudah ter-install otomatis menampilkan spanduk update.
-const APP_VERSION = '2.5.1';
+function compareSemver(a, b) {
+  if (!a || !b) return 0;
+  const pa = String(a).replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  const pb = String(b).replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const na = pa[i] || 0;
+    const nb = pb[i] || 0;
+    if (na > nb) return 1;
+    if (na < nb) return -1;
+  }
+  return 0;
+}
+const APP_VERSION = '2.5.2';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 
@@ -2368,28 +2380,91 @@ function showUpdateBanner(ver) {
   bar.style.display = 'block';
 }
 
-async function checkVitaUpdate() {
-  if (vitaUpdateShown) return;
+async function checkVitaUpdate(manual = false) {
+  if (vitaUpdateShown && !manual) return;
+  const feedback = document.getElementById('settingsUpdateFeedback');
+  if (manual && feedback) {
+    feedback.style.display = 'block';
+    feedback.style.background = 'rgba(0,240,255,0.1)';
+    feedback.style.color = '#00f0ff';
+    feedback.style.border = '1px solid rgba(0,240,255,0.3)';
+    feedback.textContent = (updateLang() === 'id') ? 'Sedang memeriksa pembaruan server...' : 'Checking server for updates...';
+  }
+
   try {
-    // Di web: fetch relative 'version.json?t=...'
-    // Di aplikasi native (PC/APK): fetch dari cloud endpoint Vercel agar selalu tahu rilis terbaru
-    let versionUrl = 'version.json?t=' + Date.now();
-    const isApp = (typeof isNativeApp === 'function' && isNativeApp()) || (window.location.protocol.indexOf('http') !== 0);
-    if (isApp) {
-      versionUrl = VITA_CLOUD_HOST + '/version.json?t=' + Date.now();
+    const endpoints = [];
+    if (window.location.protocol.indexOf('http') === 0 && !isNativeApp()) {
+      endpoints.push('version.json?t=' + Date.now());
+    }
+    endpoints.push('https://raw.githubusercontent.com/zrilxd20-code/VITA/main/version.json?t=' + Date.now());
+    endpoints.push(VITA_CLOUD_HOST + '/version.json?t=' + Date.now());
+
+    let remoteVer = null;
+    for (const url of endpoints) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data && typeof data.version === 'string') {
+            remoteVer = data.version;
+            break;
+          }
+        }
+      } catch (_) {}
     }
 
-    const res = await fetch(versionUrl, { cache: 'no-store' });
-    if (!res || !res.ok) return;
-    const data = await res.json();
-    if (!data || typeof data.version !== 'string') return;
-    if (data.version === APP_VERSION) return;
-    let dismissed = '';
-    try { dismissed = localStorage.getItem('vita_update_dismissed') || ''; } catch (e) {}
-    if (dismissed === data.version) return;
-    showUpdateBanner(data.version);
-  } catch (e) {}
+    if (!remoteVer) {
+      if (manual && feedback) {
+        feedback.style.display = 'block';
+        feedback.style.background = 'rgba(255,100,100,0.1)';
+        feedback.style.color = '#ff6b6b';
+        feedback.style.border = '1px solid rgba(255,100,100,0.3)';
+        feedback.textContent = (updateLang() === 'id') ? 'Tidak dapat terhubung ke server pembaruan (offline).' : 'Unable to connect to update server (offline).';
+      }
+      return;
+    }
+
+    const cmp = compareSemver(remoteVer, APP_VERSION);
+    if (cmp > 0) {
+      // Ada versi baru!
+      if (manual && feedback) {
+        feedback.style.display = 'block';
+        feedback.style.background = 'rgba(0,255,136,0.1)';
+        feedback.style.color = '#00ff88';
+        feedback.style.border = '1px solid rgba(0,255,136,0.3)';
+        feedback.textContent = (updateLang() === 'id') 
+          ? ('Pembaruan v' + remoteVer + ' tersedia! Klik tombol di bawah.') 
+          : ('Update v' + remoteVer + ' available! Click below.');
+      }
+      showUpdateBanner(remoteVer);
+    } else {
+      if (manual && feedback) {
+        feedback.style.display = 'block';
+        feedback.style.background = 'rgba(0,240,255,0.1)';
+        feedback.style.color = '#00f0ff';
+        feedback.style.border = '1px solid rgba(0,240,255,0.3)';
+        feedback.textContent = (updateLang() === 'id') 
+          ? ('✓ VITA sudah dalam versi terbaru (v' + APP_VERSION + ').') 
+          : ('✓ VITA is already up to date (v' + APP_VERSION + ').');
+      }
+    }
+  } catch (err) {
+    if (manual && feedback) {
+      feedback.style.display = 'block';
+      feedback.style.background = 'rgba(255,100,100,0.1)';
+      feedback.style.color = '#ff6b6b';
+      feedback.style.border = '1px solid rgba(255,100,100,0.3)';
+      feedback.textContent = (updateLang() === 'id') ? 'Gagal memeriksa pembaruan.' : 'Update check failed.';
+    }
+  }
 }
+
+window.checkVitaUpdateManual = function() {
+  checkVitaUpdate(true);
+};
 
 function isApkOrWebView() {
   try {
@@ -2423,6 +2498,17 @@ function applyVitaUpdate() {
   const isApp = typeof isNativeApp === 'function' && isNativeApp();
   if (isApp) {
     const isAndroid = (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) || navigator.userAgent.toLowerCase().includes('android');
+    if (isAndroid) {
+      if (typeof openAndroidDownloadModal === 'function') {
+        openAndroidDownloadModal();
+        return;
+      }
+    } else {
+      if (typeof openPcDownloadModal === 'function') {
+        openPcDownloadModal();
+        return;
+      }
+    }
     const updateUrl = isAndroid 
       ? VITA_CLOUD_HOST + '/downloads/vita.apk'
       : VITA_CLOUD_HOST + '/downloads/vita.exe';

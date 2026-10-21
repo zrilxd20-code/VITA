@@ -412,10 +412,10 @@ const T = {
         zoom_label: 'Perbesaran', zoom_in: 'Perbesar', zoom_out: 'Perkecil', zoom_reset: 'Reset perbesaran',
         ctrl1: 'WASD / Panah: bergerak', ctrl2: 'SPACE / Klik: menyerang', ctrl3: 'SHIFT: dash kebal — tembus jebakan & serangan',
         ctrl4: 'Kumpulkan semua artefak lalu menuju pintu keluar.',
-        death_title: '[ SUBJEK TERMINASI // GUGUR ]', death_level_lbl: 'Sektor tercapai:', death_kills_lbl: 'Anomali dinetralisir:',
+        death_title: '[ SUBJEK TERMINASI — GUGUR ]', death_level_lbl: 'Sektor tercapai:', death_kills_lbl: 'Anomali dinetralisir:',
         retry: 'DARI AWAL', retry_level: 'ULANGI LEVEL INI',
         muted_on: 'Suara mati (tekan M untuk nyalakan)', muted_off: 'Suara nyala',
-        win_title: '[ SEKTOR BERSIH // FASILITAS AMAN ]', win_sub: 'Semua 15 sektor & The Monolith telah ditaklukkan!',
+        win_title: '[ SEKTOR BERSIH — FASILITAS AMAN ]', win_sub: 'Semua 15 sektor & The Monolith telah ditaklukkan!',
         win_kills_lbl: 'Total anomali dinetralisir:', win_time_lbl: 'Waktu total:',
         win_best_lbl: 'Rekor terbaik:', play_again: 'MAIN LAGI',
         win_grade_lbl: 'Peringkat:', new_best: '[ REKOR BARU TERTINGGI ]',
@@ -430,7 +430,7 @@ const T = {
         admin_login_desc: 'Masukkan kode konsol fasilitas untuk membuka akses admin.',
         admin_code_lbl: 'Kode', admin_enter: 'MASUK', admin_cancel: 'Batal',
         admin_wrong: 'Kode salah! Akses ditolak.',
-        admin_panel_title: 'PANEL ADMIN // FASILITAS',
+        admin_panel_title: 'PANEL ADMIN — FASILITAS',
         admin_panel_desc: 'Lompat ke level / boss mana pun untuk testing.',
         admin_boss: 'UJI THE MONOLITH (LV 15)', admin_unlock: 'BUKA AIRLOCK EXIT',
         admin_god_on: 'PROTOKOL KEBAL: ON', admin_god_off: 'PROTOKOL KEBAL: OFF',
@@ -451,10 +451,10 @@ const T = {
         admin_modal_perks: 'SKILL & PERK OPERATIF',
         admin_modal_close: 'TUTUP [ESC]',
         admin_chapter_fmt: 'Sektor {n}',
-        admin_banner_title: 'OTORISASI ADMIN PENUH // ARSENAL & SKILL MAKSIMAL',
+        admin_banner_title: 'OTORISASI ADMIN PENUH — ARSENAL & SKILL MAKSIMAL',
         admin_banner_sub: 'Semua 15 Sektor Fasilitas terbuka & 6 senjata aktif. Pilih sektor untuk langsung meluncur:',
         admin_select_sector: 'PILIH SEKTOR OPERASI (1 - 15)',
-        admin_advanced_tools: 'OPSI TAMBAHAN // UJI SENJATA & SKILL SATUAN',
+        admin_advanced_tools: 'OPSI TAMBAHAN — UJI SENJATA & SKILL SATUAN',
         admin_full_loadout_msg: '⚡ ARSENAL & SKILL MAKSIMAL DIAKTIFKAN!',
         settings_reset_default: 'KEMBALIKAN PENGATURAN KE BAWAAN',
         boss_threat: 'PREDATOR PUNCAK TERDETEKSI',
@@ -480,6 +480,10 @@ const T = {
         settings_screen_shake: 'Goyangan Layar (Screen Shake)',
         settings_minimap: 'Tampilkan Radar Mini-map',
         settings_show_fps: 'Tampilkan Indikator FPS',
+        settings_sec_version: 'VERSI & PEMBARUAN (UPDATE)',
+        settings_cur_ver_lbl: 'VERSI APLIKASI SAAT INI',
+        settings_check_update_btn: '↻ CEK PEMBARUAN',
+        settings_reset_default: 'KEMBALIKAN PENGATURAN KE BAWAAN',
         settings_sec_gameplay: 'GAMEPLAY & SISTEM',
         settings_interface_lang: 'Bahasa Antarmuka',
         settings_diff_level: 'Tingkat Kesulitan',
@@ -492,7 +496,7 @@ const T = {
         pause_settings_title: 'PENGATURAN FASILITAS',
         // Arsenal & Sistem Senjata Antar-Level
         armory_title: 'PILIH PASOKAN SENJATA BARU',
-        armory_eyebrow: 'ARSENAL OPERATIF // PROTOKOL PENAHANAN ANOMALI',
+        armory_eyebrow: 'ARSENAL OPERATIF — PROTOKOL PENAHANAN ANOMALI',
         armory_sub: 'Tingkat anomali sektor meningkat. Ambil satu persenjataan taktis untuk melanjutkan misi:',
         armory_choose: 'PILIH SENJATA INI',
         armory_owned: 'SUDAH DIMILIKI',
@@ -541,20 +545,20 @@ const T = {
         // Prologue Cutscene
         prologue_skip: 'LEWATI ▸▸',
         prologue_continue: 'TEKAN TOMBOL APAPUN UNTUK MELANJUTKAN',
-        prologue_classify: 'RAHASIA TERTINGGI // HANYA UNTUK PERSONEL BERWENANG',
-        prologue_date: 'LOG INSIDEN — HARI KE-0 // FASILITAS VITA',
+        prologue_classify: 'RAHASIA TERTINGGI — HANYA UNTUK PERSONEL BERWENANG',
+        prologue_date: 'LOG INSIDEN — HARI KE-0 — FASILITAS VITA',
         prologue_title: 'SEKTOR TERLUPAKAN',
         // Combat Adrenaline & Anomaly Lore
         combo_double: 'ELIMINASI GANDA',
         combo_triple: 'ELIMINASI TIGA',
-        combo_carnage: 'BANTAIAN // CARNAGE',
-        combo_godlike: 'TAK TERBENDUNG // OVERKILL',
+        combo_carnage: 'BANTAIAN — CARNAGE',
+        combo_godlike: 'TAK TERBENDUNG — OVERKILL',
         lore_disc_found: 'DATA DISC DITEMUKAN',
         barrel_detonated: 'BIOHAZARD MELEDAK',
-        boss_monolith_phase1: 'FASE I // INTI RUNIK',
-        boss_monolith_phase2: 'FASE II // MATA KOSMIK',
-        boss_monolith_phase3: 'FASE III // AMUKAN NOVA',
-        obj_collect: 'KUMPULKAN ARTEFAK', obj_exit: 'MENUJU EXIT // AIRLOCK TERBUKA',
+        boss_monolith_phase1: 'FASE I — INTI RUNIK',
+        boss_monolith_phase2: 'FASE II — MATA KOSMIK',
+        boss_monolith_phase3: 'FASE III — AMUKAN NOVA',
+        obj_collect: 'KUMPULKAN ARTEFAK', obj_exit: 'MENUJU EXIT — AIRLOCK TERBUKA',
         tut_move: 'WASD / Joystick: bergerak — kumpulkan artefak berpendar',
         tut_attack: 'SPACE / Klik: serang ke arah kursor. SHIFT: dash kebal!',
         tut_exit: 'Semua artefak didapat! Cari portal EXIT hijau sekarang!',
@@ -588,19 +592,19 @@ const T = {
         dragon_firestorm: 'SEMBURAN API NAGA!',
         lich_summon: 'PEMANGGILAN ARWAH GELAP!',
         beholder_sweep: 'SOROTAN SINAR OCULARIS!',
-        tut_step1_badge: 'PROTOKOL 01 // LOKOMOSI',
+        tut_step1_badge: 'PROTOKOL 01 — LOKOMOSI',
         tut_step1_msg: 'Gunakan WASD / Tombol Panah / Joystick sentuh untuk menggerakkan drone BMPT',
         tut_step1_sub: 'Kalibrasi roda & track...',
         tut_step1_done: 'SISTEM LOKOMOSI TERKALIBRASI',
-        tut_step2_badge: 'PROTOKOL 02 // PENDORONG OVERDRIVE',
+        tut_step2_badge: 'PROTOKOL 02 — PENDORONG OVERDRIVE',
         tut_step2_msg: 'Tekan SHIFT / Tombol Dash untuk melesat kebal & menghindari bahaya',
         tut_step2_sub: 'Uji sistem pendorong dash...',
         tut_step2_done: 'PENDORONG OVERDRIVE AKTIF',
-        tut_step3_badge: 'PROTOKOL 03 // WEAPON POD',
+        tut_step3_badge: 'PROTOKOL 03 — WEAPON POD',
         tut_step3_msg: 'Klik Kiri / SPASI / Tombol Serang untuk mengaktifkan gergaji termal',
         tut_step3_sub: 'Uji modul senjata taktis...',
         tut_step3_done: 'MODUL SENJATA TERKALIBRASI',
-        tut_step4_badge: 'PROTOKOL 04 // DIREKTIF MISI',
+        tut_step4_badge: 'PROTOKOL 04 — DIREKTIF MISI',
         tut_step4_msg: 'Kumpulkan semua Anomali Artefak di labirin untuk membuka pintu exit',
         tut_step4_sub: 'Anomali terdeteksi di radar minimap',
         tut_step4_done: 'DIREKTIF MISI DITERIMA',
@@ -664,15 +668,15 @@ const T = {
         orient_btn_dismiss: 'TETAP MAIN TEGAK (ABAIKAN)',
         plat_selector_title: 'PILIH PLATFORM OPERASI VITA',
         plat_selector_sub: 'Pilih metode bermain yang Anda inginkan: Browser Web, Klien PC Windows, atau APK Android.',
-        plat_web_badge: 'ONLINE BROWSER // VERCEL',
+        plat_web_badge: 'ONLINE BROWSER — VERCEL',
         plat_web_title: 'MAIN DI WEB (VERCEL)',
         plat_web_desc: 'Bermain langsung tanpa instalasi di browser modern. Mendukung Co-op 4 Pemain & Cloud Save.',
         plat_web_btn: 'MAINKAN DI WEB (TAB BARU) ▸',
-        plat_pc_badge: 'WINDOWS 10/11 // STANDALONE',
+        plat_pc_badge: 'WINDOWS 10/11 — STANDALONE',
         plat_pc_title: 'EDISI PC (WINDOWS)',
         plat_pc_desc: 'Aplikasi mandiri offline ultra-ringan tanpa tab browser. Kontrol presisi keyboard & mouse.',
         plat_pc_btn: 'PILIH / UNDUH PC ▸',
-        plat_android_badge: 'NATIVE APK // SENTUH HP',
+        plat_android_badge: 'NATIVE APK — SENTUH HP',
         plat_android_title: 'EDISI ANDROID (APK)',
         plat_android_desc: 'File installer APK smartphone. Tampilan layar penuh & kontrol sentuh horizontal yang nyaman.',
         plat_android_btn: 'PILIH / UNDUH ANDROID ▸',
@@ -719,8 +723,8 @@ const T = {
         workbench_tier2: 'TIER II (OVERCLOCKED)',
         workbench_upgrade_btn: 'PASANG MODIFIKASI TIER II',
         workbench_upgraded_tag: 'MODIFIKASI TERPASANG ✓',
-        mode_campaign_btn: 'KAMPANYE // 15 SEKTOR',
-        mode_endless_btn: 'ARENA SURVIVAL // HORDE',
+        mode_campaign_btn: 'KAMPANYE — 15 SEKTOR',
+        mode_endless_btn: 'ARENA SURVIVAL — HORDE',
         mode_active_campaign: 'MODE: KAMPANYE (SEKTOR 1-15)',
         mode_active_endless: 'MODE: ARENA SURVIVAL (HORDE DEFENSE)',
         endless_wave_banner: 'GELOMBANG {w} DIMULAI!',
@@ -733,7 +737,7 @@ const T = {
         pause_exit_btn: 'KELUAR KE MENU UTAMA (EXIT)',
         talent_btn: 'POHON TALENTA (SKILL TREE)',
         talent_title: 'POHON TALENTA & PROTOKOL JEJAK',
-        talent_sub: 'Sistem peningkatan saraf & modul bionik permanen // Persisten antar-misi',
+        talent_sub: 'Sistem peningkatan saraf & modul bionik permanen — Persisten antar-misi',
         talent_nanites_lbl: 'INTI NANIT:',
         talent_branch_combat: 'JALUR TEMPUR (OFFENSE)',
         talent_branch_defense: 'JALUR KETAHANAN (SURVIVAL)',
@@ -784,10 +788,10 @@ const T = {
         zoom_label: 'Zoom', zoom_in: 'Zoom in', zoom_out: 'Zoom out', zoom_reset: 'Reset zoom',
         ctrl1: 'WASD / Arrows: move', ctrl2: 'SPACE / Click: attack', ctrl3: 'SHIFT: phase dash — invincible, pass traps & hits',
         ctrl4: 'Collect all artifacts, then reach the exit portal.',
-        death_title: '[ SUBJECT TERMINATED // DEAD ]', death_level_lbl: 'Sector reached:', death_kills_lbl: 'Monsters neutralized:',
+        death_title: '[ SUBJECT TERMINATED — DEAD ]', death_level_lbl: 'Sector reached:', death_kills_lbl: 'Monsters neutralized:',
         retry: 'FROM START', retry_level: 'RETRY LEVEL',
         muted_on: 'Muted (press M to unmute)', muted_off: 'Sound on',
-        win_title: '[ SECTOR PURGED // FACILITY SECURE ]', win_sub: 'All 15 sectors conquered & The Monolith neutralized!',
+        win_title: '[ SECTOR PURGED — FACILITY SECURE ]', win_sub: 'All 15 sectors conquered & The Monolith neutralized!',
         win_kills_lbl: 'Total monsters neutralized:', win_time_lbl: 'Total time:',
         win_best_lbl: 'Best record:', play_again: 'PLAY AGAIN',
         win_grade_lbl: 'Rank:', new_best: '[ NEW BEST RECORD ]',
@@ -802,7 +806,7 @@ const T = {
         admin_login_desc: 'Enter the facility console code to unlock admin access.',
         admin_code_lbl: 'Code', admin_enter: 'ENTER', admin_cancel: 'Cancel',
         admin_wrong: 'Wrong code! Access denied.',
-        admin_panel_title: 'ADMIN PANEL // FACILITY',
+        admin_panel_title: 'ADMIN PANEL — FACILITY',
         admin_panel_desc: 'Jump to any level / boss for testing.',
         admin_boss: 'TEST THE MONOLITH (LV 15)', admin_unlock: 'UNLOCK EXIT AIRLOCK',
         admin_god_on: 'INVULNERABLE: ON', admin_god_off: 'INVULNERABLE: OFF',
@@ -823,10 +827,10 @@ const T = {
         admin_modal_perks: 'OPERATIVE SKILLS & PERKS',
         admin_modal_close: 'CLOSE [ESC]',
         admin_chapter_fmt: 'Sector {n}',
-        admin_banner_title: 'FULL ADMIN AUTHORIZATION // ALL WEAPONS & MAX SKILLS',
+        admin_banner_title: 'FULL ADMIN AUTHORIZATION — ALL WEAPONS & MAX SKILLS',
         admin_banner_sub: 'All 15 Facility Sectors unlocked & 6 weapons active. Select a sector to deploy immediately:',
         admin_select_sector: 'SELECT OPERATION SECTOR (1 - 15)',
-        admin_advanced_tools: 'ADVANCED OPTIONS // TEST INDIVIDUAL WEAPONS & SKILLS',
+        admin_advanced_tools: 'ADVANCED OPTIONS — TEST INDIVIDUAL WEAPONS & SKILLS',
         admin_full_loadout_msg: '⚡ FULL ARSENAL & MAX SKILLS ENGAGED!',
         settings_reset_default: 'RESET ALL SETTINGS TO DEFAULT',
         boss_threat: 'APEX PREDATOR DETECTED',
@@ -852,6 +856,10 @@ const T = {
         settings_screen_shake: 'Screen Shake',
         settings_minimap: 'Minimap Radar',
         settings_show_fps: 'Show FPS Indicator',
+        settings_sec_version: 'VERSION & UPDATES',
+        settings_cur_ver_lbl: 'CURRENT APP VERSION',
+        settings_check_update_btn: '↻ CHECK FOR UPDATES',
+        settings_reset_default: 'RESTORE DEFAULT SETTINGS',
         settings_sec_gameplay: 'GAMEPLAY & SYSTEM',
         settings_interface_lang: 'Interface Language',
         settings_diff_level: 'Difficulty Level',
@@ -864,7 +872,7 @@ const T = {
         pause_settings_title: 'FACILITY SETTINGS',
         // Arsenal & Inter-Level Weapon System
         armory_title: 'SELECT NEW WEAPON SUPPLY',
-        armory_eyebrow: 'OPERATIVE ARSENAL // ANOMALY CONTAINMENT PROTOCOL',
+        armory_eyebrow: 'OPERATIVE ARSENAL — ANOMALY CONTAINMENT PROTOCOL',
         armory_sub: 'Sector anomaly level rising. Requisition one tactical armament to proceed:',
         armory_choose: 'SELECT THIS WEAPON',
         armory_owned: 'ALREADY OWNED',
@@ -913,20 +921,20 @@ const T = {
         // Prologue Cutscene
         prologue_skip: 'SKIP ▸▸',
         prologue_continue: 'PRESS ANY KEY TO CONTINUE',
-        prologue_classify: 'TOP SECRET // AUTHORIZED PERSONNEL ONLY',
-        prologue_date: 'INCIDENT LOG — DAY ZERO // VITA FACILITY',
+        prologue_classify: 'TOP SECRET — AUTHORIZED PERSONNEL ONLY',
+        prologue_date: 'INCIDENT LOG — DAY ZERO — VITA FACILITY',
         prologue_title: 'FORGOTTEN SECTOR',
         // Combat Adrenaline & Anomaly Lore
         combo_double: 'DOUBLE KILL',
         combo_triple: 'TRIPLE KILL',
         combo_carnage: 'CARNAGE',
-        combo_godlike: 'UNSTOPPABLE // OVERKILL',
+        combo_godlike: 'UNSTOPPABLE — OVERKILL',
         lore_disc_found: 'DATA DISC RECOVERED',
         barrel_detonated: 'BIOHAZARD DETONATION',
-        boss_monolith_phase1: 'PHASE I // RUNIC CORE',
-        boss_monolith_phase2: 'PHASE II // COSMIC EYE',
-        boss_monolith_phase3: 'PHASE III // BERSERK NOVA',
-        obj_collect: 'COLLECT ARTIFACTS', obj_exit: 'GO TO EXIT // AIRLOCK OPEN',
+        boss_monolith_phase1: 'PHASE I — RUNIC CORE',
+        boss_monolith_phase2: 'PHASE II — COSMIC EYE',
+        boss_monolith_phase3: 'PHASE III — BERSERK NOVA',
+        obj_collect: 'COLLECT ARTIFACTS', obj_exit: 'GO TO EXIT — AIRLOCK OPEN',
         tut_move: 'WASD / Joystick: move — collect glowing artifacts',
         tut_attack: 'SPACE / Click: attack toward cursor. SHIFT: invincible dash!',
         tut_exit: 'All artifacts secured! Find the green EXIT portal now!',
@@ -960,19 +968,19 @@ const T = {
         dragon_firestorm: 'DRAGON FIRESTORM!',
         lich_summon: 'DARK SPIRIT SUMMON!',
         beholder_sweep: 'OCULARIS EYE BEAM SWEEP!',
-        tut_step1_badge: 'PROTOCOL 01 // LOCOMOTION',
+        tut_step1_badge: 'PROTOCOL 01 — LOCOMOTION',
         tut_step1_msg: 'Use WASD / Arrow Keys / Touch Joystick to navigate the BMPT drone',
         tut_step1_sub: 'Calibrating tracks & wheels...',
         tut_step1_done: 'LOCOMOTION SYSTEM CALIBRATED',
-        tut_step2_badge: 'PROTOCOL 02 // OVERDRIVE THRUSTERS',
+        tut_step2_badge: 'PROTOCOL 02 — OVERDRIVE THRUSTERS',
         tut_step2_msg: 'Press SHIFT / Dash Button to surge invincibly past danger',
         tut_step2_sub: 'Testing dash thrusters...',
         tut_step2_done: 'OVERDRIVE THRUSTERS ACTIVE',
-        tut_step3_badge: 'PROTOCOL 03 // WEAPON POD',
+        tut_step3_badge: 'PROTOCOL 03 — WEAPON POD',
         tut_step3_msg: 'Left Click / SPACEBAR / Attack Button to strike with thermal saw',
         tut_step3_sub: 'Testing tactical weapon module...',
         tut_step3_done: 'WEAPON MODULE CALIBRATED',
-        tut_step4_badge: 'PROTOCOL 04 // MISSION DIRECTIVE',
+        tut_step4_badge: 'PROTOCOL 04 — MISSION DIRECTIVE',
         tut_step4_msg: 'Collect all glowing Artifact Anomalies to unlock the sector exit',
         tut_step4_sub: 'Anomalies detected on minimap radar',
         tut_step4_done: 'MISSION DIRECTIVE ACKNOWLEDGED',
@@ -1036,15 +1044,15 @@ const T = {
         orient_btn_dismiss: 'CONTINUE PORTRAIT (DISMISS)',
         plat_selector_title: 'SELECT VITA OPERATIONAL PLATFORM',
         plat_selector_sub: 'Choose your preferred deployment: Instant Web Browser, Windows PC Client, or Android APK.',
-        plat_web_badge: 'ONLINE BROWSER // VERCEL',
+        plat_web_badge: 'ONLINE BROWSER — VERCEL',
         plat_web_title: 'WEB PLAY (VERCEL)',
         plat_web_desc: 'Play instantly in your browser with zero installation. Supports 4-Player Co-op & Cloud Sync.',
         plat_web_btn: 'PLAY IN WEB (NEW TAB) ▸',
-        plat_pc_badge: 'WINDOWS 10/11 // STANDALONE',
+        plat_pc_badge: 'WINDOWS 10/11 — STANDALONE',
         plat_pc_title: 'PC EDITION (WINDOWS)',
         plat_pc_desc: 'Ultra-lightweight offline standalone window without browser tabs. Precision keyboard & mouse.',
         plat_pc_btn: 'SELECT / DOWNLOAD PC ▸',
-        plat_android_badge: 'NATIVE APK // TOUCH MOBILE',
+        plat_android_badge: 'NATIVE APK — TOUCH MOBILE',
         plat_android_title: 'ANDROID EDITION (APK)',
         plat_android_desc: 'Smartphone installer APK package. Clean fullscreen interface & responsive horizontal touch controls.',
         plat_android_btn: 'SELECT / DOWNLOAD ANDROID ▸',
@@ -1091,8 +1099,8 @@ const T = {
         workbench_tier2: 'TIER II (OVERCLOCKED)',
         workbench_upgrade_btn: 'INSTALL TIER II MODIFICATION',
         workbench_upgraded_tag: 'MODIFICATION INSTALLED ✓',
-        mode_campaign_btn: 'CAMPAIGN // 15 SECTORS',
-        mode_endless_btn: 'SURVIVAL ARENA // HORDE',
+        mode_campaign_btn: 'CAMPAIGN — 15 SECTORS',
+        mode_endless_btn: 'SURVIVAL ARENA — HORDE',
         mode_active_campaign: 'MODE: CAMPAIGN (SECTORS 1-15)',
         mode_active_endless: 'MODE: SURVIVAL ARENA (HORDE DEFENSE)',
         endless_wave_banner: 'WAVE {w} INCOMING!',
@@ -1105,7 +1113,7 @@ const T = {
         pause_exit_btn: 'EXIT TO MAIN MENU',
         talent_btn: 'TALENT TREE (TRACES)',
         talent_title: 'OPERATIVE TALENT TREE & TRACES',
-        talent_sub: 'Permanent neural upgrades & bionic modules // Persistent across runs',
+        talent_sub: 'Permanent neural upgrades & bionic modules — Persistent across runs',
         talent_nanites_lbl: 'NANITE CORES:',
         talent_branch_combat: 'COMBAT BRANCH (OFFENSE)',
         talent_branch_defense: 'DEFENSE BRANCH (SURVIVAL)',
@@ -2371,7 +2379,7 @@ function playEpilogueCutscene(onComplete) {
     const intro = script ? (isId ? script.intro_id : script.intro_en) : 'SECTOR 15 PURGED';
     const lines = script ? (isId ? script.lines_id : script.lines_en) : ['The labyrinth is quiet.'];
 
-    let html = `<div class="prologue-header"><span class="prologue-classify">${isId ? 'MISI SELESAI // FASILITAS AMAN' : 'MISSION COMPLETE // FACILITY SECURE'}</span><span class="prologue-date">${isId ? 'EPILOG NARRATIF' : 'NARRATIVE EPILOGUE'}</span></div>`;
+    let html = `<div class="prologue-header"><span class="prologue-classify">${isId ? 'MISI SELESAI — FASILITAS AMAN' : 'MISSION COMPLETE — FACILITY SECURE'}</span><span class="prologue-date">${isId ? 'EPILOG NARRATIF' : 'NARRATIVE EPILOGUE'}</span></div>`;
     html += `<div class="prologue-glitch" data-text="${intro}" style="margin-bottom:18px">${intro}</div>`;
     lines.forEach((l, i) => {
         html += `<div class="prologue-line narrator" style="opacity:0;animation:fadeInLine 0.9s forwards;animation-delay:${0.8 + i * 1.4}s;margin-bottom:12px">${l}</div>`;
@@ -4360,7 +4368,7 @@ function buildLevelWorld(level) {
             lang === 'en' ? 'SEC-12: DEEP BIOMASS MARROW' : 'SEKTOR 12: SUMSUM BIOMASSA PURBA',
             lang === 'en' ? 'SEC-13: SUBTERRANEAN RESONANCE' : 'SEKTOR 13: GEMA RESONANSI CARNIS',
             lang === 'en' ? 'SEC-14: THE SACRIFICIAL THRESHOLD' : 'SEKTOR 14: AMBANG BATAS PENGORBANAN',
-            lang === 'en' ? 'SEC-15: THE MONOLITH // COELUM CARNIS' : 'SEKTOR 15: THE MONOLITH // COELUM CARNIS'
+            lang === 'en' ? 'SEC-15: THE MONOLITH — COELUM CARNIS' : 'SEKTOR 15: THE MONOLITH — COELUM CARNIS'
         ];
         const zoneNames = lang === 'en'
             ? ['Subterranean Nursery', 'Spore Extraction Lab', 'Crawler Trench', 'Bone Graft Chamber', 'Harvester Stalk Forest', 'Porcelain Ward', 'The Living Corridors', 'Organ Well Abyss', 'Watcher Sanctorum', 'Apex Containment Core', 'Tissue Receptacle Labs', 'Black Marrow Trench', 'Vocal Organ Chamber', 'Monolith Antechamber', 'Sanctum of the Titan']
@@ -4372,7 +4380,7 @@ function buildLevelWorld(level) {
 
             announce.innerHTML = `
                 <div class="eas-broadcast">
-                    <div class="eas-header">⚠️ ${lang === 'en' ? 'GLOBAL EMERGENCY // EAS LEVEL-5 BROADCAST' : 'DARURAT GLOBAL // SIARAN PERINGATAN EAS LEVEL-5'} ⚠️</div>
+                    <div class="eas-header">⚠️ ${lang === 'en' ? 'GLOBAL EMERGENCY — EAS LEVEL-5 BROADCAST' : 'DARURAT GLOBAL — SIARAN PERINGATAN EAS LEVEL-5'} ⚠️</div>
                     <div class="eas-title">${lang === 'en' ? 'CONVERGENCE DETECTED: 7 MONOLITHS MIGRATING' : 'KONVERGENSI TERDETEKSI: 7 MONOLITH BERGERAK'}</div>
                     <div class="eas-sub">${lang === 'en' ? 'PREVENT THE MERGED &bull; TERMINATE SECTOR 15 MONOLITH' : 'CEGAH PENYATUAN THE MERGED &bull; ELIMINASI MONOLITH SEKTOR 15'}</div>
                 </div>
@@ -4380,7 +4388,7 @@ function buildLevelWorld(level) {
             announce.style.fontSize = '';
             announce.style.opacity = 1;
             const bEl = document.getElementById('uiBadge');
-            if (bEl) bEl.textContent = 'GLOBAL-ALERT // SEC-15';
+            if (bEl) bEl.textContent = 'GLOBAL-ALERT — SEC-15';
             setTimeout(() => { announce.style.opacity = 0; }, 4800);
         } else {
             const msg = msgList[level] || ('Level ' + (level + 1));
@@ -4390,7 +4398,7 @@ function buildLevelWorld(level) {
             announce.style.fontSize = level === 9 ? '26px' : '22px';
             announce.style.opacity = 1;
             const bEl = document.getElementById('uiBadge');
-            if (bEl) bEl.textContent = 'CARNIS-SEC // LV' + (level + 1);
+            if (bEl) bEl.textContent = 'CARNIS-SEC — LV' + (level + 1);
             setTimeout(() => { announce.style.opacity = 0; announce.style.fontSize = ''; }, 3200);
         }
 
@@ -5663,7 +5671,7 @@ function attackMonster(m, customDmg) {
             coinsCollected = artifacts ? artifacts.length : 1;
             floatingTexts.push({
                 x: m.x, y: m.y - 40,
-                text: lang === 'en' ? '[ THE MONOLITH DEFEATED // EVACUATION OPEN ]' : '[ THE MONOLITH TUMBANG // EVAKUASI TERBUKA ]',
+                text: lang === 'en' ? '[ THE MONOLITH DEFEATED — EVACUATION OPEN ]' : '[ THE MONOLITH TUMBANG — EVAKUASI TERBUKA ]',
                 color: '#f1c40f', life: 160, maxLife: 160
             });
             sWin();
@@ -6466,7 +6474,11 @@ function updatePlayer() {
         }
     }
 
-    if (mouseActive) {
+    if (document.body.classList.contains('touch-on')) {
+        if (touchMove && touchMove.active && (touchMove.dx !== 0 || touchMove.dy !== 0)) {
+            player.facing = Math.atan2(touchMove.dy, touchMove.dx);
+        }
+    } else if (mouseActive) {
         const wpc = getWorldPerCss();
         const wx = cameraX + (mouseX - W / 2) * wpc;
         const wy = cameraY + (mouseY - H / 2) * wpc;
@@ -10115,7 +10127,7 @@ function drawMonsters() {
             ctx.textAlign = 'center';
             ctx.shadowColor = '#ff0000';
             ctx.shadowBlur = 15;
-            ctx.fillText('[ THE MONOLITH // COELUM CARNIS ]', 0, headTopY - 26);
+            ctx.fillText('[ THE MONOLITH — COELUM CARNIS ]', 0, headTopY - 26);
             ctx.shadowBlur = 0;
 
             // Massive Colossal Boss HP Bar di atas kepala donat
@@ -10144,7 +10156,7 @@ function drawMonsters() {
             ctx.textAlign = 'center';
             ctx.shadowColor = '#ff0000';
             ctx.shadowBlur = 10;
-            ctx.fillText(lang === 'en' ? '[ MOTHER HARVESTER // APEX CARNIS ]' : '[ INDUK HARVESTER // APEX CARNIS ]', 0, headTopY - 22);
+            ctx.fillText(lang === 'en' ? '[ MOTHER HARVESTER — APEX CARNIS ]' : '[ INDUK HARVESTER — APEX CARNIS ]', 0, headTopY - 22);
             ctx.shadowBlur = 0;
 
             // Bar HP Kolosal Mother Harvester
@@ -12317,6 +12329,7 @@ window.addEventListener('wheel', e => {
 }, { passive: true });
 
 document.addEventListener('mousemove', e => {
+    if (document.body.classList.contains('touch-on')) return; // ignore synthetic touch mousemove
     mouseX = e.clientX;
     mouseY = e.clientY;
     mouseActive = true;
@@ -12325,6 +12338,7 @@ document.addEventListener('mousemove', e => {
 
 isMouseDown = false;
 document.addEventListener('mousedown', e => {
+    if (document.body.classList.contains('touch-on')) return; // ignore synthetic touch mousedown
     if (e.target && e.target.closest && (e.target.closest('#touchUI') || e.target.closest('#weaponBar') || e.target.closest('#weaponSelectScreen'))) return;
     isMouseDown = true;
     if (gameState === 'playing') playerAttack();
@@ -12881,7 +12895,7 @@ setupZoomHud();
 setupZoomGesture();
 
 function drawCrosshair() {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || document.body.classList.contains('touch-on')) return;
     const now = Date.now();
     const recoil = attackCooldown > 0 ? 5 : 0;
     const pulse = 1 + Math.sin(now / 150) * 0.08;
@@ -14874,7 +14888,7 @@ function sampleAndSendPeerInput() {
         dy /= len;
         lp.facing = Math.atan2(dy, dx);
     }
-    if (mouseActive) {
+    if (mouseActive && !document.body.classList.contains('touch-on')) {
         const wpc = getWorldPerCss();
         const wx = cameraX + (mouseX - W / 2) * wpc;
         const wy = cameraY + (mouseY - H / 2) * wpc;
@@ -16023,7 +16037,7 @@ function startEndlessMode() {
 
     // Kustomisasi objektif dan HUD arena survival
     const badge = document.getElementById('uiBadge');
-    if (badge) badge.textContent = 'SURVIVAL // WAVE 1';
+    if (badge) badge.textContent = 'SURVIVAL — WAVE 1';
     
     // Spawn gelombang monster pertama
     spawnEndlessWave(1);
@@ -16073,7 +16087,7 @@ function spawnEndlessWave(wave) {
     }
 
     const badge = document.getElementById('uiBadge');
-    if (badge) badge.textContent = 'SURVIVAL // WAVE ' + wave;
+    if (badge) badge.textContent = 'SURVIVAL — WAVE ' + wave;
     const exitText = document.getElementById('exitText');
     if (exitText) exitText.textContent = 'SURVIVE!';
 }
