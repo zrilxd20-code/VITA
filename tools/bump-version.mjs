@@ -33,4 +33,5 @@ bumpFile('index.html', [[prevQ, nextQ]]);
 bumpFile('js/home.js', [[`const APP_VERSION = '${prev}'`, `const APP_VERSION = '${next}'`]]);
 bumpFile('package.json', [[`"version": "${prev}"`, `"version": "${next}"`]]);
 bumpFile('src-tauri/tauri.conf.json', [[`"version": "${prev}"`, `"version": "${next}"`]]);
+bumpFile('src-tauri/Cargo.toml', [[`version = "${prev}"`, `version = "${next}"`]]);
 console.log(`\nBumped ${prev} → ${next}. Test: npm run check && npm test`);

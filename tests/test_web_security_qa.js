@@ -1386,7 +1386,7 @@ const tauriConfPath = path.join(__dirname, '../src-tauri/tauri.conf.json');
 assert(fs.existsSync(tauriConfPath), 'src-tauri/tauri.conf.json harus ada');
 const tauriConf = JSON.parse(fs.readFileSync(tauriConfPath, 'utf8'));
 assert(tauriConf.package?.productName === 'VITA', 'Nama produk Tauri harus VITA');
-assert(tauriConf.package?.version === '2.5.0', 'Versi Tauri harus 2.5.0');
+assert(tauriConf.package?.version === pkgJson.version, 'Versi Tauri harus selaras dengan package.json: ' + pkgJson.version);
 assert(tauriConf.build?.distDir === '../dist', 'Tauri distDir harus menunjuk ke ../dist');
 assert(tauriConf.tauri?.bundle?.identifier === 'com.zrilxd20.vita', 'Identifier bundle harus com.zrilxd20.vita');
 assert(tauriConf.tauri?.windows?.[0]?.width === 1280 && tauriConf.tauri?.windows?.[0]?.height === 800,
@@ -1396,7 +1396,7 @@ const cargoTomlPath = path.join(__dirname, '../src-tauri/Cargo.toml');
 assert(fs.existsSync(cargoTomlPath), 'src-tauri/Cargo.toml harus ada');
 const cargoToml = fs.readFileSync(cargoTomlPath, 'utf8');
 assert(cargoToml.includes('name = "vita"'), 'Cargo.toml harus memuat package vita');
-assert(cargoToml.includes('version = "2.5.0"'), 'Cargo.toml harus memuat versi 2.5.0');
+assert(cargoToml.includes(`version = "${pkgJson.version}"`), 'Cargo.toml harus memuat versi ' + pkgJson.version);
 assert(cargoToml.includes('tauri = { version = "1.5"'), 'Cargo.toml harus memakai tauri 1.5');
 
 // 28b. Kode sumber Rust (main.rs & build.rs)
