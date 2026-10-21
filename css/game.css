@@ -4110,3 +4110,107 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
         background: rgba(6, 12, 20, 0.82) !important;
     }
 }
+
+
+/* ============================================================
+   ANDROID 60FPS PERFORMANCE BOOST & CLEANEST MOBILE COMBAT HUD
+   ============================================================ */
+@media (pointer: coarse), (max-width: 900px), (max-height: 540px) {
+    /* 1. MATIKAN EFEK BERAT GPU COMPOSITOR DI ANDROID */
+    #gameView .fog {
+        display: none !important;
+    }
+    #gameView .scanlines {
+        display: none !important;
+    }
+    #gameView * {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    /* 2. PAUSE SCREEN SCROLLABLE & OVERFLOW-SAFE */
+    #gameView #pauseScreen {
+        max-height: 98vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 12px 14px !important;
+        justify-content: flex-start !important;
+    }
+    #gameView #pauseScreen .pause-actions-list {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        width: min(340px, 92vw) !important;
+        margin-bottom: 16px !important;
+    }
+
+    /* 3. CLEANEST IN-GAME HUD: HANYA STATUS VITAL MINI DI POJOK ATAS */
+    #gameView #ui {
+        top: 6px !important;
+        left: 6px !important;
+        padding: 4px 8px !important;
+        min-width: 0 !important;
+        max-width: 260px !important;
+        background: rgba(4, 8, 16, 0.94) !important;
+        border: 1px solid rgba(0, 240, 255, 0.3) !important;
+        border-left: 3px solid #00f0ff !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.8) !important;
+        gap: 2px !important;
+    }
+    /* Sembunyikan baris meta panjang di HP agar layar 95% bebas */
+    #gameView #ui .hud-sector-strip {
+        display: none !important;
+    }
+    #gameView #ui .bio-row {
+        display: none !important;
+    }
+    #gameView #ui .hud-tactical-grid .hud-stat-cell:first-child, /* Sembunyikan ATK */
+    #gameView #ui .hud-tactical-grid .hud-stat-cell:last-child { /* Sembunyikan Time */
+        display: none !important;
+    }
+    #gameView #ui .hud-tactical-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+        padding-top: 2px !important;
+        border-top: 1px solid rgba(0, 240, 255, 0.15) !important;
+    }
+    #gameView #ui .hud-hp-row {
+        gap: 4px !important;
+        padding: 1px 0 !important;
+    }
+    #gameView #ui .hp-bar-container {
+        height: 10px !important;
+        max-width: 110px !important;
+    }
+
+    /* 4. MINIMAP MINI & ERGONOMIS DI KANAN ATAS */
+    #gameView #minimap {
+        width: 85px !important;
+        height: 85px !important;
+        top: 6px !important;
+        right: 6px !important;
+        border-width: 1px !important;
+    }
+
+    /* 5. TOMBOL PAUSE & EXIT CEPAT DI SAMPING MINIMAP */
+    #gameView #btnTouchPause {
+        right: 100px !important;
+        top: 8px !important;
+        bottom: auto !important;
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 16px !important;
+        border-radius: 6px !important;
+        background: rgba(6, 12, 22, 0.9) !important;
+        border-color: rgba(0, 240, 255, 0.4) !important;
+    }
+    #gameView #btnTouchExit {
+        right: 144px !important;
+        top: 8px !important;
+        bottom: auto !important;
+        width: 38px !important;
+        height: 38px !important;
+        display: flex !important;
+    }
+}

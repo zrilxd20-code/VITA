@@ -49,7 +49,9 @@ let PIXEL = 3;
 // Backing store mengikuti DPR (dibatasi 2 agar hemat memori/GPU di HP DPR 3+).
 let RENDER_DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 function readRenderDpr() {
-    return Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    const isMobileTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 820);
+    const maxAllowed = isMobileTouch ? 1.25 : 2;
+    return Math.max(1, Math.min(maxAllowed, window.devicePixelRatio || 1));
 }
 // Hanya mode HD yang memakai resolusi perangkat penuh; mode pixel tetap ringan.
 function getPixelDpr() {
@@ -728,6 +730,7 @@ const T = {
         endless_survival_time_lbl: 'Waktu Bertahan Terbaik:',
         pause_bestiary_btn: 'ARSIP ANOMALI (BESTIARY)',
         pause_workbench_btn: 'BENGKEL SENJATA',
+        pause_exit_btn: 'KELUAR KE MENU UTAMA (EXIT)',
         talent_btn: 'POHON TALENTA (SKILL TREE)',
         talent_title: 'POHON TALENTA & PROTOKOL JEJAK',
         talent_sub: 'Sistem peningkatan saraf & modul bionik permanen // Persisten antar-misi',
@@ -1099,6 +1102,7 @@ const T = {
         endless_survival_time_lbl: 'Best Survival Time:',
         pause_bestiary_btn: 'ANOMALY ARCHIVE (BESTIARY)',
         pause_workbench_btn: 'WEAPON WORKBENCH',
+        pause_exit_btn: 'EXIT TO MAIN MENU',
         talent_btn: 'TALENT TREE (TRACES)',
         talent_title: 'OPERATIVE TALENT TREE & TRACES',
         talent_sub: 'Permanent neural upgrades & bionic modules // Persistent across runs',
@@ -15980,3 +15984,134 @@ window.openWorkbenchModal = openWorkbenchModal;
 window.closeWorkbenchModal = closeWorkbenchModal;
 window.openWorkbenchFromGame = openWorkbenchFromGame;
 
+
+
+// ============================================================
+// MODE ARENA SURVIVAL TAK BERUJUNG (ENDLESS HORDE MODE)
+// ============================================================
+let isEndlessMode = false;
+let endlessWave = 1;
+let endlessKills = 0;
+let endlessWaveCleared = false;
+let endlessWaveClearTimer = 0;
+
+function startEndlessMode() {
+    ensureAudio();
+    isEndlessMode = true;
+    endlessWave = 1;
+    endlessKills = 0;
+    endlessWaveCleared = false;
+    endlessWaveClearTimer = 0;
+    
+    // Sembunyikan semua overlay menu
+    const ss = document.getElementById('startScreen'); if (ss) ss.style.display = 'none';
+    const ds = document.getElementById('deathScreen'); if (ds) ds.style.display = 'none';
+    const ws = document.getElementById('winScreen'); if (ws) ws.style.display = 'none';
+    const ps = document.getElementById('pauseScreen'); if (ps) ps.classList.remove('open');
+    const pro = document.getElementById('prologueScreen'); if (pro) pro.style.display = 'none';
+
+    gameState = 'playing';
+    menuDemo = false;
+    totalKills = 0;
+    totalTime = 0;
+    showHUD();
+    hideCursor();
+
+    // Inisialisasi arena luas (menggunakan template labirin Sektor 8 ber-seed acak)
+    currentLevel = 7;
+    initLevel(7);
+
+    // Kustomisasi objektif dan HUD arena survival
+    const badge = document.getElementById('uiBadge');
+    if (badge) badge.textContent = 'SURVIVAL // WAVE 1';
+    
+    // Spawn gelombang monster pertama
+    spawnEndlessWave(1);
+
+    if (typeof announceLevel === 'function') {
+        announceLevel(tt('endless_wave_banner').replace('{w}', '1'));
+    }
+}
+
+function spawnEndlessWave(wave) {
+    if (!monsters) monsters = [];
+    monsters = [];
+    const count = Math.min(35, 6 + wave * 3);
+    
+    // Pilih anomali dari 12 kanon berdasarkan gelombang
+    const roster = ['slime', 'bat'];
+    if (wave >= 2) roster.push('crawl');
+    if (wave >= 3) roster.push('ghost');
+    if (wave >= 4) roster.push('harvester');
+    if (wave >= 5) roster.push('darkKnight');
+    if (wave >= 6) roster.push('dragon');
+    if (wave >= 7) roster.push('lich');
+    if (wave >= 8) roster.push('beholder');
+    if (wave >= 9) roster.push('mimic');
+    if (wave >= 10 && wave % 5 === 0) roster.push('theMonolith');
+
+    for (let i = 0; i < count; i++) {
+        let spawned = false;
+        for (let tries = 0; tries < 50; tries++) {
+            const rx = Math.floor(Math.random() * (maze[0].length - 4)) + 2;
+            const ry = Math.floor(Math.random() * (maze.length - 4)) + 2;
+            if (maze[ry] && maze[ry][rx] === 0) {
+                const distToP = Math.hypot((rx * CELL + CELL/2) - player.x, (ry * CELL + CELL/2) - player.y);
+                if (distToP > 5 * CELL) {
+                    const typeKey = roster[Math.floor(Math.random() * roster.length)];
+                    const m = createMonster(typeKey, rx * CELL + CELL/2, ry * CELL + CELL/2);
+                    if (m) {
+                        m.maxHp = Math.round(m.maxHp * (1 + (wave - 1) * 0.15));
+                        m.hp = m.maxHp;
+                        monsters.push(m);
+                        spawned = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    const badge = document.getElementById('uiBadge');
+    if (badge) badge.textContent = 'SURVIVAL // WAVE ' + wave;
+    const exitText = document.getElementById('exitText');
+    if (exitText) exitText.textContent = 'SURVIVE!';
+}
+
+function checkEndlessWaveProgress() {
+    if (!isEndlessMode || gameState !== 'playing') return;
+    
+    const aliveCount = monsters.filter(m => m && m.hp > 0).length;
+    if (aliveCount === 0 && !endlessWaveCleared) {
+        endlessWaveCleared = true;
+        endlessWaveClearTimer = Date.now();
+        
+        // Reward: Pulihkan HP pemain + drop medpod + ammo recharge
+        if (player) {
+            player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.4));
+        }
+        
+        // Beri nanite untuk pohon talenta
+        if (typeof addNanites === 'function') {
+            addNanites(50 + endlessWave * 10);
+        }
+
+        // Drop amunisi / medpod di posisi pemain
+        if (typeof medPods !== 'undefined' && Array.isArray(medPods)) {
+            medPods.push({ x: player.x + 30, y: player.y + 30, taken: false });
+        }
+
+        const clearMsg = tt('endless_wave_clear').replace('{w}', endlessWave);
+        if (typeof announceLevel === 'function') announceLevel(clearMsg);
+        if (typeof blip === 'function') blip(580, 0.25, 'triangle');
+
+        setTimeout(function() {
+            if (!isEndlessMode || gameState !== 'playing') return;
+            endlessWave++;
+            endlessWaveCleared = false;
+            spawnEndlessWave(endlessWave);
+            const inMsg = tt('endless_wave_banner').replace('{w}', endlessWave);
+            if (typeof announceLevel === 'function') announceLevel(inMsg);
+        }, 3200);
+    }
+}

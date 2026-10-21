@@ -1,3 +1,61 @@
+
+let activeGameDirective = 'campaign'; // 'campaign' | 'endless'
+try {
+  const savedDir = localStorage.getItem('vita_game_directive');
+  if (savedDir === 'endless' || savedDir === 'campaign') activeGameDirective = savedDir;
+} catch(_) {}
+
+function selectGameDirective(mode) {
+  activeGameDirective = (mode === 'endless') ? 'endless' : 'campaign';
+  try { localStorage.setItem('vita_game_directive', activeGameDirective); } catch(_) {}
+  
+  const btnC = document.getElementById('btnDirectiveCampaign');
+  const btnE = document.getElementById('btnDirectiveEndless');
+  const btnPlayText = document.getElementById('btnHeroPlayText');
+  const isId = (homeSettings && homeSettings.lang === 'id');
+  
+  if (btnC) {
+    if (activeGameDirective === 'campaign') {
+      btnC.classList.add('active');
+      btnC.style.borderColor = 'var(--accent, #ff3b3b)';
+      btnC.style.background = 'rgba(255, 59, 59, 0.22)';
+      btnC.style.color = '#fff';
+    } else {
+      btnC.classList.remove('active');
+      btnC.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+      btnC.style.background = 'transparent';
+      btnC.style.color = 'rgba(255, 255, 255, 0.6)';
+    }
+  }
+  if (btnE) {
+    if (activeGameDirective === 'endless') {
+      btnE.classList.add('active');
+      btnE.style.borderColor = '#00f0ff';
+      btnE.style.background = 'rgba(0, 240, 255, 0.22)';
+      btnE.style.color = '#00f0ff';
+    } else {
+      btnE.classList.remove('active');
+      btnE.style.borderColor = 'rgba(0, 229, 255, 0.3)';
+      btnE.style.background = 'rgba(0, 229, 255, 0.08)';
+      btnE.style.color = '#00e5ff';
+    }
+  }
+  if (btnPlayText) {
+    if (activeGameDirective === 'endless') {
+      btnPlayText.textContent = isId ? 'MASUK ARENA SURVIVAL // HORDE' : 'ENTER SURVIVAL ARENA // HORDE';
+    } else {
+      btnPlayText.textContent = isId ? 'MASUK KE DALAM LABIRIN' : 'ENTER THE LABYRINTH';
+    }
+  }
+}
+
+// Inisialisasi tampilan directive tombol saat Hub siap
+if (typeof document !== 'undefined') {
+  setTimeout(function() {
+    try { selectGameDirective(activeGameDirective); } catch(_) {}
+  }, 50);
+}
+
 const emberCanvas = document.getElementById('embers');
 const emberCtx = emberCanvas.getContext('2d');
 let EW, EH, embers = [];
@@ -2224,7 +2282,14 @@ function proceedToWebGame(autoStart = false) {
   if (typeof checkContinueBtn === 'function') checkContinueBtn();
   if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
   if (autoStart && typeof startGame === 'function') {
-    startGame(true);
+    if (activeGameDirective === 'endless' && typeof startEndlessMode === 'function') {
+      startEndlessMode();
+    } else {
+      startGame(true);
+    }
+  } else if (activeGameDirective === 'endless' && typeof startEndlessMode === 'function') {
+    if (ss) ss.style.display = 'none';
+    startEndlessMode();
   }
 }
 
