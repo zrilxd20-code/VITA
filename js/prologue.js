@@ -328,17 +328,27 @@ const NARRATIVE_INTERLUDES = {
             }
         ]
     },
-    13: { // Sektor 14 selesai (currentLevel === 13) menuju Sektor 15 (Puncak Pertarungan)
+    13: { // Sektor 14 selesai (currentLevel === 13) menuju Sektor 15 (Puncak Pertarungan: The Monolith)
         slides: [
+            {
+                speaker: 'DR. SARA',
+                speakerRevealed: true,
+                signal_id: '(frekuensi transmisi darurat pangkalan terhubung).......',
+                signal_en: '(emergency base frequency connected).......',
+                body_id: '"Ms. Alterisha... kita mungkin mendekati tujuan kita di pangkalan sektor ini."',
+                body_en: '"Ms. Alterisha... we may be approaching our true destination in this facility sector."',
+                tail_id: '(suara seluruh sektor bergetar hebat saat frekuensi inti bergemuruh)',
+                tail_en: '(the entire sector structure violently tremors as core frequency rumbles)'
+            },
             {
                 speaker: 'ALTERISHA',
                 speakerRevealed: true,
-                signal_id: '(distorsi medan psionik mendekati batas kritis).......',
-                signal_en: '(psionic field distortion nearing critical threshold).......',
-                body_id: '"Semua frekuensi komunikasi dari Sektor Luar mulai terputus oleh medan psionik The Monolith. Ini adalah transmisi terakhir yang bisa kukirimkan sebelum jaringan padam total. Hancurkan jantung biomekanik mereka, Prototype-19. Buktikan pengorbanan unit-unit terdahulu tidak sia-sia!"',
-                body_en: '"All external comm channels are collapsing under The Monolith\'s psionic jamming. This is the final transmission I can send before total blackout. Shatter their biomechanical core, Prototype-19. Prove that the sacrifice of every preceding unit was not in vain!"',
-                tail_id: '"Bawa fajar baru bagi umat manusia......"',
-                tail_en: '"Bring a new dawn to humanity......"'
+                signal_id: '(suara Alterisha terdengar tegas namun bergetar lirih).......',
+                signal_en: '(Alterisha\'s voice sounds resolute yet quietly hushed).......',
+                body_id: '"Ya, laksanakan semua prosedur. Letnan, Dokter, semuanya."',
+                body_en: '"Yes, execute all protocols. Lieutenant, Doctors, everyone."',
+                tail_id: '(suara kecil lirih) "Ini akan menjadi pertempuran pertama kita... menyelamatkan umat manusia."',
+                tail_en: '(quietly under her breath) "This will be our first true battle... to save humanity."'
             }
         ]
     }

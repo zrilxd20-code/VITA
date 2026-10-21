@@ -229,16 +229,26 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 
 ---
 
-### 🌑 Transisi Khusus Sektor 14 (Menuju Sektor 15 — Puncak Pertarungan) — Interlude Gelap: ALTERISHA
-*(Layar menjadi hitam pekat, tanpa kotak HUD. Teks putih berukuran besar muncul di tengah kehampaan)*
+### 🌑 Transisi Khusus Sektor 14 (Menuju Sektor 15 — Puncak Pertarungan) — Percakapan DR. SARA & ALTERISHA
+*(Layar menjadi hitam pekat, tanpa kotak HUD. Teks putih elegan memudar perlahan di tengah kehampaan saat seluruh labirin bergetar)*
 
-> **ALTERISHA**  
-> *(distorsi medan psionik mendekati kritis).......*  
-> 🇮🇩 *"Semua frekuensi komunikasi dari Sektor Luar mulai terputus oleh medan psionik The Monolith. Ini adalah transmisi terakhir yang bisa kukirimkan sebelum jaringan padam total. Hancurkan jantung biomekanik mereka, Prototype-19. Buktikan pengorbanan unit-unit terdahulu tidak sia-sia!"*  
-> 🇬🇧 *"All external comm channels are collapsing under The Monolith's psionic jamming. This is the final transmission I can send before total blackout. Shatter their biomechanical core, Prototype-19. Prove that the sacrifice of every preceding unit was not in vain!"*  
+> **Bagian 1 — Laporan Pangkalan:**  
+> **DR. SARA**  
+> *(frekuensi transmisi darurat terhubung — ruang kendali riset).......*  
+> 🇮🇩 *"Ms. Alterisha, kita mungkin mendekati tujuan kita di pangkalan sektor ini......"*  
+> 🇬🇧 *"Ms. Alterisha, we may be approaching our true destination in this facility sector......"*  
 >  
-> 🇮🇩 *"Bawa fajar baru bagi umat manusia......"*  
-> 🇬🇧 *"Bring a new dawn to humanity......"*
+> *(Suara seluruh sektor bergetar hebat saat frekuensi inti biomekanik bergemuruh)*  
+
+> **Bagian 2 — Perintah Prosedur & Janji Fajar:**  
+> **ALTERISHA**  
+> *(suara Alterisha terdengar tegas namun bergetar lirih).......*  
+> 🇮🇩 *"Ya, laksanakan semua prosedur. Letnan, Dokter, semuanya."*  
+> 🇬🇧 *"Yes, execute all protocols. Lieutenant, Doctors, everyone."*  
+>  
+> *(Suara kecil lirih)*  
+> 🇮🇩 *"Ini akan menjadi pertempuran pertama kita... menyelamatkan umat manusia."*  
+> 🇬🇧 *"This will be our first true battle... to save humanity."*
 
 ---
 
