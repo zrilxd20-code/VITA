@@ -252,3 +252,33 @@ npm test
 Released under the **MIT License** — see [LICENSE](LICENSE).
 
 Developed by [Rifky / Dev Team]. Open source and available for portfolio review and personal demonstration.
+
+---
+
+## 📌 Catatan Rilis, Alur Navigasi, Desain Logo, & Kompilasi Cloud Otomatis
+
+1. **Alur Masuk Game Konsisten (Hub ➔ Layar Mulai / Tactical Archives)**:
+   - Menekan tombol **ENTER THE LABYRINTH** pada Hub utama (`#homeView`) **selalu** membawa pemain ke Menu Layar Mulai (`#startScreen`) terlebih dahulu.
+   - Di layar ini pemain dapat memilih direktif: **PLAY NOW**, **OPERASI CO-OP**, **CONTINUE**, **LOGIN / PROFILE**, **SETTINGS**, **CODEX**, atau **ADMIN & CHAPTER SELECT**. Game tidak akan langsung meluncur ke kanvas tanpa persetujuan pemain.
+   - Pilihan mode game (*Kampanye 15 Sektor* vs *Arena Survival Horde*) yang dipilih di Hub akan otomatis dijalankan saat tombol **PLAY NOW** ditekan di Layar Mulai.
+
+2. **Identitas Visual Logo VITA Konsisten di Seluruh Menu**:
+   - Seluruh menu utama (Hub, Layar Mulai, Jeda In-Game, Gugur/Game Over, & Kemenangan) menggunakan lockup logo resmi VITA:
+     - **Emblem Heksagonal Isometrik**: Cincin heksagon kontainmen dengan monogram "V" berpendar merah neon serta titik inti anomali putih menyala.
+     - **Wordmark VITA 3D**: Tipografi tebal merah tua dengan ekstrusi rim light bertingkat dan bayangan jatuh atmosferik.
+     - **Subtitle FORGOTTEN SECTOR**: Spasi huruf tegas (*letter-spacing 12px*) dengan pendar merah penahan anomali.
+
+3. **Kompilasi Otomatis Cloud Dual-Platform (GitHub Actions)**:
+   - Setiap kali terjadi `git push` ke branch `main`, GitHub Actions langsung mengompilasi biner native secara otomatis tanpa memerlukan SDK lokal:
+     - **Android APK (`vita-debug-apk`)**: Menggunakan Capacitor + JDK 21 + Gradle (waktu build ~1,5 menit).
+     - **Windows Desktop PC (`vita-windows-x64`)**: Menggunakan Tauri 1.5 + Rust stable + WebView2 runtime menghasilkan installer `.msi` dan `.exe` mandiri (waktu build ~3–5 menit karena kompilasi native biner Rust).
+   - Artifact yang dihasilkan siap diunduh langsung dari tab **Actions** di repositori GitHub.
+
+4. **Sistem Notifikasi & Pengecekan Update Otomatis (In-App)**:
+   - Aplikasi yang terpasang (PWA Web, Windows PC, APK Android) otomatis membaca versi terbaru dari cloud endpoint / GitHub `version.json`.
+   - Tersedia tombol **[ ↻ CEK PEMBARUAN ]** di menu *Facility Settings* (`checkVitaUpdateManual()`) untuk memeriksa ketersediaan pembaruan kapan saja secara instan.
+   - Header CORS telah dipasang di `vercel.json` sehingga WebView native tidak lagi terhalang oleh security browser saat memeriksa rilis baru.
+
+5. **Kontrol Sentuh Murni di HP (Pure Virtual Joystick & Action Buttons)**:
+   - Saat mode kontrol HP (`touch-on`) aktif, crosshair bidikan mouse otomatis dinonaktifkan.
+   - Ketukan acak di kanvas tidak akan memicu serangan klik sintetis. Arah dan penyerangan murni dikendalikan oleh analog virtual joystick dan tombol aksi taktis di layar.

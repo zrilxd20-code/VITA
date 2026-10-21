@@ -163,6 +163,22 @@ vita/
 
 ---
 
+
+
+### F. Aturan Alur Navigasi, Desain Logo Konsisten, & Pembaruan Otomatis
+1. **Alur Masuk Game**: Tombol `ENTER THE LABYRINTH` di Hub (`#homeView`) **WAJIB** membawa pengguna ke Menu Layar Mulai (`#startScreen`) terlebih dahulu (`proceedToWebGame(false)`). Dilarang melompat langsung ke loop kanvas / gameplay tanpa klik tombol `PLAY NOW` di layar mulai.
+2. **Lockup Logo VITA Konsisten**:
+   - Seluruh menu (`#homeView`, `#startScreen`, `#pauseScreen`, `#deathScreen`, `#winScreen`) menggunakan lockup visual resmi VITA yang seragam: emblem heksagonal isometrik dengan monogram "V" dan titik inti putih, wordmark 3D ekstrusi merah, serta subtitle `FORGOTTEN SECTOR` ber-letter-spacing lebar.
+3. **Kompilasi Dual-Platform Cloud**:
+   - Android APK selesai dalam ~1,5 menit via GitHub Actions (`.github/workflows/android.yml`).
+   - Windows Desktop Tauri membutuhkan ~3–5 menit via GitHub Actions (`.github/workflows/desktop.yml`) karena kompilasi native biner Rust.
+4. **Pemberitahuan Update In-App**:
+   - Seluruh rilis (Web/PC/APK) membaca versi rilis via `version.json`.
+   - WebView native mengakses cloud dengan header CORS yang telah diizinkan di `vercel.json`.
+   - Pengecekan manual disediakan lewat tombol `[ ↻ CEK PEMBARUAN ]` di modal Facility Settings (`checkVitaUpdateManual()`).
+5. **Kontrol Sentuh Murni di HP**:
+   - Pada mode sentuh HP (`touch-on`), kursor/crosshair ditiadakan, synthetic mousedown diabaikan, dan bidikan/gerakan murni dipandu oleh analog virtual joystick (`touchMove.dx, touchMove.dy`) serta tombol aksi on-screen.
+
 ## 🚨 4. Aturan Penting untuk AI Agent (Golden Rules)
 
 1. **JANGAN Tambahkan Aset Gambar/Suara Eksternal**:

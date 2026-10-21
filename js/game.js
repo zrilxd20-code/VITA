@@ -13513,6 +13513,10 @@ function continueGame(bypassDeviceCheck = false) {
     document.getElementById('deathScreen').style.display = 'none';
     document.getElementById('winScreen').style.display = 'none';
     if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
+    if (typeof activeGameDirective !== 'undefined' && activeGameDirective === 'endless' && typeof startEndlessMode === 'function') {
+        startEndlessMode();
+        return;
+    }
     gameState = 'playing';
     menuDemo = false;
     totalKills = 0;

@@ -2287,9 +2287,6 @@ function proceedToWebGame(autoStart = false) {
     } else {
       startGame(true);
     }
-  } else if (activeGameDirective === 'endless' && typeof startEndlessMode === 'function') {
-    if (ss) ss.style.display = 'none';
-    startEndlessMode();
   }
 }
 

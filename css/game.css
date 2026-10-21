@@ -4214,3 +4214,67 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
         display: flex !important;
     }
 }
+
+/* ====================================================================
+   VITA BRAND LOGO LOCKUP IN GAME VIEW (START SCREEN & IN-GAME MENUS)
+   ==================================================================== */
+#gameView .vita-lockup {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 1.8vw, 24px);
+    margin-bottom: 6px;
+}
+#gameView .vita-emblem {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    width: clamp(52px, 8.5vw, 96px);
+    height: clamp(52px, 8.5vw, 96px);
+    color: #ff3b3b;
+    filter: drop-shadow(0 0 18px rgba(255, 40, 40, 0.65));
+}
+#gameView .vita-emblem .em-ring {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.8;
+    stroke-linejoin: round;
+    opacity: 0.95;
+}
+#gameView .vita-emblem .em-ring-inner {
+    fill: rgba(255, 44, 44, 0.08);
+    stroke: currentColor;
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+    opacity: 0.45;
+}
+#gameView .vita-emblem .em-ticks {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    opacity: 0.7;
+}
+#gameView .vita-emblem .em-v {
+    fill: none;
+    stroke: #ff7061;
+    stroke-width: 5.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 8px rgba(255, 96, 78, 0.95));
+}
+#gameView .vita-emblem .em-core {
+    fill: #ffffff;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 1));
+}
+#gameView #startScreen .subtitle {
+    font-size: clamp(12px, 1.8vw, 15px);
+    letter-spacing: 12px;
+    font-weight: 900;
+    color: #ff3b3b;
+    text-transform: uppercase;
+    margin-top: 4px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 16px rgba(255, 59, 59, 0.75);
+}
