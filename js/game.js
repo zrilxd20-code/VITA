@@ -49,9 +49,9 @@ let PIXEL = 1;
 // Backing store mengikuti DPR (dibatasi 2 agar hemat memori/GPU di HP DPR 3+).
 let RENDER_DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 function readRenderDpr() {
-    const isMobileTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 820);
-    const maxAllowed = isMobileTouch ? 1.25 : 2;
-    return Math.max(1, Math.min(maxAllowed, window.devicePixelRatio || 1));
+    // Memberikan resolusi kristal HD di seluruh layar smartphone & desktop (DPR hingga 2.0x native)
+    const dpr = window.devicePixelRatio || 1;
+    return Math.max(1, Math.min(2.0, dpr));
 }
 // Hanya mode HD yang memakai resolusi perangkat penuh; mode pixel tetap ringan.
 function getPixelDpr() {
@@ -71,7 +71,7 @@ function sizePixelBuffer() {
     PH = Math.max(1, Math.ceil(H * pd / PIXEL));
     if (pix.width !== PW) pix.width = PW;
     if (pix.height !== PH) pix.height = PH;
-    pctx.imageSmoothingEnabled = false;
+    pctx.imageSmoothingEnabled = (PIXEL === 1);
 }
 // W/H selalu dalam CSS px. Backing canvas = CSS x DPR, lalu transform DPR
 // dipasang sekali agar semua gambar tetap memakai koordinat CSS.
@@ -347,7 +347,7 @@ function sanitizeSettings(raw) {
 
     const difficulty = VITA_DIFFS.includes(s.difficulty) ? s.difficulty : 'normal';
     const lang0 = s.lang === 'id' ? 'id' : 'en';
-    const quality = VITA_QUALS.includes(s.quality) ? s.quality : 'retro';
+    const quality = (s.quality && VITA_QUALS.includes(s.quality) && s.quality !== 'retro') ? s.quality : 'hd';
 
     const deviceMode = (s.deviceMode === 'pc' || s.deviceMode === 'mobile' || s.deviceMode === 'ask') ? s.deviceMode : 'ask';
     const autoAim = (s.autoAim !== undefined) ? !!s.autoAim : true;
@@ -4402,7 +4402,8 @@ function buildLevelWorld(level) {
             const zone = zoneNames[level] || '';
             announce.innerHTML = msg + (zone ? '<span class="zone-name">— ' + zone + ' —</span>' : '');
             announce.style.color = isLight ? '#ff8a3d' : '#ff3636';
-            announce.style.fontSize = level === 9 ? '26px' : '22px';
+            const isSmall = window.innerWidth <= 768;
+            announce.style.fontSize = isSmall ? '13px' : (level === 9 ? '24px' : '20px');
             announce.style.opacity = 1;
             const bEl = document.getElementById('uiBadge');
             if (bEl) bEl.textContent = 'CARNIS-SEC — LV' + (level + 1);

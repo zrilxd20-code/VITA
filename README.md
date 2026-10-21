@@ -6,7 +6,7 @@
 [![Zero External Assets](https://img.shields.io/badge/Assets-100%25%20Procedural-red)](index.html)
 [![PWA Ready](https://img.shields.io/badge/PWA-Network--First%20Offline-brightgreen)](sw.js)
 [![Database](https://img.shields.io/badge/Database-Supabase%20%2F%20PostgreSQL-3ECF8E)](supabase_schema.sql)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(27%2F27%20QA)-success)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(29%2F29%20QA)-success)](tests/)
 [![Android](https://img.shields.io/badge/Android-APK%20via%20GitHub%20Actions-3DDC84)](.github/workflows/android.yml)
 
 ---
@@ -169,7 +169,7 @@ game keeps its zero-runtime-dependency guarantee (`npm test` enforces this).
 
 ```powershell
 npm run check   # syntax + global-scope + i18n parity & coverage + secret scan + manifest & HTML checks
-npm test        # 27-module web security, QA & packaging audit
+npm test        # 29-module web security, QA & packaging audit
 npm run relay   # zero-dependency WebSocket co-op relay server
 npm run icons   # regenerate PWA icons (pure Node, reproducible)
 npm run icons:android  # regenerate Android launcher icons + splash (same procedural art)
@@ -226,7 +226,7 @@ vita/
 ├── script.md               # Narrative script, characters, and dialogue canon
 ├── supabase_schema.sql     # PostgreSQL schema, check constraints, and RLS policies
 ├── tests/                  # Automated test suites
-│   └── test_web_security_qa.js # 28-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup with consistent in-game menu titles (start/pause/death/win) & reduced-motion guard, zero-dependency relay protocol contract & client wiring, co-op relay address normalization & invite-link parsing/building, relay deploy artifacts (Docker/Render) & MIT license contract, Android/Capacitor packaging contract, PC Desktop/Tauri Windows packaging contract)
+│   └── test_web_security_qa.js # 29-module QA audit (XSS, avatar, callsign, corrupt-data recovery, level bounds, Supabase schema, BFS anti-softlock, Hub brightness, dialog & keyboard a11y, i18n coverage, hub loop perf & reduced-motion, async status live regions, game loop error boundary, robot memory modal interaction, seeded deterministic world for online co-op, simulation vs render decoupling for host-authoritative architecture, multi-player abstraction via players[] & host index 0, snapshot state serialization & reconciliation for host-authoritative relay, co-op lobby UI & native WebSocket transport relay, procedural Hub logo lockup with consistent in-game menu titles (start/pause/death/win) & reduced-motion guard, zero-dependency relay protocol contract & client wiring, co-op relay address normalization & invite-link parsing/building, relay deploy artifacts (Docker/Render) & MIT license contract, Android/Capacitor packaging contract, PC Desktop/Tauri Windows packaging contract)
 ├── AGENTS.md               # Technical rules & architecture documentation for AI agents
 └── README.md               # [This File] Primary portfolio documentation
 ```
@@ -241,7 +241,7 @@ Run the automated test suites to ensure complete integrity:
 # 1. Unified check (syntax + scope + i18n + secrets)
 npm run check
 
-# 2. Run the 27-module Web Security, QA & Packaging Audit
+# 2. Run the 29-module Web Security, QA & Packaging Audit
 npm test
 ```
 
