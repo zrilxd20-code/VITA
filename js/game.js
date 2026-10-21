@@ -3264,6 +3264,13 @@ function saveHigh(h) {
     try {
         if (!h || typeof h !== 'object') return;
         localStorage.setItem(VITA_HIGH_KEY, JSON.stringify(h));
+        // Auto-sync ke Supabase Cloud setiap kali progres/rekor disimpan
+        if (typeof syncProfileToSupabase === 'function' && typeof getProfile === 'function') {
+            const curProf = getProfile();
+            if (curProf && curProf.isLoggedIn && curProf.provider !== 'guest') {
+                syncProfileToSupabase(curProf).catch(() => {});
+            }
+        }
     } catch (e) {}
 }
 

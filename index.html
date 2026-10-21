@@ -593,9 +593,9 @@
         <div id="settingsUpdateFeedback" style="grid-column:1/-1;font-size:12px;display:none;padding:8px 12px;border-radius:4px;text-align:center;"></div>
       </div>
 
-      <div class="settings-sec-head">
-        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        <span id="lblSecGameplay" data-i18n="settings_sec_gameplay">GAMEPLAY &amp; SISTEM</span>
+      <div class="settings-sec-head">
+        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span id="lblSecGameplay" data-i18n="settings_sec_gameplay">GAMEPLAY &amp; SISTEM</span>
       </div>
       <div class="settings-grid">
         <label for="homeLanguage"><span data-i18n="settings_interface_lang">Interface Language</span>
@@ -909,70 +909,117 @@
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         <span id="authModalTitle">OPERATIVE TERMINAL &bull; AUTHENTICATION</span>
       </h3>
-      <button class="btn-sidebar-close" type="button" onclick="closeAuthModal()" aria-label="Close">✕</button>
+      <button class="btn-sidebar-close" id="authModalClose" type="button" onclick="closeAuthModal()" aria-label="Close">✕</button>
     </div>
 
-    <!-- Mode Tabs: Login vs Register -->
-    <div class="coop-tabs-bar" style="margin-bottom:16px;">
-      <button class="btn-coop-tab active" id="authTabLoginBtn" type="button" onclick="switchAuthMode('login')">
-        <span>MASUK AKUN (LOGIN)</span>
-      </button>
-      <button class="btn-coop-tab" id="authTabRegisterBtn" type="button" onclick="switchAuthMode('register')">
-        <span>DAFTAR BARU (REGISTER)</span>
-      </button>
-    </div>
-
-    <!-- Section 1: Login -->
-    <div id="authLoginSection">
-      <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;">
-        Masuk dengan akun terdaftar untuk menyinkronkan foto profil, level tertinggi, senjata, dan rekor langsung dari Supabase Database.
-      </p>
-      <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
-        <label for="loginCallsignInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;">Operative Callsign / Handle:</label>
-        <input type="text" id="loginCallsignInput" placeholder="Contoh: OPERATIVE-01" autocomplete="username" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){var p=document.getElementById('loginPasscodeInput');if(p)p.focus();}">
+    <!-- Active Logged In Session Card (Displayed when operative is logged in) -->
+    <div id="authActiveUserBanner" style="display:none;margin-bottom:16px;padding:14px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.3);border-radius:6px;text-align:left;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <div>
+          <div style="font-size:11px;color:#a0a0b0;letter-spacing:1px;text-transform:uppercase;">Akun Sedang Aktif:</div>
+          <div id="authActiveCallsignText" style="font-size:16px;font-weight:bold;color:#00e5ff;margin-top:2px;">OPERATIVE-01</div>
+          <div id="authActiveRoleText" style="font-size:12px;color:#e0e0e0;margin-top:1px;">Field Operative</div>
+        </div>
+        <div style="text-align:right;">
+          <span class="auth-status-pill verified" id="authActiveStatusBadge" style="font-size:10px;padding:3px 8px;">TERVERIFIKASI</span>
+          <div style="font-size:10px;color:#00ff88;margin-top:4px;">● Auto-Sync Supabase</div>
+        </div>
       </div>
-      <div class="profile-form-group" style="margin-bottom:16px;text-align:left;">
-        <label for="loginPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;">Security Passcode (PIN/Sandi):</label>
-        <input type="password" id="loginPasscodeInput" placeholder="Masukkan sandi akun Anda" autocomplete="current-password" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){handlePerformLogin();}">
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button class="btn" id="btnPerformLogin" type="button" onclick="handlePerformLogin()" style="width:100%;">
-          <span>MASUK KE SISTEM FASILITAS ▸</span>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+        <button class="btn danger" id="authModalLogoutBtn" type="button" onclick="handleLogout()" style="width:100%;background:#ef4444;color:#fff;font-weight:bold;padding:10px;">
+          <span>🚪 KELUAR DARI AKUN (LOG OUT)</span>
         </button>
-        <button class="btn secondary" id="btnQuickGuest" type="button" onclick="handleQuickGuest()" style="width:100%;font-size:11px;">
-          Lanjut sebagai Tamu (Guest Mode)
+        <button class="btn secondary" type="button" onclick="showAuthForms(true)" style="width:100%;font-size:11px;">
+          <span>Ganti Akun / Masuk dengan Akun Lain ▸</span>
         </button>
       </div>
     </div>
 
-    <!-- Section 2: Register -->
-    <div id="authRegisterSection" style="display:none;">
-      <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;">
-        Daftarkan Callsign baru untuk mengamankan identitas, foto profil, dan seluruh pencapaian roguilite Anda ke cloud database.
-      </p>
-      <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
-        <label for="modalUsernameInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Pilih Operative Callsign (3-24 karakter):</label>
-        <input type="text" id="modalUsernameInput" placeholder="Contoh: CARNIS_HUNTER" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;">
-      </div>
-      <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
-        <label for="modalPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Buat Passcode / Sandi Akun (min. 4 karakter):</label>
-        <input type="password" id="modalPasscodeInput" placeholder="Sandi aman akun baru" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;">
-      </div>
-      <div class="profile-form-group" style="margin-bottom:16px;text-align:left;">
-        <label for="modalRoleSelect" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Divisi Fasilitas:</label>
-        <select id="modalRoleSelect" style="width:100%;box-sizing:border-box;background:#12060a;color:#e7d6cf;border:1px solid rgba(0,255,136,0.4);padding:8px;font-family:inherit;font-size:13px;border-radius:4px;">
-          <option value="Field Operative">Field Operative</option>
-          <option value="Anomaly Investigator">Anomaly Investigator</option>
-          <option value="Containment Specialist">Containment Specialist</option>
-          <option value="Biohazard Medic">Biohazard Medic</option>
-          <option value="Sector Commander">Sector Commander</option>
-        </select>
-      </div>
-      <div style="display:none;" id="modalAutoSaveIndicator"></div>
-      <div>
-        <button class="btn" id="modalSaveProfileBtn" type="button" onclick="handleModalRegisterProfile()" style="width:100%;background:linear-gradient(135deg,#00ff88,#008855);color:#021a0e;">
-          <span>DAFTAR AKUN OPERATIF BARU ▸</span>
+    <!-- Forms Container (Login vs New Account) -->
+    <div id="authFormsContainer">
+      <!-- Mode Tabs: Login vs New Account -->
+      <div class="coop-tabs-bar" id="authTabsBar" style="margin-bottom:16px;">
+        <button class="btn-coop-tab active" id="authTabLoginBtn" type="button" onclick="switchAuthMode('login')">
+          <span>MASUK (LOG IN)</span>
         </button>
+        <button class="btn-coop-tab" id="authTabRegisterBtn" type="button" onclick="switchAuthMode('register')">
+          <span>DAFTAR AKUN BARU (NEW ACCOUNT)</span>
+        </button>
+      </div>
+
+      <!-- Section 1: Login -->
+      <div id="authLoginSection">
+        <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;">
+          Masuk dengan akun terdaftar. Nama dan sandi tersimpan otomatis di perangkat ini serta disinkronkan langsung ke cloud Supabase.
+        </p>
+        <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
+          <label for="loginCallsignInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;">Operative Callsign / Handle:</label>
+          <input type="text" id="loginCallsignInput" placeholder="Masukkan Callsign operatif" autocomplete="username" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){var p=document.getElementById('loginPasscodeInput');if(p)p.focus();}">
+        </div>
+        <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
+          <label for="loginPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;">Security Passcode (PIN/Sandi):</label>
+          <div style="position:relative;display:flex;align-items:center;">
+            <input type="password" id="loginPasscodeInput" placeholder="Masukkan sandi akun Anda" autocomplete="current-password" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px 40px 10px 10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){handlePerformLogin();}">
+            <button type="button" onclick="togglePasswordVisibility('loginPasscodeInput', this)" aria-label="Toggle password visibility" style="position:absolute;right:8px;background:none;border:none;color:#00e5ff;cursor:pointer;font-size:16px;padding:4px;" title="Lihat/Sembunyikan Sandi">👁️</button>
+          </div>
+        </div>
+        <div style="margin-bottom:14px;text-align:left;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#a0a0b0;cursor:pointer;user-select:none;">
+            <input type="checkbox" id="authRememberCheckbox" checked style="accent-color:#00e5ff;width:16px;height:16px;cursor:pointer;">
+            <span>Simpan Nama & Sandi di perangkat ini (Auto-Remember)</span>
+          </label>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn" id="btnPerformLogin" type="button" onclick="handlePerformLogin()" style="width:100%;background:linear-gradient(135deg,#00e5ff,#0077b6);color:#021018;font-weight:bold;">
+            <span>MASUK KE AKUN (LOG IN) ▸</span>
+          </button>
+          <div style="font-size:11px;color:#00e5ff;margin-top:4px;text-align:center;opacity:0.85;">
+            ⚡ Otomatis sinkronisasi level, senjata, foto profil & rekor dengan Supabase
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: New Account (Register) -->
+      <div id="authRegisterSection" style="display:none;">
+        <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;">
+          Daftarkan akun operatif baru. Identitas dan seluruh pencapaian roguelite Anda akan langsung diamankan di database Supabase.
+        </p>
+        <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
+          <label for="modalUsernameInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Operative Callsign (3-24 karakter):</label>
+          <input type="text" id="modalUsernameInput" placeholder="Contoh: OPERATIVE-77" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;">
+        </div>
+        <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
+          <label for="modalPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Security Passcode (min. 4 karakter):</label>
+          <div style="position:relative;display:flex;align-items:center;">
+            <input type="password" id="modalPasscodeInput" placeholder="Buat sandi aman akun baru" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px 40px 10px 10px;font-family:inherit;font-size:14px;border-radius:4px;">
+            <button type="button" onclick="togglePasswordVisibility('modalPasscodeInput', this)" aria-label="Toggle password visibility" style="position:absolute;right:8px;background:none;border:none;color:#00ff88;cursor:pointer;font-size:16px;padding:4px;" title="Lihat/Sembunyikan Sandi">👁️</button>
+          </div>
+        </div>
+        <div class="profile-form-group" style="margin-bottom:14px;text-align:left;">
+          <label for="modalRoleSelect" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Divisi Fasilitas:</label>
+          <select id="modalRoleSelect" style="width:100%;box-sizing:border-box;background:#12060a;color:#e7d6cf;border:1px solid rgba(0,255,136,0.4);padding:8px;font-family:inherit;font-size:13px;border-radius:4px;">
+            <option value="Field Operative">Field Operative</option>
+            <option value="Anomaly Investigator">Anomaly Investigator</option>
+            <option value="Containment Specialist">Containment Specialist</option>
+            <option value="Biohazard Medic">Biohazard Medic</option>
+            <option value="Sector Commander">Sector Commander</option>
+          </select>
+        </div>
+        <div style="margin-bottom:14px;text-align:left;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#a0a0b0;cursor:pointer;user-select:none;">
+            <input type="checkbox" id="authRegRememberCheckbox" checked style="accent-color:#00ff88;width:16px;height:16px;cursor:pointer;">
+            <span>Simpan sandi & nama akun baru di perangkat ini</span>
+          </label>
+        </div>
+        <div style="display:none;" id="modalAutoSaveIndicator"></div>
+        <div>
+          <button class="btn" id="modalSaveProfileBtn" type="button" onclick="handleModalRegisterProfile()" style="width:100%;background:linear-gradient(135deg,#00ff88,#008855);color:#021a0e;font-weight:bold;">
+            <span>BUAT AKUN BARU (REGISTER) ▸</span>
+          </button>
+          <div style="font-size:11px;color:#00ff88;margin-top:6px;text-align:center;opacity:0.85;">
+            ⚡ Akun baru langsung terdaftar dan diamankan di Supabase Cloud
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1896,108 +1943,6 @@
 </div>
 
 </div><!-- /#gameView -->
-
-<!-- Modal Otorisasi Akun Operatif - Global -->
-<div class="modal-backdrop" id="authModal">
-  <div class="modal auth-modal profile-modal">
-    <div class="auth-stamp">FACILITY TERMINAL AUTHORIZATION</div>
-    <div class="auth-tabs-row">
-      <button class="auth-tab-btn active" id="authTabLoginBtn" type="button" onclick="switchAuthMode('login')">LOGIN</button>
-      <button class="auth-tab-btn" id="authTabRegisterBtn" type="button" onclick="switchAuthMode('register')">REGISTER OPERATIVE</button>
-    </div>
-
-    <!-- Mode 1: Login -->
-    <div id="authLoginSection">
-      <div class="profile-form-group" style="margin-top:14px;text-align:left">
-        <label for="loginCallsignInput">Operative Username / Callsign:</label>
-        <input type="text" id="loginCallsignInput" placeholder="Enter operative callsign" maxlength="24">
-      </div>
-      <div class="profile-form-group" style="margin-top:10px;text-align:left">
-        <label for="loginPasscodeInput">Security Passcode (PIN/Password):</label>
-        <input type="password" id="loginPasscodeInput" placeholder="Enter your account passcode" maxlength="32">
-      </div>
-      <button class="btn" id="btnPerformLogin" type="button" onclick="handlePerformLogin()" style="margin-top:16px;width:100%">
-        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
-        <span>Enter Terminal</span>
-      </button>
-    </div>
-
-    <!-- Mode 2: Register -->
-    <div id="authRegisterSection" style="display:none">
-      <div class="modal-pp-section" style="margin-top:10px">
-        <div class="pp-circle-frame sm" id="modalPpFrame">
-          <img id="modalPpImg" class="pp-avatar-img" src="" alt="PP" style="display:none">
-          <div id="modalPpDef" class="pp-avatar-default"></div>
-        </div>
-        <label class="btn-upload-pp" for="modalFileInput">
-          <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-          <span>Upload Avatar Image</span>
-        </label>
-        <input type="file" id="modalFileInput" accept="image/*" style="display:none">
-      </div>
-
-      <div class="pp-presets-box">
-        <span class="pp-presets-title">Or Choose Division Insignia:</span>
-        <div class="pp-presets-row">
-          <button class="btn-preset-avatar" type="button" onclick="selectPresetAvatar('biohazard')" title="Biohazard">
-            <svg class="preset-svg" viewBox="0 0 24 24"><path d="M12 2a1 1 0 0 1 .86.5l1.6 2.76A7.5 7.5 0 0 1 18.5 7.9l2.76-1.6a1 1 0 0 1 1.37.37 1 1 0 0 1-.37 1.36l-2.76 1.6A7.5 7.5 0 0 1 20 12a7.5 7.5 0 0 1-.5 2.63l2.76 1.6a1 1 0 0 1 .37 1.36 1 1 0 0 1-1.37.37L18.5 16.36a7.5 7.5 0 0 1-4.04 2.64l-1.6 2.76A1 1 0 0 1 12 22a1 1 0 0 1-.86-.5l-1.6-2.76A7.5 7.5 0 0 1 5.5 16.36l-2.76 1.6a1 1 0 0 1-1.37-.37 1 1 0 0 1 .37-1.36l2.76-1.6A7.5 7.5 0 0 1 4 12a7.5 7.5 0 0 1 .5-2.63l-2.76-1.6a1 1 0 0 1-.37-1.36 1 1 0 0 1 1.37-.37L5.5 7.9a7.5 7.5 0 0 1 4.04-2.64l1.6-2.76A1 1 0 0 1 12 22a1 1 0 0 1-.86-.5l-1.6-2.76A7.5 7.5 0 0 1 5.5 16.36l-2.76 1.6a1 1 0 0 1-1.37-.37 1 1 0 0 1 .37-1.36l2.76-1.6A7.5 7.5 0 0 1 4 12a7.5 7.5 0 0 1 .5-2.63l-2.76-1.6a1 1 0 0 1-.37-1.36 1 1 0 0 1 1.37-.37L5.5 7.9a7.5 7.5 0 0 1 4.04-2.64l1.6-2.76A1 1 0 0 1 12 2zm0 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
-          </button>
-          <button class="btn-preset-avatar" type="button" onclick="selectPresetAvatar('shield')" title="Security">
-            <svg class="preset-svg" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-          </button>
-          <button class="btn-preset-avatar" type="button" onclick="selectPresetAvatar('dna')" title="Geneticist">
-            <svg class="preset-svg" viewBox="0 0 24 24"><path d="M4.5 3a1 1 0 0 0-.7.3 1 1 0 0 0 0 1.4l1.6 1.6A9 9 0 0 0 4 11a9 9 0 0 0 2.6 6.4L5 19a1 1 0 1 0 1.4 1.4l1.6-1.6A9 9 0 0 0 13 20a9 9 0 0 0 6.4-2.6l1.6 1.6a1 1 0 0 0 1.4-1.4l-1.6-1.6A9 9 0 0 0 22 11a9 9 0 0 0-2.6-6.4L21 3a1 1 0 1 0-1.4-1.4l-1.6 1.6A9 9 0 0 0 13 2a9 9 0 0 0-6.4 2.6L5 3a1 1 0 0 0-.5 0zm7.5 2a7 7 0 0 1 4.9 2.1l-1.4 1.4a5 5 0 0 0-7 0L7.1 7.1A7 7 0 0 1 12 5zm-3.5 4.9a3 3 0 0 1 4.2 0 3 3 0 0 1 0 4.2l-1.4 1.4a5 5 0 0 0-7 0l-1.4-1.4a7 7 0 0 1 5.6-4.2zm7 0a7 7 0 0 1 2.1 4.9 7 7 0 0 1-2.1 4.9l-1.4-1.4a5 5 0 0 0 0-7l1.4-1.4z"/></svg>
-          </button>
-          <button class="btn-preset-avatar" type="button" onclick="selectPresetAvatar('eye')" title="Surveillance">
-            <svg class="preset-svg" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-          </button>
-          <button class="btn-preset-avatar" type="button" onclick="selectPresetAvatar('carnis')" title="Carnis">
-            <svg class="preset-svg" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-          </button>
-          <button class="btn-preset-avatar" type="button" onclick="selectPresetAvatar('cyber')" title="Cyber">
-            <svg class="preset-svg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 17.93V18a1 1 0 0 1-2 0v-1.07A8 8 0 0 1 4.07 13H5a1 1 0 0 1 0-2h-.93A8 8 0 0 1 11 4.07V5a1 1 0 0 1 2 0v-.93A8 8 0 0 1 19.93 11H19a1 1 0 0 1 0 2h.93A8 8 0 0 1 13 19.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="profile-form-group" style="margin-top:14px;text-align:left">
-        <label for="modalUsernameInput">New Callsign / Handle: <span class="auto-save-tag" id="modalAutoSaveIndicator">● Ready</span></label>
-        <input type="text" id="modalUsernameInput" placeholder="e.g. AGENT-CARNIS-01" maxlength="24">
-      </div>
-
-      <div class="profile-form-group" style="margin-top:10px;text-align:left">
-        <label for="modalPasscodeInput">Create Security Passcode (PIN/Password):</label>
-        <input type="password" id="modalPasscodeInput" placeholder="Min 4 characters or digits" maxlength="32">
-      </div>
-
-      <div class="profile-form-group" style="margin-top:10px;text-align:left">
-        <label for="modalRoleSelect">Facility Division / Role:</label>
-        <select id="modalRoleSelect">
-          <option value="Operatif Lapangan">Field Operative</option>
-          <option value="Penyelidik Anomali">Anomaly Investigator</option>
-          <option value="Spesialis Penahanan">Containment Specialist</option>
-          <option value="Dokter Medis Lapangan">Biohazard Medic</option>
-          <option value="Komandan Regu">Sector Commander</option>
-        </select>
-      </div>
-
-      <button class="btn" id="modalSaveProfileBtn" type="button" onclick="handleModalRegisterProfile()" style="margin-top:14px;width:100%">
-        <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
-        <span>Register New Operative Dossier</span>
-      </button>
-    </div>
-
-    <!-- Quick Guest & Close -->
-    <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
-      <button class="btn ghost" type="button" onclick="handleQuickGuest()" style="width:100%">
-        Instant Guest Access (No Password)
-      </button>
-      <button class="btn secondary" id="authModalClose" type="button" onclick="closeAuthModal()" style="width:100%">
-        Close
-      </button>
-    </div>
-  </div>
-</div>
 
 <script src="js/supabase.js?v=2.5.2"></script>
 <script src="js/home.js?v=2.5.2"></script>

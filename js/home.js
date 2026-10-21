@@ -526,6 +526,53 @@ document.addEventListener('keydown', e => {
 // ---- Sistem Profil Operatif & PP (Photo Profile) ----
 const VITA_PROFILE_KEY = 'vita_profile';
 const VITA_ACCOUNTS_KEY = 'vita_accounts';
+const VITA_SAVED_CRED_KEY = 'vita_saved_cred';
+
+function getSavedCredentials() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(VITA_SAVED_CRED_KEY) || '{}');
+    if (raw && typeof raw === 'object' && raw.username) return raw;
+  } catch (e) {}
+  const prof = getProfile();
+  if (prof && prof.isLoggedIn && prof.name && prof.name !== 'GUEST-77') {
+    return { username: prof.name, passcode: prof.savedPasscode || '', remember: true };
+  }
+  const accounts = getLocalAccounts();
+  const names = Object.keys(accounts);
+  if (names.length > 0) {
+    const last = accounts[names[names.length - 1]];
+    return { username: last.name, passcode: last.savedPasscode || '', remember: true };
+  }
+  return { username: '', passcode: '', remember: true };
+}
+
+function saveCredentials(username, passcode, remember = true) {
+  if (!username) return;
+  if (!remember) {
+    try { localStorage.removeItem(VITA_SAVED_CRED_KEY); } catch (e) {}
+    return;
+  }
+  try {
+    localStorage.setItem(VITA_SAVED_CRED_KEY, JSON.stringify({
+      username: String(username).trim(),
+      passcode: String(passcode || ''),
+      remember: true,
+      updatedAt: new Date().toISOString()
+    }));
+  } catch (e) {}
+}
+
+function togglePasswordVisibility(inputId, btnEl) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (btnEl) btnEl.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    if (btnEl) btnEl.textContent = '👁️';
+  }
+}
 
 function getLocalAccounts() {
   try {
@@ -546,6 +593,7 @@ function saveLocalAccount(prof) {
       avatar: prof.avatar || '',
       presetEmoji: prof.presetEmoji || 'biohazard',
       passcode: prof.passcode || '',
+      savedPasscode: prof.savedPasscode || (accounts[key] && accounts[key].savedPasscode) || '',
       provider: prof.provider || 'facility',
       status: prof.status || `${(prof.role || 'OPERATIVE').toUpperCase()} // REGISTERED`,
       updatedAt: new Date().toISOString()
@@ -977,47 +1025,83 @@ function switchAuthMode(mode) {
     else tabRegBtn.classList.remove('active');
   }
 
-  // Bersihkan password input saat berganti tab
-  const p1 = document.getElementById('loginPasscodeInput');
-  const p2 = document.getElementById('modalPasscodeInput');
-  if (p1) p1.value = '';
-  if (p2) p2.value = '';
-
+  // Mempertahankan input sandi pengguna
   homeBeep('click');
+}
+
+function showAuthForms(force = false) {
+  const banner = document.getElementById('authActiveUserBanner');
+  const forms = document.getElementById('authFormsContainer');
+  if (banner && forms) {
+    if (force) {
+      banner.style.display = 'none';
+      forms.style.display = 'block';
+      switchAuthMode('login');
+      const lCall = document.getElementById('loginCallsignInput');
+      const lPass = document.getElementById('loginPasscodeInput');
+      const cred = getSavedCredentials();
+      if (lCall && cred.username) lCall.value = cred.username;
+      if (lPass && cred.passcode) lPass.value = cred.passcode;
+    } else {
+      const prof = getProfile();
+      const isUserLoggedIn = prof && prof.isLoggedIn && prof.name && prof.name !== 'GUEST-77' && prof.provider !== 'guest';
+      banner.style.display = isUserLoggedIn ? 'block' : 'none';
+      forms.style.display = isUserLoggedIn ? 'none' : 'block';
+    }
+  }
 }
 
 function openAuthModal(mode = 'login') {
   const am = document.getElementById('authModal');
   if (am) {
     am.classList.add('open');
-    switchAuthMode(mode);
     const prof = getProfile();
+    const isUserLoggedIn = prof && prof.isLoggedIn && prof.name && prof.name !== 'GUEST-77' && prof.provider !== 'guest';
+
+    const banner = document.getElementById('authActiveUserBanner');
+    const forms = document.getElementById('authFormsContainer');
+    const activeCallsign = document.getElementById('authActiveCallsignText');
+    const activeRole = document.getElementById('authActiveRoleText');
+    const activeBadge = document.getElementById('authActiveStatusBadge');
+
+    if (banner && forms) {
+      if (isUserLoggedIn && mode !== 'force-forms') {
+        banner.style.display = 'block';
+        forms.style.display = 'none';
+        if (activeCallsign) activeCallsign.textContent = prof.name;
+        if (activeRole) activeRole.textContent = prof.role || 'Field Operative';
+        if (activeBadge) activeBadge.textContent = prof.status ? prof.status.split('//')[0].trim() : 'TERVERIFIKASI';
+      } else {
+        banner.style.display = 'none';
+        forms.style.display = 'block';
+      }
+    }
+
+    switchAuthMode(mode === 'register' ? 'register' : 'login');
+
     const lCall = document.getElementById('loginCallsignInput');
     const mCall = document.getElementById('modalUsernameInput');
     const lPass = document.getElementById('loginPasscodeInput');
     const mPass = document.getElementById('modalPasscodeInput');
+    const cred = getSavedCredentials();
 
-    if (lPass) lPass.value = '';
-    if (mPass) mPass.value = '';
-
-    if (mode === 'login') {
-      if (lCall && prof && prof.name && prof.name !== 'GUEST-77' && prof.provider !== 'guest') {
-        lCall.value = prof.name;
-        if (lPass) setTimeout(() => lPass.focus(), 150);
-      } else if (lCall) {
-        // Coba tawarkan akun lokal yang pernah disimpan
-        const localAccounts = getLocalAccounts();
-        const names = Object.keys(localAccounts);
-        if (names.length > 0 && !lCall.value) {
-          lCall.value = localAccounts[names[names.length - 1]].name;
-        }
-        setTimeout(() => lCall.focus(), 150);
+    if (mode === 'login' || mode === 'force-forms') {
+      if (lCall) {
+        lCall.value = cred.username || (isUserLoggedIn ? prof.name : '');
       }
-    } else {
-      if (mCall) {
+      if (lPass && cred.passcode) {
+        lPass.value = cred.passcode;
+      }
+      const chk = document.getElementById('authRememberCheckbox');
+      if (chk) chk.checked = cred.remember !== false;
+      if (lCall && !lCall.value) setTimeout(() => lCall.focus(), 150);
+      else if (lPass) setTimeout(() => lPass.focus(), 150);
+    } else if (mode === 'register') {
+      if (mCall && !mCall.value) {
         mCall.value = '';
         setTimeout(() => mCall.focus(), 150);
       }
+      if (mPass && !mPass.value) mPass.value = '';
     }
 
     homeBeep('open');
@@ -1094,6 +1178,13 @@ async function handlePerformLogin() {
             syncRes = { prof, high: { highestLevel: 1 } };
           }
 
+          const remChk = document.getElementById('authRememberCheckbox');
+          const shouldRemember = !remChk || remChk.checked;
+          saveCredentials(username, passcode, shouldRemember);
+          if (syncRes && syncRes.prof) {
+            syncRes.prof.savedPasscode = passcode;
+            saveLocalAccount(syncRes.prof);
+          }
           resetBtn();
           closeAuthModal();
           homeBeep('save');
@@ -1125,14 +1216,20 @@ async function handlePerformLogin() {
         return;
       }
 
+      const remChk = document.getElementById('authRememberCheckbox');
+      const shouldRemember = !remChk || remChk.checked;
+      saveCredentials(username, passcode, shouldRemember);
+
       const prof = {
         ...targetProf,
         isLoggedIn: true,
         passcode: targetProf.passcode || passcode,
+        savedPasscode: passcode,
         status: `${(targetProf.role || 'OPERATIVE').toUpperCase()} // LOCAL VERIFIED`
       };
 
       setProfile(prof);
+      saveLocalAccount(prof);
       resetBtn();
       closeAuthModal();
       homeBeep('save');
@@ -1262,6 +1359,12 @@ async function handleModalRegisterProfile() {
       status: `${role.toUpperCase()} // OFFICIAL ROSTER`
     };
 
+    const remChk = document.getElementById('authRegRememberCheckbox');
+    const shouldRemember = !remChk || remChk.checked;
+    saveCredentials(username, passcode, shouldRemember);
+    newProf.savedPasscode = passcode;
+    saveLocalAccount(newProf);
+
     setProfile(newProf);
     if (typeof syncProfileToSupabase === 'function' && typeof isSupabaseConfigured === 'function' && isSupabaseConfigured()) {
       try {
@@ -1381,8 +1484,11 @@ function handleLogout() {
   };
   try { localStorage.setItem(VITA_PROFILE_KEY, JSON.stringify(defaultGuest)); } catch (e) {}
   applyProfileUI();
+  showAuthForms(false);
+  closeAuthModal();
   homeBeep('click');
-  alert('Operative logged out. Session returned to anonymous guest mode.\n(Account data remains securely stored).');
+  showSaveIndicator('Sesi Ditutup / Logout');
+  alert('Operatif berhasil keluar (Logged out).\nSesi kembali ke mode Tamu (Guest).\nNama & sandi akun Anda tetap aman tersimpan di perangkat.');
 }
 
 function applyProfileUI() {
@@ -2806,5 +2912,26 @@ window.isNativeApp = isNativeApp;
 window.initHubPlatformView = initHubPlatformView;
 window.enterWebHub = enterWebHub;
 window.showPlatformSelector = showPlatformSelector;
+window.showAuthForms = showAuthForms;
+window.togglePasswordVisibility = togglePasswordVisibility;
+window.getSavedCredentials = getSavedCredentials;
 
 
+
+// Otomatis sinkronkan profil operatif dengan Supabase saat Hub dibuka
+async function autoSyncCloudOnStartup() {
+  const prof = getProfile();
+  if (!prof || !prof.isLoggedIn || prof.provider === 'guest' || prof.name === 'GUEST-77') return;
+  if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof fetchOperativeByCallsign === 'function') {
+    try {
+      const remote = await fetchOperativeByCallsign(prof.name);
+      if (remote && typeof syncAccountDataFromCloud === 'function') {
+        syncAccountDataFromCloud(remote);
+      } else if (!remote && typeof syncProfileToSupabase === 'function') {
+        await syncProfileToSupabase(prof);
+      }
+    } catch (e) {
+      console.warn('Auto cloud sync on startup:', e);
+    }
+  }
+}
