@@ -614,22 +614,22 @@ const T = {
         dragon_firestorm: 'SEMBURAN API NAGA!',
         lich_summon: 'PEMANGGILAN ARWAH GELAP!',
         beholder_sweep: 'SOROTAN SINAR OCULARIS!',
-        tut_step1_badge: 'PROTOKOL 01 — LOKOMOSI',
-        tut_step1_msg: 'Gunakan WASD / Tombol Panah / Joystick sentuh untuk menggerakkan drone BMPT',
-        tut_step1_sub: 'Kalibrasi roda & track...',
-        tut_step1_done: 'SISTEM LOKOMOSI TERKALIBRASI',
-        tut_step2_badge: 'PROTOKOL 02 — PENDORONG OVERDRIVE',
-        tut_step2_msg: 'Tekan SHIFT / Tombol Dash untuk melesat kebal & menghindari bahaya',
+        tut_step1_badge: 'PROTOKOL 01 — NAVIGASI & GERAK',
+        tut_step1_msg: 'Gunakan WASD / Tombol Arah / Joystick Sentuh untuk menjelajahi labirin',
+        tut_step1_sub: 'Kalibrasi aktuator gerak: ',
+        tut_step1_done: 'SISTEM NAVIGASI AKTIF',
+        tut_step2_badge: 'PROTOKOL 02 — PHASE DASH',
+        tut_step2_msg: 'Tekan SHIFT / Tombol DASH untuk melesat kebal menembus rintangan & bahaya',
         tut_step2_sub: 'Uji sistem pendorong dash...',
-        tut_step2_done: 'PENDORONG OVERDRIVE AKTIF',
-        tut_step3_badge: 'PROTOKOL 03 — WEAPON POD',
-        tut_step3_msg: 'Klik Kiri / SPASI / Tombol Serang untuk mengaktifkan gergaji termal',
-        tut_step3_sub: 'Uji modul senjata taktis...',
-        tut_step3_done: 'MODUL SENJATA TERKALIBRASI',
-        tut_step4_badge: 'PROTOKOL 04 — DIREKTIF MISI',
-        tut_step4_msg: 'Kumpulkan semua Anomali Artefak di labirin untuk membuka pintu exit',
-        tut_step4_sub: 'Anomali terdeteksi di radar minimap',
-        tut_step4_done: 'DIREKTIF MISI DITERIMA',
+        tut_step2_done: 'PHASE DASH TERUJI',
+        tut_step3_badge: 'PROTOKOL 03 — SENJATA & GANTI MODUL',
+        tut_step3_msg: 'Tekan Serang untuk menyerang. Tekan ikon senjata / Q / 1-2 untuk berganti Bilah & Senapan',
+        tut_step3_sub: 'Bilah Pedang (dekat) & Senapan Kinetik (jauh) siap digunakan...',
+        tut_step3_done: 'ARSENAL TEMPUR SIAP',
+        tut_step4_badge: 'PROTOKOL 04 — REAKTIVASI INTI & EVAKUASI',
+        tut_step4_msg: 'Reaktivasi Node Daya merah di radar, lalu segera lari ke portal Airlock Keluar!',
+        tut_step4_sub: 'Perhatian: Mengaktifkan generator akan memicu alarm dan memancing monster mengejar!',
+        tut_step4_done: 'MISI SEKTOR DIMULAI',
         tut_skip: 'LEWATI [ESC]',
         device_modal_title: 'PILIH MODE KONTROL',
         device_modal_desc: 'Sebelum masuk ke dalam sektor, pilih skema kontrol yang sesuai dengan perangkat Anda:',
@@ -1007,22 +1007,22 @@ const T = {
         dragon_firestorm: 'DRAGON FIRESTORM!',
         lich_summon: 'DARK SPIRIT SUMMON!',
         beholder_sweep: 'OCULARIS EYE BEAM SWEEP!',
-        tut_step1_badge: 'PROTOCOL 01 — LOCOMOTION',
-        tut_step1_msg: 'Use WASD / Arrow Keys / Touch Joystick to navigate the BMPT drone',
-        tut_step1_sub: 'Calibrating tracks & wheels...',
-        tut_step1_done: 'LOCOMOTION SYSTEM CALIBRATED',
-        tut_step2_badge: 'PROTOCOL 02 — OVERDRIVE THRUSTERS',
-        tut_step2_msg: 'Press SHIFT / Dash Button to surge invincibly past danger',
-        tut_step2_sub: 'Testing dash thrusters...',
-        tut_step2_done: 'OVERDRIVE THRUSTERS ACTIVE',
-        tut_step3_badge: 'PROTOCOL 03 — WEAPON POD',
-        tut_step3_msg: 'Left Click / SPACEBAR / Attack Button to strike with thermal saw',
-        tut_step3_sub: 'Testing tactical weapon module...',
-        tut_step3_done: 'WEAPON MODULE CALIBRATED',
-        tut_step4_badge: 'PROTOCOL 04 — MISSION DIRECTIVE',
-        tut_step4_msg: 'Collect all glowing Artifact Anomalies to unlock the sector exit',
-        tut_step4_sub: 'Anomalies detected on minimap radar',
-        tut_step4_done: 'MISSION DIRECTIVE ACKNOWLEDGED',
+        tut_step1_badge: 'PROTOCOL 01 — NAVIGATION & MOVEMENT',
+        tut_step1_msg: 'Use WASD / Arrow Keys / Touch Joystick to navigate the labyrinth',
+        tut_step1_sub: 'Calibrating movement actuators: ',
+        tut_step1_done: 'NAVIGATION ACTUATORS ONLINE',
+        tut_step2_badge: 'PROTOCOL 02 — PHASE DASH',
+        tut_step2_msg: 'Press SHIFT / DASH Button to surge forward invincibly through danger',
+        tut_step2_sub: 'Testing phase dash thrusters...',
+        tut_step2_done: 'PHASE DASH VERIFIED',
+        tut_step3_badge: 'PROTOCOL 03 — COMBAT & WEAPON CYCLING',
+        tut_step3_msg: 'Press Attack to strike. Tap weapon icon / Q / 1-2 to switch between Blade and Rifle',
+        tut_step3_sub: 'Tactical Blade (melee) & Kinetic Rifle (ranged) armed...',
+        tut_step3_done: 'COMBAT ARSENAL READY',
+        tut_step4_badge: 'PROTOCOL 04 — POWER CORE & EVACUATION',
+        tut_step4_msg: 'Reactivate red Power Nodes on radar, then sprint to the Airlock Exit!',
+        tut_step4_sub: 'Warning: Activating the generator will sound the alarm and summon chaser monsters!',
+        tut_step4_done: 'SECTOR DIRECTIVE ACTIVE',
         tut_skip: 'SKIP [ESC]',
         device_modal_title: 'SELECT CONTROL MODE',
         device_modal_desc: 'Before entering the sector, choose the control scheme suited for your device:',
@@ -2271,7 +2271,7 @@ function updateTutorialUI() {
     if (tutorialStep === 0) {
         if (badge) badge.textContent = tt('tut_step1_badge');
         if (msg) msg.textContent = tt('tut_step1_msg');
-        if (sub) sub.textContent = `${lang === 'id' ? 'Kalibrasi roda & track' : 'Calibrating tracks'}: ${Math.min(50, Math.floor(tutorialMoveDist))}/50px`;
+        if (sub) sub.textContent = `${lang === 'id' ? 'Kalibrasi aktuator gerak' : 'Calibrating movement actuators'}: ${Math.min(50, Math.floor(tutorialMoveDist))}/50px`;
         if (icon) icon.textContent = '✥';
         if (status) {
             status.textContent = `${Math.min(50, Math.floor(tutorialMoveDist))}/50px`;
@@ -2299,7 +2299,7 @@ function updateTutorialUI() {
         if (badge) badge.textContent = tt('tut_step4_badge');
         if (msg) msg.textContent = tt('tut_step4_msg');
         const rem = artifacts ? artifacts.filter(a => !a.collected).length : 0;
-        if (sub) sub.textContent = (lang === 'id' ? `Anomali artefak tersisa: ${rem}` : `Remaining artifacts: ${rem}`);
+        if (sub) sub.textContent = (lang === 'id' ? `Node Daya aktif tersisa: ${rem}` : `Remaining Power Nodes: ${rem}`);
         if (icon) icon.textContent = '◆';
         if (status) {
             status.textContent = 'ACTIVE';
@@ -3834,24 +3834,27 @@ function spawnMonsters(level) {
         return;
     }
 
-    const count = Math.max(1, Math.min(28, 5 + level * 2) - currentAdaptation.monsterCountReduction);
+    const count = (level === 0) ? 2 : Math.max(1, Math.min(28, 5 + level * 2) - currentAdaptation.monsterCountReduction);
     const isLight = level % 2 === 1;
 
     for (let i = 0; i < count; i++) {
         let mx, my;
         let attempts = 0;
+        const minDist = (level === 0) ? 7 : 4;
         do {
             mx = Math.floor(Math.random() * (mazeW - 2)) + 1;
             my = Math.floor(Math.random() * (mazeH - 2)) + 1;
             attempts++;
-        } while ((maze[my][mx] !== 0 || (mx < 4 && my < 4) || !hasOpenNeighbor(my, mx)) && attempts < 200);
+        } while ((maze[my][mx] !== 0 || (mx < minDist && my < minDist) || !hasOpenNeighbor(my, mx)) && attempts < 200);
 
         if (attempts >= 200) continue;
 
         // Pilih tipe monster secara kontekstual sesuai sektor fasilitas
         const maxTypeIdx = MONSTER_TYPES.length - 2; // Kecuali The Monolith yang khusus level 15
         let type;
-        if (level === 5 && (i < 3 || Math.random() < 0.5)) {
+        if (level === 0) {
+            type = MONSTER_TYPES[0]; // Amoeboid Slime (lemah & aman untuk latihan dasar pemain)
+        } else if (level === 5 && (i < 3 || Math.random() < 0.5)) {
             // Sektor 06: Blok Isolasi Mimic (Bangsal Topeng Porselen)
             type = MONSTER_TYPES.find(t => t.name === 'Mimic') || MONSTER_TYPES[0];
         } else if (level === 4 && (i < 3 || Math.random() < 0.45)) {
@@ -4315,7 +4318,7 @@ function buildLevelWorld(level) {
     const savedRun = (!player && level > 0) ? loadHigh() : null;
     const preservedWeapons = (player && Array.isArray(player.weapons) && level > 0)
         ? [...player.weapons]
-        : (savedRun && Array.isArray(savedRun.savedWeapons) && savedRun.savedWeapons.length ? [...savedRun.savedWeapons] : ['knife']);
+        : (savedRun && Array.isArray(savedRun.savedWeapons) && savedRun.savedWeapons.length ? [...savedRun.savedWeapons] : ['knife', 'rifle']);
     const preservedCurWeapon = (player && player.currentWeapon && preservedWeapons.includes(player.currentWeapon))
         ? player.currentWeapon
         : (savedRun && savedRun.savedCurrentWeapon && preservedWeapons.includes(savedRun.savedCurrentWeapon) ? savedRun.savedCurrentWeapon : 'knife');
@@ -6190,11 +6193,15 @@ function switchWeapon(keyOrIdx) {
     if (target && target !== player.currentWeapon) {
         player.currentWeapon = target;
         sWeaponSwitch();
+        if (tutorialActive && tutorialStep === 2) {
+            advanceTutorialStep(2);
+        }
         updateUI();
     }
 }
 
 function cycleWeapon(reverse = false) {
+    if (typeof isEditingTouchLayout !== 'undefined' && isEditingTouchLayout) return;
     if (!player || !player.weapons || player.weapons.length <= 1) return;
     const curIdx = player.weapons.indexOf(player.currentWeapon);
     const nextIdx = (curIdx + (reverse ? -1 : 1) + player.weapons.length) % player.weapons.length;
@@ -6625,7 +6632,7 @@ function updatePlayer() {
         if (tutorialActive && tutorialStep === 0) {
             tutorialMoveDist += speed;
             const sub = document.getElementById('tutSub');
-            if (sub) sub.textContent = `${lang === 'id' ? 'Kalibrasi roda & track' : 'Calibrating tracks'}: ${Math.min(50, Math.floor(tutorialMoveDist))}/50px`;
+            if (sub) sub.textContent = `${lang === 'id' ? 'Kalibrasi aktuator gerak' : 'Calibrating movement actuators'}: ${Math.min(50, Math.floor(tutorialMoveDist))}/50px`;
             const status = document.getElementById('tutStatus');
             if (status) status.textContent = `${Math.min(50, Math.floor(tutorialMoveDist))}/50px`;
             if (tutorialMoveDist >= 50) {
@@ -11655,10 +11662,48 @@ function handleTerminalSuccess() {
                 life: 140,
                 maxLife: 140
             });
+            if (currentLevel === 0 && !menuDemo) {
+                spawnTutorialEvacuationAmbush();
+            }
         }
     }
     updateUI();
     closeTerminalPuzzleModal(true);
+}
+
+function spawnTutorialEvacuationAmbush() {
+    try {
+        sEASAlarm();
+        addShake(22);
+        announceAdmin(lang === 'id' ? '⚠️ ALARM SEKTOR AKTIF! ANOMALI MENGEJAR — SEGERA EVAKUASI KE AIRLOCK!' : '⚠️ SECTOR ALARM TRIGGERED! ANOMALIES EN ROUTE — SPRINT TO AIRLOCK!');
+        if (monsters && typeof maze !== 'undefined') {
+            for (let i = 0; i < 3; i++) {
+                const angle = (i * Math.PI * 2) / 3;
+                let sx = player.x + Math.cos(angle) * (200 + i * 40);
+                let sy = player.y + Math.sin(angle) * (200 + i * 40);
+                const smx = Math.max(1, Math.min(mazeW - 2, Math.floor(sx / CELL)));
+                const smy = Math.max(1, Math.min(mazeH - 2, Math.floor(sy / CELL)));
+                if (maze[smy] && maze[smy][smx] === 0) {
+                    monsters.push({
+                        x: (smx + 0.5) * CELL,
+                        y: (smy + 0.5) * CELL,
+                        type: MONSTER_TYPES[0],
+                        hp: 35,
+                        maxHp: 35,
+                        speed: 2.3,
+                        facing: 0,
+                        attackCooldown: 0,
+                        stunTimer: 0,
+                        hitFlash: 0,
+                        level: 0,
+                        ranged: false,
+                        aggro: true
+                    });
+                    addParticle((smx + 0.5) * CELL, (smy + 0.5) * CELL, '#ff0055', 20, 5, 30);
+                }
+            }
+        }
+    } catch (_) {}
 }
 
 function handleTerminalFailure(reason) {
@@ -12890,7 +12935,7 @@ function applySnapshot(snap, isHost = false) {
                     dashing: sp.dashing,
                     currentWeapon: sp.curW,
                     size: sp.size,
-                    weapons: ['knife'],
+                    weapons: ['knife', 'rifle'],
                     perks: [],
                     afterimages: []
                 };
@@ -13533,10 +13578,18 @@ function openTouchLayoutEditor() {
     if (inGameModal) inGameModal.style.display = 'none';
     const hModal = document.getElementById('settingsModal');
     if (hModal) hModal.classList.remove('open');
+    const ps = document.getElementById('pauseScreen');
+    if (ps) ps.classList.remove('open');
 
     isEditingTouchLayout = true;
     document.body.classList.add('editing-touch-layout');
     document.body.classList.add('touch-on');
+
+    const exitBtn = document.getElementById('btnTouchExit');
+    if (exitBtn) {
+        exitBtn.style.display = 'none';
+        exitBtn.style.pointerEvents = 'none';
+    }
 
     const overlay = document.getElementById('touchLayoutEditor');
     if (overlay) overlay.style.display = 'block';
@@ -13602,9 +13655,19 @@ function saveTouchLayout() {
     const overlay = document.getElementById('touchLayoutEditor');
     if (overlay) overlay.style.display = 'none';
 
+    const exitBtn = document.getElementById('btnTouchExit');
+    if (exitBtn) {
+        exitBtn.style.display = '';
+        exitBtn.style.pointerEvents = '';
+    }
+
     announceAdmin(tt('layout_saved_toast'));
     sCinematicUI('save');
     applyTouchLayout();
+    if (gameState === 'paused') {
+        const ps = document.getElementById('pauseScreen');
+        if (ps) ps.classList.add('open');
+    }
 }
 
 function resetTouchLayout(fromEditor = false) {
@@ -13647,7 +13710,17 @@ function cancelTouchLayoutEditor() {
     const overlay = document.getElementById('touchLayoutEditor');
     if (overlay) overlay.style.display = 'none';
 
+    const exitBtn = document.getElementById('btnTouchExit');
+    if (exitBtn) {
+        exitBtn.style.display = '';
+        exitBtn.style.pointerEvents = '';
+    }
+
     sCinematicUI('close');
+    if (gameState === 'paused') {
+        const ps = document.getElementById('pauseScreen');
+        if (ps) ps.classList.add('open');
+    }
 }
 
 function onEditorScaleInput(val) {
@@ -14803,6 +14876,7 @@ function restartFromPause() {
 }
 
 function backToMenu() {
+    if (typeof isEditingTouchLayout !== 'undefined' && isEditingTouchLayout) return;
     gameState = 'menu';
     menuDemo = true;
     stopAmbientDrone();
