@@ -252,7 +252,32 @@ assert(homeJs.includes('focusableWithin') && /e\.key\s*!==\s*'Tab'/.test(homeJs)
 const tokensCss = fs.readFileSync(path.join(__dirname, '../css/tokens.css'), 'utf8');
 assert(tokensCss.includes('input:focus-visible') && tokensCss.includes('select:focus-visible') && tokensCss.includes('textarea:focus-visible'),
   ':focus-visible harus mencakup kontrol form (input/select/textarea)');
-console.log('✓ TEST 9 LULUS: Dialog Hub memiliki semantik ARIA, jebakan fokus Tab, dan pemulihan fokus.');
+
+// Audit statis WAI-ARIA di index.html: seluruh modal backdrop wajib memiliki role="dialog" & aria-modal="true",
+// dan setiap target aria-labelledby harus eksis secara nyata di dokumen
+const ariaRegex = /aria-labelledby=["']([^"']+)["']/g;
+let ariaMatch;
+let totalAriaLabelledby = 0;
+while ((ariaMatch = ariaRegex.exec(indexHtml)) !== null) {
+  const targetId = ariaMatch[1];
+  assert(new RegExp(`id=["']${targetId}["']`).test(indexHtml),
+    `Target aria-labelledby="${targetId}" harus memiliki elemen id="${targetId}" yang sah di index.html`);
+  totalAriaLabelledby++;
+}
+assert(totalAriaLabelledby >= 20, `Minimal 20 dialog modal harus memiliki aria-labelledby (ditemukan: ${totalAriaLabelledby})`);
+
+const modalBackdropRegex = /<div[^>]*class=["'][^"']*modal-backdrop[^"']*["'][^>]*>/g;
+let mbMatch;
+let totalModalBackdrops = 0;
+while ((mbMatch = modalBackdropRegex.exec(indexHtml)) !== null) {
+  const tag = mbMatch[0];
+  assert(tag.includes('role="dialog"'), `Modal backdrop ${tag.slice(0, 50)}... harus memiliki role="dialog"`);
+  assert(tag.includes('aria-modal="true"'), `Modal backdrop ${tag.slice(0, 50)}... harus memiliki aria-modal="true"`);
+  totalModalBackdrops++;
+}
+assert(totalModalBackdrops >= 18, `Minimal 18 modal-backdrop harus memiliki role="dialog" & aria-modal="true" (ditemukan: ${totalModalBackdrops})`);
+
+console.log('✓ TEST 9 LULUS: Dialog Hub & Game memiliki semantik ARIA lengkap, jebakan fokus Tab, dan pemulihan fokus.');
 
 // TEST 10: Kelengkapan i18n modal mode perangkat + pil mode pada layar mulai.
 // Regresi: teks statis dulu berbahasa Indonesia padahal bahasa default EN, dan sebagian
@@ -373,7 +398,20 @@ assert(indexHtml.includes('data-i18n="robot_continue"') && (gameJs.match(/robot_
   'Label tombol robot harus ter-lokalisasi (data-i18n="robot_continue" + kunci di T.id & T.en)');
 assert(homeJs.includes('.robot-memory-backdrop'),
   'Modal robot harus terdaftar pada focus manager agar Tab tidak bocor ke belakang dialog');
-console.log('✓ TEST 15 LULUS: Modal Memori Robot menjeda game, ter-lokalisasi, dan aksesibel.');
+
+// Verifikasi Mayat Peneliti & Surat Amplop Sektor 15 (Wasiat Dr. Sara)
+const openFinalBody = (gameJs.match(/function openFinalLetterModal\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+const closeFinalBody = (gameJs.match(/function closeFinalLetterModal\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+assert(openFinalBody.length > 0 && /gameState\s*=\s*'paused'/.test(openFinalBody),
+  'openFinalLetterModal() harus menjeda game (gameState = "paused") selama wasiat dibuka');
+assert(closeFinalBody.length > 0 && /gameState\s*=\s*'playing'/.test(closeFinalBody),
+  'closeFinalLetterModal() harus melanjutkan game (gameState = "playing") saat wasiat ditutup');
+assert(indexHtml.includes('id="finalLetterModal"'),
+  'Modal surat wasiat #finalLetterModal harus terpasang di index.html');
+assert(gameJs.includes('level15Corpse = {') && gameJs.includes('drawLevel15Corpse()'),
+  'Mayat Sektor 15 & amplop harus diinisialisasi dan digambar prosedural di canvas');
+
+console.log('✓ TEST 15 LULUS: Modal Memori Robot (S10) & Wasiat Mayat Sektor 15 menjeda game, ter-lokalisasi, dan aksesibel.');
 
 // TEST 16: Fondasi dunia deterministik untuk co-op online (PRNG ber-seed).
 // Regresi: dulu seluruh konstruksi level memakai Math.random() langsung, sehingga
@@ -1509,7 +1547,69 @@ assert(indexHtml.includes('openTalentTreeModal()'), 'Tombol buka talent tree har
 
 console.log('✓ TEST 29 LULUS: Sistem Pohon Talenta & Traces Operatif terverifikasi (prasyarat, nanite & audit 12 monster).');
 
+// TEST 30: Pengujian Mekanik Reaktivasi Sektor & Teka-Teki Terminal (OTN Upgrade).
+console.log('\n[TEST 30] Pengujian Reaktivasi Sektor & Teka-Teki Terminal (OTN Upgrade)...');
+
+// 30a. Verifikasi modal terminal dan semantik aksesibilitas
+assert(indexHtml.includes('id="terminalPuzzleModal"'), '#terminalPuzzleModal harus terpasang di index.html');
+assert(indexHtml.includes('id="terminalTimerBar"') && indexHtml.includes('id="terminalTimerText"'), 'Modal terminal harus memiliki bar dan teks timer');
+assert(indexHtml.includes('id="terminalPredatorWarning"'), 'Modal terminal harus memiliki indikator predator warning');
+assert(indexHtml.includes('id="terminalPuzzleBody"'), 'Modal terminal harus memiliki wadah dinamis puzzle body');
+assert(/role="dialog"\s+aria-modal="true"\s+aria-labelledby="terminalPuzzleTitle"/.test(indexHtml), 'Modal terminal harus memiliki ARIA semantik dialog aksesibel');
+
+// 30b. Verifikasi panduan operatif terintegrasi pada modal Instructions
+assert(indexHtml.includes('instructions-scenario-badge'), 'Modal Instructions harus memuat badge skenario fasilitas VITA');
+assert(indexHtml.includes('REAKTIVASI SECTOR NODE'), 'Modal Instructions harus memuat panduan reaktivasi node sektor');
+assert(indexHtml.includes('WARNING: PREDATOR APPROACHING') || indexHtml.includes('PREDATOR MENDEKAT'), 'Modal Instructions harus memuat panduan bahaya predator');
+
+// 30c. Verifikasi logika kode game.js
+assert(gameJs.includes('function openTerminalPuzzleModal'), 'Fungsi openTerminalPuzzleModal() harus terpasang');
+assert(gameJs.includes('function closeTerminalPuzzleModal'), 'Fungsi closeTerminalPuzzleModal() harus terpasang');
+assert(gameJs.includes('function generateTerminalPuzzle'), 'Fungsi generateTerminalPuzzle() harus terpasang');
+assert(gameJs.includes('function handleTerminalSuccess'), 'Fungsi handleTerminalSuccess() harus terpasang');
+assert(gameJs.includes('function handleTerminalFailure'), 'Fungsi handleTerminalFailure() harus terpasang');
+assert(gameJs.includes('function sSystemRestored'), 'Fungsi WebAudio sSystemRestored() harus terpasang');
+assert(gameJs.includes('function sShortCircuit'), 'Fungsi WebAudio sShortCircuit() harus terpasang');
+
+// 30d. Uji generasi puzzle (Type A, B, C, D)
+const puzzleGenSrc = (gameJs.match(/function generateTerminalPuzzle\(\)\s*\{[\s\S]*?\n\}/) || [''])[0];
+const riddlesSrc = (gameJs.match(/const TERMINAL_RIDDLES = \[[\s\S]*?\n\];/) || [''])[0];
+assert(puzzleGenSrc.length > 0 && riddlesSrc.length > 0, 'Sumber generateTerminalPuzzle & TERMINAL_RIDDLES harus ada');
+
+const pScope = new Function(`
+    let lang = 'id';
+    ${riddlesSrc}
+    ${puzzleGenSrc}
+    return { generateTerminalPuzzle, TERMINAL_RIDDLES };
+`)();
+
+const generatedTypes = new Set();
+for (let i = 0; i < 40; i++) {
+    const pz = pScope.generateTerminalPuzzle();
+    assert(pz && pz.type && ['A', 'B', 'C', 'D'].includes(pz.type), 'Setiap puzzle harus memiliki tipe valid A, B, C, atau D');
+    assert(pz.badge && pz.badge.length > 0, 'Puzzle harus memiliki judul badge protokol');
+    generatedTypes.add(pz.type);
+    if (pz.type === 'A') {
+        assert(Array.isArray(pz.choices) && pz.choices.length === 3, 'Tipe A harus memiliki 3 opsi tegangan');
+    } else if (pz.type === 'B') {
+        assert(Array.isArray(pz.choices) && pz.choices.length === 3, 'Tipe B harus memiliki 3 opsi jawaban arsip');
+    } else if (pz.type === 'C') {
+        assert(Array.isArray(pz.code) && pz.code.length === 4, 'Tipe C harus memiliki 4 digit kode kalibrasi');
+    } else if (pz.type === 'D') {
+        assert(Array.isArray(pz.pattern) && pz.pattern.length === 4, 'Tipe D harus memiliki 4 pola saklar biner');
+    }
+}
+assert(generatedTypes.has('A') && generatedTypes.has('B') && generatedTypes.has('C') && generatedTypes.has('D'),
+    'Generator puzzle harus mampu menghasilkan seluruh 4 varian puzzle (A, B, C, D)');
+
+// 30e. Verifikasi render Node (merah saat belum aktif, cyan/hijau saat online)
+assert(gameJs.includes('OFFLINE / CORRUPTED NODE') && gameJs.includes('ONLINE / RESTORED NODE'),
+    'drawArtifacts() harus membedakan render visual node offline (merah) dan online (cyan/green)');
+
+console.log('✓ TEST 30 LULUS: Sistem Reaktivasi Sektor & Teka-Teki Terminal (A, B, C, D) terverifikasi.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (29/29)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (30/30)');
 console.log('=========================================');
+
 

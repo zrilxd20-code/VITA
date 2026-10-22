@@ -152,10 +152,20 @@ function drawEmbers(now) {
 requestAnimationFrame(drawEmbers);
 
 function openModal(name, desc, cmd, req) {
-  document.getElementById('modalTitle').textContent = name;
-  document.getElementById('modalDesc').textContent = desc;
-  document.getElementById('modalCmd').textContent = cmd;
-  document.getElementById('modalReq').textContent = req;
+  const tText = document.getElementById('modalTitleText');
+  if (tText && name) tText.textContent = name;
+  else if (document.getElementById('modalTitle') && name) {
+    document.getElementById('modalTitle').textContent = name;
+  }
+  const mDesc = document.getElementById('modalDesc');
+  if (mDesc) mDesc.textContent = desc || '';
+  const mCmd = document.getElementById('modalCmd');
+  if (mCmd) mCmd.textContent = cmd || '';
+  const mReq = document.getElementById('modalReq');
+  if (mReq) mReq.textContent = req || '';
+  if (typeof updateInstructionsModalLang === 'function') {
+    updateInstructionsModalLang((homeSettings && homeSettings.lang) || 'id');
+  }
   document.getElementById('modal').classList.add('open');
 }
 document.getElementById('modalClose').addEventListener('click', () => {
@@ -2414,7 +2424,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.5.2';
+const APP_VERSION = '2.5.3';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 

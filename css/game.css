@@ -769,12 +769,38 @@ body.game-on.touch-on #gameView #touchUI { display: block; }
     bottom: calc(24px + env(safe-area-inset-bottom));
 }
 #gameView #btnTouchWeapon {
-    right: 184px;
-    bottom: calc(24px + env(safe-area-inset-bottom));
+    right: 22px;
+    bottom: calc(96px + env(safe-area-inset-bottom));
 }
 #gameView #btnTouchPause {
-    right: 260px;
-    bottom: calc(24px + env(safe-area-inset-bottom));
+    top: 88px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    font-size: 15px;
+    background: rgba(6, 12, 22, 0.92);
+    border: 1px solid rgba(0, 240, 255, 0.45);
+    color: #00f0ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 70;
+}
+#gameView #btnTouchExit {
+    top: 88px;
+    right: 48px;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    font-size: 15px;
+    background: rgba(20, 5, 8, 0.92);
+    border: 1px solid rgba(255, 59, 59, 0.5);
+    color: #ff5252;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 70;
 }
 /* Win grade color classes */
 #gameView #winGrade {
@@ -2848,6 +2874,170 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 50, 50, 0.6) !important;
 }
 
+/* ===== LEVEL 15 FALLEN RESEARCHER & FINAL ENVELOPE MODAL ===== */
+.final-letter-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 4, 8, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 10006;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  animation: finalLetterFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes finalLetterFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.final-letter-container {
+  max-width: 620px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(165deg, #131722 0%, #0a0d14 100%);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 28px rgba(245, 158, 11, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.final-letter-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.final-letter-stamp {
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.final-letter-meta {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 10px;
+}
+.final-letter-title {
+  margin: 0;
+  font-size: clamp(17px, 3.2vw, 21px);
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #ffffff;
+  text-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+}
+.final-letter-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 4px;
+  font-family: monospace;
+}
+.final-letter-parchment {
+  background: rgba(254, 243, 199, 0.04);
+  border: 1px solid rgba(254, 243, 199, 0.14);
+  border-radius: 8px;
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.final-letter-wax-seal {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  background: radial-gradient(circle, #dc2626 0%, #7f1d1d 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.3);
+  border: 1px solid #991b1b;
+}
+.wax-seal-circle {
+  font-family: 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #fecaca;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+.final-letter-body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(13px, 2.4vw, 15px);
+  line-height: 1.75;
+  color: #f1f5f9;
+  letter-spacing: 0.2px;
+  padding-right: 36px;
+}
+.final-letter-body p.letter-para {
+  margin: 0 0 14px 0;
+  text-indent: 18px;
+}
+.final-letter-body p.letter-para:first-child {
+  text-indent: 0;
+}
+.final-letter-body p.letter-sign {
+  margin-top: 18px;
+  text-align: right;
+  text-indent: 0;
+}
+.final-letter-body .letter-author {
+  display: block;
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #f59e0b;
+  margin-top: 4px;
+  font-weight: bold;
+}
+.final-letter-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+.final-letter-close-btn {
+  padding: 12px 24px !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(220, 38, 38, 0.3)) !important;
+  border: 1px solid #f59e0b !important;
+  color: #fef3c7 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 12px rgba(245, 158, 11, 0.25) !important;
+}
+.final-letter-close-btn:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.45), rgba(220, 38, 38, 0.5)) !important;
+  border-color: #fbbf24 !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.5) !important;
+}
+@media (max-width: 600px) {
+  .final-letter-container {
+    padding: 18px 14px;
+    gap: 10px;
+  }
+  .final-letter-body {
+    padding-right: 0;
+  }
+  .final-letter-wax-seal {
+    position: static;
+    margin: 0 auto 10px;
+  }
+}
+
 /* ===== CO-OP MULTIPLAYER LOBBY (FASE 2) ===== */
 .coop-modal {
   max-width: 680px;
@@ -4306,15 +4496,7 @@ body.editing-touch-layout #gameView #btnTouchPause::after {
     text-shadow: 0 0 16px rgba(255, 59, 59, 0.75);
 }
 
-/* Fix touch exit and pause separation */
-#btnTouchExit {
-    top: 12px !important;
-    right: 58px !important;
-}
-#btnTouchPause {
-    top: 12px !important;
-    right: 12px !important;
-}
+/* Touch exit and pause positions managed cleanly under minimap */
 
 /* ============================================================
    CHAMPIONSHIP GRADE POLISH: START SCREEN & IN-GAME MENUS
@@ -4479,11 +4661,11 @@ body.touch-on .tutorial-status-indicator {
 }
 
 /* 3. TOMBOL-TOMBOL MOBILE LURUS SEJAJAR PRESISI (100% HORIZONTAL ALIGNMENT) */
-/* Action Cluster (Kanan Bawah): Garis tengah Y = 54px dari bawah */
+/* Action Cluster (Kanan Bawah): Tata Letak Busur Segitiga Ergonomis — Zero Overlap */
 body.touch-on #gameView #btnTouchAtk,
 #btnTouchAtk {
-    right: 20px !important;
-    bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+    right: 18px !important;
+    bottom: calc(18px + env(safe-area-inset-bottom)) !important;
     width: 68px !important;
     height: 68px !important;
     font-size: 26px !important;
@@ -4496,8 +4678,8 @@ body.touch-on #gameView #btnTouchAtk,
 
 body.touch-on #gameView #btnTouchDash,
 #btnTouchDash {
-    right: 98px !important;
-    bottom: calc(28px + env(safe-area-inset-bottom)) !important;
+    right: 96px !important;
+    bottom: calc(20px + env(safe-area-inset-bottom)) !important;
     width: 52px !important;
     height: 52px !important;
     font-size: 20px !important;
@@ -4510,8 +4692,8 @@ body.touch-on #gameView #btnTouchDash,
 
 body.touch-on #gameView #btnTouchWeapon,
 #btnTouchWeapon {
-    right: 160px !important;
-    bottom: calc(28px + env(safe-area-inset-bottom)) !important;
+    right: 22px !important;
+    bottom: calc(96px + env(safe-area-inset-bottom)) !important;
     width: 52px !important;
     height: 52px !important;
     font-size: 20px !important;
@@ -4532,17 +4714,18 @@ body.touch-on #gameView #btnTouchWeapon::after {
     letter-spacing: 0.5px !important;
 }
 
-/* Utility Cluster (Kanan Atas): Tombol Exit & Pause Sejajar Lurus Sempurna */
+/* Utility Cluster (Kanan Atas): Tombol Exit & Pause Tepat di Bawah Radar Minimap */
 body.touch-on #gameView #btnTouchExit,
 #btnTouchExit {
-    top: 10px !important;
-    right: 56px !important;
+    top: 88px !important;
+    right: 48px !important;
     bottom: auto !important;
-    width: 38px !important;
-    height: 38px !important;
+    width: 36px !important;
+    height: 36px !important;
     border-radius: 6px !important;
     border: 1px solid rgba(255, 59, 59, 0.6) !important;
-    background: rgba(18, 6, 10, 0.88) !important;
+    background: rgba(18, 6, 10, 0.92) !important;
+    color: #ff5252 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -4551,28 +4734,71 @@ body.touch-on #gameView #btnTouchExit,
 
 body.touch-on #gameView #btnTouchPause,
 #btnTouchPause {
-    top: 10px !important;
-    right: 10px !important;
+    top: 88px !important;
+    right: 8px !important;
     bottom: auto !important;
-    width: 38px !important;
-    height: 38px !important;
+    width: 36px !important;
+    height: 36px !important;
     border-radius: 6px !important;
     border: 1px solid rgba(0, 240, 255, 0.5) !important;
-    background: rgba(6, 14, 24, 0.88) !important;
+    background: rgba(6, 14, 24, 0.92) !important;
+    color: #00f0ff !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     z-index: 75 !important;
 }
 
-/* Analog Virtual Joystick di Kiri Bawah */
+/* Analog Virtual Joystick di Kiri Bawah — Proporsional & Bebas Tabrakan */
 body.touch-on #gameView #stickZone,
 #stickZone {
-    left: 20px !important;
-    bottom: calc(20px + env(safe-area-inset-bottom)) !important;
-    width: 130px !important;
-    height: 130px !important;
+    left: 16px !important;
+    bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+    width: 118px !important;
+    height: 118px !important;
     z-index: 65 !important;
+}
+
+/* ZOOM HUD DESKTOP STYLING & MOBILE HIDE */
+#zoomHud {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 55;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(6, 12, 22, 0.92);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-radius: 6px;
+    padding: 3px 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+}
+#zoomHud .zoom-btn {
+    background: rgba(0, 240, 255, 0.12);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    color: #00f0ff;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+#zoomHud .zoom-reset {
+    width: auto;
+    padding: 0 6px;
+    font-size: 11px;
+    font-family: monospace;
+}
+body.touch-on #zoomHud,
+@media (pointer: coarse), (max-width: 900px) {
+    #zoomHud {
+        display: none !important;
+    }
 }
 
 /* EAS Broadcast Styling */
@@ -4858,3 +5084,461 @@ body.touch-on #gameView #stickZone,
         line-height: 1.5 !important;
     }
 }
+
+/* ============================================================
+   TERMINAL REACTIVATION PUZZLE (SECTOR NODE OVERRIDE)
+   ============================================================ */
+.terminal-puzzle-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 4, 10, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 10005;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: termPuzzleFade 0.25s ease-out;
+}
+@keyframes termPuzzleFade {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.terminal-puzzle-container {
+  max-width: 580px;
+  width: 100%;
+  max-height: 90vh;
+  max-height: 90dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(165deg, #0d121f 0%, #060910 100%);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 10px;
+  padding: 22px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 240, 255, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+
+.terminal-puzzle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  padding-bottom: 10px;
+}
+
+.terminal-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.terminal-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00f0ff;
+  box-shadow: 0 0 8px #00f0ff;
+  animation: termDotBlink 1.2s infinite alternate;
+  flex-shrink: 0;
+}
+@keyframes termDotBlink {
+  from { opacity: 0.3; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1.15); }
+}
+
+.terminal-protocol-title {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: #cbd5e1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.terminal-protocol-badge {
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #00f0ff;
+  text-transform: uppercase;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.terminal-telemetry-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.terminal-timer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.terminal-timer-bar-bg {
+  height: 8px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-timer-bar {
+  height: 100%;
+  background: #00f0ff;
+  border-radius: 4px;
+  transition: width 0.1s linear, background 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+}
+
+.terminal-timer-lbl {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-family: monospace;
+  color: #94a3b8;
+}
+
+.terminal-timer-digits {
+  font-weight: 700;
+  color: #00f0ff;
+}
+
+.terminal-predator-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 0, 51, 0.16);
+  border: 1px solid #ff0033;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #ff3366;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  animation: predatorWarnFlash 0.5s infinite alternate;
+}
+@keyframes predatorWarnFlash {
+  from { opacity: 0.7; box-shadow: 0 0 6px rgba(255, 0, 51, 0.3); }
+  to { opacity: 1; box-shadow: 0 0 18px rgba(255, 0, 51, 0.75); }
+}
+
+.terminal-puzzle-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 6px 0;
+}
+
+.terminal-puzzle-desc {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+/* PUZZLE TYPE A: VOLTAGE DISPLAY */
+.terminal-voltage-display {
+  background: rgba(0, 240, 255, 0.06);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.voltage-meter-icon {
+  font-size: 20px;
+  color: #f1c40f;
+  text-shadow: 0 0 10px rgba(241, 196, 15, 0.6);
+}
+.voltage-sequence-text {
+  font-family: monospace;
+  font-size: clamp(16px, 3.8vw, 22px);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 2px;
+}
+
+.terminal-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.terminal-options-grid.vertical {
+  grid-template-columns: 1fr;
+}
+
+.terminal-choice-btn {
+  min-height: 48px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.terminal-choice-btn:hover,
+.terminal-choice-btn:focus {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+  transform: translateY(-1px);
+}
+.terminal-choice-btn:active {
+  transform: scale(0.98);
+}
+.choice-num-tag {
+  font-family: monospace;
+  color: #00f0ff;
+  font-weight: 800;
+  font-size: 13px;
+}
+.choice-val-text {
+  font-size: 13px;
+}
+
+/* PUZZLE TYPE B: CORRUPTED RIDDLE */
+.terminal-riddle-box {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.riddle-box-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: monospace;
+  font-size: 10.5px;
+}
+.riddle-tag {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.riddle-title {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+.riddle-lore-text {
+  font-size: 13px;
+  color: #fef3c7;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* PUZZLE TYPE C: MEMORY CODE */
+.terminal-memory-slots {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px 0;
+}
+.memory-digit-box {
+  width: clamp(48px, 11vw, 62px);
+  height: clamp(56px, 13vw, 70px);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: clamp(24px, 5.5vw, 32px);
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+.memory-digit-box.revealed {
+  border-color: #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+  background: rgba(0, 240, 255, 0.08);
+}
+.memory-digit-box.filled {
+  border-color: #2ecc71;
+  color: #2ecc71;
+  box-shadow: 0 0 14px rgba(46, 204, 113, 0.3);
+  background: rgba(46, 204, 113, 0.08);
+}
+.memory-digit-box.current {
+  border-color: #f59e0b;
+  color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+  animation: currentSlotPulse 0.8s infinite alternate;
+}
+@keyframes currentSlotPulse {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+.terminal-keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 280px;
+  margin: 0 auto;
+  width: 100%;
+}
+.keypad-btn {
+  min-height: 46px;
+  font-family: monospace;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.keypad-btn:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00f0ff;
+  color: #00f0ff;
+}
+.keypad-btn:active {
+  transform: scale(0.95);
+}
+.keypad-btn.action {
+  font-size: 13px;
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* PUZZLE TYPE D: BINARY SWITCHES */
+.terminal-switches-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.terminal-switch-card {
+  padding: 12px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.4);
+  transition: all 0.15s ease;
+}
+.terminal-switch-card.off {
+  border-color: rgba(255, 51, 102, 0.35);
+  background: rgba(255, 51, 102, 0.06);
+}
+.terminal-switch-card.on {
+  border-color: #2ecc71;
+  background: rgba(46, 204, 113, 0.14);
+  box-shadow: 0 0 16px rgba(46, 204, 113, 0.25);
+}
+.switch-indicator-led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #64748b;
+}
+.terminal-switch-card.off .switch-indicator-led {
+  background: #ff3366;
+  box-shadow: 0 0 6px #ff3366;
+}
+.terminal-switch-card.on .switch-indicator-led {
+  background: #2ecc71;
+  box-shadow: 0 0 8px #2ecc71;
+}
+.switch-title {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;
+}
+.switch-status-text {
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+.terminal-switch-card.off .switch-status-text {
+  color: #ff8099;
+}
+.terminal-switch-card.on .switch-status-text {
+  color: #2ecc71;
+}
+
+.terminal-submit-circuit-btn {
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.85), rgba(0, 240, 255, 0.9)) !important;
+  border-color: #2ecc71 !important;
+  color: #060910 !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  min-height: 46px;
+  width: 100%;
+}
+.terminal-submit-circuit-btn:hover {
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.6) !important;
+}
+
+/* FOOTER */
+.terminal-puzzle-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+.terminal-tip-indicator {
+  font-family: monospace;
+  font-size: 11px;
+  color: #64748b;
+  letter-spacing: 1px;
+}
+.terminal-abort-btn {
+  font-size: 12px;
+  color: #94a3b8;
+  padding: 6px 14px;
+}
+
+@media (max-width: 560px) {
+  .terminal-puzzle-container {
+    padding: 14px;
+    gap: 10px;
+  }
+  .terminal-options-grid {
+    grid-template-columns: 1fr;
+  }
+  .terminal-switches-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

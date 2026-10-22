@@ -237,6 +237,17 @@ let levelTransition = false;
 let artifacts = [];
 let exitPos = null;
 let wreckedRobot = null;
+let level15Corpse = null;
+let terminalPuzzleActive = false;
+let terminalCurrentNode = null;
+let terminalTimeRemaining = 14.0;
+const TERMINAL_MAX_TIME = 14.0;
+let terminalPuzzleData = null;
+let terminalSlowMoTick = 0;
+let terminalInputSeq = [];
+let terminalSwitches = [0, 0, 0, 0];
+let terminalGlitchCovered = false;
+let terminalGlitchTimeout = null;
 let coinsCollected = 0;
 let floatingTexts = [];
 let lockMsgCooldown = 0;
@@ -399,7 +410,7 @@ let lang = (settings.lang === 'id') ? 'id' : 'en';
 const T = {
     id: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Kesulitan:', ui_hp: 'HP:', ui_atk: 'Attack:',
-        ui_monster: 'Monster:', ui_artifact: 'Artefak:', ui_exit: 'Exit:', ui_time: 'Waktu:',
+        ui_monster: 'Monster:', ui_artifact: 'Node Daya:', ui_exit: 'Exit:', ui_time: 'Waktu:',
         mode_light: 'TERANG', mode_dark: 'GELAP',
         exit_open: 'TERBUKA', exit_locked: 'TERKUNCI',
         ctrl_bar: 'WASD / Panah / Joystick: Gerak | SPACE / KLIK: Serang | SHIFT: Dash | ESC: Jeda | M: Bisukan',
@@ -411,7 +422,7 @@ const T = {
         quality: 'Kualitas', quality_hd: 'HD Tajam', quality_smooth: 'Halus', quality_retro: 'Retro', quality_chunky: 'Kasar',
         zoom_label: 'Perbesaran', zoom_in: 'Perbesar', zoom_out: 'Perkecil', zoom_reset: 'Reset perbesaran',
         ctrl1: 'WASD / Panah: bergerak', ctrl2: 'SPACE / Klik: menyerang', ctrl3: 'SHIFT: dash kebal — tembus jebakan & serangan',
-        ctrl4: 'Kumpulkan semua artefak lalu menuju pintu keluar.',
+        ctrl4: 'Aktifkan semua Node Sektor lalu menuju portal ekstraksi.',
         death_title: '[ SUBJEK TERMINASI — GUGUR ]', death_level_lbl: 'Sektor tercapai:', death_kills_lbl: 'Anomali dinetralisir:',
         retry: 'DARI AWAL', retry_level: 'ULANGI LEVEL INI',
         muted_on: 'Suara mati (tekan M untuk nyalakan)', muted_off: 'Suara nyala',
@@ -420,9 +431,20 @@ const T = {
         win_best_lbl: 'Rekor terbaik:', play_again: 'MAIN LAGI',
         win_grade_lbl: 'Peringkat:', new_best: '[ REKOR BARU TERTINGGI ]',
         announce_light: 'PROTOKOL: TERANG', announce_dark: 'PROTOKOL: GELAP',
-        exit_locked_label: 'AIRLOCK TERKUNCI', need_more_artifacts: 'Butuh {n} artefak lagi',
-        msg_exit_locked: 'Airlock terkunci! Cari {n} artefak lagi!',
-        arrow_artifact: 'ARTEFAK', arrow_exit: 'EXIT',
+        exit_locked_label: 'AIRLOCK TERKUNCI', need_more_artifacts: 'Butuh {n} node lagi',
+        msg_exit_locked: 'Airlock terkunci! Aktifkan {n} node daya lagi!',
+        arrow_artifact: 'NODE DAYA', arrow_exit: 'EXIT',
+        instructions_title: 'PROTOKOL OPERASI: REAKTIVASI SEKTOR',
+        instructions_close: 'MENGERTI & KEMBALI',
+        term_puzzle_title: 'TERMINAL REAKTIVASI SEKTOR',
+        term_timer_label: 'WAKTU TERSISA:',
+        term_predator_warn: '⚠️ PERINGATAN: PREDATOR MENDEKAT!',
+        term_abort_btn: 'BATALKAN (ESC)',
+        term_submit_btn: 'SAMBUNGKAN ARUS GRID',
+        term_success_msg: 'SISTEM PULIH — NODE ONLINE!',
+        term_all_nodes_msg: 'SELURUH DAYA PULIH — PINTU EKSTRAKSI DIBUKA!',
+        term_fail_msg: 'KORSLETING LISTRIK! PREDATOR TERPANCING!',
+        node_prompt_interact: '[E / SENTUH] REAKTIVASI NODE',
         trap_hit: 'Jebakan Duri! -{n} HP', level_up: 'NAIK TINGKAT! HP+{h} ATK+{a}',
         death_time_lbl: 'Waktu bermain:', ui_bpm: 'BIOMETRIK:', death_cause_lbl: 'Penyebab Kematian:',
         death_stamp: 'SUBJEK: DIMANGSA', win_stamp: 'SEKTOR DIBERSIHKAN',
@@ -558,13 +580,13 @@ const T = {
         boss_monolith_phase1: 'FASE I — INTI RUNIK',
         boss_monolith_phase2: 'FASE II — MATA KOSMIK',
         boss_monolith_phase3: 'FASE III — AMUKAN NOVA',
-        obj_collect: 'KUMPULKAN ARTEFAK', obj_exit: 'MENUJU EXIT — AIRLOCK TERBUKA',
-        tut_move: 'WASD / Joystick: bergerak — kumpulkan artefak berpendar',
+        obj_collect: 'REAKTIVASI NODE DAYA', obj_exit: 'MENUJU EXIT — AIRLOCK TERBUKA',
+        tut_move: 'WASD / Joystick: bergerak — dekati & reaktivasi Node Daya merah',
         tut_attack: 'SPACE / Klik: serang ke arah kursor. SHIFT: dash kebal!',
-        tut_exit: 'Semua artefak didapat! Cari portal EXIT hijau sekarang!',
+        tut_exit: 'Semua Node aktif! Cari portal EKSTRAKSI hijau sekarang!',
         holo_move: 'WASD / Joystick untuk bergerak',
         holo_attack: 'Klik Kiri / Tombol Arah untuk menembak',
-        holo_artifact: 'Dekati artefak kuning untuk membawanya ke portal',
+        holo_artifact: 'Dekati Node Daya merah untuk memecahkan puzzle terminal',
         perk_vamp_name: 'Sifon Biomassa Nanit',
         perk_vamp_role: 'Regenerasi Darah & Combo',
         perk_vamp_desc: 'Setiap anomali yang dinetralisir memulihkan +12 HP (+20 HP saat combo multi-kill).',
@@ -625,6 +647,12 @@ const T = {
         layout_saved_toast: 'Tata letak tombol HP disimpan.',
         layout_reset_toast: 'Tata letak tombol HP dikembalikan ke posisi default.',
         robot_continue: 'LANJUTKAN MISI ▸',
+        final_corpse_prompt: '[E / SENTUH] BACA SURAT AMPLOP TERAKHIR',
+        final_letter_badge: 'DOKUMEN WASIAT TERAKHIR // RES-01',
+        final_letter_title: 'SURAT TERAKHIR DR. SARA',
+        final_letter_sub: 'Ditemukan di samping mayat peneliti di koridor evakuasi Sektor 15',
+        final_letter_close: 'SIMPAN WASIAT & MENUJU PORTAL EVAKUASI ▸',
+        final_letter_toast: '[ WASIAT DR. SARA DITEMUKAN — SEKTOR 15 TERLENGKAPI ]',
         coop_lobby_btn: 'OPERASI CO-OP (4 PEMAIN)',
         coop_modal_title: 'TERMINAL MULTIPLAYER CO-OP',
         coop_tab_host: 'BUAT KAMAR (HOST)',
@@ -775,7 +803,7 @@ const T = {
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
-        ui_monster: 'Monster:', ui_artifact: 'Artifacts:', ui_exit: 'Exit:', ui_time: 'Time:',
+        ui_monster: 'Monster:', ui_artifact: 'Power Nodes:', ui_exit: 'Exit:', ui_time: 'Time:',
         mode_light: 'LIGHT', mode_dark: 'DARK',
         exit_open: 'OPEN', exit_locked: 'LOCKED',
         ctrl_bar: 'WASD / Arrows / Joystick: Move | SPACE / CLICK: Attack | SHIFT: Dash | ESC: Pause | M: Mute',
@@ -787,7 +815,7 @@ const T = {
         quality: 'Quality', quality_hd: 'HD Sharp', quality_smooth: 'Smooth', quality_retro: 'Retro', quality_chunky: 'Chunky',
         zoom_label: 'Zoom', zoom_in: 'Zoom in', zoom_out: 'Zoom out', zoom_reset: 'Reset zoom',
         ctrl1: 'WASD / Arrows: move', ctrl2: 'SPACE / Click: attack', ctrl3: 'SHIFT: phase dash — invincible, pass traps & hits',
-        ctrl4: 'Collect all artifacts, then reach the exit portal.',
+        ctrl4: 'Reactivate all Sector Nodes, then reach the extraction portal.',
         death_title: '[ SUBJECT TERMINATED — DEAD ]', death_level_lbl: 'Sector reached:', death_kills_lbl: 'Monsters neutralized:',
         retry: 'FROM START', retry_level: 'RETRY LEVEL',
         muted_on: 'Muted (press M to unmute)', muted_off: 'Sound on',
@@ -796,9 +824,20 @@ const T = {
         win_best_lbl: 'Best record:', play_again: 'PLAY AGAIN',
         win_grade_lbl: 'Rank:', new_best: '[ NEW BEST RECORD ]',
         announce_light: 'PROTOCOL: LIGHT', announce_dark: 'PROTOCOL: DARK',
-        exit_locked_label: 'EXIT LOCKED', need_more_artifacts: 'Need {n} more artifacts',
-        msg_exit_locked: 'Airlock locked! Find {n} more artifacts!',
-        arrow_artifact: 'ARTIFACT', arrow_exit: 'EXIT',
+        exit_locked_label: 'EXIT LOCKED', need_more_artifacts: 'Need {n} more nodes',
+        msg_exit_locked: 'Airlock locked! Reactivate {n} more power nodes!',
+        arrow_artifact: 'POWER NODE', arrow_exit: 'EXIT',
+        instructions_title: 'OPERATIONAL PROTOCOL: SECTOR REACTIVATION',
+        instructions_close: 'ACKNOWLEDGED & RETURN',
+        term_puzzle_title: 'SECTOR TERMINAL REACTIVATION',
+        term_timer_label: 'TIME REMAINING:',
+        term_predator_warn: '⚠️ WARNING: PREDATOR APPROACHING!',
+        term_abort_btn: 'ABORT (ESC)',
+        term_submit_btn: 'CONNECT GRID CIRCUIT',
+        term_success_msg: 'SYSTEM RESTORED — NODE ONLINE!',
+        term_all_nodes_msg: 'ALL SECTOR POWER RESTORED — EXTRACTION UNLOCKED!',
+        term_fail_msg: 'SHORT CIRCUIT! PREDATORS ALERTED!',
+        node_prompt_interact: '[E / TOUCH] REACTIVATE NODE',
         trap_hit: 'Spike Trap! -{n} HP', level_up: 'LEVEL UP! HP+{h} ATK+{a}',
         death_time_lbl: 'Play time:', ui_bpm: 'BIOMETRIC:', death_cause_lbl: 'Cause of Death:',
         death_stamp: 'SUBJECT: TERMINATED', win_stamp: 'SECTOR PURGED',
@@ -934,13 +973,13 @@ const T = {
         boss_monolith_phase1: 'PHASE I — RUNIC CORE',
         boss_monolith_phase2: 'PHASE II — COSMIC EYE',
         boss_monolith_phase3: 'PHASE III — BERSERK NOVA',
-        obj_collect: 'COLLECT ARTIFACTS', obj_exit: 'GO TO EXIT — AIRLOCK OPEN',
-        tut_move: 'WASD / Joystick: move — collect glowing artifacts',
+        obj_collect: 'REACTIVATE POWER NODES', obj_exit: 'GO TO EXIT — AIRLOCK OPEN',
+        tut_move: 'WASD / Joystick: move — approach & reactivate red Power Nodes',
         tut_attack: 'SPACE / Click: attack toward cursor. SHIFT: invincible dash!',
-        tut_exit: 'All artifacts secured! Find the green EXIT portal now!',
+        tut_exit: 'All Nodes online! Find the green EXTRACTION portal now!',
         holo_move: 'WASD / Joystick to move',
         holo_attack: 'Left Click / Direction Button to shoot',
-        holo_artifact: 'Approach yellow artifacts to carry them to the portal',
+        holo_artifact: 'Approach red Power Nodes to solve terminal puzzle',
         perk_vamp_name: 'Nanite Bio-Siphon',
         perk_vamp_role: 'Blood Regen & Combo',
         perk_vamp_desc: 'Every eliminated anomaly restores +12 HP (+20 HP during multi-kill combo).',
@@ -1001,6 +1040,12 @@ const T = {
         layout_saved_toast: 'Mobile button layout saved.',
         layout_reset_toast: 'Mobile button layout restored to default.',
         robot_continue: 'CONTINUE MISSION ▸',
+        final_corpse_prompt: '[E / TAP] READ FINAL ENVELOPE LETTER',
+        final_letter_badge: 'FINAL TESTAMENT MEMORANDUM // RES-01',
+        final_letter_title: 'DR. SARA\'S FINAL LETTER',
+        final_letter_sub: 'Recovered beside the fallen researcher at Sector 15 extraction',
+        final_letter_close: 'PRESERVE TESTAMENT & ENTER EXTRACTION ▸',
+        final_letter_toast: '[ DR. SARA\'S TESTAMENT FOUND — SECTOR 15 LOG COMPLETED ]',
         coop_lobby_btn: 'CO-OP ONLINE (4 PLAYERS)',
         coop_modal_title: 'CO-OP MULTIPLAYER TERMINAL',
         coop_tab_host: 'CREATE ROOM (HOST)',
@@ -1342,12 +1387,73 @@ function setLang(value) {
     if (gLang) gLang.value = lang;
     if (typeof player !== 'undefined' && player) updateUI();
 }
+function updateInstructionsModalLang(activeLang) {
+    const isEn = (activeLang === 'en');
+    const sHead = document.getElementById('instScenarioHead');
+    const sBody = document.getElementById('instScenarioBody');
+    const c1Title = document.getElementById('instCard1Title');
+    const c1Desc = document.getElementById('instCard1Desc');
+    const c2Title = document.getElementById('instCard2Title');
+    const c2Desc = document.getElementById('instCard2Desc');
+    const c3Title = document.getElementById('instCard3Title');
+    const c3Desc = document.getElementById('instCard3Desc');
+    const c4Title = document.getElementById('instCard4Title');
+    const c4Desc = document.getElementById('instCard4Desc');
+    const mTitleText = document.getElementById('modalTitleText');
+
+    if (mTitleText) {
+        mTitleText.textContent = isEn ? 'OPERATIONAL PROTOCOL: SECTOR REACTIVATION' : 'PROTOKOL OPERASI: REAKTIVASI SEKTOR';
+    }
+    if (sHead) {
+        sHead.textContent = isEn ? 'VITA FACILITY SCENARIO:' : 'SKENARIO FASILITAS VITA:';
+    }
+    if (sBody) {
+        sBody.innerHTML = isEn
+            ? 'All sector power has failed due to biological anomaly breaches. The Operative\'s mission is to reactivate all corrupted <span style="color:#ff3366;font-weight:bold;">Power Nodes</span> to disengage the <span style="color:#2ecc71;font-weight:bold;">Extraction</span> gate lock.'
+            : 'Seluruh daya sektor telah padam akibat serangan anomali biologis. Misi Operatif adalah mereaktivasi seluruh <span style="color:#ff3366;font-weight:bold;">Power Node</span> yang korup untuk membuka kuncian gerbang <span style="color:#2ecc71;font-weight:bold;">Ekstraksi</span>.';
+    }
+    if (c1Title) {
+        c1Title.textContent = isEn ? '1. MANEUVER & LOCOMOTION' : '1. MANUVER & GERAKAN';
+    }
+    if (c1Desc) {
+        c1Desc.innerHTML = isEn
+            ? '<strong>PC / Keyboard:</strong> [W][A][S][D] / Arrow Keys to move. Press [SHIFT] for Phase Dash (temporary invulnerability through traps).<br><strong>Mobile Touchscreen:</strong> Move the Virtual Joystick on the bottom-left. Tap [DASH] on the bottom-right.'
+            : '<strong>PC / Keyboard:</strong> [W][A][S][D] / Tombol Panah untuk bergerak. Tekan [SHIFT] untuk Phase Dash (kebal sesaat menembus jebakan).<br><strong>Layar Sentuh HP:</strong> Gerakkan Analog Joystick di kiri bawah layar. Sentuh tombol [DASH] di kanan bawah.';
+    }
+    if (c2Title) {
+        c2Title.textContent = isEn ? '2. REACTIVASI SECTOR NODE (TERMINAL PUZZLE)' : '2. REAKTIVASI SECTOR NODE (TERMINAL PUZZLE)';
+    }
+    if (c2Desc) {
+        c2Desc.innerHTML = isEn
+            ? 'Approach a <strong>Red Power Node</strong> (Corrupted/Offline). Touch or press <strong>[E]</strong> to access the terminal. Solve 1 of 4 system logic puzzles (Voltage Sequence, Facility Archive, Memory Calibration, or Circuit Switches) within 14 seconds to restore power to the grid (turns Glowing Green/Cyan).'
+            : 'Dekati <strong>Node Daya Merah</strong> (Corrupted/Offline). Sentuh atau tekan <strong>[E]</strong> untuk membuka terminal. Pecahkan 1 dari 4 teka-teki logika sistem (Deret Tegangan Listrik, Arsip Fasilitas, Kalibrasi Memori, atau Saklar Sirkuit) dalam batas waktu 14 detik untuk memulihkan daya ke grid (berubah jadi Hijau/Cyan Menyala).';
+    }
+    if (c3Title) {
+        c3Title.textContent = isEn ? '3. SLOW-MOTION & PREDATOR WARNING' : '3. SLOW-MOTION & PERINGATAN PREDATOR';
+    }
+    if (c3Desc) {
+        c3Desc.innerHTML = isEn
+            ? 'While the terminal is open, simulation runs in slow-motion, but nearby anomalies <strong>still slowly approach</strong>! Watch the alert: <em>WARNING: PREDATOR APPROACHING</em>. Solve the puzzle quickly before taking damage!'
+            : 'Saat terminal terbuka, simulasi game melambat (slow-motion), namun monster anomali di sekitar <strong>tetap perlahan mendekat</strong>! Perhatikan peringatan <em>WARNING: PREDATOR APPROACHING</em>. Selesaikan teka-teki secepat mungkin sebelum diserang!';
+    }
+    if (c4Title) {
+        c4Title.textContent = isEn ? '4. SHORT CIRCUIT vs SECTOR EXTRACTION' : '4. KORSLETING vs EKSTRAKSI SEKTOR';
+    }
+    if (c4Desc) {
+        c4Desc.innerHTML = isEn
+            ? '<strong>Wrong Answer / Timeout:</strong> Triggers an electrical short circuit and a sonic alarm that lures nearby predators.<br><strong>Correct Answer:</strong> Power restored. Once all Nodes in the sector are Online, the <strong>Green Extraction</strong> gate unlocks for evacuation to the next sector!'
+            : '<strong>Jawaban Salah / Waktu Habis:</strong> Terjadi korsleting listrik, memicu alarm sonik yang memanggil predator terdekat.<br><strong>Jawaban Benar:</strong> Daya pulih. Setelah seluruh Node di sektor itu Online, pintu <strong>Ekstraksi Hijau</strong> akan terbuka untuk evakuasi ke sektor berikutnya!';
+    }
+}
+window.updateInstructionsModalLang = updateInstructionsModalLang;
+
 function applyLang() {
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
         const v = tt(el.getAttribute('data-i18n'));
         if (v) el.textContent = v;
     });
+    updateInstructionsModalLang(lang);
     document.getElementById('lblLevel').textContent = tt('ui_level');
     document.getElementById('lblMode').textContent = tt('ui_mode');
     if (document.getElementById('lblDiff')) document.getElementById('lblDiff').textContent = tt('ui_diff');
@@ -3380,13 +3486,13 @@ const MONSTER_TYPES = [
 ];
 
 const ARTIFACT_TYPES = [
-    { name: 'Coin Emas', nameEn: 'Gold Coin', color: '#f1c40f', shape: 'circle' },
-    { name: 'Permata Biru', nameEn: 'Blue Gem', color: '#3498db', shape: 'diamond' },
-    { name: 'Rubi Merah', nameEn: 'Red Ruby', color: '#e74c3c', shape: 'diamond' },
-    { name: 'Kristal Hijau', nameEn: 'Green Crystal', color: '#2ecc71', shape: 'square' },
-    { name: 'Amethyst Ungu', nameEn: 'Purple Amethyst', color: '#9b59b6', shape: 'square' },
-    { name: 'Artefak Kuno', nameEn: 'Ancient Artifact', color: '#e67e22', shape: 'star' },
-    { name: 'Cincin Sakti', nameEn: 'Magic Ring', color: '#ecf0f1', shape: 'ring' }
+    { name: 'Node Daya Alfa', nameEn: 'Alpha Power Node', color: '#ff2244', shape: 'node_alpha' },
+    { name: 'Node Daya Beta', nameEn: 'Beta Power Node', color: '#ff3366', shape: 'node_beta' },
+    { name: 'Node Daya Gamma', nameEn: 'Gamma Power Node', color: '#ff4444', shape: 'node_gamma' },
+    { name: 'Node Sub-Grid Delta', nameEn: 'Delta Sub-Grid', color: '#ff5522', shape: 'node_delta' },
+    { name: 'Node Reaktor Epsilon', nameEn: 'Epsilon Reactor Node', color: '#ff1155', shape: 'node_epsilon' },
+    { name: 'Konsol Daya Utama', nameEn: 'Main Power Console', color: '#ff0033', shape: 'node_zeta' },
+    { name: 'Terminal Relay Sektor', nameEn: 'Sector Relay Terminal', color: '#ff2a2a', shape: 'node_eta' }
 ];
 
 function findFarSpot(minDist, taken) {
@@ -4051,6 +4157,12 @@ function buildLevelWorld(level) {
     traps = [];
     artifacts = [];
     coinsCollected = 0;
+    level15Corpse = null;
+    terminalPuzzleActive = false;
+    terminalCurrentNode = null;
+    if (terminalGlitchTimeout) { clearTimeout(terminalGlitchTimeout); terminalGlitchTimeout = null; }
+    const termM = document.getElementById('terminalPuzzleModal');
+    if (termM) termM.style.display = 'none';
 
     if (level === LEVELS - 1) {
         // --- LEVEL 15: CIRCULAR ARENA SETUP ---
@@ -5683,6 +5795,22 @@ function attackMonster(m, customDmg) {
                 color: '#f1c40f', life: 160, maxLife: 160
             });
             sWin();
+
+            // Menempatkan mayat peneliti (Dr. Sara) dan kertas amplop di samping portal exit
+            if (exitPos) {
+                level15Corpse = {
+                    x: exitPos.x - 38,
+                    y: exitPos.y + 6,
+                    envelopeX: exitPos.x - 20,
+                    envelopeY: exitPos.y + 14,
+                    gx: Math.floor((exitPos.x - 38) / CELL),
+                    gy: Math.floor((exitPos.y + 6) / CELL),
+                    inspected: false
+                };
+                for (let i = 0; i < 6; i++) {
+                    addDecal(level15Corpse.x + (Math.random() - 0.5) * 22, level15Corpse.y + (Math.random() - 0.5) * 18, '#3d0408', 8, 'splat');
+                }
+            }
         }
     }
 
@@ -6607,24 +6735,10 @@ function updatePlayer() {
     }
 
     artifacts.forEach(a => {
-        if (!a.collected && dist(a, player) < 26) {
-            a.collected = true;
-            coinsCollected++;
-            sArtifact();
-            const aColor = (a.type && a.type.color) ? a.type.color : '#3498db';
-            addParticle(a.x, a.y, aColor, 18, 5, 35);
-            player.hp = Math.min(player.maxHp, player.hp + 8);
-            floatingTexts.push({
-                x: a.x, y: a.y - 20,
-                text: `+${aTypeName(a.type || { name: 'Artefak', nameEn: 'Artifact' })}!`,
-                color: aColor,
-                life: 60,
-                maxLife: 60
-            });
-            if (tutorialActive && tutorialStep === 3) {
-                advanceTutorialStep(3);
+        if (!a.collected && !terminalPuzzleActive && dist(a, player) < 28) {
+            if (Date.now() > (a.cooldownUntil || 0)) {
+                openTerminalPuzzleModal(a);
             }
-            updateUI();
         }
     });
 
@@ -6653,6 +6767,15 @@ function updatePlayer() {
     if (wreckedRobot && currentLevel === 9 && !wreckedRobot.inspected && dist(player, wreckedRobot) < 45) {
         wreckedRobot.inspected = true;
         openRobotMemoryModal();
+    }
+
+    // Check Sector 15 Fallen Researcher Envelope (Beside Exit)
+    if (level15Corpse && currentLevel === LEVELS - 1 && !level15Corpse.inspected) {
+        const d = dist(player, { x: level15Corpse.envelopeX, y: level15Corpse.envelopeY });
+        if (d < 36) {
+            level15Corpse.inspected = true;
+            openFinalLetterModal();
+        }
     }
 
     // Check Nanite Medical Chamber Interaction
@@ -10390,94 +10513,121 @@ function drawParticles() {
 function drawArtifacts() {
     const time = Date.now() / 1000;
     artifacts.forEach(a => {
-        if (a.collected) return;
-
         const sx = a.x - cameraX + W / 2;
-        const sy = a.y - cameraY + H / 2 + Math.sin(time * 2 + a.bobPhase) * 4;
+        const sy = a.y - cameraY + H / 2 + Math.sin(time * 2 + (a.bobPhase || 0)) * 3;
 
-        if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) return;
+        if (sx < -60 || sx > W + 60 || sy < -60 || sy > H + 60) return;
         if (!fogOfWar[a.gy] || !fogOfWar[a.gy][a.gx]) return;
 
         ctx.save();
         ctx.translate(sx, sy);
 
-        const pulse = 1 + Math.sin(time * 3 + a.bobPhase) * 0.15;
-        ctx.shadowColor = a.type.color;
-        ctx.shadowBlur = 18;
-        ctx.fillStyle = a.type.color;
-        ctx.globalAlpha = 0.25;
-        ctx.beginPath();
-        ctx.arc(0, 0, 16 * pulse, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
+        if (!a.collected) {
+            // ==========================================
+            // 1. OFFLINE / CORRUPTED NODE (Pulsing Red)
+            // ==========================================
+            const pulse = 1 + Math.sin(time * 5 + (a.bobPhase || 0)) * 0.22;
+            const glowAlpha = 0.35 + Math.sin(time * 6 + (a.bobPhase || 0)) * 0.2;
 
-        ctx.rotate(Math.sin(time * 1.5 + a.bobPhase) * 0.3);
-        if (a.type.shape === 'circle') {
+            // Warning aura
+            ctx.shadowColor = '#ff0033';
+            ctx.shadowBlur = 18 * pulse;
+            ctx.fillStyle = '#ff0033';
+            ctx.globalAlpha = glowAlpha;
             ctx.beginPath();
-            ctx.arc(0, 0, 8 * pulse, 0, Math.PI * 2);
-            ctx.fillStyle = a.type.color;
+            ctx.arc(0, 0, 18 * pulse, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
+
+            // Geometric housing (Rotated square bracket)
+            ctx.globalAlpha = 0.85;
+            ctx.strokeStyle = '#ff3366';
+            ctx.lineWidth = 1.8;
+            ctx.save();
+            ctx.rotate(time * 1.5 + (a.bobPhase || 0));
+            ctx.strokeRect(-10 * pulse, -10 * pulse, 20 * pulse, 20 * pulse);
+            ctx.restore();
+
+            // Inner corrupted power core
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#c91c1c';
+            ctx.beginPath();
+            ctx.arc(0, 0, 7 * pulse, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
             ctx.stroke();
-            ctx.fillStyle = '#fff';
+
+            // Blinking red warning indicator dot
+            ctx.fillStyle = Math.sin(time * 8) > 0 ? '#ff0033' : '#660011';
             ctx.beginPath();
-            ctx.arc(0, 0, 3, 0, Math.PI * 2);
+            ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
             ctx.fill();
-        } else if (a.type.shape === 'diamond') {
-            ctx.beginPath();
-            ctx.moveTo(0, -10 * pulse);
-            ctx.lineTo(8 * pulse, 0);
-            ctx.lineTo(0, 10 * pulse);
-            ctx.lineTo(-8 * pulse, 0);
-            ctx.closePath();
-            ctx.fillStyle = a.type.color;
-            ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        } else if (a.type.shape === 'square') {
-            ctx.fillStyle = a.type.color;
-            ctx.fillRect(-8 * pulse, -8 * pulse, 16 * pulse, 16 * pulse);
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(-8 * pulse, -8 * pulse, 16 * pulse, 16 * pulse);
-        } else if (a.type.shape === 'star') {
-            ctx.beginPath();
-            for (let i = 0; i < 10; i++) {
-                const rad = i % 2 === 0 ? 10 * pulse : 5 * pulse;
-                const ang = -Math.PI / 2 + i * Math.PI / 5;
-                ctx.lineTo(Math.cos(ang) * rad, Math.sin(ang) * rad);
+
+            ctx.shadowBlur = 0;
+            ctx.restore();
+
+            // Status Text above/below Node
+            ctx.save();
+            ctx.fillStyle = '#ff4466';
+            ctx.font = 'bold 9px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(aTypeName(a.type), sx, sy - 22);
+
+            // Proximity interaction hint if player is near
+            if (player && dist(player, a) < 48) {
+                const hintPulse = 0.8 + Math.sin(time * 8) * 0.2;
+                ctx.globalAlpha = hintPulse;
+                ctx.fillStyle = '#00f0ff';
+                ctx.font = 'bold 9.5px Arial';
+                ctx.fillText(tt('node_prompt_interact'), sx, sy + 22);
             }
-            ctx.closePath();
-            ctx.fillStyle = a.type.color;
+            ctx.restore();
+        } else {
+            // ==========================================
+            // 2. ONLINE / RESTORED NODE (Glowing Cyan / Green)
+            // ==========================================
+            const pulse = 1 + Math.sin(time * 2.5 + (a.bobPhase || 0)) * 0.1;
+
+            // Restored energy aura
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 20 * pulse;
+            ctx.fillStyle = '#00f0ff';
+            ctx.globalAlpha = 0.25;
+            ctx.beginPath();
+            ctx.arc(0, 0, 16 * pulse, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = '#fff';
+
+            // Steady octagonal power housing
+            ctx.globalAlpha = 0.9;
+            ctx.strokeStyle = '#2ecc71';
             ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 9 * pulse, 0, Math.PI * 2);
             ctx.stroke();
-        } else if (a.type.shape === 'ring') {
+
+            // Glowing cyan core
+            ctx.fillStyle = '#00f0ff';
             ctx.beginPath();
-            ctx.arc(0, 0, 8 * pulse, 0, Math.PI * 2);
-            ctx.fillStyle = a.type.color;
+            ctx.arc(0, 0, 5, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillStyle = '#222';
+            ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.arc(0, 0, 4, 0, Math.PI * 2);
+            ctx.arc(0, 0, 2, 0, Math.PI * 2);
             ctx.fill();
-            ctx.beginPath();
-            ctx.arc(0, 0, 3, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff';
-            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            ctx.restore();
+
+            // Online label
+            ctx.save();
+            ctx.fillStyle = '#2ecc71';
+            ctx.font = 'bold 9px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('ONLINE [SEC-OK]', sx, sy + 20);
+            ctx.restore();
         }
-
-        ctx.rotate(-Math.sin(time * 1.5 + a.bobPhase) * 0.3);
-        ctx.restore();
-
-        ctx.fillStyle = a.type.color;
-        ctx.font = 'bold 10px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(aTypeName(a.type), sx, sy + 26);
     });
 
     // Draw Classified Lore Data Discs
@@ -10885,6 +11035,716 @@ function closeRobotMemoryModal() {
 }
 window.openRobotMemoryModal = openRobotMemoryModal;
 window.closeRobotMemoryModal = closeRobotMemoryModal;
+
+// ============================================================
+// LEVEL 15 FALLEN SCIENTIST (DR. SARA) & FINAL LETTER ENVELOPE
+// ============================================================
+function drawLevel15Corpse() {
+    if (!level15Corpse || currentLevel !== LEVELS - 1) return;
+    const sx = level15Corpse.x - cameraX + W / 2;
+    const sy = level15Corpse.y - cameraY + H / 2;
+
+    if (sx < -90 || sx > W + 90 || sy < -90 || sy > H + 90) return;
+    if (!fogOfWar[level15Corpse.gy] || !fogOfWar[level15Corpse.gy][level15Corpse.gx]) return;
+
+    const t = Date.now() / 1000;
+
+    ctx.save();
+    ctx.translate(sx, sy);
+
+    // 1. POOL OF COAGULATED BLOOD ON THE CONCRETE FLOOR
+    ctx.fillStyle = 'rgba(38, 4, 8, 0.88)';
+    ctx.beginPath();
+    ctx.ellipse(0, 4, 25, 13, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Inner dark crimson pool sheen
+    ctx.fillStyle = 'rgba(88, 10, 18, 0.72)';
+    ctx.beginPath();
+    ctx.ellipse(-2, 3, 17, 8, -0.15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Blood splatters
+    ctx.fillStyle = 'rgba(64, 6, 12, 0.75)';
+    ctx.beginPath();
+    ctx.arc(-20, 8, 2.2, 0, Math.PI * 2);
+    ctx.arc(-14, -10, 1.8, 0, Math.PI * 2);
+    ctx.arc(14, 11, 1.8, 0, Math.PI * 2);
+    ctx.arc(20, 5, 2.0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2. TACTICAL TROUSERS & BOOTS (SLUMPED POSE)
+    ctx.save();
+    ctx.rotate(-0.16);
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(-17, 2, 15, 5);
+    ctx.fillRect(-19, 7, 17, 5);
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(-24, 2, 7, 5.5);
+    ctx.fillRect(-26, 7, 7, 5.5);
+    ctx.restore();
+
+    // 3. SCIENTIST WHITE LAB COAT & TORSO
+    ctx.fillStyle = '#e2e8f0';
+    ctx.beginPath();
+    ctx.ellipse(-1, 0, 12, 8, -0.15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Inner dark shirt
+    ctx.fillStyle = '#334155';
+    ctx.beginPath();
+    ctx.ellipse(-1, 0, 6, 4, -0.15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Chest blood stain where fatal spore wound struck
+    ctx.fillStyle = 'rgba(127, 29, 29, 0.85)';
+    ctx.beginPath();
+    ctx.ellipse(1, 2, 5.5, 3.8, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Left arm resting beside body
+    ctx.fillStyle = '#cbd5e1';
+    ctx.beginPath();
+    ctx.ellipse(-4, -6, 7.5, 3.2, -0.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Right arm reaching forward towards the letter
+    ctx.fillStyle = '#cbd5e1';
+    ctx.beginPath();
+    ctx.ellipse(9, 4, 8.5, 3, 0.42, 0, Math.PI * 2);
+    ctx.fill();
+    // Hand
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(16, 8, 2.6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cyan ID Card Badge on lab coat lapel ("RES-01")
+    ctx.fillStyle = '#00f0ff';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 4;
+    ctx.fillRect(0, -4, 4, 2.5);
+    ctx.shadowBlur = 0;
+
+    // 4. SCIENTIST HEAD & HAIR
+    ctx.fillStyle = '#fed7aa';
+    ctx.beginPath();
+    ctx.arc(7, -5, 5.5, 0, Math.PI * 2);
+    ctx.fill();
+    // Dark hair resting peacefully
+    ctx.fillStyle = '#451a03';
+    ctx.beginPath();
+    ctx.arc(6.5, -6, 5.8, Math.PI * 0.7, Math.PI * 1.9);
+    ctx.fill();
+
+    ctx.restore(); // Back to world space
+
+    // 5. THE LETTER ENVELOPE (AMPLOP KERTAS WASIAT)
+    const envSx = level15Corpse.envelopeX - cameraX + W / 2;
+    const envSy = level15Corpse.envelopeY - cameraY + H / 2;
+
+    ctx.save();
+    ctx.translate(envSx, envSy);
+
+    // Pulsating golden beacon halo
+    const glowPulse = 0.55 + Math.sin(t * 3.5) * 0.25;
+    ctx.fillStyle = '#f59e0b';
+    ctx.shadowColor = '#f59e0b';
+    ctx.shadowBlur = 14 * glowPulse;
+    ctx.globalAlpha = 0.35 * glowPulse;
+    ctx.beginPath();
+    ctx.arc(0, 0, 13, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1.0;
+
+    // Paper envelope rectangle (angled slightly on the floor)
+    ctx.save();
+    ctx.rotate(0.2);
+    ctx.fillStyle = '#fef3c7';
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(-8, -5, 16, 10, 1.5);
+    ctx.fill();
+    ctx.stroke();
+
+    // Flap fold crease lines
+    ctx.strokeStyle = '#b45309';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(-8, -5);
+    ctx.lineTo(0, 1);
+    ctx.lineTo(8, -5);
+    ctx.stroke();
+
+    // Red wax seal in the middle
+    ctx.fillStyle = '#dc2626';
+    ctx.beginPath();
+    ctx.arc(0, 1, 2.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore(); // envelope rotation
+
+    ctx.restore(); // envelope translation
+
+    // Tiny golden ember particles
+    if (Math.random() < 0.1 && typeof addParticle === 'function') {
+        addParticle(
+            level15Corpse.envelopeX + (Math.random() - 0.5) * 8,
+            level15Corpse.envelopeY + (Math.random() - 0.5) * 8,
+            '#ffd700', 2, 1.2, 18
+        );
+    }
+
+    // Floating interaction prompt when player approaches
+    if (player && dist(player, { x: level15Corpse.envelopeX, y: level15Corpse.envelopeY }) < 50) {
+        ctx.save();
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = 'bold 11px monospace';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = 8;
+        const bob = Math.sin(t * 4.5) * 2;
+        ctx.fillText(tt('final_corpse_prompt'), envSx, envSy - 20 + bob);
+        ctx.shadowBlur = 0;
+        ctx.restore();
+    }
+}
+
+function openFinalLetterModal() {
+    const modal = document.getElementById('finalLetterModal');
+    if (!modal) return;
+    try {
+        if (typeof playOccultTone === 'function') playOccultTone(80, 50, 1.5, 0.35, 'triangle');
+    } catch (_) {}
+    const bodyEl = document.getElementById('finalLetterBodyText');
+    const curLang = (typeof lang !== 'undefined' && lang === 'en') ? 'en' : 'id';
+    if (bodyEl) {
+        bodyEl.innerHTML = curLang === 'en'
+            ? `<p class="letter-para">"To you... <strong>Prototype-19</strong>.</p>
+<p class="letter-para">If your optical sensors are scanning this paper, you did it... <em>The Monolith has fallen</em>, and this living nightmare is finally over.</p>
+<p class="letter-para">My blood is turning cold, and my final breaths are slipping away. Forgive us for awakening you without memories... with nothing but a cold serial number stamped on your chassis.</p>
+<p class="letter-para">We believed our research could transcend the threshold of mortality. But blinded by hubris, we unsealed the gates of Coelum Carnis upon this world. When the facility collapsed and evacuation sirens blared, I refused to board the last escape pod. I had to remain behind... to manually override the airlock bypass and ensure this extraction portal unlocked the moment you felled the Apex Monolith.</p>
+<p class="letter-para">You are not merely a soulless machine, Number 19. Beneath your titanium armor lies the last embers of our soul and hope.</p>
+<p class="letter-para">Step through the extraction portal beside me. Breathe the fresh dawn air above, and live free. The world outside awaits you.</p>
+<p class="letter-para letter-sign"><em>Thank you... for fighting for us."</em><br><span class="letter-author">&mdash; Dr. Sara, Chief Research Scientist (RES-01)</span></p>`
+            : `<p class="letter-para">"Untukmu... <strong>Prototype-19</strong>.</p>
+<p class="letter-para">Jika matamu membaca lembaran ini, berarti kau berhasil... <em>The Monolith telah runtuh</em>, dan mimpi buruk ini akhirnya berakhir.</p>
+<p class="letter-para">Darahku perlahan membeku, dan sisa nafasku hampir habis. Maafkan kami yang telah membangunkanmu tanpa ingatan... tanpa masa lalu selain nomor seri di sasis titaniummu.</p>
+<p class="letter-para">Kami mengira sains kami mampu menaklukkan batas kematian. Namun kami dibutakan ambisi, hingga justru membuka pintu gerbang bagi Coelum Carnis ke dunia ini. Saat seluruh fasilitas runtuh dan sirene evakuasi berbunyi, aku menolak masuk ke kapsul penyelamat terakhir. Aku harus tetap di sini... untuk memprogram ulang gerbang udara dan memastikan jalan keluar ini terbuka saat kau menumbangkan Apex Monolith.</p>
+<p class="letter-para">Kau bukan sekadar mesin nirjiwa, Nomor 19. Logam dinginmu membawa secercah jiwa dan harapan kami yang tersisa.</p>
+<p class="letter-para">Melangkahlah ke portal evakuasi di sampingku. Hirup udara fajar di atas sana, dan hiduplah bebas. Dunia di luar menunggumu.</p>
+<p class="letter-para letter-sign"><em>Terima kasih... telah berjuang untuk kami."</em><br><span class="letter-author">&mdash; Dr. Sara, Kepala Tim Riset (RES-01)</span></p>`;
+    }
+    modal.style.display = 'flex';
+    modal.classList.add('open');
+    if (typeof hideHUD === 'function') hideHUD();
+    if (typeof showCursor === 'function') showCursor();
+    if (gameState === 'playing') gameState = 'paused';
+}
+
+function closeFinalLetterModal() {
+    const modal = document.getElementById('finalLetterModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('open');
+    }
+    if (typeof showHUD === 'function') showHUD();
+    if (typeof hideCursor === 'function') hideCursor();
+    if (level15Corpse) level15Corpse.inspected = true;
+    if (gameState === 'paused') gameState = 'playing';
+}
+window.openFinalLetterModal = openFinalLetterModal;
+window.closeFinalLetterModal = closeFinalLetterModal;
+
+// ============================================================
+// TERMINAL REACTIVATION PUZZLE (SECTOR NODE OVERRIDE)
+// ============================================================
+function sSystemRestored() {
+    if (typeof audioCtx === 'undefined' || !audioCtx) return;
+    const notes = [440, 554.37, 659.25, 880, 1108.73];
+    notes.forEach((freq, i) => {
+        setTimeout(() => {
+            playOccultTone(freq, 0.18, 0.22, 0.08, 'sine');
+        }, i * 65);
+    });
+}
+
+function sShortCircuit() {
+    if (typeof audioCtx === 'undefined' || !audioCtx) return;
+    playNoiseBurst(0.35, 800, 3, 0.25, 0.05, 'bandpass');
+    playOccultTone(140, 0.35, 0.3, 0.04, 'sawtooth');
+    setTimeout(() => {
+        playOccultTone(90, 0.4, 0.28, 0.03, 'sawtooth');
+    }, 120);
+}
+
+function sTerminalTick(high) {
+    if (typeof audioCtx === 'undefined' || !audioCtx) return;
+    playOccultTone(high ? 920 : 640, 0.04, 0.08, 0.02, 'sine');
+}
+
+const TERMINAL_RIDDLES = [
+    {
+        titleId: 'PROTOKOL DEKODIFIKASI BIOLOGIS // SPESIMEN AMOEBOID',
+        titleEn: 'BIOLOGICAL DECODING PROTOCOL // AMOEBOID SPECIMEN',
+        loreId: 'CATATAN DR. SARA (LOG #03): "Spesimen Amoeboid membelah diri secara instan bila terkena benturan kinetik biasa. Satu-satunya metode melumpuhkan inti sitoplasmanya tanpa memicu replikasi adalah...?"',
+        loreEn: 'DR. SARA’S LOG (#03): "Amoeboid specimens replicate instantly upon kinetic impact. The only protocol to neutralize their cytoplasmic core without triggering mitosis is...?"',
+        choicesId: ['Suhu Ekstrem Termal (Thermal Venting)', 'Radiasi Medan Magnet', 'Frekuensi Gelombang Suara Ultrasonik'],
+        choicesEn: ['Extreme Thermal Venting', 'Magnetic Field Radiation', 'Ultrasonic Acoustic Waves'],
+        correct: 0
+    },
+    {
+        titleId: 'LOG OTORISASI REAKTOR // SUB-GRID KELISTRIKAN',
+        titleEn: 'REACTOR AUTHORIZATION LOG // ELECTRICAL SUB-GRID',
+        loreId: 'LOG INSINYUR KELISTRIKAN: "Untuk membuka katup daya darurat Sektor, kalikan jumlah nomor tiga sektor awal bio-hazard (Sektor 1, 2, dan 3) dengan angka keamanan 7:"',
+        loreEn: 'FACILITY ELECTRICAL LOG: "To override sector emergency valve, sum the first three bio-hazard sectors (Sectors 1, 2, and 3) then multiply by security key 7:"',
+        choicesId: ['35', '42', '49'],
+        choicesEn: ['35', '42', '49'],
+        correct: 1
+    },
+    {
+        titleId: 'DOKUMEN TAKTIK ANOMALI // ENTITAS VESPER',
+        titleEn: 'ANOMALY TACTICAL ARCHIVE // VESPER ENTITY',
+        loreId: 'LOG KEAMANAN SEKTOR: "Predator Vesper berburu dalam gelap menggunakan sensor sonar membran sayap. Kelemahan fatal anatominya saat bersiap menyergap adalah...?"',
+        loreEn: 'SECURITY SECTOR ARCHIVE: "Vesper predators hunt in dark corridors using wing membrane sonar. Their fatal anatomical vulnerability during ambush posture is...?"',
+        choicesId: ['Sensor sonar dibutakan oleh letupan Cahaya Nova', 'Armor sayap kebal terhadap peluru', 'Dapat menyerap gas beracun'],
+        choicesEn: ['Sonar blinded by Nova Light Flares', 'Wing armor is immune to bullets', 'Can absorb poisonous gas'],
+        correct: 0
+    },
+    {
+        titleId: 'ARCHIVE ENTITAS APEX // THE MONOLITH',
+        titleEn: 'APEX ENTITY ARCHIVE // THE MONOLITH',
+        loreId: 'LOG PENELITIAN UTAMA: "The Monolith adalah entitas piramida parasit raksasa. Kapan perisai kristalnya terbuka dan rentan terhadap tembakan langsung operatif?"',
+        loreEn: 'PRIMARY RESEARCH LOG: "The Monolith is a colossal parasitic organism. When is its crystalline shield exposed and vulnerable to direct operative strikes?"',
+        choicesId: ['Saat melepaskan letupan Nova Spora', 'Saat melayang tenang di udara', 'Saat menyerap peluru kinetik'],
+        choicesEn: ['When releasing Spore Nova bursts', 'While hovering in stillness', 'When absorbing kinetic shells'],
+        correct: 0
+    },
+    {
+        titleId: 'PROSEDUR AIRLOCK FASILITAS // EVAKUASI AKHIR',
+        titleEn: 'FACILITY AIRLOCK PROCEDURE // FINAL EVACUATION',
+        loreId: 'PANDUAN OPERASIONAL: "Protokol kuncian pintu Ekstraksi Sektor mensyaratkan status seluruh Node Daya berada pada kondisi...?"',
+        loreEn: 'OPERATIONAL MANUAL: "The Sector Extraction airlock protocol strictly requires all Power Nodes to be in state...?"',
+        choicesId: ['100% Seluruh Node Terkoneksi & Online', '50% Sebagian Node Cadangan', 'Mode Hibernasi Darurat'],
+        choicesEn: ['100% All Nodes Connected & Online', '50% Partial Standby Nodes', 'Emergency Hibernate Mode'],
+        correct: 0
+    }
+];
+
+function generateTerminalPuzzle() {
+    const types = ['A', 'B', 'C', 'D'];
+    const type = types[Math.floor(Math.random() * types.length)];
+
+    if (type === 'A') {
+        const seqPool = [
+            { seq: '3V — 6V — 12V — 24V — [ ? ]', ans: '48V', choices: ['36V', '48V', '96V'], correct: 1 },
+            { seq: '4V — 8V — 16V — 32V — [ ? ]', ans: '64V', choices: ['48V', '64V', '128V'], correct: 1 },
+            { seq: '5V — 8V — 13V — 21V — [ ? ]', ans: '34V', choices: ['29V', '34V', '42V'], correct: 1 },
+            { seq: '7V — 14V — 21V — 28V — [ ? ]', ans: '35V', choices: ['35V', '42V', '49V'], correct: 0 },
+            { seq: '12V — 19V — 26V — 33V — [ ? ]', ans: '40V', choices: ['39V', '40V', '47V'], correct: 1 },
+            { seq: '2V — 6V — 18V — 54V — [ ? ]', ans: '162V', choices: ['108V', '162V', '144V'], correct: 1 },
+            { seq: '10V — 14V — 12V — 16V — 14V — [ ? ]', ans: '18V', choices: ['16V', '18V', '20V'], correct: 1 }
+        ];
+        const p = seqPool[Math.floor(Math.random() * seqPool.length)];
+        return {
+            type: 'A',
+            badge: lang === 'en' ? 'PROTOCOL A // VOLTAGE SEQUENCE ROUTING' : 'PROTOKOL A // PENYEIMBANG TEGANGAN REAKTOR',
+            seqText: p.seq,
+            choices: p.choices,
+            correct: p.correct
+        };
+    } else if (type === 'B') {
+        const r = TERMINAL_RIDDLES[Math.floor(Math.random() * TERMINAL_RIDDLES.length)];
+        return {
+            type: 'B',
+            badge: lang === 'en' ? 'PROTOCOL B // CORRUPTED ARCHIVE LOG RIDDLE' : 'PROTOKOL B // TEKA-TEKI LOG ARSIP DARURAT',
+            title: lang === 'en' ? r.titleEn : r.titleId,
+            lore: lang === 'en' ? r.loreEn : r.loreId,
+            choices: lang === 'en' ? r.choicesEn : r.choicesId,
+            correct: r.correct
+        };
+    } else if (type === 'C') {
+        const d1 = Math.floor(Math.random() * 9) + 1;
+        const d2 = Math.floor(Math.random() * 10);
+        const d3 = Math.floor(Math.random() * 10);
+        const d4 = Math.floor(Math.random() * 9) + 1;
+        return {
+            type: 'C',
+            badge: lang === 'en' ? 'PROTOCOL C // BIOSENSOR MEMORY CALIBRATION' : 'PROTOKOL C // KALIBRASI MEMORI BIOSENSOR',
+            code: [d1, d2, d3, d4],
+            glitchCovered: false
+        };
+    } else {
+        const targets = [
+            {
+                pattern: [1, 0, 0, 1],
+                promptId: 'Hubungkan polaritas Sub-Grid Alpha: Saklar 1 dan 4 harus AKTIF (1), Saklar 2 dan 3 NONAKTIF (0).',
+                promptEn: 'Connect Sub-Grid Alpha polarity: Switches 1 and 4 must be ON (1), Switches 2 and 3 OFF (0).'
+            },
+            {
+                pattern: [1, 0, 1, 0],
+                promptId: 'Bypass polaritas Ganjil: Saklar 1 dan 3 harus AKTIF (1), Saklar 2 dan 4 NONAKTIF (0).',
+                promptEn: 'Odd Polarity Bypass: Switches 1 and 3 must be ON (1), Switches 2 and 4 OFF (0).'
+            },
+            {
+                pattern: [0, 1, 1, 0],
+                promptId: 'Overdrive Inti Cadangan: Hanya Saklar 2 dan 3 yang AKTIF (1), sisanya NONAKTIF (0).',
+                promptEn: 'Auxiliary Core Overdrive: Only Switches 2 and 3 must be ON (1), others OFF (0).'
+            },
+            {
+                pattern: [1, 1, 0, 1],
+                promptId: 'Sinkronisasi Tri-Fase: Saklar 1, 2, dan 4 harus AKTIF (1), Saklar 3 NONAKTIF (0).',
+                promptEn: 'Tri-Phase Synchronization: Switches 1, 2, and 4 must be ON (1), Switch 3 OFF (0).'
+            }
+        ];
+        const t = targets[Math.floor(Math.random() * targets.length)];
+        return {
+            type: 'D',
+            badge: lang === 'en' ? 'PROTOCOL D // CIRCUIT SWITCH BYPASS OVERRIDE' : 'PROTOKOL D // SAKLAR BYPASS JARINGAN ARUS',
+            prompt: lang === 'en' ? t.promptEn : t.promptId,
+            pattern: t.pattern
+        };
+    }
+}
+
+function renderTerminalPuzzleUI() {
+    const bodyEl = document.getElementById('terminalPuzzleBody');
+    const badgeEl = document.getElementById('terminalProtocolBadge');
+    const tipEl = document.getElementById('terminalTipText');
+    if (!bodyEl || !terminalPuzzleData) return;
+
+    if (badgeEl) badgeEl.textContent = terminalPuzzleData.badge;
+
+    if (terminalPuzzleData.type === 'A') {
+        if (tipEl) tipEl.textContent = lang === 'en' ? '[KEYS 1 - 3 / TOUCH] SELECT TERMINAL VOLTAGE' : '[TOMBOL 1 - 3 / SENTUH] PILIH TEGANGAN TERMINAL';
+        bodyEl.innerHTML = `
+            <div class="terminal-puzzle-desc">
+                ${lang === 'en' ? 'Sequence destabilization detected in power routing bus! Select the correct voltage to balance converter:' : 'Ketidakseimbangan deret terdeteksi pada bus daya! Tentukan tegangan berikutnya untuk menyeimbangkan konverter:'}
+            </div>
+            <div class="terminal-voltage-display">
+                <span class="voltage-meter-icon">⚡</span>
+                <span class="voltage-sequence-text">${terminalPuzzleData.seqText}</span>
+            </div>
+            <div class="terminal-options-grid">
+                ${terminalPuzzleData.choices.map((c, i) => `
+                    <button class="btn secondary terminal-choice-btn" type="button" onclick="submitTerminalAnswer(${i})">
+                        <span class="choice-num-tag">[${i + 1}]</span>
+                        <span class="choice-val-text">${c}</span>
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    } else if (terminalPuzzleData.type === 'B') {
+        if (tipEl) tipEl.textContent = lang === 'en' ? '[KEYS 1 - 3 / TOUCH] SELECT DECODED ANSWER' : '[TOMBOL 1 - 3 / SENTUH] PILIH JAWABAN ARSIP';
+        bodyEl.innerHTML = `
+            <div class="terminal-riddle-box">
+                <div class="riddle-box-header">
+                    <span class="riddle-tag">ARCHIVE CLASSIFIED</span>
+                    <span class="riddle-title">${terminalPuzzleData.title}</span>
+                </div>
+                <div class="riddle-lore-text">${terminalPuzzleData.lore}</div>
+            </div>
+            <div class="terminal-options-grid vertical">
+                ${terminalPuzzleData.choices.map((c, i) => `
+                    <button class="btn secondary terminal-choice-btn" type="button" onclick="submitTerminalAnswer(${i})">
+                        <span class="choice-num-tag">[${i + 1}]</span>
+                        <span class="choice-val-text">${c}</span>
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    } else if (terminalPuzzleData.type === 'C') {
+        if (tipEl) tipEl.textContent = lang === 'en' ? '[KEYPAD 0-9 / CLICK] INPUT 4-DIGIT CALIBRATION CODE' : '[KEYPAD 0-9 / SENTUH] MASUKKAN 4 DIGIT KODE KALIBRASI';
+        const isCovered = terminalGlitchCovered;
+        const entered = terminalInputSeq;
+        bodyEl.innerHTML = `
+            <div class="terminal-puzzle-desc">
+                ${isCovered ? 
+                    (lang === 'en' ? 'GLITCH INTERFERENCE! Enter the 4-digit code in order:' : 'GANGGUAN GLITCH AKTIF! Masukkan 4 digit kode sesuai urutan awal:') : 
+                    (lang === 'en' ? 'MEMORIZE CALIBRATION CODE BEFORE INTERFERENCE (1.5s):' : 'HAFALKAN KODE KALIBRASI SEBELUM INTERFERENSI (1.5 detik):')
+                }
+            </div>
+            <div class="terminal-memory-slots">
+                ${[0, 1, 2, 3].map(idx => {
+                    let val = '';
+                    let activeCls = '';
+                    if (!isCovered) {
+                        val = terminalPuzzleData.code[idx];
+                        activeCls = 'revealed';
+                    } else {
+                        if (idx < entered.length) {
+                            val = entered[idx];
+                            activeCls = 'filled';
+                        } else {
+                            val = '?';
+                            activeCls = idx === entered.length ? 'current' : 'hidden';
+                        }
+                    }
+                    return `<div class="memory-digit-box ${activeCls}">${val}</div>`;
+                }).join('')}
+            </div>
+            <div class="terminal-keypad-grid">
+                ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 'CLR', 0, 'DEL'].map(k => {
+                    if (k === 'CLR') {
+                        return `<button class="btn secondary keypad-btn action" type="button" onclick="terminalKeypadPress('CLR')">CLR</button>`;
+                    } else if (k === 'DEL') {
+                        return `<button class="btn secondary keypad-btn action" type="button" onclick="terminalKeypadPress('DEL')">⌫</button>`;
+                    } else {
+                        return `<button class="btn secondary keypad-btn" type="button" onclick="terminalKeypadPress(${k})">${k}</button>`;
+                    }
+                }).join('')}
+            </div>
+        `;
+    } else if (terminalPuzzleData.type === 'D') {
+        if (tipEl) tipEl.textContent = lang === 'en' ? '[CLICK SW 1-4] TOGGLE STATE, THEN CONNECT GRID' : '[SENTUH SAKLAR 1-4] TOGGLE STATUS, LALU SAMBUNGKAN ARUS';
+        bodyEl.innerHTML = `
+            <div class="terminal-puzzle-desc" style="color:#00f0ff;">
+                ${terminalPuzzleData.prompt}
+            </div>
+            <div class="terminal-switches-grid">
+                ${[0, 1, 2, 3].map(idx => {
+                    const isOn = terminalSwitches[idx] === 1;
+                    return `
+                        <button class="terminal-switch-card ${isOn ? 'on' : 'off'}" type="button" onclick="toggleTerminalSwitch(${idx})">
+                            <div class="switch-indicator-led"></div>
+                            <div class="switch-title">SW-${idx + 1}</div>
+                            <div class="switch-status-text">${isOn ? 'ON [ 1 ]' : 'OFF [ 0 ]'}</div>
+                        </button>
+                    `;
+                }).join('')}
+            </div>
+            <div style="margin-top:14px;text-align:center;">
+                <button class="btn terminal-submit-circuit-btn" type="button" onclick="submitTerminalSwitchCircuit()">
+                    <span data-i18n="term_submit_btn">${tt('term_submit_btn')}</span> ▸
+                </button>
+            </div>
+        `;
+    }
+}
+
+function terminalKeypadPress(key) {
+    if (!terminalPuzzleActive || !terminalPuzzleData || terminalPuzzleData.type !== 'C') return;
+    sTerminalTick(true);
+    if (key === 'CLR') {
+        terminalInputSeq = [];
+        renderTerminalPuzzleUI();
+        return;
+    }
+    if (key === 'DEL') {
+        if (terminalInputSeq.length > 0) {
+            terminalInputSeq.pop();
+            renderTerminalPuzzleUI();
+        }
+        return;
+    }
+    if (typeof key === 'number' && terminalInputSeq.length < 4) {
+        terminalInputSeq.push(key);
+        renderTerminalPuzzleUI();
+        if (terminalInputSeq.length === 4) {
+            const isCorrect = terminalInputSeq.every((v, i) => v === terminalPuzzleData.code[i]);
+            if (isCorrect) {
+                handleTerminalSuccess();
+            } else {
+                handleTerminalFailure('WRONG_CODE');
+            }
+        }
+    }
+}
+
+function toggleTerminalSwitch(idx) {
+    if (!terminalPuzzleActive || !terminalPuzzleData || terminalPuzzleData.type !== 'D') return;
+    terminalSwitches[idx] = terminalSwitches[idx] === 1 ? 0 : 1;
+    sTerminalTick(terminalSwitches[idx] === 1);
+    renderTerminalPuzzleUI();
+}
+
+function submitTerminalSwitchCircuit() {
+    if (!terminalPuzzleActive || !terminalPuzzleData || terminalPuzzleData.type !== 'D') return;
+    const isCorrect = terminalSwitches.every((val, i) => val === terminalPuzzleData.pattern[i]);
+    if (isCorrect) {
+        handleTerminalSuccess();
+    } else {
+        handleTerminalFailure('WRONG_CIRCUIT');
+    }
+}
+
+function submitTerminalAnswer(choiceIdx) {
+    if (!terminalPuzzleActive || !terminalPuzzleData) return;
+    if (terminalPuzzleData.type === 'A' || terminalPuzzleData.type === 'B') {
+        if (choiceIdx === terminalPuzzleData.correct) {
+            handleTerminalSuccess();
+        } else {
+            handleTerminalFailure('WRONG_ANSWER');
+        }
+    }
+}
+
+function openTerminalPuzzleModal(node) {
+    const modal = document.getElementById('terminalPuzzleModal');
+    if (!modal) return;
+    terminalCurrentNode = node;
+    terminalPuzzleActive = true;
+    terminalTimeRemaining = TERMINAL_MAX_TIME;
+    terminalInputSeq = [];
+    terminalSwitches = [0, 0, 0, 0];
+    terminalGlitchCovered = false;
+    terminalPuzzleData = generateTerminalPuzzle();
+
+    if (terminalPuzzleData.type === 'C') {
+        if (terminalGlitchTimeout) clearTimeout(terminalGlitchTimeout);
+        terminalGlitchTimeout = setTimeout(() => {
+            if (terminalPuzzleActive && terminalPuzzleData && terminalPuzzleData.type === 'C') {
+                terminalGlitchCovered = true;
+                sTerminalTick(false);
+                renderTerminalPuzzleUI();
+            }
+        }, 1500);
+    }
+
+    renderTerminalPuzzleUI();
+    modal.style.display = 'flex';
+    if (typeof showCursor === 'function') showCursor();
+}
+
+function closeTerminalPuzzleModal(isSuccess) {
+    const modal = document.getElementById('terminalPuzzleModal');
+    if (modal) modal.style.display = 'none';
+    terminalPuzzleActive = false;
+    if (terminalGlitchTimeout) { clearTimeout(terminalGlitchTimeout); terminalGlitchTimeout = null; }
+    if (typeof hideCursor === 'function' && gameState === 'playing') hideCursor();
+}
+window.openTerminalPuzzleModal = openTerminalPuzzleModal;
+window.closeTerminalPuzzleModal = closeTerminalPuzzleModal;
+
+function handleTerminalSuccess() {
+    sSystemRestored();
+    if (terminalCurrentNode) {
+        terminalCurrentNode.collected = true;
+        terminalCurrentNode.active = true;
+        terminalCurrentNode.puzzleSolved = true;
+        coinsCollected++;
+        addParticle(terminalCurrentNode.x, terminalCurrentNode.y, '#00f0ff', 32, 6, 45);
+        addShockwave(terminalCurrentNode.x, terminalCurrentNode.y, 85, '#00f0ff', 24);
+        player.hp = Math.min(player.maxHp, player.hp + 15);
+        floatingTexts.push({
+            x: terminalCurrentNode.x,
+            y: terminalCurrentNode.y - 25,
+            text: `+${tt('term_success_msg')}`,
+            color: '#00f0ff',
+            life: 90,
+            maxLife: 90
+        });
+
+        if (tutorialActive && tutorialStep === 3) {
+            advanceTutorialStep(3);
+        }
+
+        if (artifacts && artifacts.length > 0 && coinsCollected >= artifacts.length) {
+            sWin();
+            addShockwave(player.x, player.y, 140, '#2ecc71', 35);
+            floatingTexts.push({
+                x: player.x,
+                y: player.y - 45,
+                text: `★ ${tt('term_all_nodes_msg')} ★`,
+                color: '#2ecc71',
+                life: 140,
+                maxLife: 140
+            });
+        }
+    }
+    updateUI();
+    closeTerminalPuzzleModal(true);
+}
+
+function handleTerminalFailure(reason) {
+    sShortCircuit();
+    addShake(18);
+    if (terminalCurrentNode) {
+        terminalCurrentNode.cooldownUntil = Date.now() + 2500;
+        addParticle(terminalCurrentNode.x, terminalCurrentNode.y, '#ff0033', 25, 5, 30);
+    }
+    floatingTexts.push({
+        x: player.x,
+        y: player.y - 30,
+        text: `⚠️ ${tt('term_fail_msg')}`,
+        color: '#ff2244',
+        life: 100,
+        maxLife: 100
+    });
+
+    if (monsters && monsters.length && player) {
+        monsters.forEach(m => {
+            if (m.hp > 0 && dist(m, player) < 360) {
+                m.lastSeen = { x: player.x, y: player.y };
+                m.lastSeenTimer = 300;
+                m.state = 'chase';
+                m.hitFlash = 12;
+            }
+        });
+    }
+
+    closeTerminalPuzzleModal(false);
+}
+
+function updateTerminalTelemetry() {
+    if (!terminalPuzzleActive) return;
+
+    terminalTimeRemaining -= 1 / 60;
+    const timerBar = hudEl('terminalTimerBar');
+    const timerText = hudEl('terminalTimerText');
+
+    if (timerBar) {
+        const pct = Math.max(0, Math.min(100, (terminalTimeRemaining / TERMINAL_MAX_TIME) * 100));
+        timerBar.style.width = pct.toFixed(1) + '%';
+        if (pct < 30) {
+            timerBar.style.background = '#ff0033';
+            timerBar.style.boxShadow = '0 0 14px rgba(255, 0, 51, 0.8)';
+        } else if (pct < 60) {
+            timerBar.style.background = '#f59e0b';
+            timerBar.style.boxShadow = '0 0 10px rgba(245, 158, 11, 0.7)';
+        } else {
+            timerBar.style.background = '#00f0ff';
+            timerBar.style.boxShadow = '0 0 10px rgba(0, 240, 255, 0.7)';
+        }
+    }
+
+    if (timerText) {
+        setHudText(timerText, Math.max(0, terminalTimeRemaining).toFixed(1) + 's');
+    }
+
+    if (terminalTimeRemaining <= 0) {
+        handleTerminalFailure('TIMEOUT');
+        return;
+    }
+
+    let nearestDist = 99999;
+    if (monsters && monsters.length && player) {
+        for (let i = 0; i < monsters.length; i++) {
+            const m = monsters[i];
+            if (m.hp > 0) {
+                const d = dist(m, player);
+                if (d < nearestDist) nearestDist = d;
+            }
+        }
+    }
+
+    const warnEl = hudEl('terminalPredatorWarning');
+    const warnTxt = hudEl('terminalPredatorText');
+    if (warnEl && warnTxt) {
+        if (nearestDist < 160) {
+            warnEl.style.display = 'flex';
+            const distM = Math.max(1, Math.round(nearestDist / 16));
+            setHudText(warnTxt, `${tt('term_predator_warn')} [${distM}m]`);
+        } else {
+            warnEl.style.display = 'none';
+        }
+    }
+}
 
 function drawExit() {
     if (!exitPos) return;
@@ -11726,6 +12586,7 @@ function renderGame() {
     drawMedPods();
     drawExit();
     drawWreckedRobot();
+    drawLevel15Corpse();
     drawTraps();
     if (players && players.length > 1) {
         for (let pi = 0; pi < players.length; pi++) {
@@ -12200,7 +13061,15 @@ function gameLoopFrame() {
         }
         playAmbientDrone();
         startProceduralOST();
-        stepSimulation();
+        if (terminalPuzzleActive) {
+            updateTerminalTelemetry();
+            terminalSlowMoTick = (terminalSlowMoTick + 1) % 5;
+            if (terminalSlowMoTick === 0) {
+                stepSimulation();
+            }
+        } else {
+            stepSimulation();
+        }
         stepLocalVisuals();
         updateMonsterProximityAndHeartbeat();
         stepCamera();
@@ -12252,6 +13121,42 @@ document.addEventListener('keydown', e => {
         return;
     }
 
+    // Dismiss or interact with Terminal Puzzle modal
+    const termM = document.getElementById('terminalPuzzleModal');
+    const isTermMOpen = termM && (termM.style.display === 'flex' || termM.classList.contains('open'));
+    if (isTermMOpen) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            e.preventDefault();
+            closeTerminalPuzzleModal(false);
+            return;
+        }
+        if (terminalPuzzleData) {
+            if (terminalPuzzleData.type === 'A' || terminalPuzzleData.type === 'B') {
+                if (e.key === '1') { e.preventDefault(); submitTerminalAnswer(0); return; }
+                if (e.key === '2') { e.preventDefault(); submitTerminalAnswer(1); return; }
+                if (e.key === '3') { e.preventDefault(); submitTerminalAnswer(2); return; }
+            } else if (terminalPuzzleData.type === 'C') {
+                if (/^[0-9]$/.test(e.key)) {
+                    e.preventDefault();
+                    terminalKeypadPress(parseInt(e.key, 10));
+                    return;
+                }
+                if (e.key === 'Backspace') {
+                    e.preventDefault();
+                    terminalKeypadPress('DEL');
+                    return;
+                }
+            } else if (terminalPuzzleData.type === 'D') {
+                if (e.key === '1') { e.preventDefault(); toggleTerminalSwitch(0); return; }
+                if (e.key === '2') { e.preventDefault(); toggleTerminalSwitch(1); return; }
+                if (e.key === '3') { e.preventDefault(); toggleTerminalSwitch(2); return; }
+                if (e.key === '4') { e.preventDefault(); toggleTerminalSwitch(3); return; }
+                if (e.key === 'Enter') { e.preventDefault(); submitTerminalSwitchCircuit(); return; }
+            }
+        }
+        return;
+    }
+
     // Dismiss admin arsenal modal
     const adminM = document.getElementById('adminArsenalModal');
     const isAdminMOpen = adminM && (adminM.classList.contains('open') || adminM.style.display === 'flex');
@@ -12267,6 +13172,14 @@ document.addEventListener('keydown', e => {
     if (isRobotMOpen && (e.key === 'Escape' || e.key === 'Esc' || e.key === ' ' || e.key === 'Enter')) {
         e.preventDefault();
         closeRobotMemoryModal();
+        return;
+    }
+
+    const finalM = document.getElementById('finalLetterModal');
+    const isFinalMOpen = finalM && (finalM.style.display === 'flex' || finalM.classList.contains('open'));
+    if (isFinalMOpen && (e.key === 'Escape' || e.key === 'Esc' || e.key === ' ' || e.key === 'Enter')) {
+        e.preventDefault();
+        closeFinalLetterModal();
         return;
     }
 
@@ -12325,9 +13238,20 @@ document.addEventListener('keydown', e => {
         } else if (e.key === 'q' || e.key === 'Q') {
             cycleWeapon(true);
         } else if (e.key === 'e' || e.key === 'E') {
+            if (level15Corpse && currentLevel === LEVELS - 1 && player && dist(player, { x: level15Corpse.envelopeX, y: level15Corpse.envelopeY }) < 55) {
+                openFinalLetterModal();
+                return;
+            }
             if (wreckedRobot && currentLevel === 9 && player && dist(player, wreckedRobot) < 55) {
                 openRobotMemoryModal();
                 return;
+            }
+            if (artifacts && artifacts.length) {
+                const nearNode = artifacts.find(a => !a.collected && dist(a, player) < 48);
+                if (nearNode && Date.now() > (nearNode.cooldownUntil || 0)) {
+                    openTerminalPuzzleModal(nearNode);
+                    return;
+                }
             }
             cycleWeapon(false);
         }

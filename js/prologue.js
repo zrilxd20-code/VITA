@@ -166,6 +166,46 @@ const SECTOR_TRANSMISSIONS = {
         color: '#00f0ff',
         text_en: 'Outstanding work, Prototype-19! Exterior perimeter Sectors 1-10 are fully cleared. Prepare yourself... we are descending into the deeper facility vaults!',
         text_id: 'Kerja bagus, Prototype-19! Seluruh perimeter luar Sektor 1-10 berhasil kamu bersihkan. Bersiaplah... kita akan menuruni terowongan fasilitas yang jauh lebih dalam!'
+    },
+    10: {
+        speaker: 'ALTERISHA — TELEMETRY',
+        callsign: 'ALTERISHA // OVERWATCH',
+        icon: 'cyber',
+        color: '#00f0ff',
+        text_en: 'Prototype-19, you have breached the deepest vault chambers. Anomalies here project psychic fields. Re-energize the sector nodes and do not let them encircle you!',
+        text_id: 'Prototype-19, kamu telah memasuki kubah terdalam. Anomali di sektor ini memancarkan medan psikis. Reaktivasi seluruh node sektor dan jangan biarkan mereka mengepungmu!'
+    },
+    11: {
+        speaker: 'ALTERISHA — WARNING',
+        callsign: 'ALTERISHA // OVERWATCH',
+        icon: 'cyber',
+        color: '#00f0ff',
+        text_en: 'Labyrinth temperature is plummeting. Organic bio-walls are reacting to your presence. Purge all node corruptions to force the airlock open!',
+        text_id: 'Suhu labirin merosot tajam. Dinding biomassa mulai bereaksi terhadap keberadaanmu. Bersihkan seluruh korupsi node untuk membuka paksa pintu airlock!'
+    },
+    12: {
+        speaker: 'ALTERISHA — BIOMASS SURGE',
+        callsign: 'ALTERISHA // OVERWATCH',
+        icon: 'biohazard',
+        color: '#e74c3c',
+        text_en: 'Biomass interference is bleeding into our comms! Sector 13 is crawling with apex horrors. Ready all heavy armaments and surge with Phase Dash!',
+        text_id: 'Interferensi biomassa menembus frekuensi komunikasi kita! Sektor 13 dipenuhi makhluk apex. Siapkan seluruh persenjataan berat dan meluncurlah dengan Phase Dash!'
+    },
+    13: {
+        speaker: 'DR. SARA — FINAL APPROACH',
+        callsign: 'DR. SARA // RES-01',
+        icon: 'dna',
+        color: '#9b59b6',
+        text_en: 'Prototype-19... the tremors in this sector converge directly beneath us. We are approaching the epicenter of The Monolith. Hold the line, I beg you!',
+        text_id: 'Prototype-19... getaran di sektor ini berpusat tepat di bawah pijakan kita. Kita hampir sampai di episentrum The Monolith. Bertahanlah, kumohon!'
+    },
+    14: {
+        speaker: 'ALTERISHA — APEX DIRECTIVE',
+        callsign: 'ALTERISHA // OVERWATCH',
+        icon: 'cyber',
+        color: '#ff0055',
+        text_en: 'THIS IS IT. SECTOR 15 CORE. The Monolith awaits at the end of the maze. Restore every system node, heed Dr. Sara\'s final will, and purge the cataclysm for all humanity!',
+        text_id: 'INI DIA. INTI SEKTOR 15. The Monolith menunggumu di ujung labirin. Reaktivasi seluruh node sistem, cermati wasiat Dr. Sara, dan musnahkan sang anomali demi masa depan umat manusia!'
     }
 };
 
