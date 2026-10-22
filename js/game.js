@@ -763,14 +763,16 @@ const T = {
         pause_bestiary_btn: 'ARSIP ANOMALI (BESTIARY)',
         pause_workbench_btn: 'BENGKEL SENJATA',
         pause_exit_btn: 'KELUAR KE MENU UTAMA (EXIT)',
-        talent_btn: 'POHON TALENTA (SKILL TREE)',
+        talent_btn: 'POHON TALENTA',
         talent_title: 'POHON TALENTA & PROTOKOL JEJAK',
         talent_sub: 'Sistem peningkatan saraf & modul bionik permanen — Persisten antar-misi',
         talent_nanites_lbl: 'INTI NANIT:',
-        talent_branch_combat: 'JALUR TEMPUR (OFFENSE)',
-        talent_branch_defense: 'JALUR KETAHANAN (SURVIVAL)',
-        talent_branch_tactical: 'JALUR TAKTIS (MOBILITY)',
+        talent_branch_combat: 'JALUR TEMPUR',
+        talent_branch_defense: 'JALUR KETAHANAN',
+        talent_branch_tactical: 'JALUR TAKTIS',
         talent_branch_core: 'INTI OPERATIF PUSAT',
+        talent_cur_effect: 'EFEK SAAT INI:',
+        talent_next_effect: 'EFEK TINGKAT BERIKUTNYA:',
         talent_rank_lbl: 'Tingkat:',
         talent_cost_lbl: 'Biaya:',
         talent_upgrade_btn: 'TINGKATKAN PROTOKOL',
@@ -783,7 +785,7 @@ const T = {
         talent_core_name: 'Inti Tautan Saraf Operatif',
         talent_core_desc: 'Pusat integrasi prostetik bionik & pengontrol telemetri nanit.',
         talent_atk_name: 'Penajaman Nanit',
-        talent_atk_desc: 'Meningkatkan Serangan Dasar (Base ATK) sebesar +10% per tingkat.',
+        talent_atk_desc: 'Meningkatkan Serangan Dasar sebesar +10% per tingkat.',
         talent_crit_name: 'Lonjakan Kritis',
         talent_crit_desc: 'Meningkatkan Peluang Kritis +10% dan Kerusakan Kritis +30% per tingkat.',
         talent_plasma_name: 'Busur Plasma Sabit (Talenta Utama)',
@@ -1156,14 +1158,16 @@ const T = {
         pause_bestiary_btn: 'ANOMALY ARCHIVE (BESTIARY)',
         pause_workbench_btn: 'WEAPON WORKBENCH',
         pause_exit_btn: 'EXIT TO MAIN MENU',
-        talent_btn: 'TALENT TREE (TRACES)',
+        talent_btn: 'TALENT TREE',
         talent_title: 'OPERATIVE TALENT TREE & TRACES',
         talent_sub: 'Permanent neural upgrades & bionic modules — Persistent across runs',
         talent_nanites_lbl: 'NANITE CORES:',
-        talent_branch_combat: 'COMBAT BRANCH (OFFENSE)',
-        talent_branch_defense: 'DEFENSE BRANCH (SURVIVAL)',
-        talent_branch_tactical: 'TACTICAL BRANCH (MOBILITY)',
+        talent_branch_combat: 'COMBAT BRANCH',
+        talent_branch_defense: 'DEFENSE BRANCH',
+        talent_branch_tactical: 'TACTICAL BRANCH',
         talent_branch_core: 'CENTRAL OPERATIVE CORE',
+        talent_cur_effect: 'CURRENT EFFECT:',
+        talent_next_effect: 'NEXT RANK EFFECT:',
         talent_rank_lbl: 'Rank:',
         talent_cost_lbl: 'Cost:',
         talent_upgrade_btn: 'UPGRADE PROTOCOL',
@@ -1176,7 +1180,7 @@ const T = {
         talent_core_name: 'Operative Neural Link Core',
         talent_core_desc: 'Central integration hub for bionic prosthetics & nanite telemetry control.',
         talent_atk_name: 'Nanite Edge',
-        talent_atk_desc: 'Increases Base Attack (ATK) by +10% per rank.',
+        talent_atk_desc: 'Increases Base Attack by +10% per rank.',
         talent_crit_name: 'Critical Surge',
         talent_crit_desc: 'Increases Critical Hit Chance by +10% and Critical Damage by +30% per rank.',
         talent_plasma_name: 'Plasma Arc Wave (Major Talent)',
@@ -11622,6 +11626,9 @@ function closeTerminalPuzzleModal(isSuccess) {
     const modal = document.getElementById('terminalPuzzleModal');
     if (modal) modal.style.display = 'none';
     terminalPuzzleActive = false;
+    if (terminalCurrentNode) {
+        terminalCurrentNode.cooldownUntil = Date.now() + 2000;
+    }
     if (terminalGlitchTimeout) { clearTimeout(terminalGlitchTimeout); terminalGlitchTimeout = null; }
     if (typeof hideCursor === 'function' && gameState === 'playing') hideCursor();
 }
@@ -13106,6 +13113,11 @@ function gameLoopFrame() {
         }
         playAmbientDrone();
         startProceduralOST();
+        const termModalEl = document.getElementById('terminalPuzzleModal');
+        if (terminalPuzzleActive && (!termModalEl || termModalEl.style.display === 'none')) {
+            terminalPuzzleActive = false;
+        }
+
         if (terminalPuzzleActive) {
             updateTerminalTelemetry();
         } else {
@@ -16241,7 +16253,9 @@ const TALENT_NODES = [
         nameKey: 'talent_atk_name',
         descKey: 'talent_atk_desc',
         cost: [25, 50, 100],
-        descVals: ['+10% Base ATK', '+20% Base ATK', '+30% Base ATK']
+        descVals: ['+10% Serangan Dasar', '+20% Serangan Dasar', '+30% Serangan Dasar'],
+        descValsId: ['+10% Serangan Dasar', '+20% Serangan Dasar', '+30% Serangan Dasar'],
+        descValsEn: ['+10% Base Attack', '+20% Base Attack', '+30% Base Attack']
     },
     {
         id: 'crit_surge',
@@ -16252,7 +16266,9 @@ const TALENT_NODES = [
         nameKey: 'talent_crit_name',
         descKey: 'talent_crit_desc',
         cost: [40, 80, 140],
-        descVals: ['+10% Crit Chance & +30% Crit DMG', '+20% Crit Chance & +60% Crit DMG', '+30% Crit Chance & +90% Crit DMG']
+        descVals: ['+10% Peluang Kritis & +30% Kerusakan Kritis', '+20% Peluang Kritis & +60% Kerusakan Kritis', '+30% Peluang Kritis & +90% Kerusakan Kritis'],
+        descValsId: ['+10% Peluang Kritis & +30% Kerusakan Kritis', '+20% Peluang Kritis & +60% Kerusakan Kritis', '+30% Peluang Kritis & +90% Kerusakan Kritis'],
+        descValsEn: ['+10% Crit Chance & +30% Crit DMG', '+20% Crit Chance & +60% Crit DMG', '+30% Crit Chance & +90% Crit DMG']
     },
     {
         id: 'plasma_arc',
@@ -16264,7 +16280,9 @@ const TALENT_NODES = [
         nameKey: 'talent_plasma_name',
         descKey: 'talent_plasma_desc',
         cost: [160],
-        descVals: ['Busur Sabit Plasma setiap 3 tebasan']
+        descVals: ['Busur Sabit Plasma setiap 3 tebasan'],
+        descValsId: ['Busur Sabit Plasma setiap 3 tebasan'],
+        descValsEn: ['Plasma Crescent Wave every 3 strikes']
     },
     // Jalur Ketahanan (Defense / Survival - Atas/Biru-Hijau)
     {
@@ -16276,7 +16294,9 @@ const TALENT_NODES = [
         nameKey: 'talent_hp_name',
         descKey: 'talent_hp_desc',
         cost: [25, 50, 100],
-        descVals: ['+30 Max HP', '+65 Max HP', '+100 Max HP']
+        descVals: ['+30 HP Maksimal', '+65 HP Maksimal', '+100 HP Maksimal'],
+        descValsId: ['+30 HP Maksimal', '+65 HP Maksimal', '+100 HP Maksimal'],
+        descValsEn: ['+30 Max HP', '+65 Max HP', '+100 Max HP']
     },
     {
         id: 'nano_repair',
@@ -16287,7 +16307,9 @@ const TALENT_NODES = [
         nameKey: 'talent_regen_name',
         descKey: 'talent_regen_desc',
         cost: [40, 80, 140],
-        descVals: ['Regen 1 HP / 2.5s jika HP < 40%', 'Regen 2 HP / 2.5s jika HP < 40%', 'Regen 3 HP / 2.5s jika HP < 40%']
+        descVals: ['Regenerasi 1 HP / 2.5s saat HP < 40%', 'Regenerasi 2 HP / 2.5s saat HP < 40%', 'Regenerasi 3 HP / 2.5s saat HP < 40%'],
+        descValsId: ['Regenerasi 1 HP / 2.5s saat HP < 40%', 'Regenerasi 2 HP / 2.5s saat HP < 40%', 'Regenerasi 3 HP / 2.5s saat HP < 40%'],
+        descValsEn: ['Regen 1 HP / 2.5s when HP < 40%', 'Regen 2 HP / 2.5s when HP < 40%', 'Regen 3 HP / 2.5s when HP < 40%']
     },
     {
         id: 'aegis_shield',
@@ -16299,7 +16321,9 @@ const TALENT_NODES = [
         nameKey: 'talent_aegis_name',
         descKey: 'talent_aegis_desc',
         cost: [160],
-        descVals: ['Perisai menyerap 1 serangan (cooldown 25s)']
+        descVals: ['Perisai menyerap 1 serangan (jeda 25 detik)'],
+        descValsId: ['Perisai menyerap 1 serangan (jeda 25 detik)'],
+        descValsEn: ['Shield absorbs 1 incoming strike (25s cooldown)']
     },
     // Jalur Taktis (Tactical / Mobility - Kanan/Cyan-Gold)
     {
@@ -16311,7 +16335,9 @@ const TALENT_NODES = [
         nameKey: 'talent_speed_name',
         descKey: 'talent_speed_desc',
         cost: [25, 50, 100],
-        descVals: ['+8% Move & Dash Speed', '+16% Move & Dash Speed', '+24% Move & Dash Speed']
+        descVals: ['+8% Kecepatan Gerak & Dash', '+16% Kecepatan Gerak & Dash', '+24% Kecepatan Gerak & Dash'],
+        descValsId: ['+8% Kecepatan Gerak & Dash', '+16% Kecepatan Gerak & Dash', '+24% Kecepatan Gerak & Dash'],
+        descValsEn: ['+8% Move & Dash Speed', '+16% Move & Dash Speed', '+24% Move & Dash Speed']
     },
     {
         id: 'flux_capacitor',
@@ -16322,7 +16348,9 @@ const TALENT_NODES = [
         nameKey: 'talent_flux_name',
         descKey: 'talent_flux_desc',
         cost: [40, 80, 140],
-        descVals: ['+20% Senter, -15% Dash Cooldown', '+40% Senter, -30% Dash Cooldown', '+60% Senter, -45% Dash Cooldown']
+        descVals: ['+20% Jangkauan Senter, -15% Jeda Dash', '+40% Jangkauan Senter, -30% Jeda Dash', '+60% Jangkauan Senter, -45% Jeda Dash'],
+        descValsId: ['+20% Jangkauan Senter, -15% Jeda Dash', '+40% Jangkauan Senter, -30% Jeda Dash', '+60% Jangkauan Senter, -45% Jeda Dash'],
+        descValsEn: ['+20% Flashlight Range, -15% Dash Cooldown', '+40% Flashlight Range, -30% Dash Cooldown', '+60% Flashlight Range, -45% Dash Cooldown']
     },
     {
         id: 'phantom_dash',
@@ -16334,7 +16362,9 @@ const TALENT_NODES = [
         nameKey: 'talent_phantom_name',
         descKey: 'talent_phantom_desc',
         cost: [160],
-        descVals: ['Dash memicu medan kejut listrik statis']
+        descVals: ['Dash memicu medan kejut listrik statis'],
+        descValsId: ['Dash memicu medan kejut listrik statis'],
+        descValsEn: ['Dash leaves behind a static shock field']
     }
 ];
 
@@ -16466,13 +16496,14 @@ function updateTalentInspector() {
 
     // Current Effect Desc
     const curDescEl = document.getElementById('talentNodeCurrentDesc');
+    const curVals = (lang === 'en' ? node.descValsEn : node.descValsId) || node.descVals;
     if (curDescEl) {
         if (node.id === 'core') {
             curDescEl.textContent = tt(node.descKey);
         } else if (curRank === 0) {
             curDescEl.textContent = '-';
-        } else if (node.descVals && node.descVals[curRank - 1]) {
-            curDescEl.textContent = `${node.descVals[curRank - 1]} (${tt(node.descKey)})`;
+        } else if (curVals && curVals[curRank - 1]) {
+            curDescEl.textContent = `${curVals[curRank - 1]} — ${tt(node.descKey)}`;
         } else {
             curDescEl.textContent = tt(node.descKey);
         }
@@ -16486,8 +16517,8 @@ function updateTalentInspector() {
             nextBox.style.display = 'none';
         } else {
             nextBox.style.display = 'block';
-            const nextVal = (node.descVals && node.descVals[curRank]) ? node.descVals[curRank] : tt(node.descKey);
-            nextDescEl.textContent = `${nextVal} (${tt(node.descKey)})`;
+            const nextVal = (curVals && curVals[curRank]) ? curVals[curRank] : tt(node.descKey);
+            nextDescEl.textContent = `${nextVal} — ${tt(node.descKey)}`;
         }
     }
 
