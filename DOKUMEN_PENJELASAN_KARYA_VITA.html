@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dokumen Penjelasan Karya - VITA: Forgotten Sector</title>
+<style>
+  :root {
+    --primary: #0070f3;
+    --dark: #0f172a;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg-light: #f8fafc;
+    --accent: #0284c7;
+    --danger: #dc2626;
+    --success: #16a34a;
+  }
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: #fff;
+    line-height: 1.6;
+    margin: 0;
+    padding: 30px;
+    font-size: 11pt;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  
+  /* COVER & HEADER */
+  .doc-header {
+    border-bottom: 3px double var(--primary);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .doc-badge {
+    display: inline-block;
+    background: var(--dark);
+    color: #38bdf8;
+    font-size: 9pt;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .doc-title {
+    font-size: 26pt;
+    font-weight: 800;
+    color: var(--dark);
+    margin: 6px 0;
+    letter-spacing: -0.5px;
+  }
+  .doc-subtitle {
+    font-size: 13pt;
+    color: var(--text-muted);
+    margin-top: 0;
+    font-weight: 500;
+  }
+  
+  /* METADATA GRID */
+  .meta-box {
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin-bottom: 26px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    font-size: 10pt;
+  }
+  .meta-item strong {
+    color: var(--dark);
+  }
+
+  /* HEADINGS */
+  h2 {
+    color: var(--dark);
+    font-size: 15pt;
+    border-left: 4px solid var(--primary);
+    padding-left: 12px;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  h3 {
+    color: var(--accent);
+    font-size: 12pt;
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+  p {
+    margin: 0 0 12px 0;
+    text-align: justify;
+  }
+  ul, ol {
+    margin: 0 0 14px 0;
+    padding-left: 24px;
+  }
+  li {
+    margin-bottom: 5px;
+  }
+
+  /* CALLOUT & CARDS */
+  .callout {
+    background: #f0f9ff;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin: 14px 0;
+    font-size: 10pt;
+  }
+  .callout-title {
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  
+  /* TABLES */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 20px 0;
+    font-size: 9.5pt;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th {
+    background: var(--bg-light);
+    color: var(--dark);
+    font-weight: 700;
+  }
+  tr:nth-child(even) {
+    background: #fafafa;
+  }
+
+  /* PRINT SPECIFIC */
+  @media print {
+    body { padding: 0; font-size: 10pt; }
+    .page-break { page-break-before: always; }
+    .no-print { display: none !important; }
+    a { text-decoration: none; color: inherit; }
+  }
+
+  .print-btn-bar {
+    position: sticky;
+    top: 10px;
+    z-index: 1000;
+    background: #0f172a;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  .btn-print {
+    background: #0284c7;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 10pt;
+    transition: background 0.2s;
+  }
+  .btn-print:hover { background: #0369a1; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- PRINT TOOLBAR (HANYA MUNCUL DI LAYAR BROWSER) -->
+  <div class="print-btn-bar no-print">
+    <div>
+      <strong>📄 Dokumen Penjelasan Karya Resmi VITA</strong> &bull; Siap Simpan ke PDF
+    </div>
+    <button class="btn-print" onclick="window.print()">🖨️ Cetak / Simpan sebagai PDF (Ctrl+P)</button>
+  </div>
+
+  <!-- HEADER DOKUMEN -->
+  <header class="doc-header">
+    <div class="doc-badge">BERKAS PENJELASAN KARYA PENGEMBANGAN GAME &bull; OTN</div>
+    <h1 class="doc-title">VITA: FORGOTTEN SECTOR</h1>
+    <div class="doc-subtitle">Sektor Terlupakan — Top-Down Survival Horror Maze Roguelite (100% Procedural Engine)</div>
+  </header>
+
+  <!-- METADATA PROYEK -->
+  <div class="meta-box">
+    <div class="meta-item"><strong>Judul Karya:</strong> VITA: Forgotten Sector (Sektor Terlupakan)</div>
+    <div class="meta-item"><strong>Genre:</strong> Top-Down Survival Horror / Roguelite Action</div>
+    <div class="meta-item"><strong>Software / Engine:</strong> HTML5 Canvas 2D &amp; Vanilla JavaScript (Pure Web Engine)</div>
+    <div class="meta-item"><strong>Audio Engine:</strong> WebAudio API (100% Procedural Synthesizer)</div>
+    <div class="meta-item"><strong>Target Platform:</strong> Multi-Platform (Web Offline, PC Windows Desktop, Android)</div>
+    <div class="meta-item"><strong>Ukuran Berkas:</strong> &plusmn; 1.2 MB (Zero External Assets Dependencies)</div>
+    <div class="meta-item" style="grid-column: 1 / -1; background:#e0f2fe; padding:8px 12px; border-radius:6px; border:1px solid #7dd3fc;">
+      <strong>🌐 Link Main Game Online (Live Play):</strong> <a href="https://vita-game-three.vercel.app/" target="_blank" style="color:#0284c7;font-weight:700;">https://vita-game-three.vercel.app/</a><br>
+      <strong>📦 Repositori Kode Sumber (GitHub):</strong> <a href="https://github.com/zrilxd20-code/VITA" target="_blank" style="color:#0284c7;font-weight:700;">https://github.com/zrilxd20-code/VITA</a>
+    </div>
+  </div>
+
+  <!-- BAB I -->
+  <h2>BAB I &mdash; KONSEP &amp; LATAR BELAKANG KARYA</h2>
+  
+  <h3>1.1 Sinopsis Cerita (Lore Skenario)</h3>
+  <p>
+    Fasilitas Riset Bawah Tanah <strong>VITA (Biological Anomaly Research Facility)</strong> telah terbengkalai selama ratusan tahun setelah insiden kebocoran biomassa nekrotik <strong>Spesimen CARNIS-07</strong>. Fasilitas ini terbagi menjadi 15 sektor labirin bawah tanah yang terisolasi dalam kegelapan pekat. Pemain terbangun sebagai <strong>PROTOTYPE-19</strong>, sebuah unit robot sibernetik berkasis titanium yang dirancang khusus dengan prosesor saraf stabil untuk menembus kabut beracun yang mematikan bagi manusia biasa.
+  </p>
+  <p>
+    Tugas Operatif bukan sekadar melarikan diri, melainkan melakukan <strong>SECTOR REACTIVATION (Reaktivasi Sektor)</strong>: menghidupkan kembali node-node daya utama di setiap sektor untuk membuka segel pintu dekompresi darurat, mengungkap kebenaran di balik hilangnya para peneliti melalui rekaman <em>Blackbox Data Log</em> dan wasiat Dr. Sara, hingga menghadapi entitas pengendali biomassa raksasa di pusat terdalam: <strong>The Monolith</strong>.
+  </p>
+
+  <h3>1.2 Filosofi Desain: Zero External Asset Dependencies</h3>
+  <p>
+    Sebagian besar game modern mengandalkan puluhan hingga ratusan megabyte aset gambar (.png/.jpg) dan rekaman suara eksternal (.mp3/.wav). <strong>VITA dibangun dengan prinsip revolusioner: 100% Procedural</strong>:
+  </p>
+  <ul>
+    <li><strong>Grafis Prosedural:</strong> Seluruh visual karakter, animasi langkah kaki, efek bayangan dinamis obor (Torch Lighting Raymarching), kepakan sayap, tanduk monster, hingga partikel ledakan digambar secara real-time via kode HTML5 Canvas 2D API.</li>
+    <li><strong>Audio Prosedural:</strong> Seluruh efek suara (tebasan pisau, tembakan shotgun, ledakan granat, sengatan listrik, hingga atmosfer ketegangan) disintesis secara matematis menggunakan <strong>WebAudio API</strong> (osilator sinusoidal, gelombang gergaji, dan filter frekuensi).</li>
+    <li><strong>Ukuran Ultra Ringkas:</strong> Seluruh game, termasuk 15 level labirin, 12 tipe monster anomali, sistem talenta, dan alur narasi penuh, hanya berukuran sekitar 1 MB dan dapat dimainkan secara instan tanpa loading lama.</li>
+  </ul>
+
+  <!-- BAB II -->
+  <h2>BAB II &mdash; MEKANIK UTAMA &amp; FITUR UNGGULAN</h2>
+
+  <h3>2.1 Mekanik Reaktivasi Sektor (Sector Node Reactivation Puzzle)</h3>
+  <p>
+    Di setiap sektor labirin, pintu evakuasi (Airlock Exit) terkunci oleh protokol darurat. Pemain wajib mencari dan mereaktivasi seluruh <strong>Power Node</strong> yang tersebar di labirin. Node yang belum aktif memancarkan aura merah berkedip (Offline/Corrupted). Saat disentuh, pemain akan membuka <strong>Terminal Reactivation Puzzle</strong> dengan 4 jenis protokol acak:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Protokol</th>
+        <th>Tipe Teka-Teki</th>
+        <th>Deskripsi &amp; Logika Penyelesaian</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Tipe A</strong></td>
+        <td>Kalibrasi Tegangan (Voltage)</td>
+        <td>Pemain harus memilih nilai voltase cadangan yang tepat untuk menstabilkan konverter sirkuit.</td>
+      </tr>
+      <tr>
+        <td><strong>Tipe B</strong></td>
+        <td>Dekripsi Arsip Fasilitas</td>
+        <td>Pertanyaan keamanan lore rahasia fasilitas VITA berdasarkan log penelitian yang ditemukan.</td>
+      </tr>
+      <tr>
+        <td><strong>Tipe C</strong></td>
+        <td>Urutan Sandi Frekuensi</td>
+        <td>Pemain merekonstruksi urutan kode sandi numerik (4 digit) yang teracak.</td>
+      </tr>
+      <tr>
+        <td><strong>Tipe D</strong></td>
+        <td>Saklar Daya Biner</td>
+        <td>Pemain menyelaraskan kombinasi 4 saklar biner (1 / 0) sesuai pola target sistem darurat.</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <div class="callout-title">⚠️ Waktu Terbatas &amp; Bahaya Predator</div>
+    Teka-teki terminal dibatasi oleh timer mundur (12 detik). Jika gagal atau waktu habis, terjadi korsleting listrik yang mengurangi HP pemain dan memicu alarm yang memanggil monster terdekat.
+  </div>
+
+  <h3>2.2 AI Monster Berbasis Breadth-First Search (BFS) &amp; Separation Boids</h3>
+  <p>
+    Monster di dalam labirin tidak bergerak secara acak. Mereka ditenagai algoritma <strong>Breadth-First Search (BFS)</strong> pada grid labirin dengan alokasi memori bersama (<em>pre-allocated shared buffer</em>) untuk mencegah lagging / stuttering. Sistem ini dipadukan dengan gaya tolak-menolak <em>Boids Separation Forces</em> sehingga kawanan monster mengepung pemain secara cerdas tanpa bertumpuk di satu koordinat.
+  </p>
+
+  <h3>2.3 Keanekaragaman 12 Spesimen Monster Anomali</h3>
+  <p>
+    Setiap monster memiliki pola serang, bentuk prosedural, kecepatan, dan kemampuan unik:
+  </p>
+  <ul>
+    <li><strong>Amoeboid Slime:</strong> Membelah diri menjadi unit kecil saat menerima serangan fatal.</li>
+    <li><strong>Vesper Bat:</strong> Predator lincah bersayap yang mampu bermanuver cepat di koridor sempit.</li>
+    <li><strong>Phantasm Ghost:</strong> Entitas spektral yang mampu menembus dinding labirin secara berkala.</li>
+    <li><strong>Bio-Harvester (Mini-Boss Sektor 5 &amp; 10):</strong> Menembakkan duri asam radial berkekuatan tinggi.</li>
+    <li><strong>Decoy Mimic:</strong> Menyamar sebagai peti logistik amunisi dan menyergap pemain dari jarak dekat.</li>
+    <li><strong>The Monolith (Final Boss Sektor 15):</strong> Inti biomekanik raksasa dengan 3 fase serangan mematikan.</li>
+  </ul>
+
+  <h3>2.4 Pohon Talenta Permanen &amp; Arsenal Tier II</h3>
+  <p>
+    Pemain dapat mengumpulkan Nanite Core dari monster yang dikalahkan untuk membuka peningkatan permanen pada <strong>Operative Talent Tree</strong> (peningkatan regenerasi HP, kapasitas amunisi, durasi Phase Dash, dan efisiensi sensor radar) yang tersimpan secara lokal dan persisten antar-sesi bermain.
+  </p>
+
+  <!-- BAB III -->
+  <div class="page-break"></div>
+  <h2>BAB III &mdash; PANDUAN CARA BERMAIN &amp; KONTROL</h2>
+
+  <h3>3.1 Alur Permainan (Core Game Loop)</h3>
+  <ol>
+    <li><strong>Penyusupan Labirin:</strong> Masuki sektor baru dengan obor berdaya jangkau terbatas.</li>
+    <li><strong>Eksplorasi &amp; Reaktivasi:</strong> Jelajahi lorong, temukan seluruh Power Node, dan selesaikan teka-teki terminal reaktivasi.</li>
+    <li><strong>Pertahanan &amp; Taktik Tempur:</strong> Hadapi kawanan monster menggunakan 5 jenis senjata (Pisau Taktis, Senapan Pulsa, Shotgun, Meriam Plasma, dan Granat). Manfaatkan tombol <em>Phase Dash</em> untuk menerobos bahaya tanpa terluka.</li>
+    <li><strong>Evakuasi (Airlock Extraction):</strong> Setelah seluruh node aktif, pintu keluar sektor terbuka dan pemain dapat berpindah ke sektor berikutnya.</li>
+  </ol>
+
+  <h3>3.2 Tata Letak Kontrol Permainan</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Aksi Permainan</th>
+        <th>Kontrol PC (Keyboard &amp; Mouse)</th>
+        <th>Kontrol Mobile / Tablet (Layar Sentuh)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Pergerakan Karakter</strong></td>
+        <td>Tombol W, A, S, D atau Tombol Panah</td>
+        <td>Virtual Analog Joystick (Sisi Kiri Layar)</td>
+      </tr>
+      <tr>
+        <td><strong>Arah Bidikan</strong></td>
+        <td>Arah Kursor Mouse (360 Derajat Bebas)</td>
+        <td>Bidikan Otomatis Cerdas (Smart Auto-Aim)</td>
+      </tr>
+      <tr>
+        <td><strong>Serangan / Menembak</strong></td>
+        <td>Klik Kiri Mouse atau Tombol Spasi</td>
+        <td>Tombol Sentuh Serang [ATTACK]</td>
+      </tr>
+      <tr>
+        <td><strong>Phase Dash (Menghindar)</strong></td>
+        <td>Tombol Shift</td>
+        <td>Tombol Sentuh [DASH]</td>
+      </tr>
+      <tr>
+        <td><strong>Ganti Senjata</strong></td>
+        <td>Tombol Angka 1, 2, 3, 4, 5</td>
+        <td>Tombol Sentuh [SWAP] Senjata</td>
+      </tr>
+      <tr>
+        <td><strong>Interaksi Node / Puzzle</strong></td>
+        <td>Dekati Node / Klik Opsi Terminal</td>
+        <td>Sentuh Node / Sentuh Opsi Layar Terminal</td>
+      </tr>
+      <tr>
+        <td><strong>Jeda Permainan</strong></td>
+        <td>Tombol ESC atau P</td>
+        <td>Tombol Sentuh [PAUSE] di Sudut Kanan Atas</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- BAB IV -->
+  <h2>BAB IV &mdash; PROSES &amp; METODOLOGI PEMBUATAN</h2>
+
+  <h3>4.1 Tahapan Pengembangan (Development Pipeline)</h3>
+  <ul>
+    <li><strong>Tahap 1 &mdash; Perancangan Algoritma Inti:</strong> Perancangan generator labirin berbasis <em>Recursive Backtracker</em> dan <em>Depth-First Search</em> ber-seed PRNG (Mulberry32) untuk menjamin labirin terbuat secara deterministik dan selalu memiliki jalan keluar (bebas softlock).</li>
+    <li><strong>Tahap 2 &mdash; Canvas 2D Rendering Engine:</strong> Pembuatan sistem kamera dinamis (Smooth Camera Following), sistem pencahayaan radial obor berbasis gradien matematika, dan rendering visual partikel darah organik.</li>
+    <li><strong>Tahap 3 &mdash; Desain Audio Prosedural:</strong> Pemrograman modul WebAudio API murni untuk menghasilkan efek suara tembakan, desis biomassa, hingga frekuensi radio transmisi radio komunikasi.</li>
+    <li><strong>Tahap 4 &mdash; Desain UI/UX &amp; Aksesibilitas:</strong> Penerapan sistem token CSS modular, optimasi kontrol sentuh ganda (joystick + tombol aksi), dan kepatuhan WAI-ARIA (seluruh 21 modal dialog memiliki role dan label aksesibel).</li>
+    <li><strong>Tahap 5 &mdash; QA &amp; Pengujian Keamanan:</strong> Pembuatan automated test suite (30 modul uji mandiri) untuk mengaudit pencegahan injeksi XSS, integritas save data localStorage, kestabilan loop 60 FPS, dan respon memori bebas crash.</li>
+  </ul>
+
+  <h3>4.2 Alat &amp; Teknologi yang Digunakan</h3>
+  <ul>
+    <li><strong>Bahasa Pemrograman:</strong> JavaScript Modern (ES6+), HTML5, CSS3 murni (Vanilla, tanpa library/framework bloated).</li>
+    <li><strong>APIs Inti:</strong> HTML5 Canvas 2D API, WebAudio API, LocalStorage Web API, Touch Events API.</li>
+    <li><strong>Alat Pengujian &amp; Build:</strong> Node.js Standard Library (tools verifikasi sintaks, checker paritas i18n, generator bundel web).</li>
+  </ul>
+
+  <!-- BAB V -->
+  <h2>BAB V &mdash; KESIMPULAN &amp; NILAI KEUNGGULAN</h2>
+  <p>
+    <strong>VITA: Forgotten Sector</strong> membuktikan bahwa game aksi roguelite yang mendalam, memiliki grafis atmosferik, efek pencahayaan dinamis, kecerdasan buatan monster yang kompleks, dan audio sintetis yang hidup dapat diwujudkan secara <strong>100% mandiri (self-contained) tanpa bergantung pada aset gambar maupun rekaman suara luar</strong>.
+  </p>
+  <p>
+    Dengan ukuran yang ultra-ringkas (&plusmn; 1.2 MB), dukungan dwibahasa penuh (Indonesia &amp; Inggris), serta kemampuan berjalan secara mulus di berbagai perangkat (komputer desktop maupun smartphone), karya ini siap diuji dan memberikan pengalaman bermain yang menantang, mendalam, dan berkesan bagi para juri.
+  </p>
+
+  <div style="margin-top:40px;padding-top:20px;border-top:1px solid var(--border);text-align:center;font-size:9.5pt;color:var(--text-muted);">
+    <strong>VITA Project Development Team</strong> &bull; Dibuat untuk Kompetisi Nasional Pengembangan Game (OTN)<br>
+    <em>Karya Mandiri Berlisensi Terbuka &bull; 100% Zero External Assets Web Roguelite Engine</em>
+  </div>
+
+</div>
+
+</body>
+</html>
