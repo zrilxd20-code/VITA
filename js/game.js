@@ -11253,8 +11253,8 @@ function openFinalLetterModal() {
 <p class="letter-para">FAREWELL... and to the words I never had the courage to speak until now...</p>
 <p class="letter-para" style="font-size:14px;color:#fcd34d;font-style:italic;">Farewell... I love you, Dear Alterisha..."</p>
 <p class="letter-para letter-sign" style="text-align:right;margin-top:16px;"><em>With eternal love,</em><br><strong style="font-size:15px;color:#f59e0b;">— Dr. Rudra</strong><br><span style="font-size:11px;color:#94a3b8;">Chief Pioneer of Sector Exploration</span></p>
-<div class="letter-alterisha-outro" style="margin-top:16px;padding:8px 12px;background:rgba(255,59,59,0.08);border-left:3px solid #ff3b3b;border-radius:4px;font-size:12px;font-style:italic;color:#fca5a5;">
-    <strong>ALTERISHA:</strong> "Tsk......... so this is how your story ends... Dr. Rudra..."
+<div class="letter-alterisha-outro" style="margin-top:16px;padding:10px 14px;background:rgba(255,59,59,0.08);border-left:3px solid #ff3b3b;border-radius:4px;font-size:12px;font-style:italic;color:#fca5a5;line-height:1.5;">
+    <strong>ALTERISHA:</strong> "...You fool. Why did you have to carry this burden all alone... Rest now, Rudra. Your promise... will live on with us forever."
 </div>`
             : `<div class="letter-alterisha-intro" style="margin-bottom:14px;padding:10px 12px;background:rgba(0,240,255,0.06);border-left:3px solid #00f0ff;border-radius:4px;font-size:12px;line-height:1.5;color:#ccd6f6;">
     <div style="font-weight:bold;color:#00f0ff;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
@@ -11273,8 +11273,8 @@ function openFinalLetterModal() {
 <p class="letter-para">SELAMAT TINGGAL... dan ada satu kata yang belum sempat terucap di hadapanmu...</p>
 <p class="letter-para" style="font-size:14px;color:#fcd34d;font-style:italic;">Selamat tinggal... aku mencintaimu, Dear Alterisha..."</p>
 <p class="letter-para letter-sign" style="text-align:right;margin-top:16px;"><em>Dengan segenap cinta dan baktiku,</em><br><strong style="font-size:15px;color:#f59e0b;">— Dr. Rudra</strong><br><span style="font-size:11px;color:#94a3b8;">Pelopor Eksplorasi Sektor Terlupakan</span></p>
-<div class="letter-alterisha-outro" style="margin-top:16px;padding:8px 12px;background:rgba(255,59,59,0.08);border-left:3px solid #ff3b3b;border-radius:4px;font-size:12px;font-style:italic;color:#fca5a5;">
-    <strong>ALTERISHA:</strong> "Cckk......... jadi dengan begini cerita lore-mu berakhir... Dr. Rudra..."
+<div class="letter-alterisha-outro" style="margin-top:16px;padding:10px 14px;background:rgba(255,59,59,0.08);border-left:3px solid #ff3b3b;border-radius:4px;font-size:12px;font-style:italic;color:#fca5a5;line-height:1.5;">
+    <strong>ALTERISHA:</strong> "...Bodoh. Kenapa kau harus pergi sejauh ini sendirian... Selamat jalan, Rudra. Janjimu... akan kami jaga selamanya."
 </div>`;
     }
     modal.style.display = 'flex';

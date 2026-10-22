@@ -322,8 +322,8 @@ Interaksi naratif sebelum melangkah ke portal evakuasi terakhir Sektor 15:
 >  
 > **ALTERISHA**  
 > *(suara hening bergetar, lalu desah napas berat menahan air mata)*  
-> 🇮🇩 *"Cckk......... jadi dengan begini cerita lore-mu berakhir... Dr. Rudra..."*  
-> 🇬🇧 *"Tsk......... so this is how your story ends... Dr. Rudra..."*
+> 🇮🇩 *"...Bodoh. Kenapa kau harus pergi sejauh ini sendirian... Selamat jalan, Rudra. Janjimu... akan kami jaga selamanya."*  
+> 🇬🇧 *"...You fool. Why did you have to carry this burden all alone... Rest now, Rudra. Your promise... will live on with us forever."*
 
 ---
 
