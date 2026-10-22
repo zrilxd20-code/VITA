@@ -278,7 +278,56 @@ Dokumen rahasia yang dapat ditemukan pemain di terminal koridor labirin:
 
 ---
 
-## 🌅 5. Epilog / Ending (Setelah Mengalahkan Sektor 15)
+## ✉️ 5. Wasiat Terakhir Sektor 15 — Surat Terakhir Dr. Rudra (Beside Extraction Portal)
+
+Interaksi naratif sebelum melangkah ke portal evakuasi terakhir Sektor 15:
+
+> **INTERAKSI JALUR EVAKUASI: JASAD DR. RUDRA & AMPLOP WASIAT BERSEGEL**
+>
+> **ALTERISHA**  
+> *(suara Alterisha tercekat melalui saluran transmisi radio).......*  
+> 🇮🇩 *"Tunggu... itu... itu dia... orang yang telah menghilang dari kita selama ini..."*  
+> 🇬🇧 *"Wait... that... that's him... The person who vanished from us all this time..."*  
+>  
+> **(NARATOR / LOG SISTEM)**  
+> 🇮🇩 *Dr. Rudra... ialah sosok peneliti yang selama ini dicari oleh Alterisha dan seluruh organisasi.*  
+> 🇬🇧 *Dr. Rudra... the very pioneer and researcher that Alterisha and the entire organization had been desperately searching for.*  
+>  
+> **ALTERISHA**  
+> 🇮🇩 *"Dia... kenapa ada di sini?!"*  
+> 🇬🇧 *"Him... why is he here?!"*  
+>  
+> 🇮🇩 *"Bentar tolong... Prototype-19, scan dan buka surat itu."*  
+> 🇬🇧 *"Hold on, please... Prototype-19, scan and unseal that letter."*
+
+---
+
+> **ISI DOKUMEN WASIAT — SURAT TERAKHIR DR. RUDRA:**  
+>  
+> 🇮🇩 *"Hai... Mungkin saat kalian membuka dan membaca surat ini, aku telah tiada. Kalian mungkin penasaran dan merasa sedih kenapa aku berada di sini. Tentu saja, semua ini demi kita semua.*  
+> *Aku menyelinap dan pergi sendiri karena aku tahu pasti aku akan dihalangi oleh kalian, untuk meneliti sektor terdalam yang belum pernah berhasil direbut kembali oleh manusia. Dengan peralatan yang kubuat sendiri, kutembus dan kuteliti seluruh isi sektor hingga mencapai Monolith-07.*  
+> *Namun sejak awal, aku telah merencanakan bahwa ini akan menjadi perjalanan terakhirku. Sebelum aku gugur di dekat Monolith, aku telah mengirimkan seluruh data penelitian terakhir secara anonim kepada kalian... serta meninggalkan surat terakhir ini yang kuharap suatu hari akan kalian temukan.*  
+> *Tentu saja... aku sangat rindu bekerja sama dengan kalian, serta partner yang teramat berharga bagiku, Alterisha.... Janganlah kalian bersedih karenaku. Aku akan terus bersama kalian, di dalam kobaran semangat dan senyuman kalian.*  
+> *SELAMAT TINGGAL... dan ada satu kata yang belum sempat terucap di hadapanmu... Selamat tinggal... aku mencintaimu, Dear Alterisha......."*  
+>  
+> **— Dr. Rudra**  
+>  
+> 🇬🇧 *"Hello... Perhaps by the time you unseal and read this letter, I will already be gone from this world. You might wonder, with sorrow in your heart, why I am here. It was all for us—for everyone.*  
+> *I slipped away into the shadows and ventured alone because I knew you would try to stop me from researching sectors that mankind could never reclaim. Armed with the equipment I forged, I breached and investigated every corridor until I stood before Monolith-07.*  
+> *Yet, I planned from the start that this would be my final journey. Before I fell near the Monolith, I transmitted our final scientific findings anonymously to your terminals... along with this very last letter that you might eventually discover.*  
+> *Of course... I deeply miss working side-by-side with all of you, and with my dearest, most precious partner, Alterisha.... Please do not grieve for me. I will forever walk beside you in spirit—in your unyielding courage, and in your warm smiles.*  
+> *FAREWELL... and to the words I never had the courage to speak until now... Farewell... I love you, Dear Alterisha......."*  
+>  
+> **— Dr. Rudra**  
+>  
+> **ALTERISHA**  
+> *(suara hening bergetar, lalu desah napas berat menahan air mata)*  
+> 🇮🇩 *"Cckk......... jadi dengan begini cerita lore-mu berakhir... Dr. Rudra..."*  
+> 🇬🇧 *"Tsk......... so this is how your story ends... Dr. Rudra..."*
+
+---
+
+## 🌅 6. Epilog / Ending (Setelah Mengalahkan Sektor 15)
 
 > **THE MONOLITH RUNTUH. LABIRIN BERGETAR SAAT JANTUNG BIOMEKANIKNYA BERHENTI BERDETAK.**
 > 

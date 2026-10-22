@@ -649,10 +649,10 @@ const T = {
         robot_continue: 'LANJUTKAN MISI ▸',
         final_corpse_prompt: '[E / SENTUH] BACA SURAT AMPLOP TERAKHIR',
         final_letter_badge: 'DOKUMEN WASIAT TERAKHIR // RES-01',
-        final_letter_title: 'SURAT TERAKHIR DR. SARA',
-        final_letter_sub: 'Ditemukan di samping mayat peneliti di koridor evakuasi Sektor 15',
+        final_letter_title: 'SURAT TERAKHIR DR. RUDRA',
+        final_letter_sub: 'Ditemukan di samping jasad Dr. Rudra di koridor evakuasi Sektor 15',
         final_letter_close: 'SIMPAN WASIAT & MENUJU PORTAL EVAKUASI ▸',
-        final_letter_toast: '[ WASIAT DR. SARA DITEMUKAN — SEKTOR 15 TERLENGKAPI ]',
+        final_letter_toast: '[ WASIAT DR. RUDRA DITEMUKAN — SEKTOR 15 TERLENGKAPI ]',
         coop_lobby_btn: 'OPERASI CO-OP (4 PEMAIN)',
         coop_modal_title: 'TERMINAL MULTIPLAYER CO-OP',
         coop_tab_host: 'BUAT KAMAR (HOST)',
@@ -1044,10 +1044,10 @@ const T = {
         robot_continue: 'CONTINUE MISSION ▸',
         final_corpse_prompt: '[E / TAP] READ FINAL ENVELOPE LETTER',
         final_letter_badge: 'FINAL TESTAMENT MEMORANDUM // RES-01',
-        final_letter_title: 'DR. SARA\'S FINAL LETTER',
-        final_letter_sub: 'Recovered beside the fallen researcher at Sector 15 extraction',
+        final_letter_title: 'DR. RUDRA\'S FINAL LETTER',
+        final_letter_sub: 'Recovered beside the fallen Dr. Rudra at Sector 15 extraction',
         final_letter_close: 'PRESERVE TESTAMENT & ENTER EXTRACTION ▸',
-        final_letter_toast: '[ DR. SARA\'S TESTAMENT FOUND — SECTOR 15 LOG COMPLETED ]',
+        final_letter_toast: '[ DR. RUDRA\'S TESTAMENT FOUND — SECTOR 15 LOG COMPLETED ]',
         coop_lobby_btn: 'CO-OP ONLINE (4 PLAYERS)',
         coop_modal_title: 'CO-OP MULTIPLAYER TERMINAL',
         coop_tab_host: 'CREATE ROOM (HOST)',
@@ -11236,20 +11236,46 @@ function openFinalLetterModal() {
     const curLang = (typeof lang !== 'undefined' && lang === 'en') ? 'en' : 'id';
     if (bodyEl) {
         bodyEl.innerHTML = curLang === 'en'
-            ? `<p class="letter-para">"To you... <strong>Prototype-19</strong>.</p>
-<p class="letter-para">If your optical sensors are scanning this paper, you did it... <em>The Monolith has fallen</em>, and this living nightmare is finally over.</p>
-<p class="letter-para">My blood is turning cold, and my final breaths are slipping away. Forgive us for awakening you without memories... with nothing but a cold serial number stamped on your chassis.</p>
-<p class="letter-para">We believed our research could transcend the threshold of mortality. But blinded by hubris, we unsealed the gates of Coelum Carnis upon this world. When the facility collapsed and evacuation sirens blared, I refused to board the last escape pod. I had to remain behind... to manually override the airlock bypass and ensure this extraction portal unlocked the moment you felled the Apex Monolith.</p>
-<p class="letter-para">You are not merely a soulless machine, Number 19. Beneath your titanium armor lies the last embers of our soul and hope.</p>
-<p class="letter-para">Step through the extraction portal beside me. Breathe the fresh dawn air above, and live free. The world outside awaits you.</p>
-<p class="letter-para letter-sign"><em>Thank you... for fighting for us."</em><br><span class="letter-author">&mdash; Dr. Sara, Chief Research Scientist (RES-01)</span></p>`
-            : `<p class="letter-para">"Untukmu... <strong>Prototype-19</strong>.</p>
-<p class="letter-para">Jika matamu membaca lembaran ini, berarti kau berhasil... <em>The Monolith telah runtuh</em>, dan mimpi buruk ini akhirnya berakhir.</p>
-<p class="letter-para">Darahku perlahan membeku, dan sisa nafasku hampir habis. Maafkan kami yang telah membangunkanmu tanpa ingatan... tanpa masa lalu selain nomor seri di sasis titaniummu.</p>
-<p class="letter-para">Kami mengira sains kami mampu menaklukkan batas kematian. Namun kami dibutakan ambisi, hingga justru membuka pintu gerbang bagi Coelum Carnis ke dunia ini. Saat seluruh fasilitas runtuh dan sirene evakuasi berbunyi, aku menolak masuk ke kapsul penyelamat terakhir. Aku harus tetap di sini... untuk memprogram ulang gerbang udara dan memastikan jalan keluar ini terbuka saat kau menumbangkan Apex Monolith.</p>
-<p class="letter-para">Kau bukan sekadar mesin nirjiwa, Nomor 19. Logam dinginmu membawa secercah jiwa dan harapan kami yang tersisa.</p>
-<p class="letter-para">Melangkahlah ke portal evakuasi di sampingku. Hirup udara fajar di atas sana, dan hiduplah bebas. Dunia di luar menunggumu.</p>
-<p class="letter-para letter-sign"><em>Terima kasih... telah berjuang untuk kami."</em><br><span class="letter-author">&mdash; Dr. Sara, Kepala Tim Riset (RES-01)</span></p>`;
+            ? `<div class="letter-alterisha-intro" style="margin-bottom:14px;padding:10px 12px;background:rgba(0,240,255,0.06);border-left:3px solid #00f0ff;border-radius:4px;font-size:12px;line-height:1.5;color:#ccd6f6;">
+    <div style="font-weight:bold;color:#00f0ff;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:7px;height:7px;background:#00f0ff;border-radius:50%;box-shadow:0 0 6px #00f0ff;"></span>
+        ALTERISHA // COMMS CHANNEL:
+    </div>
+    <div style="font-style:italic;color:#e2e8f0;margin-bottom:6px;">"Wait... that... that's him... The person who vanished from us all this time..."</div>
+    <div style="color:#94a3b8;font-size:11px;margin-bottom:6px;"><em>(Narrator: Dr. Rudra... the very person Alterisha and the entire organization had been searching for.)</em></div>
+    <div style="font-style:italic;color:#e2e8f0;margin-bottom:4px;">"Him... why is he here?!"</div>
+    <div style="font-style:italic;color:#38bdf8;">"Hold on, please... Prototype-19, scan and unseal that letter."</div>
+</div>
+<p class="letter-para">"Hello... Perhaps by the time you unseal and read this letter, I will already be gone from this world.</p>
+<p class="letter-para">You might wonder, with sorrow in your heart, why I am here. It was all for us—for everyone. I slipped away into the shadows and ventured alone because I knew you would try to stop me from researching sectors that mankind could never reclaim. Armed with the equipment I forged, I breached and investigated every corridor until I stood before Monolith-07.</p>
+<p class="letter-para">Yet, I planned from the start that this would be my final journey. Before I fell near the Monolith, I transmitted our final scientific findings anonymously to your terminals... along with this very last letter that you might eventually discover.</p>
+<p class="letter-para">Of course... I deeply miss working side-by-side with all of you, and with my dearest, most precious partner, <strong>Alterisha</strong>... Please do not grieve for me. I will forever walk beside you in spirit—in your unyielding courage, and in your warm smiles.</p>
+<p class="letter-para">FAREWELL... and to the words I never had the courage to speak until now...</p>
+<p class="letter-para" style="font-size:14px;color:#fcd34d;font-style:italic;">Farewell... I love you, Dear Alterisha..."</p>
+<p class="letter-para letter-sign" style="text-align:right;margin-top:16px;"><em>With eternal love,</em><br><strong style="font-size:15px;color:#f59e0b;">— Dr. Rudra</strong><br><span style="font-size:11px;color:#94a3b8;">Chief Pioneer of Sector Exploration</span></p>
+<div class="letter-alterisha-outro" style="margin-top:16px;padding:8px 12px;background:rgba(255,59,59,0.08);border-left:3px solid #ff3b3b;border-radius:4px;font-size:12px;font-style:italic;color:#fca5a5;">
+    <strong>ALTERISHA:</strong> "Tsk......... so this is how your story ends... Dr. Rudra..."
+</div>`
+            : `<div class="letter-alterisha-intro" style="margin-bottom:14px;padding:10px 12px;background:rgba(0,240,255,0.06);border-left:3px solid #00f0ff;border-radius:4px;font-size:12px;line-height:1.5;color:#ccd6f6;">
+    <div style="font-weight:bold;color:#00f0ff;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:7px;height:7px;background:#00f0ff;border-radius:50%;box-shadow:0 0 6px #00f0ff;"></span>
+        ALTERISHA // SALURAN TRANSMISI:
+    </div>
+    <div style="font-style:italic;color:#e2e8f0;margin-bottom:6px;">"Tunggu... itu... itu dia... orang yang telah menghilang dari kita selama ini..."</div>
+    <div style="color:#94a3b8;font-size:11px;margin-bottom:6px;"><em>(Narator: Dr. Rudra... ialah sosok yang selama ini dicari oleh Alterisha dan seluruh organisasi.)</em></div>
+    <div style="font-style:italic;color:#e2e8f0;margin-bottom:4px;">"Dia... kenapa ada di sini?!"</div>
+    <div style="font-style:italic;color:#38bdf8;">"Bentar tolong... Prototype-19, scan dan buka surat itu."</div>
+</div>
+<p class="letter-para">"Hai... Mungkin saat kalian membuka dan membaca surat ini, aku telah tiada.</p>
+<p class="letter-para">Kalian mungkin penasaran dan merasa sedih kenapa aku berada di sini. Tentu saja, semua ini demi kita semua. Aku menyelinap dan pergi sendiri karena aku tahu pasti aku akan dihalangi oleh kalian, untuk meneliti sektor terdalam yang belum pernah berhasil direbut kembali oleh manusia. Dengan peralatan yang kubuat sendiri, kutembus dan kuteliti seluruh isi sektor hingga mencapai Monolith-07.</p>
+<p class="letter-para">Namun sejak awal, aku telah merencanakan bahwa ini akan menjadi perjalanan terakhirku. Sebelum aku gugur di dekat Monolith, aku telah mengirimkan seluruh data penelitian terakhir secara anonim kepada kalian... serta meninggalkan surat terakhir ini yang kuharap suatu hari akan kalian temukan.</p>
+<p class="letter-para">Tentu saja... aku sangat rindu bekerja sama dengan kalian, serta partner yang teramat berharga bagiku, <strong>Alterisha</strong>... Janganlah kalian bersedih karenaku. Aku akan terus bersama kalian, di dalam kobaran semangat dan senyuman kalian.</p>
+<p class="letter-para">SELAMAT TINGGAL... dan ada satu kata yang belum sempat terucap di hadapanmu...</p>
+<p class="letter-para" style="font-size:14px;color:#fcd34d;font-style:italic;">Selamat tinggal... aku mencintaimu, Dear Alterisha..."</p>
+<p class="letter-para letter-sign" style="text-align:right;margin-top:16px;"><em>Dengan segenap cinta dan baktiku,</em><br><strong style="font-size:15px;color:#f59e0b;">— Dr. Rudra</strong><br><span style="font-size:11px;color:#94a3b8;">Pelopor Eksplorasi Sektor Terlupakan</span></p>
+<div class="letter-alterisha-outro" style="margin-top:16px;padding:8px 12px;background:rgba(255,59,59,0.08);border-left:3px solid #ff3b3b;border-radius:4px;font-size:12px;font-style:italic;color:#fca5a5;">
+    <strong>ALTERISHA:</strong> "Cckk......... jadi dengan begini cerita lore-mu berakhir... Dr. Rudra..."
+</div>`;
     }
     modal.style.display = 'flex';
     modal.classList.add('open');
