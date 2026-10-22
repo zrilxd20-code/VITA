@@ -82,8 +82,8 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 
 ### 🟢 Sektor 1 (Level 1) — Pendaratan & Kalibrasi Labirin
 * **Pengirim:** DR. SARA — RES-01
-* **Pesan (ID):** *"Prototype-19, telemetri biologis tersinkron. Kumpulkan seluruh artefak berpendar di koridor untuk membuka kunci segel gerbang karantina. Waspadai bayangan di tikungan!"*
-* **Pesan (EN):** *"Prototype-19, bio-telemetry synchronized. Collect all luminous artifacts in the corridors to destabilize the quarantine gate locks. Watch the shadows at the corners!"*
+* **Pesan (ID):** *"Prototype-19, telemetri biologis tersinkron. Reaktivasi seluruh generator daya di koridor untuk membuka kunci segel gerbang karantina. Waspadai bayangan di tikungan!"*
+* **Pesan (EN):** *"Prototype-19, bio-telemetry synchronized. Reactivate all power generators in the corridors to destabilize the quarantine gate locks. Watch the shadows at the corners!"*
 
 ---
 
@@ -138,8 +138,8 @@ Transmisi audio radio ini muncul di kotak transceiver komunikasi di pojok layar 
 
 ### 🔴 Sektor 9 (Level 9) — Fluktuasi Biometrik Ekstrem
 * **Pengirim:** DR. SARA — RES-01
-* **Pesan (ID):** *"Grafik biometrik BPM melonjak tajam! Kepadatan monster di persimpangan mencapai puncaknya. Prioritaskan rute pengumpulan artefak tercepat dan segera capai airlock keluar!"*
-* **Pesan (EN):** *"Biometric BPM telemetry is spiking! Anomaly density at intersections is peaking. Prioritize the fastest artifact gathering route and reach the extraction airlock immediately!"*
+* **Pesan (ID):** *"Grafik biometrik BPM melonjak tajam! Kepadatan monster di persimpangan mencapai puncaknya. Prioritaskan rute reaktivasi generator tercepat dan segera capai airlock keluar!"*
+* **Pesan (EN):** *"Biometric BPM telemetry is spiking! Anomaly density at intersections is peaking. Prioritize the fastest generator reactivation route and reach the extraction airlock immediately!"*
 
 ---
 

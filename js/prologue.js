@@ -92,8 +92,8 @@ const SECTOR_TRANSMISSIONS = {
         callsign: 'DR. SARA // RES-01',
         icon: 'dna',
         color: '#2ecc71',
-        text_en: 'Prototype-19, bio-telemetry synchronized. Collect all luminous artifacts in the corridors to destabilize the quarantine gate locks. Watch the shadows at the corners!',
-        text_id: 'Prototype-19, telemetri biologis tersinkron. Kumpulkan seluruh artefak berpendar di koridor untuk membuka kunci segel gerbang karantina. Waspadai bayangan di tikungan!'
+        text_en: 'Prototype-19, bio-telemetry synchronized. Reactivate all power generators in the corridors to destabilize the quarantine gate locks. Watch the shadows at the corners!',
+        text_id: 'Prototype-19, telemetri biologis tersinkron. Reaktivasi seluruh generator daya di koridor untuk membuka kunci segel gerbang karantina. Waspadai bayangan di tikungan!'
     },
     1: {
         speaker: 'DR. RAINSER — SYSTEMS',
@@ -156,8 +156,8 @@ const SECTOR_TRANSMISSIONS = {
         callsign: 'DR. SARA // RES-01',
         icon: 'dna',
         color: '#e74c3c',
-        text_en: 'Biometric BPM telemetry is spiking! Anomaly density at intersections is peaking. Prioritize the fastest artifact gathering route and reach the extraction airlock immediately!',
-        text_id: 'Grafik biometrik BPM melonjak tajam! Kepadatan monster di persimpangan mencapai puncaknya. Prioritaskan rute pengumpulan artefak tercepat dan segera capai airlock keluar!'
+        text_en: 'Biometric BPM telemetry is spiking! Anomaly density at intersections is peaking. Prioritize the fastest generator reactivation route and reach the extraction airlock immediately!',
+        text_id: 'Grafik biometrik BPM melonjak tajam! Kepadatan monster di persimpangan mencapai puncaknya. Prioritaskan rute reaktivasi generator tercepat dan segera capai airlock keluar!'
     },
     9: {
         speaker: 'LT. VAD — CHECKPOINT',

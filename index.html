@@ -245,7 +245,7 @@
         <figcaption><b>The Monolith</b><span>Apex Anomaly</span></figcaption>
       </figure>
     </div>
-    <p class="teaser-stats"><b>15 LABYRINTH SECTORS</b> &bull; EVADE PREDATORS &bull; HARVEST ARTIFACTS &bull; REACH EXTRACTION</p>
+    <p class="teaser-stats"><b>15 LABYRINTH SECTORS</b> &bull; EVADE PREDATORS &bull; REPOWER GENERATORS &bull; REACH EXTRACTION</p>
   </section>
 </div>
 
@@ -1263,7 +1263,7 @@
 <div class="scanlines"></div>
 <div class="vignette"></div>
 <div id="damageVignette"></div>
-<div id="objectiveTracker" style="display:none"><span class="tracker-dot"></span><span id="objectiveTrackerText">ARTIFACTS 0/0</span></div>
+<div id="objectiveTracker" style="display:none"><span class="tracker-dot"></span><span id="objectiveTrackerText">GENERATOR 0/0</span></div>
 <div id="tutorialToast" role="status" aria-live="polite"></div>
 <canvas id="gameCanvas"></canvas>
 
@@ -1365,8 +1365,8 @@
             <span id="lblMonster">Monsters:</span> <span id="monsterCount">0</span>
         </div>
         <div class="hud-stat-cell">
-            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M17.21 9l-4.38-6.56a1 1 0 0 0-1.66 0L6.79 9H2l8.4 12.6a2 2 0 0 0 3.2 0L22 9h-4.79zM12 4.69L14.87 9H9.13L12 4.69z"/></svg>
-            <span id="lblArtifact" data-i18n="ui_artifact">Power Nodes:</span> <span id="artifactText">0 / 0</span>
+            <svg class="hud-icon" viewBox="0 0 24 24"><path d="M11 21h-1l1-7H7.5c-.88 0-.33-.75-.31-.78C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/></svg>
+            <span id="lblArtifact" data-i18n="ui_artifact">Generator:</span> <span id="artifactText">0 / 0</span>
         </div>
         <div class="hud-stat-cell">
             <svg class="hud-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v3l-5-4 5-4v3h4v2z"/></svg>
@@ -1944,7 +1944,7 @@
         <p id="ctrl1">WASD / Arrows: move</p>
         <p id="ctrl2">SPACE / Click: attack</p>
         <p id="ctrl3">SHIFT: phase dash — invincible, pass traps &amp; hits</p>
-        <p id="ctrl4">Collect all artifacts, then reach the exit portal.</p>
+        <p id="ctrl4" data-i18n="ctrl4">Reaktivasi semua generator lalu menuju pintu keluar.</p>
         <button class="btn secondary" id="controlsClose" onclick="toggleHomePanel('homeControls')">Close</button>
     </div>
 </div>
