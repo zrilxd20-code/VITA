@@ -241,7 +241,7 @@ let level15Corpse = null;
 let terminalPuzzleActive = false;
 let terminalCurrentNode = null;
 let terminalTimeRemaining = 14.0;
-const TERMINAL_MAX_TIME = 14.0;
+const TERMINAL_MAX_TIME = 25.0;
 let terminalPuzzleData = null;
 let terminalSlowMoTick = 0;
 let terminalInputSeq = [];
@@ -1204,12 +1204,12 @@ const WEAPONS = {
         nameKey: 'weapon_knife',
         roleKey: 'weapon_knife_role',
         descKey: 'weapon_knife_desc',
-        cooldown: 20,
+        cooldown: 14,
         type: 'melee',
         shortTag: 'PISAU',
         shortTagEn: 'KNIFE',
-        specs: { dmg: 'Sedang (1.0x)', rate: 'Cepat (3.0/s)', range: 'Dekat (42px)', special: 'Critical Backstab 2.2x' },
-        specsEn: { dmg: 'Medium (1.0x)', rate: 'Fast (3.0/s)', range: 'Close (42px)', special: 'Critical Backstab 2.2x' }
+        specs: { dmg: 'Cepat & Tajam (1.25x)', rate: 'Sangat Cepat (4.2/s)', range: 'Dekat (46px)', special: 'Critical Backstab 2.5x' },
+        specsEn: { dmg: 'Sharp (1.25x)', rate: 'Very Fast (4.2/s)', range: 'Close (46px)', special: 'Critical Backstab 2.5x' }
     },
     rifle: {
         id: 'rifle',
@@ -1218,12 +1218,12 @@ const WEAPONS = {
         nameKey: 'weapon_rifle',
         roleKey: 'weapon_rifle_role',
         descKey: 'weapon_rifle_desc',
-        cooldown: 24,
+        cooldown: 16,
         type: 'ranged',
         shortTag: 'RIFLE',
         shortTagEn: 'RIFLE',
-        specs: { dmg: 'Tinggi (1.4x)', rate: 'Sedang (2.5/s)', range: 'Jauh (560px)', special: 'Tembus 2 Musuh (Railgun)' },
-        specsEn: { dmg: 'High (1.4x)', rate: 'Medium (2.5/s)', range: 'Long (560px)', special: '2-Target Piercing (Railgun)' }
+        specs: { dmg: 'Tinggi (1.6x)', rate: 'Responsif (3.7/s)', range: 'Jauh (580px)', special: 'Tembus 2 Musuh (Railgun)' },
+        specsEn: { dmg: 'High (1.6x)', rate: 'Responsive (3.7/s)', range: 'Long (580px)', special: '2-Target Piercing (Railgun)' }
     },
     grenade: {
         id: 'grenade',
@@ -1232,12 +1232,12 @@ const WEAPONS = {
         nameKey: 'weapon_grenade',
         roleKey: 'weapon_grenade_role',
         descKey: 'weapon_grenade_desc',
-        cooldown: 75,
+        cooldown: 48,
         type: 'throwable',
         shortTag: 'GREN',
         shortTagEn: 'GREN',
-        specs: { dmg: 'Area Besar (1.75x)', rate: 'Lambat (0.8/s)', range: 'Menengah Pantul', special: 'EMP Shockwave + Gas Spora' },
-        specsEn: { dmg: 'AoE Blast (1.75x)', rate: 'Slow (0.8/s)', range: 'Mid (Bounce)', special: 'EMP Wave + Toxic Gas Cloud' }
+        specs: { dmg: 'Area Besar (2.2x)', rate: 'Mantap (1.2/s)', range: 'Menengah Pantul', special: 'EMP Shockwave + Gas Spora' },
+        specsEn: { dmg: 'AoE Blast (2.2x)', rate: 'Solid (1.2/s)', range: 'Mid (Bounce)', special: 'EMP Wave + Toxic Gas Cloud' }
     },
     bazooka: {
         id: 'bazooka',
@@ -1246,12 +1246,12 @@ const WEAPONS = {
         nameKey: 'weapon_bazooka',
         roleKey: 'weapon_bazooka_role',
         descKey: 'weapon_bazooka_desc',
-        cooldown: 115,
+        cooldown: 70,
         type: 'heavy',
         shortTag: 'BAZK',
         shortTagEn: 'BAZK',
-        specs: { dmg: 'Masif (2.6x)', rate: 'Sangat Lambat', range: 'Jarak Jauh', special: 'Ledakan Kluster 3 Arah' },
-        specsEn: { dmg: 'Massive (2.6x)', rate: 'Very Slow', range: 'Long Range', special: '3-Way Cluster Detonation' }
+        specs: { dmg: 'Masif (3.0x)', rate: 'Sedang (0.9/s)', range: 'Jarak Jauh', special: 'Ledakan Kluster 3 Arah' },
+        specsEn: { dmg: 'Massive (3.0x)', rate: 'Medium (0.9/s)', range: 'Long Range', special: '3-Way Cluster Detonation' }
     },
     shield: {
         id: 'shield',
@@ -1260,12 +1260,12 @@ const WEAPONS = {
         nameKey: 'weapon_shield',
         roleKey: 'weapon_shield_role',
         descKey: 'weapon_shield_desc',
-        cooldown: 160,
+        cooldown: 100,
         type: 'defense',
         shortTag: 'SHLD',
         shortTagEn: 'SHLD',
-        specs: { dmg: 'Pulse Stun (0.95x)', rate: 'Durasi 2.5s', range: 'Aura Tubuh (36px)', special: 'Kinetic Pulse Discharge' },
-        specsEn: { dmg: 'Pulse Stun (0.95x)', rate: '2.5s Duration', range: 'Body Aura (36px)', special: 'Kinetic Pulse Discharge' }
+        specs: { dmg: 'Pulse Stun (1.2x)', rate: 'Durasi 3.0s', range: 'Aura Tubuh (42px)', special: 'Kinetic Pulse Discharge' },
+        specsEn: { dmg: 'Pulse Stun (1.2x)', rate: '3.0s Duration', range: 'Body Aura (42px)', special: 'Kinetic Pulse Discharge' }
     },
     minigun: {
         id: 'minigun',
@@ -1274,12 +1274,12 @@ const WEAPONS = {
         nameKey: 'weapon_minigun',
         roleKey: 'weapon_minigun_role',
         descKey: 'weapon_minigun_desc',
-        cooldown: 6,
+        cooldown: 5,
         type: 'rapid',
         shortTag: 'MINI',
         shortTagEn: 'MINI',
-        specs: { dmg: 'DPS Cepat (0.45x)', rate: 'Ekstrem (10/s)', range: 'Jarak Jauh', special: 'Laras Membara & Steam Vent' },
-        specsEn: { dmg: 'Fast DPS (0.45x)', rate: 'Extreme (10/s)', range: 'Long Range', special: 'Glowing Barrel & Steam Vent' }
+        specs: { dmg: 'DPS Cepat (0.55x)', rate: 'Ekstrem (12/s)', range: 'Jarak Jauh', special: 'Laras Membara & Steam Vent' },
+        specsEn: { dmg: 'Fast DPS (0.55x)', rate: 'Extreme (12/s)', range: 'Long Range', special: 'Glowing Barrel & Steam Vent' }
     }
 };
 
@@ -4192,21 +4192,21 @@ function buildLevelWorld(level) {
         }
         exitPos = { x: cx * CELL + CELL / 2, y: cy * CELL + CELL / 2, gx: cx, gy: cy };
     } else {
-        if (level > 0) {
-            const trapCount = 3 + level * 2;
+        if (level > 1) {
+            const trapCount = Math.max(1, Math.min(5, Math.floor(level * 0.5)));
             const pSpawnX = 1, pSpawnY = 1;
             for(let i=0; i<trapCount; i++) {
-                let spot = findFarSpot(4, taken);
+                let spot = findFarSpot(6, taken);
                 let tAttempts = 0;
-                while (Math.hypot(spot.gx - pSpawnX, spot.gy - pSpawnY) < 3.2 && tAttempts < 50) {
-                    spot = findFarSpot(4, taken);
+                while (Math.hypot(spot.gx - pSpawnX, spot.gy - pSpawnY) < 6.5 && tAttempts < 50) {
+                    spot = findFarSpot(6, taken);
                     tAttempts++;
                 }
                 traps.push({
                     x: spot.x, y: spot.y, gx: spot.gx, gy: spot.gy,
                     type: 'spikes',
                     state: 'hidden',
-                    timer: 60 + Math.random() * 120,
+                    timer: 90 + Math.random() * 150,
                     cool: 0
                 });
             }
@@ -4338,7 +4338,7 @@ function buildLevelWorld(level) {
     const perkTherm = preservedPerks.filter(p => p === 'thermal_trail').length;
 
     let baseMaxHp = 100 + level * 10 + (perkNano * 50);
-    let baseAtk = 20 + level * 3;
+    let baseAtk = 28 + level * 4;
     if (perkPlasma > 0) {
         baseAtk = Math.round(baseAtk * Math.pow(1.3, perkPlasma));
     }
@@ -6008,7 +6008,7 @@ function nextLevel() {
         setTimeout(() => {
             playNarrativeInterlude(currentLevel, () => {
                 levelTransition = false;
-                const isMilestone = (currentLevel === 1 || currentLevel === 3 || currentLevel === 5 || currentLevel === 7 || currentLevel === 9 || currentLevel === 11 || currentLevel === 13);
+                const isMilestone = currentLevel < LEVELS - 1;
                 if (isMilestone) {
                     openWeaponSelectModal(currentLevel + 1);
                 } else {
@@ -6019,8 +6019,8 @@ function nextLevel() {
         return;
     }
 
-    // Transisi setiap 2 level (LV 2->3: idx 1, LV 4->5: idx 3, LV 6->7: idx 5, LV 8->9: idx 7, LV 10->11: idx 9, LV 12->13: idx 11, LV 14->15: idx 13)
-    const isArsenalMilestone = (currentLevel === 1 || currentLevel === 3 || currentLevel === 5 || currentLevel === 7 || currentLevel === 9 || currentLevel === 11 || currentLevel === 13);
+    // Hadiah Kartu Upgrade/Augmentasi setelah setiap sektor berhasil diselesaikan
+    const isArsenalMilestone = currentLevel < LEVELS - 1;
 
     if (isArsenalMilestone) {
         setTimeout(() => {
@@ -7902,7 +7902,7 @@ function updateMonsters() {
 }
 
 function trapDamage() {
-    return Math.round((10 + currentLevel * 2) * getDiffStatMult());
+    return Math.round((6 + currentLevel * 0.8) * getDiffStatMult());
 }
 
 function updateTraps() {
@@ -7913,7 +7913,7 @@ function updateTraps() {
         }
         if (tr.state === 'triggered' || tr.state === 'cooldown') {
             if (--tr.cool <= 0) {
-                if (tr.state === 'triggered') { tr.state = 'cooldown'; tr.cool = 110; }
+                if (tr.state === 'triggered') { tr.state = 'cooldown'; tr.cool = 130; }
                 else tr.state = 'armed';
             }
             return;
@@ -7921,15 +7921,15 @@ function updateTraps() {
         if (tr.state !== 'armed') return;
         if (typeof godmode !== 'undefined' && godmode) return;
         if (player.invincible > 0) return;
-        if (Math.hypot(player.x - tr.x, player.y - tr.y) >= 24) return;
+        if (Math.hypot(player.x - tr.x, player.y - tr.y) >= 22) return;
         let dmg = trapDamage();
         if (player && player.perkNano) {
             dmg *= Math.max(0.5, 1 - player.perkNano * 0.25);
         }
         player.hp -= dmg;
-        player.invincible = 30;
-        screenShake = 8;
-        hurtFlash = 8;
+        player.invincible = 45;
+        screenShake = 6;
+        hurtFlash = 6;
         sHit();
         triggerHaptic('hit');
         addParticle(tr.x, tr.y, '#c0392b', 14, 5, 25);
@@ -13108,10 +13108,6 @@ function gameLoopFrame() {
         startProceduralOST();
         if (terminalPuzzleActive) {
             updateTerminalTelemetry();
-            terminalSlowMoTick = (terminalSlowMoTick + 1) % 5;
-            if (terminalSlowMoTick === 0) {
-                stepSimulation();
-            }
         } else {
             stepSimulation();
         }
