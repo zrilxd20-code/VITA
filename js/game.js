@@ -14931,10 +14931,16 @@ if (adminCodeInput) {
     });
 }
 
-document.getElementById('gVolume').addEventListener('input', e => setMasterVolume(e.target.value, true));
-document.getElementById('gVolume').value = Math.max(0, Math.min(100, Math.round(Number(settings.volume) || 70)));
-document.getElementById('gBrightness').addEventListener('input', e => applyBrightness(e.target.value));
-document.getElementById('gBrightness').value = Math.max(30, Math.min(180, Math.round(Number(settings.brightness) || 100)));
+const gVol = document.getElementById('gVolume');
+if (gVol) {
+    gVol.addEventListener('input', e => setMasterVolume(e.target.value, true));
+    gVol.value = Math.max(0, Math.min(100, Math.round(Number(settings.volume) || 70)));
+}
+const gBright = document.getElementById('gBrightness');
+if (gBright) {
+    gBright.addEventListener('input', e => applyBrightness(e.target.value));
+    gBright.value = Math.max(30, Math.min(180, Math.round(Number(settings.brightness) || 100)));
+}
 
 const langSel = document.getElementById('gLanguage');
 if (langSel) {
@@ -17199,3 +17205,25 @@ function checkEndlessWaveProgress() {
         }, 3200);
     }
 }
+
+// Window global bindings for in-game UI & modal triggers
+window.restartGame = restartGame;
+window.restartFromPause = typeof restartFromPause === 'function' ? restartFromPause : restartGame;
+window.continueGame = continueGame;
+window.togglePause = togglePause;
+window.retryLevel = retryLevel;
+window.backToMenu = backToMenu;
+window.finishEpilogue = typeof finishEpilogue === 'function' ? finishEpilogue : () => {};
+window.openWorkbenchModal = typeof openWorkbenchModal === 'function' ? openWorkbenchModal : () => {};
+window.closeWorkbenchModal = typeof closeWorkbenchModal === 'function' ? closeWorkbenchModal : () => {};
+window.openTalentTreeModal = typeof openTalentTreeModal === 'function' ? openTalentTreeModal : () => {};
+window.closeTalentTreeModal = typeof closeTalentTreeModal === 'function' ? closeTalentTreeModal : () => {};
+window.openBestiaryModal = typeof openBestiaryModal === 'function' ? openBestiaryModal : () => {};
+window.closeBestiaryModal = typeof closeBestiaryModal === 'function' ? closeBestiaryModal : () => {};
+window.closeRobotMemoryModal = typeof closeRobotMemoryModal === 'function' ? closeRobotMemoryModal : () => {};
+window.closeTerminalPuzzleModal = typeof closeTerminalPuzzleModal === 'function' ? closeTerminalPuzzleModal : () => {};
+window.openAdminLogin = typeof openAdminLogin === 'function' ? openAdminLogin : () => {};
+window.submitAdminLogin = typeof submitAdminLogin === 'function' ? submitAdminLogin : () => {};
+window.openPauseSettings = typeof openPauseSettings === 'function' ? openPauseSettings : () => {};
+window.closePauseSettings = typeof closePauseSettings === 'function' ? closePauseSettings : () => {};
+

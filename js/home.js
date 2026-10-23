@@ -166,16 +166,27 @@ function openModal(name, desc, cmd, req) {
   if (typeof updateInstructionsModalLang === 'function') {
     updateInstructionsModalLang((homeSettings && homeSettings.lang) || 'id');
   }
-  document.getElementById('modal').classList.add('open');
+  const m = document.getElementById('modal');
+  if (m) m.classList.add('open');
 }
-document.getElementById('modalClose').addEventListener('click', () => {
-  document.getElementById('modal').classList.remove('open');
-});
-document.getElementById('modal').addEventListener('click', e => {
-  if (e.target.id === 'modal') e.currentTarget.classList.remove('open');
-});
+const mCloseBtn = document.getElementById('modalClose');
+if (mCloseBtn) {
+  mCloseBtn.addEventListener('click', () => {
+    const m = document.getElementById('modal');
+    if (m) m.classList.remove('open');
+  });
+}
+const mRoot = document.getElementById('modal');
+if (mRoot) {
+  mRoot.addEventListener('click', e => {
+    if (e.target.id === 'modal') e.currentTarget.classList.remove('open');
+  });
+}
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.getElementById('modal').classList.remove('open');
+  if (e.key === 'Escape') {
+    const m = document.getElementById('modal');
+    if (m) m.classList.remove('open');
+  }
 });
 
 /* Teaser monster: pixel-art prosedural 2-frame, tanpa aset eksternal.
@@ -2413,7 +2424,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.5.4';
+const APP_VERSION = '2.5.5';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 
@@ -2475,11 +2486,13 @@ function showUpdateBanner(ver) {
   pendingVersion = ver;
   const L = UPDATE_TXT[updateLang()] || UPDATE_TXT.id;
   const bar = ensureUpdateBanner();
-  const isApp = typeof isNativeApp === 'function' && isNativeApp();
-  document.getElementById('updateBannerMsg').textContent = L.msg + ' (v' + ver + ' | ' + (isApp ? (navigator.userAgent.toLowerCase().includes('android') ? 'Android' : 'PC') : 'Web') + ')';
-  document.getElementById('updateBannerGo').textContent = isApp ? (L.btn_app || L.btn) : L.btn;
-  document.getElementById('updateBannerLater').textContent = L.later;
-  bar.style.display = 'block';
+  const msgEl = document.getElementById('updateBannerMsg');
+  if (msgEl) msgEl.textContent = L.msg + ' (v' + ver + ' | ' + (isApp ? (navigator.userAgent.toLowerCase().includes('android') ? 'Android' : 'PC') : 'Web') + ')';
+  const goEl = document.getElementById('updateBannerGo');
+  if (goEl) goEl.textContent = isApp ? (L.btn_app || L.btn) : L.btn;
+  const laterEl = document.getElementById('updateBannerLater');
+  if (laterEl) laterEl.textContent = L.later;
+  if (bar) bar.style.display = 'block';
 }
 
 async function checkVitaUpdate(manual = false) {
@@ -2911,6 +2924,39 @@ window.showPlatformSelector = showPlatformSelector;
 window.showAuthForms = showAuthForms;
 window.togglePasswordVisibility = togglePasswordVisibility;
 window.getSavedCredentials = getSavedCredentials;
+window.openSidebar = openSidebar;
+window.closeSidebar = closeSidebar;
+window.openProfileModal = openProfileModal;
+window.closeProfileModal = closeProfileModal;
+window.openLeaderboardModal = openLeaderboardModal;
+window.closeLeaderboardModal = closeLeaderboardModal;
+window.openSettingsModal = openSettingsModal;
+window.closeSettingsModal = closeSettingsModal;
+window.openControlsModal = openControlsModal;
+window.closeControlsModal = closeControlsModal;
+window.openManualModal = openManualModal;
+window.closeManualModal = closeManualModal;
+window.openAuthModal = openAuthModal;
+window.closeAuthModal = closeAuthModal;
+window.openCodexModal = typeof openCodexModal === 'function' ? openCodexModal : () => {};
+window.closeCodexModal = typeof closeCodexModal === 'function' ? closeCodexModal : () => {};
+window.openDatabaseModal = typeof openDatabaseModal === 'function' ? openDatabaseModal : () => {};
+window.closeDatabaseModal = typeof closeDatabaseModal === 'function' ? closeDatabaseModal : () => {};
+window.openDeviceModeModal = typeof openDeviceModeModal === 'function' ? openDeviceModeModal : () => {};
+window.closeDeviceModeModal = typeof closeDeviceModeModal === 'function' ? closeDeviceModeModal : () => {};
+window.openPcDownloadModal = typeof openPcDownloadModal === 'function' ? openPcDownloadModal : () => {};
+window.closePcDownloadModal = typeof closePcDownloadModal === 'function' ? closePcDownloadModal : () => {};
+window.openAndroidDownloadModal = typeof openAndroidDownloadModal === 'function' ? openAndroidDownloadModal : () => {};
+window.closeAndroidDownloadModal = typeof closeAndroidDownloadModal === 'function' ? closeAndroidDownloadModal : () => {};
+window.openCoopLobbyModal = typeof openCoopLobbyModal === 'function' ? openCoopLobbyModal : () => {};
+window.closeCoopLobbyModal = typeof closeCoopLobbyModal === 'function' ? closeCoopLobbyModal : () => {};
+window.checkVitaUpdateManual = typeof checkVitaUpdateManual === 'function' ? checkVitaUpdateManual : () => {};
+window.selectGameDirective = selectGameDirective;
+window.selectDeviceChoice = typeof selectDeviceChoice === 'function' ? selectDeviceChoice : () => {};
+window.confirmDeviceChoiceAndPlay = typeof confirmDeviceChoiceAndPlay === 'function' ? confirmDeviceChoiceAndPlay : () => {};
+window.playWebGame = typeof playWebGame === 'function' ? playWebGame : () => {};
+window.installPwaFromHub = typeof installPwaFromHub === 'function' ? installPwaFromHub : () => {};
+window.homeBeep = homeBeep;
 
 // Otomatis sinkronkan profil operatif dengan Supabase saat Hub dibuka
 async function autoSyncCloudOnStartup() {
