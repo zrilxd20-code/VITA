@@ -28,7 +28,7 @@ const nextQ = '?v=' + next;
 
 writeFileSync('version.json', JSON.stringify({ version: next }) + '\n');
 console.log('updated version.json');
-bumpFile('sw.js', [[prevTag, cacheTag], [prev, next]]);
+bumpFile('sw.js', [[prevTag, cacheTag]]);
 bumpFile('index.html', [[prevQ, nextQ]]);
 bumpFile('js/home.js', [[`const APP_VERSION = '${prev}'`, `const APP_VERSION = '${next}'`]]);
 bumpFile('package.json', [[`"version": "${prev}"`, `"version": "${next}"`]]);
