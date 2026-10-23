@@ -239,6 +239,7 @@ let exitPos = null;
 let wreckedRobot = null;
 let level15Corpse = null;
 let terminalPuzzleActive = false;
+let terminalOpenTime = 0;
 let terminalCurrentNode = null;
 let terminalTimeRemaining = 14.0;
 const TERMINAL_MAX_TIME = 25.0;
@@ -11552,6 +11553,7 @@ function renderTerminalPuzzleUI() {
 
 function terminalKeypadPress(key) {
     if (!terminalPuzzleActive || !terminalPuzzleData || terminalPuzzleData.type !== 'C') return;
+    if (Date.now() - terminalOpenTime < 200) return;
     sTerminalTick(true);
     if (key === 'CLR') {
         terminalInputSeq = [];
@@ -11581,6 +11583,7 @@ function terminalKeypadPress(key) {
 
 function toggleTerminalSwitch(idx) {
     if (!terminalPuzzleActive || !terminalPuzzleData || terminalPuzzleData.type !== 'D') return;
+    if (Date.now() - terminalOpenTime < 200) return;
     terminalSwitches[idx] = terminalSwitches[idx] === 1 ? 0 : 1;
     sTerminalTick(terminalSwitches[idx] === 1);
     renderTerminalPuzzleUI();
@@ -11588,6 +11591,7 @@ function toggleTerminalSwitch(idx) {
 
 function submitTerminalSwitchCircuit() {
     if (!terminalPuzzleActive || !terminalPuzzleData || terminalPuzzleData.type !== 'D') return;
+    if (Date.now() - terminalOpenTime < 250) return;
     const isCorrect = terminalSwitches.every((val, i) => val === terminalPuzzleData.pattern[i]);
     if (isCorrect) {
         handleTerminalSuccess();
@@ -11598,6 +11602,7 @@ function submitTerminalSwitchCircuit() {
 
 function submitTerminalAnswer(choiceIdx) {
     if (!terminalPuzzleActive || !terminalPuzzleData) return;
+    if (Date.now() - terminalOpenTime < 250) return;
     if (terminalPuzzleData.type === 'A' || terminalPuzzleData.type === 'B') {
         if (choiceIdx === terminalPuzzleData.correct) {
             handleTerminalSuccess();
@@ -11612,11 +11617,22 @@ function openTerminalPuzzleModal(node) {
     if (!modal) return;
     terminalCurrentNode = node;
     terminalPuzzleActive = true;
+    terminalOpenTime = Date.now();
     terminalTimeRemaining = TERMINAL_MAX_TIME;
     terminalInputSeq = [];
     terminalSwitches = [0, 0, 0, 0];
     terminalGlitchCovered = false;
     terminalPuzzleData = generateTerminalPuzzle();
+
+    // Hentikan gerakan player agar karakter tidak meluncur saat membuka terminal
+    if (keys && typeof keys === 'object') {
+        Object.keys(keys).forEach(k => { keys[k] = false; });
+    }
+    if (typeof touchMove !== 'undefined' && touchMove) {
+        touchMove.active = false;
+        touchMove.dx = 0;
+        touchMove.dy = 0;
+    }
 
     if (terminalPuzzleData.type === 'C') {
         if (terminalGlitchTimeout) clearTimeout(terminalGlitchTimeout);
@@ -11634,7 +11650,11 @@ function openTerminalPuzzleModal(node) {
     if (typeof showCursor === 'function') showCursor();
 }
 
-function closeTerminalPuzzleModal(isSuccess) {
+function closeTerminalPuzzleModal(isSuccess, isForced) {
+    // Abaikan dismiss pembatalan dini (< 400ms) untuk mencegah auto-close dari tombol/sentuhan berjalan
+    if (!isSuccess && !isForced && Date.now() - terminalOpenTime < 400) {
+        return;
+    }
     const modal = document.getElementById('terminalPuzzleModal');
     if (modal) modal.style.display = 'none';
     terminalPuzzleActive = false;
@@ -11642,7 +11662,7 @@ function closeTerminalPuzzleModal(isSuccess) {
     terminalInputSeq = [];
     terminalSwitches = [0, 0, 0, 0];
     if (terminalCurrentNode) {
-        terminalCurrentNode.cooldownUntil = Date.now() + 2500;
+        terminalCurrentNode.cooldownUntil = Date.now() + (isSuccess ? 0 : 1000);
         terminalCurrentNode = null;
     }
     if (terminalGlitchTimeout) { clearTimeout(terminalGlitchTimeout); terminalGlitchTimeout = null; }
@@ -11653,6 +11673,10 @@ function closeTerminalPuzzleModal(isSuccess) {
 }
 window.openTerminalPuzzleModal = openTerminalPuzzleModal;
 window.closeTerminalPuzzleModal = closeTerminalPuzzleModal;
+window.submitTerminalAnswer = submitTerminalAnswer;
+window.terminalKeypadPress = terminalKeypadPress;
+window.toggleTerminalSwitch = toggleTerminalSwitch;
+window.submitTerminalSwitchCircuit = submitTerminalSwitchCircuit;
 
 function handleTerminalSuccess() {
     sSystemRestored();
@@ -11738,7 +11762,7 @@ function handleTerminalFailure(reason) {
     addShake(18);
     const node = terminalCurrentNode;
     if (node) {
-        node.cooldownUntil = Date.now() + 2500;
+        node.cooldownUntil = Date.now() + 1500;
         addParticle(node.x, node.y, '#ff0033', 25, 5, 30);
     }
     floatingTexts.push({
@@ -11761,7 +11785,7 @@ function handleTerminalFailure(reason) {
         });
     }
 
-    closeTerminalPuzzleModal(false);
+    closeTerminalPuzzleModal(false, true);
 }
 
 function updateTerminalTelemetry() {
@@ -13202,10 +13226,12 @@ document.addEventListener('keydown', e => {
     if (isTermMOpen) {
         if (e.key === 'Escape' || e.key === 'Esc') {
             e.preventDefault();
-            closeTerminalPuzzleModal(false);
+            if (Date.now() - terminalOpenTime >= 400) {
+                closeTerminalPuzzleModal(false);
+            }
             return;
         }
-        if (terminalPuzzleData) {
+        if (terminalPuzzleData && Date.now() - terminalOpenTime >= 200) {
             if (terminalPuzzleData.type === 'A' || terminalPuzzleData.type === 'B') {
                 if (e.key === '1') { e.preventDefault(); submitTerminalAnswer(0); return; }
                 if (e.key === '2') { e.preventDefault(); submitTerminalAnswer(1); return; }
@@ -13371,7 +13397,16 @@ document.addEventListener('mousemove', e => {
 isMouseDown = false;
 document.addEventListener('mousedown', e => {
     if (document.body.classList.contains('touch-on')) return; // ignore synthetic touch mousedown
-    if (e.target && e.target.closest && (e.target.closest('#touchUI') || e.target.closest('#weaponBar') || e.target.closest('#weaponSelectScreen'))) return;
+    if (terminalPuzzleActive) return;
+    if (e.target && e.target.closest && (
+        e.target.closest('#touchUI') ||
+        e.target.closest('#weaponBar') ||
+        e.target.closest('#weaponSelectScreen') ||
+        e.target.closest('#terminalPuzzleModal') ||
+        e.target.closest('.terminal-puzzle-backdrop') ||
+        e.target.closest('.modal-backdrop') ||
+        e.target.closest('.robot-memory-backdrop')
+    )) return;
     isMouseDown = true;
     if (gameState === 'playing') playerAttack();
 });
@@ -17222,6 +17257,11 @@ window.openBestiaryModal = typeof openBestiaryModal === 'function' ? openBestiar
 window.closeBestiaryModal = typeof closeBestiaryModal === 'function' ? closeBestiaryModal : () => {};
 window.closeRobotMemoryModal = typeof closeRobotMemoryModal === 'function' ? closeRobotMemoryModal : () => {};
 window.closeTerminalPuzzleModal = typeof closeTerminalPuzzleModal === 'function' ? closeTerminalPuzzleModal : () => {};
+window.openTerminalPuzzleModal = typeof openTerminalPuzzleModal === 'function' ? openTerminalPuzzleModal : () => {};
+window.submitTerminalAnswer = typeof submitTerminalAnswer === 'function' ? submitTerminalAnswer : () => {};
+window.terminalKeypadPress = typeof terminalKeypadPress === 'function' ? terminalKeypadPress : () => {};
+window.toggleTerminalSwitch = typeof toggleTerminalSwitch === 'function' ? toggleTerminalSwitch : () => {};
+window.submitTerminalSwitchCircuit = typeof submitTerminalSwitchCircuit === 'function' ? submitTerminalSwitchCircuit : () => {};
 window.openAdminLogin = typeof openAdminLogin === 'function' ? openAdminLogin : () => {};
 window.submitAdminLogin = typeof submitAdminLogin === 'function' ? submitAdminLogin : () => {};
 window.openPauseSettings = typeof openPauseSettings === 'function' ? openPauseSettings : () => {};

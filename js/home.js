@@ -472,7 +472,7 @@ document.addEventListener('keydown', e => {
     if (!activeHost) restoreTarget = document.activeElement;
     activeHost = host;
     const dlg = ensureSemantics(host);
-    const target = focusableWithin(dlg)[0] || dlg;
+    const target = (host.id === 'terminalPuzzleModal') ? dlg : (focusableWithin(dlg)[0] || dlg);
     // Tunggu satu frame agar transisi/display selesai sebelum memindahkan fokus.
     // Batalkan bila dialog sudah ditutup/diganti sebelum frame berjalan.
     requestAnimationFrame(() => {
@@ -2424,7 +2424,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.5.5';
+const APP_VERSION = '2.5.6';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 
