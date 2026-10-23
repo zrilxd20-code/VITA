@@ -199,6 +199,10 @@
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 3.79 2 6v12c0 2.21 4.48 4 10 4s10-1.79 10-4V6c0-2.21-4.48-4-10-4zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
         <span data-i18n="hero_manual_btn">Field Manual &amp; Info</span>
       </button>
+      <button class="btn btn-hero-sub" type="button" onclick="openAdminArsenalModal()" style="border-color:rgba(255,215,0,0.55);color:#ffd700;">
+        <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span data-i18n="admin_btn_short">ADMIN &amp; CHEAT ENGINE [~]</span>
+      </button>
     </div>
     <!-- Tombol kembali ke pemilih platform jika di web -->
     <div id="webPlatformSwitchRow" style="margin-top:12px;text-align:center;">
@@ -1076,6 +1080,67 @@
   </div>
 </div>
 
+<!-- GLOBAL SHARED ADMIN ARSENAL & CHEATS MODAL (ACCESSIBLE FROM ANYWHERE) -->
+<div id="adminArsenalModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle" style="display:none;z-index:10005;position:fixed;inset:0;background:rgba(5,7,12,0.88);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;overflow-y:auto;" onclick="if(event.target===this)closeAdminArsenalModal()">
+  <div class="modal modal-lg" style="max-width:560px;width:100%;border:1px solid rgba(0,229,255,0.45);background:rgba(10,12,20,0.98);box-shadow:0 0 35px rgba(0,229,255,0.25);border-radius:10px;padding:20px;color:#e6edf3;max-height:92vh;overflow-y:auto;" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.25);padding-bottom:10px;margin-bottom:12px;">
+      <h3 style="color:#00f0ff;margin:0;font-size:16px;letter-spacing:1px;display:flex;align-items:center;gap:6px;" id="adminModalTitle" data-i18n="admin_modal_title">
+        <svg class="btn-icon" viewBox="0 0 24 24" style="width:18px;height:18px;fill:#00f0ff;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>ARSENAL TAKTIS ADMIN &amp; CHEATS</span>
+      </h3>
+      <button class="btn-micro danger" type="button" onclick="closeAdminArsenalModal()" style="padding:4px 10px;font-size:14px;" aria-label="Close">&#10005;</button>
+    </div>
+    <p style="font-size:12px;opacity:0.85;margin-bottom:12px;" id="adminModalSub" data-i18n="admin_modal_sub">Akses instan cheat operatif &amp; lompat ke sektor mana pun tanpa ribet:</p>
+
+    <!-- ONE-CLICK MASTER CHEAT -->
+    <button class="btn" style="width:100%;margin-bottom:12px;background:linear-gradient(135deg,#ffd700,#ff8800);color:#0a0a12;font-weight:900;font-size:13px;padding:12px;letter-spacing:1px;box-shadow:0 0 22px rgba(255,215,0,0.45);border:none;cursor:pointer;" onclick="adminFullGodLoadout()" data-i18n="admin_all_god_btn">
+      🌟 GODMODE + SEMUA SENJATA + SEMUA SKILL (MAX LOADOUT)
+    </button>
+
+    <!-- QUICK CHEATS GRID -->
+    <div style="color:#ffd700;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;">KONTROL CHEAT CEPAT</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px;">
+      <button class="btn secondary" type="button" onclick="adminToggleGod()" id="adminModalGodBtn" style="border-color:rgba(255,215,0,0.5);color:#ffd700;font-weight:bold;font-size:12px;padding:8px 4px;">
+        🛡️ KEBAL (GODMODE): OFF
+      </button>
+      <button class="btn secondary" type="button" onclick="adminGiveAllWeapons()" data-i18n="admin_give_weapons_btn" style="border-color:rgba(0,240,255,0.5);color:#00f0ff;font-weight:bold;font-size:12px;padding:8px 4px;">
+        ⚔️ DAPAT SEMUA SENJATA
+      </button>
+      <button class="btn secondary" type="button" onclick="adminUnlockAllPerks()" data-i18n="admin_unlock_all_perks" style="border-color:rgba(0,255,136,0.5);color:#00ff88;font-weight:bold;font-size:12px;padding:8px 4px;">
+        ⚡ DAPAT SEMUA SKILL (MAX)
+      </button>
+      <button class="btn secondary" type="button" onclick="adminHealFull()" style="border-color:rgba(46,204,113,0.5);color:#2ecc71;font-weight:bold;font-size:12px;padding:8px 4px;">
+        💚 HEAL 100%
+      </button>
+      <button class="btn secondary" type="button" onclick="adminUnlockExit()" style="border-color:rgba(0,255,136,0.5);color:#00ff88;font-weight:bold;font-size:12px;padding:8px 4px;">
+        🚪 BUKA AIRLOCK EXIT
+      </button>
+      <button class="btn secondary" type="button" onclick="adminKillAll()" style="border-color:rgba(255,54,54,0.5);color:#ff3636;font-weight:bold;font-size:12px;padding:8px 4px;">
+        💀 PURGE ALL MONSTERS
+      </button>
+    </div>
+
+    <!-- SECTOR JUMP -->
+    <div style="color:#00f0ff;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;" id="adminModalJumpTitle" data-i18n="admin_modal_jump">LOMPAT KE SEKTOR / BAB (1-15)</div>
+    <div id="adminModalLevels" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px;"></div>
+
+    <!-- INDIVIDUAL WEAPONS -->
+    <div style="color:#00f0ff;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;" data-i18n="admin_modal_weapons">PASANG SENJATA SATUAN</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
+      <button class="btn-micro" type="button" data-i18n="weapon_knife" onclick="adminEquipWeapon('knife')">Tactical Knife</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_rifle" onclick="adminEquipWeapon('rifle')">Tactical Rifle</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_grenade" onclick="adminEquipWeapon('grenade')">EMP Grenade</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_bazooka" onclick="adminEquipWeapon('bazooka')">Rocket Launcher</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_shield" onclick="adminEquipWeapon('shield')">Kinetic Shield</button>
+      <button class="btn-micro" type="button" data-i18n="weapon_minigun" onclick="adminEquipWeapon('minigun')">Minigun</button>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn secondary" type="button" data-i18n="admin_modal_close" onclick="closeAdminArsenalModal()">TUTUP [ESC]</button>
+    </div>
+  </div>
+</div>
+
 <div id="gameView" style="display:none">
 
 <!-- LEVEL 10 WRECKED ROBOT DISCOVERY MODAL -->
@@ -1485,55 +1550,7 @@
     </div>
 </div>
 
-<!-- IN-GAME ADMIN ARSENAL MODAL -->
-<div id="adminArsenalModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle" style="display:none;z-index:10002;position:fixed;inset:0;background:rgba(5,7,12,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
-  <div class="modal-card" style="max-width:540px;width:100%;border:1px solid rgba(0,229,255,0.45);background:rgba(10,12,20,0.96);box-shadow:0 0 35px rgba(0,229,255,0.25);border-radius:8px;padding:20px;color:#e6edf3;">
-    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,229,255,0.25);padding-bottom:10px;margin-bottom:12px;">
-      <h3 style="color:#00f0ff;margin:0;font-size:16px;letter-spacing:1px;" id="adminModalTitle" data-i18n="admin_modal_title">ADMIN TACTICAL ARSENAL</h3>
-      <button class="btn-micro danger" type="button" onclick="closeAdminArsenalModal()" style="padding:4px 10px;font-size:14px;" aria-label="Close">&#10005;</button>
-    </div>
-    <p style="font-size:12px;opacity:0.8;margin-bottom:12px;" id="adminModalSub" data-i18n="admin_modal_sub">Jump to any sector or requisition test equipment:</p>
 
-    <div style="color:#00f0ff;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;" id="adminModalJumpTitle" data-i18n="admin_modal_jump">JUMP TO SECTOR / CHAPTER (1-15)</div>
-    <div id="adminModalLevels" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px;"></div>
-    
-    <div style="color:#00f0ff;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;" data-i18n="admin_modal_weapons">WEAPONS</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
-      <button class="btn-micro" type="button" data-i18n="weapon_knife" onclick="adminEquipWeapon('knife')">Tactical Knife</button>
-      <button class="btn-micro" type="button" data-i18n="weapon_rifle" onclick="adminEquipWeapon('rifle')">Tactical Rifle</button>
-      <button class="btn-micro" type="button" data-i18n="weapon_grenade" onclick="adminEquipWeapon('grenade')">EMP Grenade</button>
-      <button class="btn-micro" type="button" data-i18n="weapon_bazooka" onclick="adminEquipWeapon('bazooka')">Rocket Launcher</button>
-      <button class="btn-micro" type="button" data-i18n="weapon_shield" onclick="adminEquipWeapon('shield')">Kinetic Shield</button>
-      <button class="btn-micro" type="button" data-i18n="weapon_minigun" onclick="adminEquipWeapon('minigun')">Minigun</button>
-    </div>
-
-    <div style="color:#ffd700;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;" data-i18n="admin_modal_perks">OPERATIVE SKILLS &amp; PERKS</div>
-    <button class="btn secondary" style="width:100%;margin-bottom:8px;border-color:rgba(255,215,0,0.5);color:#ffd700;font-weight:bold;" data-i18n="admin_unlock_all_perks" onclick="adminUnlockAllPerks()">UNLOCK ALL SKILLS (MAX)</button>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:16px;">
-      <button class="btn-micro" type="button" data-i18n="perk_nano_name" onclick="adminAddPerk('nano_plating')">Nanite Armor Plating</button>
-      <button class="btn-micro" type="button" data-i18n="perk_adren_name" onclick="adminAddPerk('adrenaline')">Adrenaline Servo Injector</button>
-      <button class="btn-micro" type="button" data-i18n="perk_plasma_name" onclick="adminAddPerk('plasma')">Hyper-Charge Plasma Munitions</button>
-      <button class="btn-micro" type="button" data-i18n="perk_cryo_name" onclick="adminAddPerk('cryo_vent')">Cryo-Vent Heat Sinks</button>
-      <button class="btn-micro" type="button" data-i18n="perk_vamp_name" onclick="adminAddPerk('vampiric')">Nanite Bio-Siphon</button>
-      <button class="btn-micro" type="button" data-i18n="perk_rico_name" onclick="adminAddPerk('ricochet')">Plasma Deflection Matrix</button>
-      <button class="btn-micro" type="button" data-i18n="perk_emp_name" onclick="adminAddPerk('kinetic_emp')">Kinetic EMP Discharge</button>
-      <button class="btn-micro" type="button" data-i18n="perk_therm_name" onclick="adminAddPerk('thermal_trail')">Thermal Exhaust Trail</button>
-    </div>
-
-    <div style="color:#2ecc71;font-size:12px;font-weight:bold;margin-bottom:6px;letter-spacing:1px;">INSTANT TACTICAL CHEATS</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;">
-      <button class="btn-micro" type="button" style="color:#2ecc71;border-color:rgba(46,204,113,0.5);" onclick="adminHealFull()">HEAL 100%</button>
-      <button class="btn-micro" type="button" style="color:#ff3636;border-color:rgba(255,54,54,0.5);" onclick="adminKillAll()">KILL ALL</button>
-      <button class="btn-micro" type="button" style="color:#00ff88;border-color:rgba(0,255,136,0.5);" onclick="adminUnlockExit()">OPEN EXIT</button>
-      <button class="btn-micro" type="button" style="color:#00f0ff;border-color:rgba(0,240,255,0.5);" onclick="adminRevealMap()">REVEAL MAP</button>
-    </div>
-
-    <div style="display:flex;gap:8px;justify-content:flex-end;">
-      <button class="btn secondary" type="button" onclick="adminToggleGod()" id="adminModalGodBtn">INVULNERABLE: OFF</button>
-      <button class="btn" type="button" data-i18n="admin_modal_close" onclick="closeAdminArsenalModal()">CLOSE [ESC]</button>
-    </div>
-  </div>
-</div>
 
 <!-- IN-GAME PAUSE SETTINGS MODAL -->
 <div id="inGameSettingsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pauseSettingsModalTitle" style="display:none;z-index:10003;position:fixed;inset:0;background:rgba(5,7,12,0.88);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;overflow-y:auto;">
@@ -1839,9 +1856,9 @@
           <span id="btnCodexText">ARCHIVES CODEX</span>
         </button>
         <button class="btn secondary" id="btnControls" onclick="openControlsModal()">HOW TO PLAY</button>
-        <button class="btn secondary" id="btnAdmin" onclick="openAdminLogin()" style="border-color:rgba(0,229,255,0.4);color:#00e5ff;">
-          <svg class="btn-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 12H5v-2h6v2zm-3.5-3.5L4 9l1.5-1.5L8.5 10l-1 2.5z"/></svg>
-          <span id="btnAdminText">ADMIN &amp; CHAPTER SELECT</span>
+        <button class="btn secondary" id="btnAdmin" onclick="openAdminArsenalModal()" style="border-color:rgba(255,215,0,0.55);color:#ffd700;">
+          <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span id="btnAdminText" data-i18n="admin_btn_short">ADMIN &amp; CHEAT ENGINE [~]</span>
         </button>
         <button class="btn secondary" id="btnBackToHome" onclick="backToMenu()">
           <svg class="btn-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>

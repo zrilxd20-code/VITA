@@ -491,6 +491,9 @@ const T = {
         admin_select_sector: 'PILIH SEKTOR OPERASI (1 - 15)',
         admin_advanced_tools: 'OPSI TAMBAHAN — UJI SENJATA & SKILL SATUAN',
         admin_full_loadout_msg: '⚡ ARSENAL & SKILL MAKSIMAL DIAKTIFKAN!',
+        admin_btn_short: 'ADMIN & CHEAT ENGINE [~]',
+        admin_all_god_btn: '🌟 GODMODE + SEMUA SENJATA + SEMUA SKILL (MAX LOADOUT)',
+        admin_give_weapons_btn: '⚔️ DAPAT SEMUA SENJATA',
         settings_reset_default: 'KEMBALIKAN PENGATURAN KE BAWAAN',
         boss_threat: 'PREDATOR PUNCAK TERDETEKSI',
         settings_sec_audio: 'SUARA & AUDIO',
@@ -891,6 +894,9 @@ const T = {
         admin_select_sector: 'SELECT OPERATION SECTOR (1 - 15)',
         admin_advanced_tools: 'ADVANCED OPTIONS — TEST INDIVIDUAL WEAPONS & SKILLS',
         admin_full_loadout_msg: '⚡ FULL ARSENAL & MAX SKILLS ENGAGED!',
+        admin_btn_short: 'ADMIN & CHEAT ENGINE [~]',
+        admin_all_god_btn: '🌟 GODMODE + ALL WEAPONS + ALL SKILLS (MAX LOADOUT)',
+        admin_give_weapons_btn: '⚔️ UNLOCK ALL WEAPONS',
         settings_reset_default: 'RESET ALL SETTINGS TO DEFAULT',
         boss_threat: 'APEX PREDATOR DETECTED',
         settings_sec_audio: 'AUDIO & SOUND',
@@ -3921,27 +3927,22 @@ function spawnMonsters(level) {
                 type = MONSTER_TYPES.find(t => t.name === 'Mimic') || type;
             }
         }
-        // Kurva sigmoid: lambat di awal, percepatan di mid-game, stabil di late-game
-        // LV1≈1.04x → LV5≈1.66x → LV8≈2.67x → LV12≈3.35x → LV14≈3.48x
-        const diffMult = 1 + 2.5 * (1 / (1 + Math.exp(-0.45 * (level - 7))));
+        // Kurva peningkatan tantangan yang seimbang dan proporsional dengan damage player
+        // LV1 ≈ 1.0x → LV5 ≈ 1.35x → LV8 ≈ 1.70x → LV12 ≈ 2.05x → LV15 ≈ 2.30x
+        const diffMult = 1.0 + 1.3 * (1 / (1 + Math.exp(-0.35 * (level - 7))));
 
-        let speed = type.speed * (0.9 + level * 0.05) * diffSpeedMult * currentAdaptation.monsterSpeedMult;
+        let speed = type.speed * (0.95 + level * 0.03) * diffSpeedMult * currentAdaptation.monsterSpeedMult;
         let hp = type.hp * diffMult * diffStatMult * currentAdaptation.monsterHpMult;
-        let atk = type.atk * diffMult * diffStatMult;
+        let atk = type.atk * (1.0 + level * 0.06) * diffStatMult;
 
         if (isLight) {
-            hp *= 1.3;
-            atk *= 1.3;
-            speed *= 1.1;
-        } else {
-            hp *= 0.85;
-            atk *= 0.85;
-            speed *= 0.95;
-        }
-
-        if (level > 5) {
             hp *= 1.2;
             atk *= 1.2;
+            speed *= 1.08;
+        } else {
+            hp *= 0.88;
+            atk *= 0.88;
+            speed *= 0.96;
         }
 
         const isHarv = type.name === 'Harvester';
@@ -4387,7 +4388,7 @@ function buildLevelWorld(level) {
     const perkTherm = preservedPerks.filter(p => p === 'thermal_trail').length;
 
     let baseMaxHp = 100 + level * 10 + (perkNano * 50);
-    let baseAtk = 28 + level * 4;
+    let baseAtk = 32 + level * 6;
     if (perkPlasma > 0) {
         baseAtk = Math.round(baseAtk * Math.pow(1.3, perkPlasma));
     }
@@ -6621,6 +6622,16 @@ function updatePlayer() {
     let speed = player.speed * (0.35 + 0.65 * analogMag);
     if (player.shieldTimer > 0) speed *= 0.85; // 15% slow saat perisai aktif
     if (player.currentWeapon === 'minigun' && player.attackAnim > 0) speed *= 0.75; // 25% slow saat menembakkan minigun
+
+    // Absolute Godmode Protection
+    if (typeof godmode !== 'undefined' && godmode) {
+        player.hp = Math.max(player.maxHp, 999);
+        player.maxHp = Math.max(player.maxHp, 999);
+        player.invincible = 999999;
+        player.freezeTimer = 0;
+        player.poisonTimer = 0;
+        player.burnTimer = 0;
+    }
 
     // Player Status Effects Processing
     if (player.freezeTimer > 0) {
@@ -13375,15 +13386,11 @@ document.addEventListener('keydown', e => {
     // Toggle Admin Arsenal Console via Tilde (~) / Backquote or F2
     if (e.key === '`' || e.key === '~' || e.code === 'Backquote' || e.key === 'F2' || e.code === 'F2') {
         e.preventDefault();
-        if (isAdmin) {
-            const aM = document.getElementById('adminArsenalModal');
-            if (aM && (aM.style.display === 'flex' || aM.classList.contains('open'))) {
-                closeAdminArsenalModal();
-            } else {
-                openAdminArsenalModal();
-            }
+        const aM = document.getElementById('adminArsenalModal');
+        if (aM && (aM.style.display === 'flex' || aM.classList.contains('open'))) {
+            closeAdminArsenalModal();
         } else {
-            openAdminLogin();
+            openAdminArsenalModal();
         }
         return;
     }
@@ -14326,55 +14333,34 @@ function grantAdminFullArsenal(target) {
 }
 
 function openAdminLogin() {
-    if (isAdmin) {
-        renderAdminLevels();
-        toggleHomePanel('adminPanel');
-        return;
-    }
-    const err = document.getElementById('adminLoginErr');
-    if (err) { err.style.display = 'none'; err.textContent = ''; }
-    const inp = document.getElementById('adminCode');
-    if (inp) { inp.value = ''; setTimeout(() => { try { inp.focus(); } catch (e) {} }, 50); }
-    toggleHomePanel('adminLogin');
+    isAdmin = true;
+    openAdminArsenalModal();
 }
 
 function submitAdminLogin() {
-    const inp = document.getElementById('adminCode');
-    const err = document.getElementById('adminLoginErr');
-    const val = inp ? String(inp.value || '').trim() : '';
-    if (val === ADMIN_CODE) {
-        isAdmin = true;
-        if (err) { err.style.display = 'none'; err.textContent = ''; }
-        if (inp) inp.value = '';
+    isAdmin = true;
+    try {
+        const high = loadHigh();
+        high.highestLevel = 15;
+        high.lastLevel = 14;
+        high.savedWeapons = [...ADMIN_WEAPONS_FULL];
+        high.savedCurrentWeapon = 'rifle';
+        high.savedPerks = [...ADMIN_PERKS_FULL];
+        high.savedExp = 9999;
+        high.savedPLevel = 15;
+        saveHigh(high);
+        checkContinueBtn();
+    } catch (e) {}
 
-        // Otomatis buka seluruh 15 sektor & bekali senjata serta augmentasi maksimal
-        try {
-            const high = loadHigh();
-            high.highestLevel = 15;
-            high.lastLevel = 14;
-            high.savedWeapons = [...ADMIN_WEAPONS_FULL];
-            high.savedCurrentWeapon = 'rifle';
-            high.savedPerks = [...ADMIN_PERKS_FULL];
-            high.savedExp = 9999;
-            high.savedPLevel = 15;
-            saveHigh(high);
-            checkContinueBtn();
-        } catch (e) {}
-
-        if (player) {
-            grantAdminFullArsenal(player);
-        }
-
-        renderAdminLevels();
-        toggleHomePanel('adminPanel');
-        applyLang();
-        announceAdmin(tt('admin_welcome'));
-        sWeaponUnlock();
-    } else {
-        if (err) { err.textContent = tt('admin_wrong'); err.style.display = 'block'; }
-        sLocked();
-        if (inp) { try { inp.focus(); inp.select(); } catch (e) {} }
+    if (player) {
+        grantAdminFullArsenal(player);
     }
+
+    renderAdminLevels();
+    applyLang();
+    announceAdmin(tt('admin_welcome'));
+    sWeaponUnlock();
+    openAdminArsenalModal();
 }
 
 function adminLogout() {
@@ -14412,11 +14398,21 @@ function renderAdminLevels() {
 }
 
 function adminStartAt(level) {
+    isAdmin = true;
     level = Math.max(0, Math.min(LEVELS - 1, Math.floor(Number(level) || 0)));
     ensureAudio();
-    document.getElementById('startScreen').style.display = 'none';
-    document.getElementById('deathScreen').style.display = 'none';
-    document.getElementById('winScreen').style.display = 'none';
+    closeAdminArsenalModal();
+    const hv = document.getElementById('homeView');
+    if (hv) hv.style.display = 'none';
+    const gv = document.getElementById('gameView');
+    if (gv) gv.style.display = '';
+    document.body.classList.add('game-on');
+    const ss = document.getElementById('startScreen');
+    if (ss) ss.style.display = 'none';
+    const ds = document.getElementById('deathScreen');
+    if (ds) ds.style.display = 'none';
+    const ws = document.getElementById('winScreen');
+    if (ws) ws.style.display = 'none';
     const ps = document.getElementById('pauseScreen');
     if (ps) ps.classList.remove('open');
     gameState = 'playing';
@@ -14428,70 +14424,74 @@ function adminStartAt(level) {
     initLevel(level);
     if (player) {
         grantAdminFullArsenal(player);
+        if (godmode) {
+            player.maxHp = Math.max(player.maxHp, 999);
+            player.hp = player.maxHp;
+            player.invincible = 999999;
+        }
     }
     sWeaponUnlock();
-    if (typeof floatingTexts !== 'undefined' && player) {
-        floatingTexts.push({
-            x: player.x,
-            y: player.y - 34,
-            text: tt('admin_full_loadout_msg') + ' (CH ' + (level + 1) + ')',
-            color: '#00f0ff',
-            life: 140,
-            maxLife: 140
-        });
-    }
     announceAdmin(tt('admin_jump_msg') + (level + 1));
     updateUI();
 }
 
 function adminJump(level) {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     adminStartAt(level);
 }
 
 function adminTestBoss() {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     adminStartAt(LEVELS - 1);
 }
 
 function adminUnlockExit() {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     if (!artifacts || !artifacts.length) return;
     artifacts.forEach(a => { a.collected = true; });
     coinsCollected = artifacts.length;
     sArtifact();
+    announceAdmin('AIRLOCK EXIT UNLOCKED');
     updateUI();
 }
 
 function adminToggleGod() {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     godmode = !godmode;
     if (player) {
-        if (godmode) { player.hp = player.maxHp; player.invincible = 999999; }
-        else { player.invincible = 0; }
+        if (godmode) {
+            player.maxHp = Math.max(player.maxHp, 999);
+            player.hp = player.maxHp;
+            player.invincible = 999999;
+        } else {
+            player.invincible = 0;
+        }
     }
     const b = document.getElementById('adminGodBtn');
     if (b) b.textContent = godmode ? tt('admin_god_on') : tt('admin_god_off');
+    updateAdminModalUI();
+    announceAdmin(godmode ? '🛡️ GODMODE ON (KEBAL)' : '🛡️ GODMODE OFF');
 }
 
 function adminKillAll() {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     if (!monsters || !monsters.length) return;
     monsters.forEach(m => {
         if (m.hp > 0) {
             m.hp = 0;
             totalKills++;
             registerComboKill();
-            addParticle(m.x, m.y, m.color, 20, 6, 35);
+            addParticle(m.x, m.y, m.color || '#ff0055', 20, 6, 35);
             gainExp(m.exp || 20);
         }
     });
     sArtifact();
+    announceAdmin('💀 ALL MONSTERS PURGED');
     updateUI();
 }
 
 function adminHealFull() {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     if (!player) return;
     player.hp = player.maxHp;
     sMedPod();
@@ -14501,7 +14501,7 @@ function adminHealFull() {
 }
 
 function adminRevealMap() {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     if (!fogOfWar) return;
     for (let y = 0; y < mazeH; y++) {
         for (let x = 0; x < mazeW; x++) {
@@ -14514,8 +14514,73 @@ function adminRevealMap() {
     updateUI();
 }
 
+function adminGiveAllWeapons() {
+    isAdmin = true;
+    if (player) {
+        player.weapons = [...ADMIN_WEAPONS_FULL];
+        if (!player.currentWeapon) player.currentWeapon = 'rifle';
+        player.weaponCooldowns = {};
+        ADMIN_WEAPONS_FULL.forEach(w => { player.weaponCooldowns[w] = 0; });
+        player.minigunHeat = 0;
+        player.minigunOverheat = 0;
+        sWeaponUnlock();
+        if (typeof floatingTexts !== 'undefined') {
+            floatingTexts.push({
+                x: player.x,
+                y: player.y - 25,
+                text: '⚔️ ALL WEAPONS UNLOCKED!',
+                color: '#00f0ff',
+                life: 90,
+                maxLife: 90
+            });
+        }
+        updateUI();
+    }
+    try {
+        const high = loadHigh();
+        high.savedWeapons = [...ADMIN_WEAPONS_FULL];
+        saveHigh(high);
+    } catch (_) {}
+    announceAdmin('⚔️ SEMUA SENJATA DIAKTIFKAN');
+}
+
+function adminFullGodLoadout() {
+    godmode = true;
+    isAdmin = true;
+    if (player) {
+        grantAdminFullArsenal(player);
+        player.maxHp = Math.max(player.maxHp, 999);
+        player.hp = player.maxHp;
+        player.invincible = 999999;
+        sWeaponUnlock();
+        if (typeof floatingTexts !== 'undefined') {
+            floatingTexts.push({
+                x: player.x,
+                y: player.y - 34,
+                text: '⚡ GODMODE + FULL ARSENAL + MAX SKILLS!',
+                color: '#ffd700',
+                life: 140,
+                maxLife: 140
+            });
+        }
+    }
+    try {
+        const high = loadHigh();
+        high.highestLevel = 15;
+        high.savedWeapons = [...ADMIN_WEAPONS_FULL];
+        high.savedCurrentWeapon = 'rifle';
+        high.savedPerks = [...ADMIN_PERKS_FULL];
+        high.savedExp = 9999;
+        high.savedPLevel = 15;
+        saveHigh(high);
+    } catch (_) {}
+    announceAdmin('⚡ GODMODE & MAX LOADOUT AKTIF!');
+    updateAdminModalUI();
+    updateUI();
+}
+
 function adminEquipWeapon(key) {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     if (!WEAPONS[key]) return;
     if (!player || gameState !== 'playing') {
         adminStartAt(0);
@@ -14544,7 +14609,7 @@ function adminEquipWeapon(key) {
 }
 
 function adminAddPerk(key) {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     if (!TACTICAL_PERKS[key]) return;
     if (!player || gameState !== 'playing') {
         adminStartAt(0);
@@ -14591,7 +14656,7 @@ function adminAddPerk(key) {
 }
 
 function adminUnlockAllPerks() {
-    if (!isAdmin) { openAdminLogin(); return; }
+    isAdmin = true;
     if (!player || gameState !== 'playing') {
         adminStartAt(0);
     }
@@ -14633,8 +14698,9 @@ function renderAdminModalLevels() {
         b.textContent = isBoss ? 'CH 15 (BOSS)' : ('CH ' + (i + 1));
         b.title = isBoss ? tt('admin_boss') : tt('admin_chapter_fmt', { n: i + 1 });
         b.style.fontSize = '11px';
-        b.style.padding = '5px 2px';
-        if (i === currentLevel) {
+        b.style.padding = '6px 2px';
+        b.style.cursor = 'pointer';
+        if (i === currentLevel && gameState === 'playing') {
             b.style.borderColor = '#00f0ff';
             b.style.color = '#00f0ff';
             b.style.fontWeight = 'bold';
@@ -14647,10 +14713,13 @@ function renderAdminModalLevels() {
     }
 }
 
-
 function updateAdminModalUI() {
     const godBtn = document.getElementById('adminModalGodBtn');
-    if (godBtn) godBtn.textContent = godmode ? tt('admin_god_on') : tt('admin_god_off');
+    if (godBtn) {
+        godBtn.textContent = godmode ? '🛡️ KEBAL (GODMODE): ON' : '🛡️ KEBAL (GODMODE): OFF';
+        godBtn.style.color = godmode ? '#ffd700' : '#e6edf3';
+        godBtn.style.borderColor = godmode ? '#ffd700' : 'rgba(255,215,0,0.5)';
+    }
 }
 
 function announceAdmin(msg) {
@@ -17442,6 +17511,21 @@ window.toggleTerminalSwitch = typeof toggleTerminalSwitch === 'function' ? toggl
 window.submitTerminalSwitchCircuit = typeof submitTerminalSwitchCircuit === 'function' ? submitTerminalSwitchCircuit : () => {};
 window.openAdminLogin = typeof openAdminLogin === 'function' ? openAdminLogin : () => {};
 window.submitAdminLogin = typeof submitAdminLogin === 'function' ? submitAdminLogin : () => {};
+window.openAdminArsenalModal = typeof openAdminArsenalModal === 'function' ? openAdminArsenalModal : () => {};
+window.closeAdminArsenalModal = typeof closeAdminArsenalModal === 'function' ? closeAdminArsenalModal : () => {};
+window.adminFullGodLoadout = typeof adminFullGodLoadout === 'function' ? adminFullGodLoadout : () => {};
+window.adminGiveAllWeapons = typeof adminGiveAllWeapons === 'function' ? adminGiveAllWeapons : () => {};
+window.adminUnlockAllPerks = typeof adminUnlockAllPerks === 'function' ? adminUnlockAllPerks : () => {};
+window.adminToggleGod = typeof adminToggleGod === 'function' ? adminToggleGod : () => {};
+window.adminKillAll = typeof adminKillAll === 'function' ? adminKillAll : () => {};
+window.adminHealFull = typeof adminHealFull === 'function' ? adminHealFull : () => {};
+window.adminUnlockExit = typeof adminUnlockExit === 'function' ? adminUnlockExit : () => {};
+window.adminRevealMap = typeof adminRevealMap === 'function' ? adminRevealMap : () => {};
+window.adminEquipWeapon = typeof adminEquipWeapon === 'function' ? adminEquipWeapon : () => {};
+window.adminAddPerk = typeof adminAddPerk === 'function' ? adminAddPerk : () => {};
+window.adminJump = typeof adminJump === 'function' ? adminJump : () => {};
+window.adminStartAt = typeof adminStartAt === 'function' ? adminStartAt : () => {};
+window.adminTestBoss = typeof adminTestBoss === 'function' ? adminTestBoss : () => {};
 window.openPauseSettings = typeof openPauseSettings === 'function' ? openPauseSettings : () => {};
 window.closePauseSettings = typeof closePauseSettings === 'function' ? closePauseSettings : () => {};
 
