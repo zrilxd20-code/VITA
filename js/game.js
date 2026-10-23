@@ -4470,6 +4470,8 @@ function buildLevelWorld(level) {
     players = [];
     players[coopLocalIdx] = player;
     localPlayerIndex = coopLocalIdx;
+    cameraX = player.x;
+    cameraY = player.y;
 
     if (isAdmin && typeof grantAdminFullArsenal === 'function') {
         grantAdminFullArsenal(player);
@@ -6627,7 +6629,7 @@ function updatePlayer() {
     if (typeof godmode !== 'undefined' && godmode) {
         player.hp = Math.max(player.maxHp, 999);
         player.maxHp = Math.max(player.maxHp, 999);
-        player.invincible = 999999;
+        player.invincible = 0;
         player.freezeTimer = 0;
         player.poisonTimer = 0;
         player.burnTimer = 0;
@@ -8444,10 +8446,27 @@ function drawPlayer(targetPlayer) {
         });
     }
 
-    if (p.invincible > 0 && Math.floor(p.invincible / 3) % 2 === 0) return;
+    // Hanya flicker saat terkena damage biasa (post-hit invincibility: 1-60 frame).
+    // Jangan pernah menyembunyikan pemain saat godmode, menuDemo, dash, shield, atau nilai invincibility tinggi.
+    const isHurtFlicker = !menuDemo && !godmode && !p.dashing && (!p.shieldTimer || p.shieldTimer <= 0) && (p.invincible > 0 && p.invincible <= 60);
+    if (isHurtFlicker && Math.floor(p.invincible / 3) % 2 === 0) return;
 
     ctx.save();
     ctx.translate(sx, sy);
+
+    // Divine Golden Aegis Aura for Godmode
+    if (godmode) {
+        ctx.save();
+        const gPulse = 0.6 + 0.4 * Math.sin(Date.now() / 140);
+        ctx.strokeStyle = `rgba(255, 215, 0, ${0.45 * gPulse})`;
+        ctx.shadowColor = '#ffd700';
+        ctx.shadowBlur = 14 * gPulse;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.arc(0, 0, (p.size || 10) + 12, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+    }
 
     // Diegetic Holographic Dash Cooldown Ring under BMPT Chassis
     const dashMax = 45;
@@ -12905,7 +12924,7 @@ function renderGame() {
     drawTraps();
     if (players && players.length > 1) {
         for (let pi = 0; pi < players.length; pi++) {
-            if (players[pi] && players[pi].hp > 0) {
+            if (players[pi] && (players[pi].hp > 0 || players[pi].downed)) {
                 drawPlayer(players[pi]);
             }
         }
@@ -13022,7 +13041,7 @@ function demoUpdate() {
     }
 
     player.hp = player.maxHp;
-    player.invincible = 60;
+    player.invincible = 0;
     if (attackCooldown > 0) attackCooldown--;
 
     const pmx = Math.floor(player.x / CELL);
@@ -14470,7 +14489,7 @@ function adminStartAt(level) {
         if (godmode) {
             player.maxHp = Math.max(player.maxHp, 999);
             player.hp = player.maxHp;
-            player.invincible = 999999;
+            player.invincible = 0;
         }
     }
     sWeaponUnlock();
@@ -14505,7 +14524,7 @@ function adminToggleGod() {
         if (godmode) {
             player.maxHp = Math.max(player.maxHp, 999);
             player.hp = player.maxHp;
-            player.invincible = 999999;
+            player.invincible = 0;
         } else {
             player.invincible = 0;
         }
@@ -14594,7 +14613,7 @@ function adminFullGodLoadout() {
         grantAdminFullArsenal(player);
         player.maxHp = Math.max(player.maxHp, 999);
         player.hp = player.maxHp;
-        player.invincible = 999999;
+        player.invincible = 0;
         sWeaponUnlock();
         if (typeof floatingTexts !== 'undefined') {
             floatingTexts.push({
