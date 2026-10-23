@@ -34,7 +34,7 @@
         "icons/icon.ico"
       ],
       "identifier": "com.zrilxd20.vita",
-      "longDescription": "VITA — Forgotten Sector. Top-down survival horror maze roguelite. Procedural zero external assets.",
+      "longDescription": "VITA — Forgotten Sector. Top-down survival horror maze roguelite.",
       "macOS": {
         "exceptionDomain": "",
         "frameworks": [],

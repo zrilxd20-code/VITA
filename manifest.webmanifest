@@ -2,7 +2,7 @@
   "name": "VITA — Forgotten Sector",
   "short_name": "VITA",
   "id": "/vita-forgotten-sector",
-  "description": "Top-down survival horror maze roguelite across 15 procedural sectors with zero external assets.",
+  "description": "Top-down survival horror maze roguelite across 15 procedural sectors. Evade predators and defeat The Monolith.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
