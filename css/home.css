@@ -351,12 +351,12 @@ body {
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 95;
+    z-index: 10005;
     padding: 22px;
     opacity: 0;
     transition: opacity 0.25s ease;
   }
-.modal-backdrop.open, #homeView .modal-backdrop.open { display: flex; opacity: 1; }
+.modal-backdrop.open, #homeView .modal-backdrop.open { display: flex !important; opacity: 1 !important; pointer-events: auto !important; }
 .modal, #homeView .modal {
     width: 100%;
     max-width: 480px;

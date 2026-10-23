@@ -4771,11 +4771,12 @@ function updateUI() {
     let aliveMonsters = 0;
     for (let i = 0; i < monsters.length; i++) if (monsters[i].hp > 0) aliveMonsters++;
     setHudText(hudEl('monsterCount'), aliveMonsters);
+    let unlocked = false;
     if (isEndlessMode) {
         setHudText(hudEl('artifactText'), '—');
         setHudText(hudEl('exitText'), tt('endless_objective'));
     } else {
-        const unlocked = artifacts.length > 0 && coinsCollected >= artifacts.length;
+        unlocked = artifacts.length > 0 && coinsCollected >= artifacts.length;
         setHudText(hudEl('artifactText'), `${coinsCollected} / ${artifacts.length}`);
         setHudText(hudEl('exitText'), unlocked ? tt('exit_open') : tt('exit_locked'));
     }
@@ -6815,12 +6816,12 @@ function updatePlayer() {
             for (let pi = 0; pi < players.length; pi++) {
                 const p = players[pi];
                 if (!p || p.hp <= 0 || p.downed) continue;
-                if (dist(a, p) < 26) {
+                if (dist(a, p) < 38) {
                     collector = p;
                     break;
                 }
             }
-        } else if (player && dist(a, player) < 26) {
+        } else if (player && dist(a, player) < 38) {
             collector = player;
         }
 
@@ -6939,7 +6940,7 @@ function updatePlayer() {
         }
     }
 
-    if (exitPos && !levelTransition && dist(player, exitPos) < 26) {
+    if (exitPos && !levelTransition && dist(player, exitPos) < 36) {
         if (!isEndlessMode && coinsCollected >= artifacts.length) {
             sExitOpen();
             nextLevel();

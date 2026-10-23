@@ -87,6 +87,12 @@ A. Versi Web (`index.html` + `css/` + `js/`)
 5. **Aksesibilitas**:
    - Semua modal non-native terdaftar pada *focus manager* (`js/home.js`, MutationObserver): otomatis mendapat `role="dialog"`, `aria-modal`, focus trap, dan pengembalian fokus saat ditutup.
    - Kontrol non-native (kartu device, blok start screen) wajib memiliki `role="button"` + `tabindex="0"` (dan `aria-pressed` bila bersifat toggle) serta dapat diaktifkan lewat **Enter/Space**.
+6. **Lapisan Modal Global (Shared Modal Layer)**:
+   - Semua modal dialog yang dapat diakses dari Hub maupun Menu In-Game (`#settingsModal`, `#authModal`, `#modal` [Field Manual], `#coopLobbyModal`, `#deviceModeModal`) wajib berada di luar `#homeView` (di tingkat `body` sebelum `#gameView`) dan memiliki `z-index: 10005`.
+   - Gaya kelas `.modal-backdrop.open` wajib menggunakan `display: flex !important;` agar meng-override atribut `style="display:none"` inline saat dibuka.
+7. **Interaksi Generator Sektor & Toleransi Margin (Walk-Over Instant Pickup)**:
+   - Radius aktivasi walk-over generator ditetapkan `38px` (lebih besar dari ukuran ubin lorong `CELL = 32px` + margin tabrakan dinding `10px`), memastikan aktivasi instan tanpa tersangkut di dinding lorong.
+   - Variabel `unlocked` pada `updateUI()` wajib berada di scope fungsi agar dapat dibaca oleh tracker objektif (`vita2UpdateTracker`) tanpa ReferenceError.
 
 B. Persistence Web (`localStorage`)
 1. **Pengaturan**: key `'vita_save'` (volume, brightness, lang, difficulty, quality).
