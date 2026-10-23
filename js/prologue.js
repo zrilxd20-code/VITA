@@ -1,12 +1,12 @@
-// ============================================================
+
 // VITA FACILITY NARRATIVE COMPENDIUM & LORE ENGINE
-// ============================================================
+
 // This compendium drives:
 // 1. PROLOGUE_SCRIPT — Cutscene dialogue before Sector 1
 // 2. SECTOR_TRANSMISSIONS — Live tactical radio comms during missions
 // 3. LORE_DATA_LOGS — Classified blackbox memory terminals in the labyrinth
 // 4. EPILOGUE_SCRIPT — Cinematic narrative endings upon purging Sector 15
-// ============================================================
+
 
 const PROLOGUE_SCRIPT = [
     {
@@ -278,9 +278,9 @@ const EPILOGUE_SCRIPT = {
     ]
 };
 
-// ============================================================
+
 // INTERLUDE SINEMATIK LATAR GELAP TANPA BOX (ALTERISHA)
-// ============================================================
+
 const NARRATIVE_INTERLUDES = {
     9: { // Sektor 10 selesai (currentLevel === 9) menuju Sektor 11
         slides: [

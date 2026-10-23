@@ -424,13 +424,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* ---- A11y: Manajemen Fokus Dialog (modal & sidebar) ----
-   Semua dialog memakai pola .modal-backdrop (plus .robot-memory-backdrop untuk
-   dialog temuan in-game), sebagian dibuka lewat kelas .open dan sebagian lewat
-   style.display. Daripada menyentuh puluhan fungsi buka/tutup, satu
-   MutationObserver menjaga atribut ARIA, memindahkan fokus ke dalam dialog saat
-   dibuka, mengembalikannya saat ditutup, dan menjebak tombol Tab agar tidak
-   bocor ke konten di belakang. */
+/* Semua dialog memakai pola .modal-backdrop (plus .robot-memory-backdrop untuk */
 (function initDialogA11y() {
   const FOCUSABLE = 'a[href],area[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
   const hosts = Array.from(document.querySelectorAll('.modal-backdrop, .robot-memory-backdrop, #sidebarDrawer'));
@@ -514,12 +508,7 @@ document.addEventListener('keydown', e => {
   });
 })();
 
-/* ---- A11y: Kontrol Non-Native (role="button") Dapat Diaktifkan Keyboard ----
-   Kartu pilihan perangkat, pil mode, dan banner operatif adalah <div> agar
-   tata letaknya fleksibel, tetapi tetap harus bisa dipakai tanpa mouse.
-   Satu listener terdelegasi menerjemahkan Enter/Space menjadi klik, sehingga
-   tidak ada handler per-elemen yang perlu dirawat. Elemen native (button, a,
-   input) dikecualikan karena sudah menangani kedua tombol itu sendiri. */
+/* Kartu pilihan perangkat, pil mode, dan banner operatif adalah <div> agar */
 (function initKeyboardButtonActivation() {
   const NATIVE = { BUTTON: 1, A: 1, INPUT: 1, SELECT: 1, TEXTAREA: 1, SUMMARY: 1 };
   document.addEventListener('keydown', e => {
@@ -2733,12 +2722,11 @@ window.addEventListener('load', () => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVitaUpdate(); });
 setInterval(checkVitaUpdate, 30 * 60 * 1000);
 
-// ============================================================
 // VITA v2.0 HUB POLISH (procedural, no new deps)
 // - ESC closes sidebar/modals (industry-standard)
 // - Bestiary canvases get living pulse animation
 // - Ember loop pauses when tab hidden (battery/perf)
-// ============================================================
+
 (function vita2HubPolish() {
   document.addEventListener('keydown', (e) => {
     if (!e || !e.key) return;
@@ -2777,9 +2765,8 @@ setInterval(checkVitaUpdate, 30 * 60 * 1000);
   if (!HOME_REDUCE_MOTION && typeof requestAnimationFrame === 'function') requestAnimationFrame(vita2PulseFoes);
 })();
 
-// ============================================================
 // MODAL PLATFORM DOWNLOADER (PC & ANDROID)
-// ============================================================
+
 function openPcDownloadModal() {
   const m = document.getElementById('pcDownloadModal');
   if (m) m.classList.add('open');
@@ -2831,9 +2818,8 @@ window.openAndroidDownloadModal = openAndroidDownloadModal;
 window.closeAndroidDownloadModal = closeAndroidDownloadModal;
 window.installPwaFromHub = installPwaFromHub;
 
-// ============================================================
 // DETEKSI PLATFORM NATIVE (PC WINDOWS TAURI & ANDROID CAPACITOR)
-// ============================================================
+
 function isNativeApp() {
   try {
     if (typeof window !== 'undefined') {
@@ -2925,8 +2911,6 @@ window.showPlatformSelector = showPlatformSelector;
 window.showAuthForms = showAuthForms;
 window.togglePasswordVisibility = togglePasswordVisibility;
 window.getSavedCredentials = getSavedCredentials;
-
-
 
 // Otomatis sinkronkan profil operatif dengan Supabase saat Hub dibuka
 async function autoSyncCloudOnStartup() {

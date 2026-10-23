@@ -1,8 +1,4 @@
-/* VITA service worker: network-first dengan fallback cache offline untuk file inti.
-   Hanya aktif saat disajikan via http(s); dibuka via file:// diabaikan
-   oleh browser secara alami (pendaftaran dijaga di home.js).
-   PENTING: samakan versi CACHE dengan version.json (saat ini 2.5.3)
-   setiap rilis agar klien tidak terjebak cache lama. */
+/* Hanya aktif saat disajikan via http(s); dibuka via file:// diabaikan */
 const CACHE = 'vita-v2-5-3';
 const CORE = [
   './',

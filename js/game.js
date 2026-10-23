@@ -276,9 +276,6 @@ function toggleDebugOverlay() {
     debugOverlayOpen = !debugOverlayOpen;
 }
 
-
-
-
 // ---- Pengaturan & procedural audio (WebAudio) ----
 const VITA_SAVE_KEY = 'vita_save';
 const VITA_HIGH_KEY = 'vita_high';
@@ -4076,14 +4073,13 @@ function spawnMonsters(level) {
     }
 }
 
-// ---------------------------------------------------------------------------
 // Fase 1 (fondasi co-op online) — konstruksi dunia deterministik.
 // Saat sesi punya seed (multiplayer), seluruh rantai pembangunan level
 // (applyAdaptation → generateMaze → spawnMonsters → penempatan jebakan/artefak)
 // berjalan di atas PRNG ber-seed, sehingga setiap peer menurunkan labirin,
 // daftar monster, dan loot yang identik dari pasangan (netSessionSeed, level).
 // Single-player tidak berubah: netSessionSeed tetap null → Math.random() polos.
-// ---------------------------------------------------------------------------
+
 let netSessionSeed = null;
 
 // FNV-1a 32-bit: teks seed → uint32 (stabil lintas platform & peer).
@@ -8332,9 +8328,9 @@ function drawPlayer(targetPlayer) {
     const isLowHp = p.hp < (p.maxHp * 0.3);
     const flashFlicker = (isLowHp && Math.random() < 0.22) ? (0.25 + Math.random() * 0.5) : 1.0;
 
-    // ============================================================
+    
     // 1. DUAL TACTICAL HEADLIGHTS (Lampu Sorot Senter Volumetrik)
-    // ============================================================
+    
     const flashLen = currentLevel % 2 === 1 ? 135 : 180;
     const flashSpread = 0.42;
 
@@ -8357,9 +8353,9 @@ function drawPlayer(targetPlayer) {
         ctx.restore();
     }
 
-    // ============================================================
+    
     // 2. BMPT TANKETTE CHASSIS (ROBOT TRACK & WHEEL SYSTEM)
-    // ============================================================
+    
     // Rotate entire robot body to player facing direction
     ctx.save();
     ctx.rotate(p.facing);
@@ -8519,9 +8515,9 @@ function drawPlayer(targetPlayer) {
     ctx.arc(-12, -8.5, 1.2, 0, Math.PI * 2);
     ctx.fill();
 
-    // ============================================================
+    
     // 3. TOP TURRET & CYCLOPS OPTICAL SENSOR (Mata / Sensor Pintar)
-    // ============================================================
+    
     // Rotating Turret Ring
     ctx.fillStyle = '#0f172a';
     ctx.beginPath();
@@ -8547,9 +8543,9 @@ function drawPlayer(targetPlayer) {
     ctx.arc(4.0, 0, 1.0, 0, Math.PI * 2);
     ctx.fill();
 
-    // ============================================================
+    
     // 4. TOP-MOUNTED DEPLOYABLE WEAPON PLATFORM (Senjata Muncul di Atas)
-    // ============================================================
+    
     const curW = p.currentWeapon || 'knife';
     const recoil = (p.attackAnim > 0) ? Math.min(4, p.attackAnim * 0.4) : 0;
 
@@ -8664,9 +8660,9 @@ function drawPlayer(targetPlayer) {
 
     ctx.restore(); // Restore facing rotation
 
-    // ============================================================
+    
     // 5. KINETIC SHIELD DOME OVERLAY (If Shield Active)
-    // ============================================================
+    
     if (p.shieldTimer > 0) {
         const sProg = Math.min(1, p.shieldTimer / 150);
         const sRad = p.size + 18 + Math.sin(Date.now() * 0.01) * 2;
@@ -8690,9 +8686,9 @@ function drawPlayer(targetPlayer) {
         ctx.restore();
     }
 
-    // ============================================================
+    
     // 6. FIRING MUZZLE FLASHES & WEAPON IMPACT ANIMATION
-    // ============================================================
+    
     if (p.attackAnim > 0) {
         const prog = p.attackAnim / 15;
         if (curW === 'knife') {
@@ -10528,9 +10524,9 @@ function drawArtifacts() {
         ctx.translate(sx, sy);
 
         if (!a.collected) {
-            // ==========================================
+            
             // 1. OFFLINE / CORRUPTED NODE (Pulsing Red)
-            // ==========================================
+            
             const pulse = 1 + Math.sin(time * 5 + (a.bobPhase || 0)) * 0.22;
             const glowAlpha = 0.35 + Math.sin(time * 6 + (a.bobPhase || 0)) * 0.2;
 
@@ -10589,9 +10585,9 @@ function drawArtifacts() {
             }
             ctx.restore();
         } else {
-            // ==========================================
+            
             // 2. ONLINE / RESTORED NODE (Glowing Cyan / Green)
-            // ==========================================
+            
             const pulse = 1 + Math.sin(time * 2.5 + (a.bobPhase || 0)) * 0.1;
 
             // Restored energy aura
@@ -10726,7 +10722,6 @@ function drawArtifacts() {
     }
 }
 
-
 function drawWreckedRobot() {
     if (!wreckedRobot || currentLevel !== 9) return;
     const sx = wreckedRobot.x - cameraX + W / 2;
@@ -10740,9 +10735,9 @@ function drawWreckedRobot() {
     ctx.save();
     ctx.translate(sx, sy);
 
-    // ============================================================
+    
     // 1. GROUND SCORCH & HEAVY HYDRAULIC OIL SLICK
-    // ============================================================
+    
     ctx.fillStyle = 'rgba(10, 6, 8, 0.82)';
     ctx.beginPath();
     ctx.ellipse(0, 3, 24, 16, 0.25, 0, Math.PI * 2);
@@ -10761,9 +10756,9 @@ function drawWreckedRobot() {
     // Slumped Russian BMPT Terminator chassis angle
     ctx.rotate(0.48);
 
-    // ============================================================
+    
     // 2. RUSSIAN BMPT CATERPILLAR TRACKS & ROAD WHEELS (DAMAGED)
-    // ============================================================
+    
     const trackWidth = 5.5;
     const trackLength = 29;
     const trackYOffset = 8.5;
@@ -10831,9 +10826,9 @@ function drawWreckedRobot() {
     ctx.fillRect(-18, rightTy + 8, 3, 2);
     ctx.fillRect(-23, rightTy + 11, 2, 2.5);
 
-    // ============================================================
+    
     // 3. SLOPED ARMORED HULL / MAIN CHASSIS (CHARRED BMPT)
-    // ============================================================
+    
     // Lower Hull Bed (Charred steel)
     ctx.fillStyle = '#131924';
     ctx.beginPath();
@@ -10906,9 +10901,9 @@ function drawWreckedRobot() {
     ctx.lineTo(-19, -6.5);
     ctx.stroke();
 
-    // ============================================================
+    
     // 4. BMPT DUAL 30MM 2A42 AUTOCANNON WEAPON MOUNT (TWIN BARRELS)
-    // ============================================================
+    
     // Armored Mantlet (Tilted weapon cradle)
     ctx.fillStyle = '#182030';
     ctx.fillRect(-2, -4.5, 6, 9);
@@ -10937,9 +10932,9 @@ function drawWreckedRobot() {
     ctx.closePath();
     ctx.fill();
 
-    // ============================================================
+    
     // 5. TOP TURRET & DYING CYCLOPS OPTICAL SENSOR
-    // ============================================================
+    
     // Tilted Turret Ring
     ctx.save();
     ctx.rotate(0.18);
@@ -15242,11 +15237,10 @@ window.addEventListener('unhandledrejection', (e) => {
 initLevel(0);
 gameLoop();
 
-// ============================================================
 // VITA v2.0 INDUSTRIAL MODULE (procedural-only, shared-buffer safe)
 // Objective tracker + tutorial FTUE + damage vignette + boss intro.
 // Semua fungsi ber-prefix vita2* agar tidak tabrakan scope global.
-// ============================================================
+
 let vita2ToastTimer = null;
 let vita2TutStage = 0;
 let vita2LastDmgAt = 0;
@@ -15315,7 +15309,6 @@ setInterval(() => {
         }
     } catch (e) {}
 }, 500);
-
 
 // ---- FRAME BUDGET MONITOR & DIAGNOSTICS OVERLAY ----
 function drawDebugDiagnostics() {
@@ -17066,8 +17059,6 @@ window.openBestiaryFromGame = openBestiaryFromGame;
 window.openWorkbenchModal = openWorkbenchModal;
 window.closeWorkbenchModal = closeWorkbenchModal;
 window.openWorkbenchFromGame = openWorkbenchFromGame;
-
-
 
 // 
 let isEndlessMode = false;

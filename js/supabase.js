@@ -1,6 +1,5 @@
-// ====================================================================
+
 // VITA - Supabase REST Client Module (Pure Fetch / Zero Dependency)
-// ====================================================================
 
 const SUPABASE_CONFIG_KEY = 'vita_supabase_config';
 // v2.0: no hardcoded credentials in source. User pastes URL+anon key
