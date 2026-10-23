@@ -1,4 +1,4 @@
-# 🕯️ VITA — Forgotten Sector
+VITA — Forgotten Sector
 > *A high-octane retro cyberpunk & cosmic horror survival roguelite engineered with 100% procedural Canvas graphics and synthesized WebAudio — zero external asset dependencies.*
 
 [![Platform](https://img.shields.io/badge/Platform-Web%20(HTML5%20Canvas)-orange)](index.html)
@@ -11,7 +11,7 @@
 
 ---
 
-## 📖 Project Overview
+Project Overview
 
 **VITA** is a web game engine showcase demonstrating cutting-edge browser game engineering without any external assets (v2.0 Web-only; Desktop Pygame retired):
 
@@ -25,7 +25,7 @@
 
 ---
 
-## 🎮 Controls & Field Protocol
+Controls & Field Protocol
 
 | Action | Keyboard / Mouse | Mobile Touch Controls |
 | :--- | :--- | :--- |
@@ -38,57 +38,57 @@
 
 ---
 
-## 🌟 Technical Highlights & Engineering Feats
+Technical Highlights & Engineering Feats
 
-### 1. 100% Zero External Asset Dependencies
+1. 100% Zero External Asset Dependencies
 Every visual element and sound effect is synthesized at runtime:
 - **Procedural Bestiary**: All 12 creature classes (*Slime, Bat, Crawl, Ghost, Harvester, Dark Knight, Dragon, Lich, Beholder, Mimic, Final Boss, and The Monolith*) — plus the Sektor 10 apex boss *Mother Harvester* — feature procedural Canvas geometry, pulsating cores, dynamic wing flapping cycles, and particle emitters.
 - **Synthesized Audio**: Sound effects (footsteps, knife slashes, rifle recoils, bazooka detonations, kinetic shield hums, monster shrieks, heartbeat alerts) are programmatically generated via mathematical sine/sawtooth frequency modulation in the WebAudio API (`OscillatorNode`, `BiquadFilterNode`, `GainNode`).
 
-### 2. High-Performance BFS AI & Boids Separation
+2. High-Performance BFS AI & Boids Separation
 - Monsters pathfind towards the operative across complex labyrinth grids using Breadth-First Search.
 - Avoids runtime garbage collector stalls by pre-allocating static buffer arrays (`bfsPrev`, `bfsQueue`).
 - Integrates separation repulsion vectors to prevent enemy sprite stacking in corridors.
 
-### 3. Alternating Tactical Lighting Protocols
-- **☀️ Light Protocol (Odd Sectors)**: Full facility visibility; higher monster speed and heightened enemy aggression.
-- **🌙 Dark Protocol (Even Sectors)**: Constrained vision cone with dynamic torchlight radial falloff and real-time Fog of War, rewarding tactical stealth.
+3. Alternating Tactical Lighting Protocols
+- ** Light Protocol (Odd Sectors)**: Full facility visibility; higher monster speed and heightened enemy aggression.
+- ** Dark Protocol (Even Sectors)**: Constrained vision cone with dynamic torchlight radial falloff and real-time Fog of War, rewarding tactical stealth.
 
-### 4. Global Cloud Telemetry & Offline PWA
+4. Global Cloud Telemetry & Offline PWA
 - **Supabase Cloud REST API**: Global cross-platform leaderboard and operative dossier synchronization protected with PostgreSQL Row Level Security (RLS).
 - **Offline Progressive Web App (PWA)**: Registered Service Worker (`sw.js`) provides instant offline gameplay with network-first runtime updates.
 - **In-App Auto-Update Pipeline**: Automatically notifies operatives of new engine builds via `version.json` polling.
 
-### 5. Bilingual System (i18n)
+5. Bilingual System (i18n)
 - Native bilingual support for **English** and **Bahasa Indonesia** with real-time switching across the web hub, in-game HUD, and operational modals.
 - Enforced at build-check time: `tools/check.mjs` asserts **two-way key parity** between the `id`/`en` dictionaries and verifies every `tt()` / `data-i18n` token resolves, so a missing translation fails CI before it can ship.
 
-### 6. Performance-First HUD (60 Hz Frame Budget)
+6. Performance-First HUD (60 Hz Frame Budget)
 - The render loop treats DOM work as the expensive operation it is: a memoized element cache (`hudEl()` — validated via `isConnected`) removes repeated `getElementById` lookups from `gameLoop()` / `updateUI()` / `renderWeaponHUD()`.
 - `setHudText()` elides redundant text writes, and HP-bar tiers, boss-bar widths, and weapon-cooldown fills are **change-detected**, keeping layout/style recalculation off the per-frame critical path.
 - Hot AI counters use simple count loops instead of allocating a fresh array every frame, complementing the shared BFS buffers.
 
-### 7. Accessibility & Keyboard Operability
+7. Accessibility & Keyboard Operability
 - Operational dialogs (device mode, lore, codex, settings) expose **ARIA** `role="dialog"` / `aria-modal` semantics, a Tab focus trap, and focus restoration on close.
 - Non-native interactive controls (device cards, start-screen blocks) are keyboard-reachable via `role="button"` + `tabindex="0"` (with `aria-pressed` state) and activate on **Enter/Space**.
 - Visible `:focus-visible` rings are provided for both the hub (orange) and in-game HUD (cyan) themes.
 
 ---
 
-## 🚀 Quickstart & How to Run
+Quickstart & How to Run
 
-### Web Edition (Instant Play)
+Web Edition (Instant Play)
 Serve over **http** (required for Service Worker + PWA):
 
 ```powershell
 npm run dev
-# → http://localhost:8000
+→ http://localhost:8000
 ```
 
 Or any static server (`npx serve .`, `python -m http.server 8000`).
 `version.json` is served `no-store` so in-app update polling never sees stale cache.
 
-### Online Co-op (Host-Authoritative, up to 4 Players)
+Online Co-op (Host-Authoritative, up to 4 Players)
 
 The campaign supports online co-op over a relay. The relay is a **zero-dependency Node
 stdlib WebSocket server** (`tools/relay.mjs`, RFC 6455 handshake + frame codec) — no
@@ -96,10 +96,10 @@ stdlib WebSocket server** (`tools/relay.mjs`, RFC 6455 handshake + frame codec) 
 streams 20 Hz snapshots; joiners send inputs and reconcile with client prediction.
 
 ```powershell
-# Terminal 1 — static game server
+Terminal 1 — static game server
 npm run dev      # → http://localhost:8000
 
-# Terminal 2 — co-op relay (default ws://localhost:8080)
+Terminal 2 — co-op relay (default ws://localhost:8080)
 npm run relay    # or: npm run relay -- --port 8080
 ```
 
@@ -122,20 +122,20 @@ Notes & troubleshooting:
 - Co-op **requires the relay process to be running** — without it the lobby shows a
   connection error and no peers can join.
 
-### Deploying the Relay Online (`wss://`)
+Deploying the Relay Online (`wss://`)
 
 The relay is deploy-ready with **zero build step and zero dependencies**:
 
 ```powershell
-# Option A — Docker (any host)
+Option A — Docker (any host)
 docker build -t vita-relay .
 docker run --rm -p 8080:8080 -e PORT=8080 vita-relay
 
-# Option B — Render Blueprint (render.yaml in this repo)
-#   Render Dashboard → New → Blueprint → select repo → Apply
-#   → yields wss://<service>.onrender.com, paste it into the lobby's Relay address field.
+Option B — Render Blueprint (render.yaml in this repo)
+Render Dashboard → New → Blueprint → select repo → Apply
+→ yields wss://<service>.onrender.com, paste it into the lobby's Relay address field.
 
-# Option C — any Node host
+Option C — any Node host
 PORT=8080 node tools/relay.mjs
 ```
 
@@ -143,7 +143,7 @@ Host the static front-end anywhere (e.g. `vercel.json` is included for Vercel). 
 game is served over `https://` in production, the relay must be reachable over `wss://`
 (Render/`render.yaml` and the bundled `Dockerfile` both give you that automatically).
 
-### Android APK (Capacitor, built in GitHub Actions)
+Android APK (Capacitor, built in GitHub Actions)
 
 The same HTML5 build ships as a native Android app via **Capacitor**. The `android/` project is
 committed with the app identity (`com.zrilxd20.vita`, label **VITA**) and procedurally generated
@@ -165,7 +165,7 @@ launcher icons/splash already in place, so CI only has to compile.
 Capacitor is a **devDependency only** — it is never bundled into the web app, so the shipped
 game keeps its zero-runtime-dependency guarantee (`npm test` enforces this).
 
-### Node Tooling (stdlib only, zero install)
+Node Tooling (stdlib only, zero install)
 
 ```powershell
 npm run check   # syntax + global-scope + i18n parity & coverage + secret scan + manifest & HTML checks
@@ -181,7 +181,7 @@ npm run bump -- 2.5.0  # sync version.json, sw.js, index.html, APP_VERSION
 
 ---
 
-## 📁 Repository Map
+Repository Map
 
 ```
 vita/
@@ -233,21 +233,21 @@ vita/
 
 ---
 
-## 🧪 Automated Testing & Verification
+Automated Testing & Verification
 
 Run the automated test suites to ensure complete integrity:
 
 ```powershell
-# 1. Unified check (syntax + scope + i18n + secrets)
+1. Unified check (syntax + scope + i18n + secrets)
 npm run check
 
-# 2. Run the 29-module Web Security, QA & Packaging Audit
+2. Run the 29-module Web Security, QA & Packaging Audit
 npm test
 ```
 
 ---
 
-## 🛡️ License
+License
 
 Released under the **MIT License** — see [LICENSE](LICENSE).
 
@@ -255,9 +255,9 @@ Developed by [Rifky / Dev Team]. Open source and available for portfolio review 
 
 ---
 
-## 📌 Catatan Rilis, Alur Navigasi, Desain Logo, & Kompilasi Cloud Otomatis
+Catatan Rilis, Alur Navigasi, Desain Logo, & Kompilasi Cloud Otomatis
 
-1. **Alur Masuk Game Konsisten (Hub ➔ Layar Mulai / Tactical Archives)**:
+1. **Alur Masuk Game Konsisten (Hub -> Layar Mulai / Tactical Archives)**:
    - Menekan tombol **ENTER THE LABYRINTH** pada Hub utama (`#homeView`) **selalu** membawa pemain ke Menu Layar Mulai (`#startScreen`) terlebih dahulu.
    - Di layar ini pemain dapat memilih direktif: **PLAY NOW**, **OPERASI CO-OP**, **CONTINUE**, **LOGIN / PROFILE**, **SETTINGS**, **CODEX**, atau **ADMIN & CHAPTER SELECT**. Game tidak akan langsung meluncur ke kanvas tanpa persetujuan pemain.
    - Pilihan mode game (*Kampanye 15 Sektor* vs *Arena Survival Horde*) yang dipilih di Hub akan otomatis dijalankan saat tombol **PLAY NOW** ditekan di Layar Mulai.

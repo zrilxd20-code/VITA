@@ -1,10 +1,10 @@
-# VITA - AI Agent Context & Repository Guide
+VITA - AI Agent Context & Repository Guide
 
 Dokumen ini ditujukan khusus untuk **AI Coding Assistant & Agent** (Google Antigravity, Gemini, OpenCode, Claude, Cursor, dll.) agar dapat memahami arsitektur, konvensi, dan aturan proyek **VITA** dengan cepat dan akurat.
 
 ---
 
-## 🧭 1. Ringkasan Proyek
+1. Ringkasan Proyek
 
 * **Nama Proyek**: VITA (*Sektor Terlupakan / Forgotten Sector*)
 * **Genre**: Top-Down Survival Horror Maze Roguelite / Action.
@@ -12,7 +12,7 @@ Dokumen ini ditujukan khusus untuk **AI Coding Assistant & Agent** (Google Antig
 
 ---
 
-## 📂 2. Peta Berkas & Struktur Repositori
+2. Peta Berkas & Struktur Repositori
 
 ```
 vita/
@@ -58,9 +58,9 @@ vita/
 
 ---
 
-## ⚙️ 3. Arsitektur Teknis
+3. Arsitektur Teknis
 
-### A. Versi Web (`index.html` + `css/` + `js/`)
+A. Versi Web (`index.html` + `css/` + `js/`)
 1. **Zero External Assets**:
    - **Visual**: Menggunakan HTML5 Canvas 2D API murni. Monster (Slime, Bat, Crawl, Ghost, Harvester, Dark Knight, Dragon, Lich, Beholder, Mimic, Final Boss, The Monolith) memiliki bentuk, tanduk, mahkota, kepakan sayap, dan partikel sendiri.
    - **Audio**: Prosedural menggunakan **WebAudio API** (`AudioContext`, `OscillatorNode`, `GainNode`). Tidak ada file `.mp3` atau `.wav` eksternal.
@@ -88,13 +88,13 @@ vita/
    - Semua modal non-native terdaftar pada *focus manager* (`js/home.js`, MutationObserver): otomatis mendapat `role="dialog"`, `aria-modal`, focus trap, dan pengembalian fokus saat ditutup.
    - Kontrol non-native (kartu device, blok start screen) wajib memiliki `role="button"` + `tabindex="0"` (dan `aria-pressed` bila bersifat toggle) serta dapat diaktifkan lewat **Enter/Space**.
 
-### B. Persistence Web (`localStorage`)
+B. Persistence Web (`localStorage`)
 1. **Pengaturan**: key `'vita_save'` (volume, brightness, lang, difficulty, quality).
 2. **Supabase config**: key `'vita_supabase_config'` (hanya dari input user, tanpa hardcoded secret).
 3. **Rekor**: key `'vita_high'`.
 4. **Override relay co-op**: key `'vita_relay_url'` (opsional, mis. `ws://192.168.1.10:8080`).
 
-### C. Co-op Online (Host-Authoritative, maks 4 pemain)
+C. Co-op Online (Host-Authoritative, maks 4 pemain)
 1. **Pemisahan simulasi vs render**: `stepSimulation()` memperbarui seluruh state game, lalu
    `stepLocalVisuals()`/`stepCamera()`/`updatePerfCounters()`/`renderFrame()` menangani efek
    lokal & presentasi. Host menjalankan simulasi otoritatif; klien hanya memprediksi.
@@ -125,7 +125,7 @@ vita/
    (front-end). Relay menghormati `env.PORT`. Tanpa kredensial akun, deploy tetap harus dijalankan
    oleh pemilik repo (lihat catatan README).
 
-### D. Pengemasan Android (Capacitor, APK di CI)
+D. Pengemasan Android (Capacitor, APK di CI)
 1. **Shell native**: `capacitor.config.json` (`appId com.zrilxd20.vita`, `appName VITA`,
    `webDir dist`, `server.androidScheme = https`, `android.allowMixedContent = false`).
    Proyek `android/` **di-commit** (identitas + ikon/splash sudah final) agar CI hanya mengompilasi.
@@ -147,7 +147,7 @@ vita/
 6. **Dependency**: Capacitor hanya `devDependencies` (versi dipin). Tidak ada `dependencies`
    runtime — dijaga oleh TEST 27.
 
-### E. Pengemasan Desktop PC (Tauri, Windows .EXE / .MSI di CI)
+E. Pengemasan Desktop PC (Tauri, Windows .EXE / .MSI di CI)
 1. **Shell native desktop**: `src-tauri/` (`tauri.conf.json`, `Cargo.toml`, `src/main.rs`, `build.rs`).
    Menghasilkan aplikasi mandiri Windows ultra-ringan menggunakan runtime native WebView2.
    Jendela berdimensi 1280×800 (resizable, min 800×600, center).
@@ -165,7 +165,7 @@ vita/
 
 
 
-### F. Aturan Alur Navigasi, Desain Logo Konsisten, & Pembaruan Otomatis
+F. Aturan Alur Navigasi, Desain Logo Konsisten, & Pembaruan Otomatis
 1. **Alur Masuk Game**: Tombol `ENTER THE LABYRINTH` di Hub (`#homeView`) **WAJIB** membawa pengguna ke Menu Layar Mulai (`#startScreen`) terlebih dahulu (`proceedToWebGame(false)`). Dilarang melompat langsung ke loop kanvas / gameplay tanpa klik tombol `PLAY NOW` di layar mulai.
 2. **Lockup Logo VITA Konsisten**:
    - Seluruh menu (`#homeView`, `#startScreen`, `#pauseScreen`, `#deathScreen`, `#winScreen`) menggunakan lockup visual resmi VITA yang seragam: emblem heksagonal isometrik dengan monogram "V" dan titik inti putih, wordmark 3D ekstrusi merah, serta subtitle `FORGOTTEN SECTOR` ber-letter-spacing lebar.
@@ -179,7 +179,7 @@ vita/
 5. **Kontrol Sentuh Murni di HP**:
    - Pada mode sentuh HP (`touch-on`), kursor/crosshair ditiadakan, synthetic mousedown diabaikan, dan bidikan/gerakan murni dipandu oleh analog virtual joystick (`touchMove.dx, touchMove.dy`) serta tombol aksi on-screen.
 
-## 🚨 4. Aturan Penting untuk AI Agent (Golden Rules)
+4. Aturan Penting untuk AI Agent (Golden Rules)
 
 1. **JANGAN Tambahkan Aset Gambar/Suara Eksternal**:
    - Selalu pertahankan sifat *self-contained / procedural*. Jika butuh efek visual atau suara baru, buat menggunakan Canvas rendering math atau fungsi WebAudio sintetis (`blip()`).
@@ -194,9 +194,9 @@ vita/
 
 ---
 
-## 🛡️ 5. VITA - AI Project Rules (Kebijakan Wajib)
+5. VITA - AI Project Rules (Kebijakan Wajib)
 
-### General
+General
 - Jangan menghapus fitur yang masih bekerja.
 - Jangan mengubah file yang tidak berhubungan dengan task.
 - Baca struktur project sebelum perubahan besar.
@@ -204,14 +204,14 @@ vita/
 - Jangan menyimpan API key, password, token, atau secret di source code.
 - Jangan menganggap kode aman hanya karena tidak ada error.
 
-### Backend
+Backend
 - Semua input dari user dianggap tidak terpercaya.
 - Validasi input sebelum diproses.
 - Gunakan parameterized query.
 - Pisahkan API, service, model, database, dan security.
 - Jangan expose data sensitif melalui response atau error message.
 
-### Security
+Security
 - Periksa authentication dan authorization.
 - Periksa input validation.
 - Periksa injection.
@@ -221,17 +221,17 @@ vita/
 - Periksa dependency vulnerabilities.
 - Temuan CRITICAL/HIGH wajib diperbaiki sebelum commit.
 
-### Testing
+Testing
 - Setelah perubahan jalankan test.
 - Bug yang sudah diperbaiki harus memiliki regression test jika memungkinkan.
 
-### Git
+Git
 - Jangan melakukan commit sebelum test selesai.
 - Jangan menghapus history Git.
 
 ---
 
-## 🛠️ 6. Perintah Menjalankan & Validasi
+6. Perintah Menjalankan & Validasi
 
 * **Uji Sintaksis & Keamanan Web**:
   ```bash
