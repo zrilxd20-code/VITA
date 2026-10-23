@@ -1600,6 +1600,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     inset: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background: #000000;
     z-index: 99999;
     display: none;

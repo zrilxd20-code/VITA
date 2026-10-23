@@ -735,9 +735,10 @@ function showSaveIndicator(msg = 'Profile Saved') {
     modalTag.style.color = '#4ade80';
   }
 
+  const safeMsg = (typeof escapeLbHtml === 'function' ? escapeLbHtml(msg) : String(msg)).replace(/"/g, '&quot;');
   if (btn) {
     if (!btn.dataset.origHtml) btn.dataset.origHtml = btn.innerHTML;
-    btn.innerHTML = `<svg class="btn-icon" viewBox="0 0 24 24" style="fill:#fff"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> <span>${msg} ✓</span>`;
+    btn.innerHTML = `<svg class="btn-icon" viewBox="0 0 24 24" style="fill:#fff"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> <span>${safeMsg} ✓</span>`;
     btn.classList.add('save-success');
     clearTimeout(saveIndicatorTimer);
     saveIndicatorTimer = setTimeout(() => {
@@ -748,7 +749,7 @@ function showSaveIndicator(msg = 'Profile Saved') {
 
   if (mBtn) {
     if (!mBtn.dataset.origHtml) mBtn.dataset.origHtml = mBtn.innerHTML;
-    mBtn.innerHTML = `<svg class="btn-icon" viewBox="0 0 24 24" style="fill:#fff"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> <span>${msg} ✓</span>`;
+    mBtn.innerHTML = `<svg class="btn-icon" viewBox="0 0 24 24" style="fill:#fff"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> <span>${safeMsg} ✓</span>`;
     mBtn.classList.add('save-success');
     setTimeout(() => {
       if (mBtn.dataset.origHtml) mBtn.innerHTML = mBtn.dataset.origHtml;
