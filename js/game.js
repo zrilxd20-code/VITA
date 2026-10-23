@@ -4250,6 +4250,18 @@ function buildLevelWorld(level) {
             });
         }
         exitPos = { x: cx * CELL + CELL / 2, y: cy * CELL + CELL / 2, gx: cx, gy: cy };
+        level15Corpse = {
+            x: exitPos.x - 38,
+            y: exitPos.y + 6,
+            envelopeX: exitPos.x - 20,
+            envelopeY: exitPos.y + 14,
+            gx: Math.floor((exitPos.x - 38) / CELL),
+            gy: Math.floor((exitPos.y + 6) / CELL),
+            inspected: false
+        };
+        for (let i = 0; i < 6; i++) {
+            addDecal(level15Corpse.x + (Math.random() - 0.5) * 22, level15Corpse.y + (Math.random() - 0.5) * 18, '#3d0408', 8, 'splat');
+        }
     } else {
         if (level > 1) {
             const trapCount = Math.max(1, Math.min(5, Math.floor(level * 0.5)));
@@ -6072,7 +6084,9 @@ function nextLevel() {
             }
         };
 
-        if (typeof playEpilogueCutscene === 'function') {
+        if (typeof playNarrativeInterlude === 'function' && typeof NARRATIVE_INTERLUDES !== 'undefined' && NARRATIVE_INTERLUDES[14]) {
+            playNarrativeInterlude(14, triggerFinalWin);
+        } else if (typeof playEpilogueCutscene === 'function') {
             playEpilogueCutscene(triggerFinalWin);
         } else {
             triggerFinalWin();
@@ -6080,13 +6094,13 @@ function nextLevel() {
         return;
     }
 
+    gameState = 'cutscene';
     levelTransition = true;
 
-    // Cek apakah ada narasi interlude khusus setelah level ini (misal Sektor 11: currentLevel === 10, Sektor 12: currentLevel === 11)
+    // Cek apakah ada narasi interlude khusus setelah level ini (misal Sektor 11: currentLevel === 9, Sektor 12: currentLevel === 10, dst)
     if (typeof playNarrativeInterlude === 'function' && typeof NARRATIVE_INTERLUDES !== 'undefined' && NARRATIVE_INTERLUDES[currentLevel]) {
         setTimeout(() => {
             playNarrativeInterlude(currentLevel, () => {
-                levelTransition = false;
                 const isMilestone = currentLevel < LEVELS - 1;
                 if (isMilestone) {
                     openWeaponSelectModal(currentLevel + 1);
@@ -6958,7 +6972,7 @@ function updatePlayer() {
         }
     }
 
-    if (exitPos && !levelTransition && dist(player, exitPos) < 36) {
+    if (exitPos && !levelTransition && gameState === 'playing' && dist(player, exitPos) < 36) {
         if (!isEndlessMode && coinsCollected >= artifacts.length) {
             sExitOpen();
             nextLevel();
@@ -11208,7 +11222,8 @@ function drawLevel15Corpse() {
     const sy = level15Corpse.y - cameraY + H / 2;
 
     if (sx < -90 || sx > W + 90 || sy < -90 || sy > H + 90) return;
-    if (!fogOfWar[level15Corpse.gy] || !fogOfWar[level15Corpse.gy][level15Corpse.gx]) return;
+    const inArena = (currentLevel === LEVELS - 1 && dist(player, level15Corpse) < 380);
+    if (!inArena && (!fogOfWar[level15Corpse.gy] || !fogOfWar[level15Corpse.gy][level15Corpse.gx])) return;
 
     const t = Date.now() / 1000;
 

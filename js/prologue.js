@@ -397,6 +397,70 @@ const NARRATIVE_INTERLUDES = {
                 tail_en: '(quietly under her breath) "This will be our first true battle... to save humanity."'
             }
         ]
+    },
+    14: { // Sektor 15 selesai (The Monolith kalah, gerbang evakuasi & fajar dunia luar)
+        slides: [
+            {
+                speaker: 'THE MONOLITH — DEFEATED',
+                speakerRevealed: false,
+                signal_id: '(jantung biomekanik raksasa berhenti berdetak... kabut nekrotik memudar).......',
+                signal_en: '(the colossal biomechanical heart ceases beating... necrotic fog dissipates).......',
+                body_id: '"The Monolith runtuh. Labirin bergetar hebat saat seluruh biomassa purba perlahan layu dan hancur."',
+                body_en: '"The Monolith collapses. The labyrinth violently shudders as the ancient necrotic biomass withers away."',
+                tail_id: '"Di ambang pintu evakuasi, Prototype-19 menemukan jasad Dr. Rudra terbaring di samping meja wasiat..."',
+                tail_en: '"At the extraction threshold, Prototype-19 discovers Dr. Rudra resting peacefully beside a field desk..."'
+            },
+            {
+                speaker: 'ALTERISHA',
+                speakerRevealed: true,
+                signal_id: '(frekuensi transmisi darurat terhubung dengan suara bergetar lirih).......',
+                signal_en: '(emergency comms frequency connects with a quietly trembling voice).......',
+                body_id: '"Tunggu... sosok itu... dia adalah orang yang menghilang dari kita selama ini... Rudra... Prototype-19, buka dan bacakan wasiatnya."',
+                body_en: '"Wait... that silhouette... it was him all along... Rudra... Prototype-19, scan and decrypt his final will."',
+                tail_id: '(suara hening Alterisha menahan duka)',
+                tail_en: '(Alterisha falls into hushed, sorrowful silence)'
+            },
+            {
+                speaker: 'SURAT WASIAT DR. RUDRA',
+                speakerRevealed: true,
+                signal_id: '(surat wasiat usang dengan segel lilin merah Dr. Rudra).......',
+                signal_en: '(weathered parchment sealed with crimson wax).......',
+                body_id: '"Hai... Mungkin saat kalian membaca surat ini, aku telah tiada. Semua ini demi kita semua. Aku pergi sendiri meneliti hingga Monolith-07..."',
+                body_en: '"Hello... Perhaps when you read this letter, I am already gone. All of this was for everyone. I went alone to investigate deep into Monolith-07..."',
+                tail_id: '"Maafkan aku karena harus pergi tanpa pamit..."',
+                tail_en: '"Forgive me for leaving without saying goodbye..."'
+            },
+            {
+                speaker: 'SURAT WASIAT DR. RUDRA',
+                speakerRevealed: true,
+                signal_id: '(lembar akhir wasiat Dr. Rudra).......',
+                signal_en: '(final page of Dr. Rudra\'s testament).......',
+                body_id: '"Aku sangat rindu bekerja sama dengan kalian, dan partner yang teramat berharga bagiku, Alterisha... Janganlah kalian bersedih. Selamat tinggal... aku mencintaimu, Dear Alterisha."',
+                body_en: '"I dearly miss working alongside all of you, and my most treasured partner, Alterisha... Do not weep for me. Farewell... I love you, Dear Alterisha."',
+                tail_id: '(tertanda: Dr. Rudra // Lead Researcher)',
+                tail_en: '(signed: Dr. Rudra // Lead Researcher)'
+            },
+            {
+                speaker: 'ALTERISHA',
+                speakerRevealed: true,
+                signal_id: '(suara Alterisha terisak lirih namun penuh tekad).......',
+                signal_en: '(Alterisha\'s voice trembles softly yet resolute).......',
+                body_id: '"...Bodoh. Kenapa kau harus memikul semua ini sendirian... Selamat jalan, Rudra. Janjimu... akan kami jaga selamanya."',
+                body_en: '"...You idiot. Why did you bear all of this alone... Farewell, Rudra. Your promise... we will cherish forever."',
+                tail_id: '(protokol evakuasi pangkalan terbuka penuh)',
+                tail_en: '(base evacuation protocols depressurize fully)'
+            },
+            {
+                speaker: 'FAJAR BARU',
+                speakerRevealed: true,
+                signal_id: '(gerbang dekontaminasi darurat terbuka menuju dunia luar).......',
+                signal_en: '(emergency decontamination airlocks open to the surface world).......',
+                body_id: '"Pintu fasilitas perlahan terangkat. Cahaya matahari fajar pertama menerpa zirah Prototype-19. Kau berdiri di ambang dunia baru."',
+                body_en: '"The heavy blast doors slowly lift. The first golden rays of dawn strike Prototype-19\'s armored chassis. You stand at the threshold of a new world."',
+                tail_id: '"Prajurit yang lahir di kegelapan pekat labirin... demi memberi fajar kehidupan bagi seluruh umat manusia."',
+                tail_en: '"A soldier born in the depths of darkness... who gave humanity another dawn."'
+            }
+        ]
     }
 };
 
