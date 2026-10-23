@@ -755,6 +755,8 @@ const T = {
         mode_active_endless: 'MODE: ARENA SURVIVAL (HORDE DEFENSE)',
         endless_wave_banner: 'GELOMBANG {w} DIMULAI!',
         endless_wave_clear: 'GELOMBANG {w} DIBERSIHKAN!',
+        endless_badge_wave: 'SURVIVAL — GELOMBANG {w}',
+        endless_objective: 'BERTAHAN!',
         gen_restored: '+GENERATOR PULIH! // +12 HP',
         gen_all_online: '★ SEMUA GENERATOR AKTIF // PINTU TERBUKA ★',
         endless_respite_lbl: 'JEDA PASOKAN: {s}s',
@@ -1152,6 +1154,8 @@ const T = {
         mode_active_endless: 'MODE: SURVIVAL ARENA (HORDE DEFENSE)',
         endless_wave_banner: 'WAVE {w} INCOMING!',
         endless_wave_clear: 'WAVE {w} PURGED!',
+        endless_badge_wave: 'SURVIVAL — WAVE {w}',
+        endless_objective: 'SURVIVE!',
         gen_restored: '+GENERATOR RESTORED! // +12 HP',
         gen_all_online: '★ ALL GENERATORS ONLINE // EXIT OPEN ★',
         endless_respite_lbl: 'SUPPLY RESPITE: {s}s',
@@ -3383,6 +3387,8 @@ function loadHigh() {
         if (Number.isFinite(bt) && bt >= 0) out.bestTime = bt;
         const bk = Math.floor(Number(h.bestKills));
         if (Number.isFinite(bk) && bk >= 0) out.bestKills = bk;
+        const eb = Math.floor(Number(h.endlessBestWave));
+        if (Number.isFinite(eb) && eb >= 0) out.endlessBestWave = eb;
         const ll = Math.floor(Number(h.lastLevel));
         if (Number.isFinite(ll) && ll >= 0 && ll < LEVELS) out.lastLevel = ll;
         if (Array.isArray(h.savedWeapons)) out.savedWeapons = h.savedWeapons.filter(w => typeof w === 'string');
@@ -4750,9 +4756,14 @@ function updateUI() {
     let aliveMonsters = 0;
     for (let i = 0; i < monsters.length; i++) if (monsters[i].hp > 0) aliveMonsters++;
     setHudText(hudEl('monsterCount'), aliveMonsters);
-    const unlocked = artifacts.length > 0 && coinsCollected >= artifacts.length;
-    setHudText(hudEl('artifactText'), `${coinsCollected} / ${artifacts.length}`);
-    setHudText(hudEl('exitText'), unlocked ? tt('exit_open') : tt('exit_locked'));
+    if (isEndlessMode) {
+        setHudText(hudEl('artifactText'), '—');
+        setHudText(hudEl('exitText'), tt('endless_objective'));
+    } else {
+        const unlocked = artifacts.length > 0 && coinsCollected >= artifacts.length;
+        setHudText(hudEl('artifactText'), `${coinsCollected} / ${artifacts.length}`);
+        setHudText(hudEl('exitText'), unlocked ? tt('exit_open') : tt('exit_locked'));
+    }
     setHudText(hudEl('timeText'), Math.floor((Date.now() - levelStartTime) / 1000));
     renderWeaponHUD();
     try { vita2UpdateTracker(unlocked); } catch (e) {}
@@ -5476,7 +5487,21 @@ function handlePlayerDeath(cause) {
         ds.classList.add('cinematic-open');
     }
     const dLevel = document.getElementById('deathLevel');
-    if (dLevel) dLevel.textContent = currentLevel + 1;
+    if (dLevel) {
+        if (isEndlessMode) {
+            dLevel.textContent = tt('endless_badge_wave').replace('{w}', endlessWave);
+        } else {
+            dLevel.textContent = currentLevel + 1;
+        }
+    }
+    if (isEndlessMode) {
+        const high = loadHigh();
+        const prevWave = Math.floor(Number(high.endlessBestWave || 0));
+        if (endlessWave > prevWave) {
+            high.endlessBestWave = endlessWave;
+            saveHigh(high);
+        }
+    }
     const dKills = document.getElementById('deathKills');
     if (dKills) dKills.textContent = totalKills;
     const sessionTime = totalTime + Math.floor((Date.now() - levelStartTime) / 1000);
@@ -6765,8 +6790,26 @@ function updatePlayer() {
         }
     }
 
-    artifacts.forEach(a => {
-        if (!a.collected && dist(a, player) < 26) {
+    let artifactUiDirty = false;
+    for (let ai = 0; ai < artifacts.length; ai++) {
+        const a = artifacts[ai];
+        if (a.collected) continue;
+
+        let collector = null;
+        if (players && players.length > 0) {
+            for (let pi = 0; pi < players.length; pi++) {
+                const p = players[pi];
+                if (!p || p.hp <= 0 || p.downed) continue;
+                if (dist(a, p) < 26) {
+                    collector = p;
+                    break;
+                }
+            }
+        } else if (player && dist(a, player) < 26) {
+            collector = player;
+        }
+
+        if (collector) {
             a.collected = true;
             coinsCollected++;
             sGeneratorOnline();
@@ -6774,7 +6817,7 @@ function updatePlayer() {
             addParticle(a.x, a.y, '#2ecc71', 18, 5, 35);
             addShockwave(a.x, a.y, 50, '#00f0ff', 20);
             addShockwave(a.x, a.y, 85, '#2ecc71', 30);
-            player.hp = Math.min(player.maxHp, player.hp + 12);
+            collector.hp = Math.min(collector.maxHp, collector.hp + 12);
             floatingTexts.push({
                 x: a.x,
                 y: a.y - 20,
@@ -6788,10 +6831,10 @@ function updatePlayer() {
             }
             if (artifacts && artifacts.length > 0 && coinsCollected >= artifacts.length) {
                 sWin();
-                addShockwave(player.x, player.y, 140, '#2ecc71', 35);
+                addShockwave(collector.x, collector.y, 140, '#2ecc71', 35);
                 floatingTexts.push({
-                    x: player.x,
-                    y: player.y - 45,
+                    x: collector.x,
+                    y: collector.y - 45,
                     text: tt('gen_all_online'),
                     color: '#2ecc71',
                     life: 140,
@@ -6801,9 +6844,12 @@ function updatePlayer() {
                     spawnTutorialEvacuationAmbush();
                 }
             }
-            updateUI();
+            artifactUiDirty = true;
         }
-    });
+    }
+    if (artifactUiDirty) {
+        updateUI();
+    }
 
     // Emergency Artifact Magnet: Saat artefak > 70% terkumpul & HP < 25%, sisa artefak bergeser mendekat ke player
     updateEmergencyArtifactMagnet();
@@ -6879,10 +6925,10 @@ function updatePlayer() {
     }
 
     if (exitPos && !levelTransition && dist(player, exitPos) < 26) {
-        if (coinsCollected >= artifacts.length) {
+        if (!isEndlessMode && coinsCollected >= artifacts.length) {
             sExitOpen();
             nextLevel();
-        } else if (lockMsgCooldown <= 0) {
+        } else if (!isEndlessMode && lockMsgCooldown <= 0) {
             const need = artifacts.length - coinsCollected;
             sLocked();
             if (!menuDemo) {
@@ -11347,7 +11393,13 @@ function closeFinalLetterModal() {
 window.openFinalLetterModal = openFinalLetterModal;
 window.closeFinalLetterModal = closeFinalLetterModal;
 
-// 
+// =============================================================================
+// [LEGACY / CADANGAN] — Sub-sistem Teka-Teki Terminal OTN
+// CATATAN ARSITEKTUR: Tidak dipanggil dalam simulasi gameplay aktif. Gameplay
+// VITA v2.5.7+ murni menggunakan sistem Walk-Over Instant Generator Pickup
+// (sGeneratorOnline) tanpa pembekuan gameplay/modal. Modul ini dipertahankan
+// sebagai artefak DOM dan kompatibilitas suite pengujian TEST 30.
+// =============================================================================
 function sSystemRestored() {
     if (typeof audioCtx === 'undefined' || !audioCtx) return;
     const notes = [440, 554.37, 659.25, 880, 1108.73];
@@ -17279,10 +17331,16 @@ function startEndlessMode() {
     // Inisialisasi arena luas (menggunakan template labirin Sektor 8 ber-seed acak)
     currentLevel = 7;
     initLevel(7);
+    artifacts = [];
+    coinsCollected = 0;
 
     // Kustomisasi objektif dan HUD arena survival
-    const badge = document.getElementById('uiBadge');
-    if (badge) badge.textContent = 'SURVIVAL — WAVE 1';
+    const badge = hudEl('uiBadge') || document.getElementById('uiBadge');
+    if (badge) setHudText(badge, tt('endless_badge_wave').replace('{w}', '1'));
+    const exitText = hudEl('exitText') || document.getElementById('exitText');
+    if (exitText) setHudText(exitText, tt('endless_objective'));
+    const artText = hudEl('artifactText') || document.getElementById('artifactText');
+    if (artText) setHudText(artText, '—');
     
     // Spawn gelombang monster pertama
     spawnEndlessWave(1);
@@ -17331,16 +17389,19 @@ function spawnEndlessWave(wave) {
         }
     }
 
-    const badge = document.getElementById('uiBadge');
-    if (badge) badge.textContent = 'SURVIVAL — WAVE ' + wave;
-    const exitText = document.getElementById('exitText');
-    if (exitText) exitText.textContent = 'SURVIVE!';
+    const badge = hudEl('uiBadge') || document.getElementById('uiBadge');
+    if (badge) setHudText(badge, tt('endless_badge_wave').replace('{w}', wave));
+    const exitText = hudEl('exitText') || document.getElementById('exitText');
+    if (exitText) setHudText(exitText, tt('endless_objective'));
 }
 
 function checkEndlessWaveProgress() {
     if (!isEndlessMode || gameState !== 'playing') return;
     
-    const aliveCount = monsters.filter(m => m && m.hp > 0).length;
+    let aliveCount = 0;
+    for (let i = 0; i < monsters.length; i++) {
+        if (monsters[i] && monsters[i].hp > 0) aliveCount++;
+    }
     if (aliveCount === 0 && !endlessWaveCleared) {
         endlessWaveCleared = true;
         endlessWaveClearTimer = Date.now();

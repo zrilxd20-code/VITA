@@ -169,11 +169,16 @@ function openModal(name, desc, cmd, req) {
   const m = document.getElementById('modal');
   if (m) m.classList.add('open');
 }
+
+function closeModal() {
+  const m = document.getElementById('modal');
+  if (m) m.classList.remove('open');
+}
+
 const mCloseBtn = document.getElementById('modalClose');
 if (mCloseBtn) {
   mCloseBtn.addEventListener('click', () => {
-    const m = document.getElementById('modal');
-    if (m) m.classList.remove('open');
+    closeModal();
   });
 }
 const mRoot = document.getElementById('modal');
@@ -3008,6 +3013,7 @@ window.selectDeviceChoice = typeof selectDeviceChoice === 'function' ? selectDev
 window.confirmDeviceChoiceAndPlay = typeof confirmDeviceChoiceAndPlay === 'function' ? confirmDeviceChoiceAndPlay : () => {};
 window.playWebGame = typeof playWebGame === 'function' ? playWebGame : () => {};
 window.installPwaFromHub = typeof installPwaFromHub === 'function' ? installPwaFromHub : () => {};
+window.closeModal = typeof closeModal === 'function' ? closeModal : () => {};
 window.homeBeep = typeof homeBeep === 'function' ? homeBeep : () => {};
 
 // Otomatis sinkronkan profil operatif dengan Supabase saat Hub dibuka
