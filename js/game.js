@@ -1631,7 +1631,9 @@ function ensureAudio() {
         masterGain.gain.value = (settings && settings.muted) ? 0 : (Number.isFinite(v) ? Math.max(0, Math.min(100, v)) / 100 : 0.7);
         masterGain.connect(audioCtx.destination);
     }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+    }
     return audioCtx;
 }
 function getSfxGain() {
@@ -11637,10 +11639,17 @@ function closeTerminalPuzzleModal(isSuccess) {
     const modal = document.getElementById('terminalPuzzleModal');
     if (modal) modal.style.display = 'none';
     terminalPuzzleActive = false;
+    terminalGlitchCovered = false;
+    terminalInputSeq = [];
+    terminalSwitches = [0, 0, 0, 0];
     if (terminalCurrentNode) {
-        terminalCurrentNode.cooldownUntil = Date.now() + 2000;
+        terminalCurrentNode.cooldownUntil = Date.now() + 2500;
+        terminalCurrentNode = null;
     }
     if (terminalGlitchTimeout) { clearTimeout(terminalGlitchTimeout); terminalGlitchTimeout = null; }
+    if (keys && typeof keys === 'object') {
+        Object.keys(keys).forEach(k => { keys[k] = false; });
+    }
     if (typeof hideCursor === 'function' && gameState === 'playing') hideCursor();
 }
 window.openTerminalPuzzleModal = openTerminalPuzzleModal;
@@ -13161,6 +13170,7 @@ function gameLoopFrame() {
 }
 
 document.addEventListener('keydown', e => {
+    if (!e || typeof e.key !== 'string') return;
     keys[e.key.toLowerCase()] = true;
 
     if (e.key === 'F3' || e.code === 'F3') {
@@ -13339,6 +13349,7 @@ document.addEventListener('keydown', e => {
 });
 
 document.addEventListener('keyup', e => {
+    if (!e || typeof e.key !== 'string') return;
     keys[e.key.toLowerCase()] = false;
 });
 
