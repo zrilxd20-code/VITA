@@ -1608,8 +1608,31 @@ assert(gameJs.includes('OFFLINE / CORRUPTED NODE') && gameJs.includes('ONLINE / 
 
 console.log('✓ TEST 30 LULUS: Sistem Reaktivasi Sektor & Teka-Teki Terminal (A, B, C, D) terverifikasi.');
 
+// =============================================================================
+// TEST 31: Regresi ReferenceError — fungsi yang dipanggil wajib terdefinisi
+// (bug lama: getMasterVol, sMedkit, sRadarPing, sShotgun, sanitizeHtml,
+//  createMonster, announceLevel, addNanites tidak pernah dideklarasikan)
+// =============================================================================
+console.log('\n[TEST 31] Pengujian Regresi Pemanggilan Fungsi Tak Terdefinisi...');
+const mustExist31 = ['sGeneratorOnline', 'sMedPod', 'sCommsBeep', 'sShotgun', 'sanitizeHtml',
+    'createMonster', 'announceLevel', 'addNanites', 'addNaniteShards', 'getDiffStatMult', 'getDiffSpeedMult'];
+mustExist31.forEach(fn => {
+    assert(new RegExp('function\\s+' + fn + '\\s*\\(').test(gameJs), `Fungsi ${fn}() harus dideklarasikan di game.js`);
+});
+const banned31 = ['getMasterVol', 'sMedkit', 'sRadarPing'];
+banned31.forEach(fn => {
+    assert(!new RegExp('(^|[^.\\w$])' + fn + '\\s*\\(').test(gameJs), `Pemanggilan ${fn}() tanpa definisi tidak boleh ada`);
+});
+// sanitizeHtml harus benar-benar meng-escape karakter berbahaya
+const sanSrc31 = (gameJs.match(/function sanitizeHtml\([\s\S]*?\n\}/) || [''])[0];
+const san31 = new Function(sanSrc31 + '; return sanitizeHtml;')();
+assert(san31('<img src=x onerror="a">') === '&lt;img src=x onerror=&quot;a&quot;&gt;', 'sanitizeHtml harus meng-escape tag & atribut');
+// Teks pickup generator wajib lewat kamus i18n
+assert(/gen_restored:/.test(gameJs) && /tt\('gen_restored'\)/.test(gameJs), 'Teks pickup generator harus memakai kunci i18n gen_restored');
+console.log('✓ TEST 31 LULUS: Tidak ada pemanggilan fungsi tak terdefinisi pada jalur generator/admin/co-op/endless.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (30/30)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (31/31)');
 console.log('=========================================');
 
 

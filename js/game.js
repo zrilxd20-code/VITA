@@ -755,6 +755,8 @@ const T = {
         mode_active_endless: 'MODE: ARENA SURVIVAL (HORDE DEFENSE)',
         endless_wave_banner: 'GELOMBANG {w} DIMULAI!',
         endless_wave_clear: 'GELOMBANG {w} DIBERSIHKAN!',
+        gen_restored: '+GENERATOR PULIH! // +12 HP',
+        gen_all_online: '★ SEMUA GENERATOR AKTIF // PINTU TERBUKA ★',
         endless_respite_lbl: 'JEDA PASOKAN: {s}s',
         endless_highest_wave_lbl: 'Rekor Gelombang Tertinggi:',
         endless_survival_time_lbl: 'Waktu Bertahan Terbaik:',
@@ -1150,6 +1152,8 @@ const T = {
         mode_active_endless: 'MODE: SURVIVAL ARENA (HORDE DEFENSE)',
         endless_wave_banner: 'WAVE {w} INCOMING!',
         endless_wave_clear: 'WAVE {w} PURGED!',
+        gen_restored: '+GENERATOR RESTORED! // +12 HP',
+        gen_all_online: '★ ALL GENERATORS ONLINE // EXIT OPEN ★',
         endless_respite_lbl: 'SUPPLY RESPITE: {s}s',
         endless_highest_wave_lbl: 'Highest Wave Record:',
         endless_survival_time_lbl: 'Best Survival Time:',
@@ -2861,18 +2865,18 @@ function sArtifact() {
 // Aktivasi Generator Sektor: Arpeggio akord mayor futuristik + resonance surge
 function sGeneratorOnline() {
     try {
-        const master = getMasterVol();
-        if (master <= 0) return;
+        // Volume master sudah diterapkan oleh playOccultTone/playNoiseBurst (settings.volume + masterGain)
+        if (Number(settings.volume) <= 0) return;
         const notes = [523.25, 659.25, 783.99, 1046.50];
         notes.forEach((freq, i) => {
             setTimeout(() => {
                 try {
-                    playOccultTone(freq, freq * 1.01, 0.32, 0.45 * (master / 100), 'sine');
+                    playOccultTone(freq, freq * 1.01, 0.32, 0.45, 'sine');
                 } catch (_) {}
             }, i * 65);
         });
-        playOccultTone(110, 220, 0.55, 0.4 * (master / 100), 'triangle');
-        playNoiseBurst(0.22, 1200, 380, 2.8, 0.22 * (master / 100), 'bandpass');
+        playOccultTone(110, 220, 0.55, 0.4, 'triangle');
+        playNoiseBurst(0.22, 1200, 380, 2.8, 0.22, 'bandpass');
     } catch (e) {}
 }
 
@@ -3044,6 +3048,12 @@ function sShieldDischarge() {
 function sMinigun() {
     playNoiseBurst(0.06, 2400, 180, 2.2, 0.45, 'lowpass');
     playOccultTone(180 + Math.random() * 60, 60, 0.05, 0.4, 'sawtooth');
+}
+
+// Shotgun: ledakan noise lebar + punch sub-bass (dipakai tembakan peer co-op)
+function sShotgun() {
+    playNoiseBurst(0.22, 3200, 140, 1.8, 0.75, 'lowpass');
+    playOccultTone(120, 38, 0.18, 0.7, 'sawtooth');
 }
 
 function sSteamVent() {
@@ -6768,7 +6778,7 @@ function updatePlayer() {
             floatingTexts.push({
                 x: a.x,
                 y: a.y - 20,
-                text: `+${lang === 'en' ? 'GENERATOR RESTORED! // +12 HP' : 'GENERATOR PULIH! // +12 HP'}`,
+                text: tt('gen_restored'),
                 color: '#00f0ff',
                 life: 85,
                 maxLife: 85
@@ -6782,7 +6792,7 @@ function updatePlayer() {
                 floatingTexts.push({
                     x: player.x,
                     y: player.y - 45,
-                    text: `★ ${lang === 'en' ? 'ALL GENERATORS ONLINE // EXIT OPEN' : 'SEMUA GENERATOR AKTIF // PINTU TERBUKA'} ★`,
+                    text: tt('gen_all_online'),
                     color: '#2ecc71',
                     life: 140,
                     maxLife: 140
@@ -14391,7 +14401,7 @@ function adminHealFull() {
     if (!isAdmin) { openAdminLogin(); return; }
     if (!player) return;
     player.hp = player.maxHp;
-    sMedkit();
+    sMedPod();
     addParticle(player.x, player.y, '#2ecc71', 25, 5, 30);
     announceAdmin('HEALTH RESTORED 100%');
     updateUI();
@@ -14406,7 +14416,7 @@ function adminRevealMap() {
             if (visitedTiles && visitedTiles[y]) visitedTiles[y][x] = true;
         }
     }
-    sRadarPing();
+    sCommsBeep();
     announceAdmin('FULL MAP REVEALED');
     updateUI();
 }
@@ -14625,6 +14635,73 @@ function announceAdmin(msg) {
         a.style.opacity = 1;
         setTimeout(() => { a.style.opacity = 0; a.style.fontSize = ''; }, 2200);
     } catch (e) {}
+}
+
+// Banner pengumuman umum (Endless Survival dll). textContent → aman dari XSS.
+function announceLevel(msg) {
+    try {
+        const a = document.getElementById('levelAnnounce');
+        if (!a) return;
+        a.textContent = String(msg == null ? '' : msg);
+        a.style.color = '#00f0ff';
+        a.style.opacity = 1;
+        clearTimeout(announceLevel._t);
+        announceLevel._t = setTimeout(() => { a.style.opacity = 0; }, 2400);
+    } catch (e) {}
+}
+
+// Escape HTML untuk string tak terpercaya (callsign peer co-op) sebelum masuk innerHTML.
+function sanitizeHtml(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Alias reward nanite (Endless Survival) → sistem Pohon Talenta.
+function addNanites(amount) {
+    addNaniteShards(amount, player ? player.x : undefined, player ? player.y : undefined);
+}
+
+// Pabrik monster tunggal untuk Endless Survival. Menghormati multiplier difficulty.
+// Harvester (butuh filamen statis) & Monolith (boss arena khusus) dipetakan ke tipe mobile.
+const ENDLESS_TYPE_MAP = {
+    slime: 'Slime', bat: 'Bat', crawl: 'Crawl', ghost: 'Ghost', harvester: 'Dark Knight',
+    darkKnight: 'Dark Knight', dragon: 'Dragon', lich: 'Lich', beholder: 'Beholder',
+    mimic: 'Mimic', theMonolith: 'Final Boss'
+};
+function createMonster(typeKey, x, y) {
+    const name = ENDLESS_TYPE_MAP[typeKey] || 'Slime';
+    const type = MONSTER_TYPES.find(t => t.name === name) || MONSTER_TYPES[0];
+    const sMult = getDiffStatMult();
+    const vMult = getDiffSpeedMult();
+    const hp = Math.round(type.hp * sMult);
+    return {
+        x: x, y: y, vx: 0, vy: 0,
+        hp: hp, maxHp: hp,
+        atk: Math.round(type.atk * sMult),
+        speed: type.speed * vMult,
+        size: Math.min(type.size, 22),
+        color: type.color, name: type.name, exp: type.exp,
+        isBoss: type.name === 'Final Boss',
+        isHarvester: false, filamentTrapCooldown: 0,
+        ai: 'chase', state: 'wander',
+        angle: Math.random() * Math.PI * 2,
+        wanderTimer: 40, stuckTimer: 0, blocked: false,
+        rx: 0, ry: 0, turnDir: Math.random() < 0.5 ? 1 : -1, netT2: 0,
+        lastWatchX: x, lastWatchY: y,
+        lastSeen: null, lastSeenTimer: 0,
+        path: null, pathIdx: 0, pathCooldown: 20,
+        stall: 0, lastWayD: 99999, checkTimer: 30,
+        lastPosX: 0, lastPosY: 0, wanderTarget: null,
+        pauseTimer: 0, lastPx: -1, lastPy: -1,
+        attackCooldown: 0, stunTimer: 0, hitFlash: 0,
+        burnTimer: 0, freezeTimer: 0, poisonTimer: 0, diveTimer: 0,
+        disguised: false, riposteTimer: 0,
+        level: currentLevel, ranged: type.name === 'Lich' || type.name === 'Beholder'
+    };
 }
 
 function checkContinueBtn() {
