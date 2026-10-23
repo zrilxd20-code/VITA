@@ -1,0 +1,226 @@
+
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset='utf-8'>
+<title>Dokumen Penjelasan Karya - VITA</title>
+<!--[if gte mso 9]>
+<xml>
+<w:WordDocument>
+<w:View>Print</w:View>
+<w:Zoom>100</w:Zoom>
+<w:DoNotOptimizeForBrowser/>
+</w:WordDocument>
+</xml>
+<![endif]-->
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dokumen Penjelasan Karya — VITA: Sektor Terlupakan</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 22mm 20mm 22mm 20mm;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+      color: #1a1a24;
+      background: #ffffff;
+      margin: 0;
+      padding: 30px;
+    }
+    .header-box {
+      border-bottom: 3px double #0d3b66;
+      padding-bottom: 14px;
+      margin-bottom: 24px;
+    }
+    .badge-comp {
+      display: inline-block;
+      background: #0d3b66;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 24px;
+      color: #0b132b;
+      margin: 0 0 6px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #475569;
+      margin: 0 0 12px 0;
+      font-style: italic;
+    }
+    .meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+    .meta-table td {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .meta-table td.label {
+      font-weight: bold;
+      color: #334155;
+      width: 25%;
+      background: #edf2f7;
+    }
+    h2 {
+      font-size: 16px;
+      color: #0d3b66;
+      border-left: 4px solid #0d3b66;
+      padding-left: 10px;
+      margin: 22px 0 10px 0;
+      text-transform: uppercase;
+    }
+    h3 {
+      font-size: 13px;
+      color: #1e293b;
+      margin: 14px 0 6px 0;
+    }
+    p, li {
+      font-size: 12.5px;
+      color: #2d3748;
+      text-align: justify;
+    }
+    ul, ol {
+      margin: 6px 0 12px 20px;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+    .callout {
+      background: #f1f5f9;
+      border-left: 3px solid #3b82f6;
+      padding: 10px 14px;
+      margin: 12px 0;
+      font-size: 12px;
+      color: #1e293b;
+      border-radius: 0 4px 4px 0;
+    }
+    .footer {
+      margin-top: 35px;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 10px;
+      text-align: center;
+      font-size: 11px;
+      color: #64748b;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-box">
+    <div class="badge-comp">OTN CODING GAME COMPETITION</div>
+    <h1>VITA: Sektor Terlupakan</h1>
+    <div class="subtitle">Top-Down Survival Horror Roguelite Multiplatform dengan Paradigma Zero External Dependencies</div>
+  </div>
+
+  <table class="meta-table">
+    <tr>
+      <td class="label">Judul Karya</td>
+      <td><strong>VITA: Sektor Terlupakan (The Forgotten Sector)</strong></td>
+      <td class="label">Genre / Kategori</td>
+      <td>Top-Down Survival Horror Roguelite</td>
+    </tr>
+    <tr>
+      <td class="label">Arsitektur Teknis</td>
+      <td>HTML5 Canvas 2D + WebAudio API (Zero-Dependency)</td>
+      <td class="label">Ukuran Berkas</td>
+      <td>~1.2 MB (Ultra-Lightweight)</td>
+    </tr>
+    <tr>
+      <td class="label">Target Platform</td>
+      <td>Web Browser (PC & Smartphone), PWA, Android (APK)</td>
+      <td class="label">Status Babak</td>
+      <td>Selesai (Chapter 1: Sektor 1 – Sektor 15)</td>
+    </tr>
+  </table>
+
+  <h2>1. Konsep dan Latar Belakang Karya</h2>
+  <p>
+    Sebagian besar video game modern mengandalkan engine pihak ketiga berukuran masif (seperti Unity atau Unreal Engine) yang menghasilkan beban berkas ratusan megabita hingga gigabita. Hal ini menciptakan kendala akses bagi pengguna dengan perangkat berspesifikasi standar atau jaringan terbatas.
+  </p>
+  <p>
+    Karya <strong>VITA: Sektor Terlupakan</strong> dibangun untuk membuktikan keunggulan rekayasa web native melalui prinsip <strong>Zero External Dependencies</strong>:
+  </p>
+  <ul>
+    <li><strong>Grafis Prosedural 100%:</strong> Seluruh elemen visual (12 varian anomali monster, animasi tebasan senjata, efek partikel bioluminescence, pantulan senter dinamis, hingga amplop wasiat) dirender secara langsung menggunakan HTML5 Canvas 2D API tanpa file gambar eksternal.</li>
+    <li><strong>Audio Sintetis Real-Time:</strong> Seluruh efek suara (langkah kaki, desing proyektil, atmosfer horor bawah tanah, hingga nada ketik dialog) digenerasi melalui osilator dan modulasi frekuensi WebAudio API tanpa file .mp3 atau .wav.</li>
+    <li><strong>Aksesibilitas dan Efisiensi:</strong> Berkas kompresi hanya berukuran <strong>1.2 MB</strong>, waktu muat kurang dari satu detik, dan berjalan mulus 60 FPS pada peramban komputer maupun gawai mobile.</li>
+  </ul>
+
+  <h2>2. Sinopsis Cerita (Lore Chapter 1)</h2>
+  <div class="callout">
+    <em>"Di kedalaman fasilitas riset terlarang yang runtuh akibat wabah Coelum Carnis, sebuah sasis tempur bernama Prototype-19 diaktifkan kembali tanpa ingatan masa lalu..."</em>
+  </div>
+  <p>
+    Dipandu oleh operator radio bernama <strong>Alterisha</strong>, pemain menyusuri 15 sektor labirin bawah tanah untuk memulihkan modul daya dan mengeliminasi entitas Apex <em>The Monolith</em>. Pada akhir pelarian di Sektor 15, pemain menemukan jasad dan amplop wasiat bersegel dari <strong>Dr. Rudra</strong>—ilmuwan pelopor yang selama ini dicari oleh Alterisha. Surat tersebut menyingkapkan pengorbanan di balik terciptanya Prototype-19, mengikat aspek emosional narasi secara elegan sebelum pemain melangkah menuju permukaan fajar.
+  </p>
+
+  <h2>3. Cara Bermain dan Skema Kontrol</h2>
+  <p>
+    Game dilengkapi sistem kendali adaptif yang mendeteksi masukan pengguna secara otomatis:
+  </p>
+  <ul>
+    <li><strong>Komputer (PC / Laptop):</strong>
+      <ul>
+        <li>Tombol <strong>W, A, S, D / Arah Panah</strong>: Pergerakan karakter Prototype-19.</li>
+        <li><strong>Kursor Mouse</strong>: Navigasi sudut pandang dan bidikan presisi 360 derajat.</li>
+        <li><strong>Klik Kiri / Spasi</strong>: Menyerang menggunakan persenjataan aktif.</li>
+        <li><strong>Shift Kiri</strong>: Manuver darurat <em>Phase Dash</em> untuk menembus kepungan monster.</li>
+        <li><strong>Tombol Q / E / 1-5</strong>: Pergantian senjata (Pisau Taktis, Senapan, Granat, Bazooka, Minigun).</li>
+        <li><strong>Tombol E</strong>: Interaksi dengan generator daya, kotak rekaman memori, dan amplop wasiat.</li>
+      </ul>
+    </li>
+    <li><strong>Ponsel Pintar / Tablet (Touchscreen):</strong>
+      <ul>
+        <li><strong>Dual Virtual Joystick</strong>: Analog kiri untuk pergerakan, analog kanan untuk bidikan dan serangan.</li>
+        <li><strong>Editor Tata Letak Kustom</strong>: Tombol antarmuka mobile dapat digeser bebas sesuai preferensi jari pemain.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>4. Fitur-Fitur Utama</h2>
+  <ol>
+    <li><strong>15 Sektor Labirin Algoritmik:</strong> Labirin dihasilkan secara prosedural dan divalidasi dengan algoritma Breadth-First Search (BFS) guna menjamin konektivitas bebas hambatan (anti-softlock).</li>
+    <li><strong>Ekosistem 12 Predator Anomali:</strong> AI musuh bervariasi dari gerombolan Amoeboid Slime, pemburu cepat Carnis Hound, hingga monster Apex berfase jamak The Monolith.</li>
+    <li><strong>Pohon Talenta Permanen (Traces System):</strong> Nanit yang dikumpulkan dari eliminasi monster dapat diinvestasikan ke Jalur Tempur, Jalur Ketahanan, atau Jalur Taktis.</li>
+    <li><strong>Kartu Peningkatan Roguelite:</strong> Tiap penyelesaian sektor menyajikan tiga opsi kartu augmentasi senjata acak.</li>
+    <li><strong>Multiplayer Online Co-op 4 Pemain:</strong> Permainan bersama secara real-time melalui arsitektur Host-Authoritative dan WebSocket relay mandiri berformat handshake RFC 6455.</li>
+    <li><strong>Dukungan Bilingual Terpadu:</strong> Transisi bahasa instan antara Bahasa Indonesia dan English tanpa memuat ulang laman.</li>
+  </ol>
+
+  <h2>5. Arsitektur Perangkat Lunak & Jaminan Kualitas</h2>
+  <p>
+    Struktur kode dibangun menggunakan pola arsitektur Game Loop modular: pemisahan antara kalkulasi simulasi fisik (<em>stepSimulation</em>) dan presentasi visual (<em>renderFrame</em>). Kestabilan game diverifikasi melalui <strong>30 modul automated quality assurance</strong> mencakup mitigasi XSS, pengujian determinisme seed PRNG (<em>mulberry32</em>), sinkronisasi snapshot 20 Hz, serta kepatuhan aksesibilitas WAI-ARIA.
+  </p>
+
+  <div class="footer">
+    Dokumen Lampiran Karya Lomba — VITA: Sektor Terlupakan (Chapter 1)
+  </div>
+
+</body>
+</html>
+
+</body>
+</html>
