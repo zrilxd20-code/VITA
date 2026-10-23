@@ -151,6 +151,13 @@ const PLAYER_COLORS = [
 let coopRoomId = null;
 let isCoopHost = false;
 
+// Endless survival mode state (declared up here to avoid TDZ ReferenceError during early init/updateUI)
+let isEndlessMode = false;
+let endlessWave = 1;
+let endlessKills = 0;
+let endlessWaveCleared = false;
+let endlessWaveClearTimer = 0;
+
 function getLocalPlayer() {
     return (players && players[localPlayerIndex]) ? players[localPlayerIndex] : player;
 }
@@ -17234,12 +17241,7 @@ window.openWorkbenchModal = openWorkbenchModal;
 window.closeWorkbenchModal = closeWorkbenchModal;
 window.openWorkbenchFromGame = openWorkbenchFromGame;
 
-// 
-let isEndlessMode = false;
-let endlessWave = 1;
-let endlessKills = 0;
-let endlessWaveCleared = false;
-let endlessWaveClearTimer = 0;
+// Mode Endless Survival
 
 function startEndlessMode() {
     ensureAudio();
