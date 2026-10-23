@@ -1659,10 +1659,9 @@ function setMasterVolume(vol, preview = false) {
     if (!Number.isFinite(v)) return;
     settings.volume = Math.max(0, Math.min(100, v));
     try {
-        const ac = ensureAudio();
-        if (ac && masterGain) {
+        if (audioCtx && masterGain) {
             const finalVol = (settings && settings.muted) ? 0 : (settings.volume / 100);
-            masterGain.gain.setValueAtTime(finalVol, ac.currentTime);
+            masterGain.gain.setValueAtTime(finalVol, audioCtx.currentTime);
         }
     } catch (_) {}
     const gVol = document.getElementById('gVolume');
