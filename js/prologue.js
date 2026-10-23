@@ -264,17 +264,23 @@ const EPILOGUE_SCRIPT = {
     intro_id: 'THE MONOLITH RUNTUH. LABIRIN BERGETAR SAAT JANTUNG BIOMEKANIKNYA BERHENTI BERDETAK.',
     lines_en: [
         'The necrotic red fog dissipates from the corridors of the Forgotten Sector.',
-        'Emergency decontamination airlocks depressurize one by one, opening the path to the surface.',
-        'Your internal HUD flickers: [DIRECTIVE COMPLETED // THREAT CARNIS-07 PURGED].',
-        'In the distance, the sirens fall silent. For the first time in centuries, the Tide Labyrinth is quiet.',
+        'At the evacuation airlock threshold, Prototype-19 discovers the fallen silhouette of Dr. Rudra beside a sealed field letter...',
+        'ALTERISHA // COMMS: "Wait... that... that was him... The person who vanished from us all this time... Prototype-19, scan and unseal his testament."',
+        'SURAT WASIAT DR. RUDRA: "Hai... Mungkin saat kalian membaca surat ini, aku telah tiada. Semua ini demi kita semua. Aku pergi sendiri meneliti sektor terdalam hingga Monolith-07..."',
+        'SURAT WASIAT DR. RUDRA: "Aku sangat rindu bekerja sama dengan kalian, serta partner yang teramat berharga bagiku, Alterisha... Janganlah kalian bersedih. Selamat tinggal... aku mencintaimu, Dear Alterisha."',
+        'ALTERISHA: "...Bodoh. Kenapa kau harus memikul beban ini sendirian... Selamat jalan, Rudra. Janjimu... akan kami jaga selamanya."',
+        'Emergency decontamination airlocks depressurize one by one, opening the path to the surface world.',
         'You stand at the threshold of the outside world. An operative born in the dark, who gave humanity another dawn.'
     ],
     lines_id: [
         'Kabut merah nekrotik perlahan memudar dari lorong-lorong Sektor Terlupakan.',
-        'Pintu kedap dekontaminasi darurat membuka satu demi satu, membuka jalan menuju permukaan.',
-        'HUD internalmu berkedip: [PERINTAH SELESAI // ANCAMAN CARNIS-07 BERHASIL DIMUSNAHKAN].',
-        'Di kejauhan, sirene darurat mereda. Untuk pertama kalinya dalam ratusan tahun, Labirin Tide terdiam.',
-        'Kau berdiri di ambang pintu dunia luar. Seorang prajurit yang lahir di kegelapan, demi memberi fajar baru bagi umat manusia.'
+        'Di ambang pintu evakuasi, Prototype-19 menemukan jasad Dr. Rudra terbaring di samping meja dokumen dan amplop bersegel lilin...',
+        'ALTERISHA // SALURAN TRANSMISI: "Tunggu... itu... sosok yang menghilang dari kita selama ini... Prototype-19, pindai dan buka surat wasiatnya."',
+        'SURAT WASIAT DR. RUDRA: "Hai... Mungkin saat kalian membaca surat ini, aku telah tiada. Semua ini demi kita semua. Aku menyelinap dan pergi sendiri meneliti hingga Monolith-07..."',
+        'SURAT WASIAT DR. RUDRA: "Aku sangat rindu bekerja sama dengan kalian, dan partner yang teramat berharga bagiku, Alterisha... Janganlah kalian bersedih. Selamat tinggal... aku mencintaimu, Dear Alterisha."',
+        'ALTERISHA: "...Bodoh. Kenapa kau harus memikul semua ini sendirian... Selamat jalan, Rudra. Janjimu... akan kami jaga selamanya."',
+        'Pintu kedap dekontaminasi darurat membuka satu demi satu, membuka jalan menuju dunia luar.',
+        'Kau berdiri di ambang fajar baru. Prajurit yang lahir di kegelapan, demi memberi kehidupan baru bagi seluruh umat manusia.'
     ]
 };
 

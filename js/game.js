@@ -6907,14 +6907,8 @@ function updatePlayer() {
         openRobotMemoryModal();
     }
 
-    // Check Sector 15 Fallen Researcher Envelope (Beside Exit)
-    if (level15Corpse && currentLevel === LEVELS - 1 && !level15Corpse.inspected) {
-        const d = dist(player, { x: level15Corpse.envelopeX, y: level15Corpse.envelopeY });
-        if (d < 36) {
-            level15Corpse.inspected = true;
-            openFinalLetterModal();
-        }
-    }
+    // Sector 15 Fallen Researcher Envelope: Pajangan Dokumen di Samping Exit Portal
+    // (Pemain dapat berinteraksi secara sukarela dengan tombol E / sentuh; seluruh cerita lengkap berjalan di cutscene epilog setelah menyentuh exit)
 
     // Check Nanite Medical Chamber Interaction
     if (typeof medPods !== 'undefined' && medPods.length) {
@@ -7262,6 +7256,9 @@ function updateMonsters() {
             bossHud.style.display = 'none';
         }
     }
+
+    const diffStatMult = typeof getDiffStatMult === 'function' ? getDiffStatMult() : 1.0;
+    const diffSpeedMult = typeof getDiffSpeedMult === 'function' ? getDiffSpeedMult() : 1.0;
 
     monsters.forEach(m => {
         if (m.hp <= 0) return;
