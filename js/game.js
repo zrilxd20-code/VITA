@@ -4575,8 +4575,8 @@ function buildLevelWorld(level) {
             setTimeout(() => { announce.style.opacity = 0; announce.style.fontSize = ''; }, 3200);
         }
 
-        // Trigger Tactical Comms Transmission if available
-        if (typeof SECTOR_TRANSMISSIONS !== 'undefined' && SECTOR_TRANSMISSIONS[level]) {
+        // Trigger Tactical Comms Transmission if available (Hanya untuk Sektor awal 1-9; Sektor 10-15 telah memiliki narasi sinematik Interlude agar tidak muncul script dobel)
+        if (level < 9 && typeof SECTOR_TRANSMISSIONS !== 'undefined' && SECTOR_TRANSMISSIONS[level]) {
             setTimeout(() => triggerComms(SECTOR_TRANSMISSIONS[level]), 1200);
         }
 
@@ -11280,7 +11280,7 @@ function drawLevel15Corpse() {
 
     ctx.restore(); // Back to world space
 
-    // 5. THE LETTER ENVELOPE (AMPLOP KERTAS WASIAT)
+    // 5. THE LETTER & FIELD RESEARCH DESK (MEJA ALAS DOKUMEN WASIAT)
     const envSx = level15Corpse.envelopeX - cameraX + W / 2;
     const envSy = level15Corpse.envelopeY - cameraY + H / 2;
 
@@ -11288,45 +11288,91 @@ function drawLevel15Corpse() {
     ctx.translate(envSx, envSy);
 
     // Pulsating golden beacon halo
-    const glowPulse = 0.55 + Math.sin(t * 3.5) * 0.25;
+    const glowPulse = 0.65 + Math.sin(t * 3.5) * 0.25;
     ctx.fillStyle = '#f59e0b';
     ctx.shadowColor = '#f59e0b';
-    ctx.shadowBlur = 14 * glowPulse;
-    ctx.globalAlpha = 0.35 * glowPulse;
+    ctx.shadowBlur = 18 * glowPulse;
+    ctx.globalAlpha = 0.4 * glowPulse;
     ctx.beginPath();
-    ctx.arc(0, 0, 13, 0, Math.PI * 2);
+    ctx.arc(0, 0, 20, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
     ctx.globalAlpha = 1.0;
 
-    // Paper envelope rectangle (angled slightly on the floor)
+    // Field Research Table / Desk Base (Meja Dokumen Taktis)
+    ctx.fillStyle = '#0f172a';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(-16, -11, 32, 22, 3);
+    ctx.fill();
+    ctx.stroke();
+
+    // Metallic table corner rivets
+    ctx.fillStyle = '#64748b';
+    ctx.beginPath();
+    ctx.arc(-13, -8, 1.2, 0, Math.PI * 2);
+    ctx.arc(13, -8, 1.2, 0, Math.PI * 2);
+    ctx.arc(-13, 8, 1.2, 0, Math.PI * 2);
+    ctx.arc(13, 8, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Underneath letter envelope (Angled slightly)
     ctx.save();
-    ctx.rotate(0.2);
-    ctx.fillStyle = '#fef3c7';
+    ctx.rotate(-0.1);
+    ctx.fillStyle = '#fde68a';
     ctx.strokeStyle = '#d97706';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(-8, -5, 16, 10, 1.5);
+    ctx.roundRect(-12, -7, 24, 15, 1.5);
     ctx.fill();
     ctx.stroke();
 
-    // Flap fold crease lines
+    // Envelope triangular flap
     ctx.strokeStyle = '#b45309';
+    ctx.lineWidth = 0.9;
+    ctx.beginPath();
+    ctx.moveTo(-12, -7);
+    ctx.lineTo(0, 1);
+    ctx.lineTo(12, -7);
+    ctx.stroke();
+    ctx.restore();
+
+    // Open folded Letter Sheet (Kertas Surat Wasiat) resting on top
+    ctx.save();
+    ctx.rotate(0.12);
+    ctx.fillStyle = '#fffbeb';
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(-10, -8, 20, 16, 1.5);
+    ctx.fill();
+    ctx.stroke();
+
+    // Ruled lines of handwritten ink on the letter
+    ctx.strokeStyle = 'rgba(120, 53, 15, 0.65)';
     ctx.lineWidth = 0.8;
     ctx.beginPath();
-    ctx.moveTo(-8, -5);
-    ctx.lineTo(0, 1);
-    ctx.lineTo(8, -5);
+    ctx.moveTo(-7, -4);
+    ctx.lineTo(7, -4);
+    ctx.moveTo(-7, -1);
+    ctx.lineTo(7, -1);
+    ctx.moveTo(-7, 2);
+    ctx.lineTo(4, 2);
+    ctx.moveTo(-7, 5);
+    ctx.lineTo(6, 5);
     ctx.stroke();
 
-    // Red wax seal in the middle
+    // Crimson wax seal with golden ring in the center
     ctx.fillStyle = '#dc2626';
     ctx.beginPath();
-    ctx.arc(0, 1, 2.4, 0, Math.PI * 2);
+    ctx.arc(0, 0, 3.2, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 0.7;
+    ctx.stroke();
 
-    ctx.restore(); // envelope rotation
-
+    ctx.restore(); // letter rotation
     ctx.restore(); // envelope translation
 
     // Tiny golden ember particles
@@ -11347,7 +11393,7 @@ function drawLevel15Corpse() {
         ctx.shadowColor = '#f59e0b';
         ctx.shadowBlur = 8;
         const bob = Math.sin(t * 4.5) * 2;
-        ctx.fillText(tt('final_corpse_prompt'), envSx, envSy - 20 + bob);
+        ctx.fillText('✉️ ' + tt('final_corpse_prompt'), envSx, envSy - 20 + bob);
         ctx.shadowBlur = 0;
         ctx.restore();
     }
