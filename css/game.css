@@ -1301,7 +1301,7 @@ body.hud-hidden #gameView .weapon-hud-bar {
     padding: 40px 16px 100px;
     box-sizing: border-box;
 }
-#prologueScreen.active { display: flex; }
+#prologueScreen.active { display: flex !important; }
 
 /* Custom retro terminal scrollbar */
 #prologueScreen::-webkit-scrollbar {

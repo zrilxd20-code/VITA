@@ -667,6 +667,7 @@ const T = {
         final_letter_close: 'SIMPAN WASIAT & MENUJU PORTAL EVAKUASI ▸',
         final_letter_toast: '[ WASIAT DR. RUDRA DITEMUKAN — SEKTOR 15 TERLENGKAPI ]',
         coop_lobby_btn: 'OPERASI CO-OP (4 PEMAIN)',
+        menu_tutorial: 'TUTORIAL & PROLOG (HOW TO PLAY)',
         coop_modal_title: 'TERMINAL MULTIPLAYER CO-OP',
         coop_tab_host: 'BUAT KAMAR (HOST)',
         coop_tab_join: 'GABUNG KAMAR',
@@ -1066,6 +1067,7 @@ const T = {
         final_letter_close: 'PRESERVE TESTAMENT & ENTER EXTRACTION ▸',
         final_letter_toast: '[ DR. RUDRA\'S TESTAMENT FOUND — SECTOR 15 LOG COMPLETED ]',
         coop_lobby_btn: 'CO-OP ONLINE (4 PLAYERS)',
+        menu_tutorial: 'TUTORIAL & PROLOGUE (HOW TO PLAY)',
         coop_modal_title: 'CO-OP MULTIPLAYER TERMINAL',
         coop_tab_host: 'CREATE ROOM (HOST)',
         coop_tab_join: 'JOIN ROOM',
@@ -8980,7 +8982,10 @@ function drawMonsters() {
         const viewDist = (currentLevel === LEVELS - 1) ? 28 : (currentLevel % 2 === 0 ? 8 : 12);
         if (!m.isBoss && pdist > viewDist * CELL) return;
 
-        const ph = m.x + m.y + m.name.length;
+        if (!m.name) m.name = (m.type && m.type.name) || 'Slime';
+        if (!m.color) m.color = (m.type && m.type.color) || '#2ecc71';
+        if (!m.size) m.size = (m.type && m.type.size) || 12;
+        const ph = m.x + m.y + (m.name ? m.name.length : 5);
         const bob = Math.sin(t * 3 + ph) * 1.7;
         const blink = m.blink !== undefined && m.blink > 0 && m.blink < 7;
         const flashColor = getMonsterFlashColor(m);
@@ -11864,6 +11869,7 @@ function spawnTutorialEvacuationAmbush() {
         addShake(22);
         announceAdmin(lang === 'id' ? '⚠️ ALARM SEKTOR AKTIF! ANOMALI MENGEJAR — SEGERA EVAKUASI KE AIRLOCK!' : '⚠️ SECTOR ALARM TRIGGERED! ANOMALIES EN ROUTE — SPRINT TO AIRLOCK!');
         if (monsters && typeof maze !== 'undefined') {
+            const t = (typeof MONSTER_TYPES !== 'undefined' && MONSTER_TYPES[0]) || { name: 'Slime', color: '#2ecc71', speed: 0.8, hp: 30, atk: 8, size: 12, exp: 10 };
             for (let i = 0; i < 3; i++) {
                 const angle = (i * Math.PI * 2) / 3;
                 let sx = player.x + Math.cos(angle) * (200 + i * 40);
@@ -11872,13 +11878,33 @@ function spawnTutorialEvacuationAmbush() {
                 const smy = Math.max(1, Math.min(mazeH - 2, Math.floor(sy / CELL)));
                 if (maze[smy] && maze[smy][smx] === 0) {
                     monsters.push({
+                        name: t.name,
+                        color: t.color,
                         x: (smx + 0.5) * CELL,
                         y: (smy + 0.5) * CELL,
-                        type: MONSTER_TYPES[0],
+                        vx: 0,
+                        vy: 0,
                         hp: 35,
                         maxHp: 35,
+                        atk: t.atk || 8,
                         speed: 2.3,
+                        size: t.size || 12,
+                        exp: t.exp || 10,
                         facing: 0,
+                        angle: Math.random() * Math.PI * 2,
+                        ai: 'chase',
+                        state: 'chase',
+                        wanderTimer: 60,
+                        stuckTimer: 0,
+                        blocked: false,
+                        rx: 0, ry: 0, turnDir: 1, netT2: 0,
+                        lastWatchX: 0, lastWatchY: 0,
+                        lastSeen: { x: player.x, y: player.y },
+                        lastSeenTimer: 300,
+                        path: null, pathIdx: 0, pathCooldown: 30,
+                        stall: 0, lastWayD: 99999, checkTimer: 30,
+                        lastPosX: 0, lastPosY: 0, wanderTarget: null,
+                        pauseTimer: 0, lastPx: -1, lastPy: -1,
                         attackCooldown: 0,
                         stunTimer: 0,
                         hitFlash: 0,
@@ -14845,6 +14871,7 @@ function playPrologueCutscene(onComplete) {
     });
 
     content.innerHTML = html;
+    screen.style.display = 'flex';
     screen.classList.add('active');
     continueEl.classList.remove('visible');
 
@@ -14930,6 +14957,7 @@ function playPrologueCutscene(onComplete) {
         try { sExitOpen(); } catch(e) {}
         setTimeout(() => {
             screen.classList.remove('active', 'fade-out');
+            screen.style.display = 'none';
             content.innerHTML = '';
             if (typeof onComplete === 'function') onComplete();
         }, 1100);
@@ -14960,8 +14988,20 @@ function playPrologueCutscene(onComplete) {
         if (e.target === skipBtn || skipBtn.contains(e.target)) return;
         advanceDialogue();
     }
-    document.addEventListener('keydown', onInput);
-    document.addEventListener('click', onClickContinue);
+    setTimeout(() => {
+        if (prologueActive) {
+            document.addEventListener('keydown', onInput);
+            document.addEventListener('click', onClickContinue);
+        }
+    }, 120);
+}
+
+function startTutorialMode() {
+    try {
+        localStorage.removeItem('vita_tutorial_done');
+    } catch (_) {}
+    prologuePlayed = false;
+    startGame(true);
 }
 
 function startGame(bypassDeviceCheck = false) {
