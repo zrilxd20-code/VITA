@@ -11656,17 +11656,18 @@ window.closeTerminalPuzzleModal = closeTerminalPuzzleModal;
 
 function handleTerminalSuccess() {
     sSystemRestored();
-    if (terminalCurrentNode) {
-        terminalCurrentNode.collected = true;
-        terminalCurrentNode.active = true;
-        terminalCurrentNode.puzzleSolved = true;
+    const node = terminalCurrentNode;
+    if (node) {
+        node.collected = true;
+        node.active = true;
+        node.puzzleSolved = true;
         coinsCollected++;
-        addParticle(terminalCurrentNode.x, terminalCurrentNode.y, '#00f0ff', 32, 6, 45);
-        addShockwave(terminalCurrentNode.x, terminalCurrentNode.y, 85, '#00f0ff', 24);
+        addParticle(node.x, node.y, '#00f0ff', 32, 6, 45);
+        addShockwave(node.x, node.y, 85, '#00f0ff', 24);
         player.hp = Math.min(player.maxHp, player.hp + 15);
         floatingTexts.push({
-            x: terminalCurrentNode.x,
-            y: terminalCurrentNode.y - 25,
+            x: node.x,
+            y: node.y - 25,
             text: `+${tt('term_success_msg')}`,
             color: '#00f0ff',
             life: 90,
@@ -11735,9 +11736,10 @@ function spawnTutorialEvacuationAmbush() {
 function handleTerminalFailure(reason) {
     sShortCircuit();
     addShake(18);
-    if (terminalCurrentNode) {
-        terminalCurrentNode.cooldownUntil = Date.now() + 2500;
-        addParticle(terminalCurrentNode.x, terminalCurrentNode.y, '#ff0033', 25, 5, 30);
+    const node = terminalCurrentNode;
+    if (node) {
+        node.cooldownUntil = Date.now() + 2500;
+        addParticle(node.x, node.y, '#ff0033', 25, 5, 30);
     }
     floatingTexts.push({
         x: player.x,
