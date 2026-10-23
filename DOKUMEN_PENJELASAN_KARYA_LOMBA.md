@@ -12,6 +12,8 @@
 * **Target Platform:** Multiplatform (Web Browser PC/Mobile, Progressive Web App / PWA, dan Android APK)
 * **Ukuran Berkas:** ~1.2 MB (Ultra-Lightweight)
 * **Status Proyek:** Selesai (Chapter 1: 15 Sektor Fasilitas Bawah Tanah)
+* **Tautan Live Game:** https://vita-game-three.vercel.app/
+* **Repositori Kode (GitHub):** https://github.com/zrilxd20-code/VITA
 
 ---
 
