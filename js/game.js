@@ -2218,9 +2218,7 @@ function closeCodexModal() {
     if (gameState === 'paused') gameState = 'playing';
 }
 
-// ============================================================
-// LEVEL 1 LIVE FIELD TUTORIAL CONTROLLER (SEKTOR 1 PROTOCOLS)
-// ============================================================
+// 
 function sTutorialStep() {
     try {
         const ac = ensureAudio();
@@ -3384,9 +3382,7 @@ function saveHigh(h) {
     } catch (e) {}
 }
 
-// ============================================================
-// SUBTLE DIFFICULTY ADAPTATION SYSTEM (Dynamic Pity & Scaling)
-// ============================================================
+// 
 let currentAdaptation = {
     deaths: 0,
     extraMedPod: false,
@@ -5043,9 +5039,7 @@ function drawGasClouds() {
     });
 }
 
-// ============================================================================
-// UNIQUE PROCEDURAL DEATH ANIMATIONS (10 MONSTER TYPES, ZERO EXTERNAL ASSETS)
-// ============================================================================
+// 
 function spawnDeathEffect(m, x, y) {
     if (!m) return;
     const name = m.name || '';
@@ -11047,9 +11041,7 @@ function closeRobotMemoryModal() {
 window.openRobotMemoryModal = openRobotMemoryModal;
 window.closeRobotMemoryModal = closeRobotMemoryModal;
 
-// ============================================================
-// LEVEL 15 FALLEN SCIENTIST (DR. SARA) & FINAL LETTER ENVELOPE
-// ============================================================
+// 
 function drawLevel15Corpse() {
     if (!level15Corpse || currentLevel !== LEVELS - 1) return;
     const sx = level15Corpse.x - cameraX + W / 2;
@@ -11298,9 +11290,7 @@ function closeFinalLetterModal() {
 window.openFinalLetterModal = openFinalLetterModal;
 window.closeFinalLetterModal = closeFinalLetterModal;
 
-// ============================================================
-// TERMINAL REACTIVATION PUZZLE (SECTOR NODE OVERRIDE)
-// ============================================================
+// 
 function sSystemRestored() {
     if (typeof audioCtx === 'undefined' || !audioCtx) return;
     const notes = [440, 554.37, 659.25, 880, 1108.73];
@@ -15361,9 +15351,7 @@ function drawDebugDiagnostics() {
     ctx.restore();
 }
 
-// ============================================================
-// FASE 2 CO-OP ONLINE: LOBBY & TRANSPORT RELAY WEBSOCKET
-// ============================================================
+// 
 let coopWs = null;
 let coopPeers = [];
 let coopRelayUrl = 'ws://localhost:8080';
@@ -15533,9 +15521,7 @@ function submitJoinCoopRoom() {
     connectCoopRelay();
 }
 
-// ============================================================
-// RELAI & TAUTAN UNDANGAN: normalisasi alamat, persist, badge, invite.
-// ============================================================
+// 
 const COOP_DEFAULT_RELAY_URL = 'ws://localhost:8080';
 const COOP_RELAY_URL_MAX = 256;
 // Host: nama host / IPv4 / IPv6 dalam kurung siku. Port opsional 1..5 digit.
@@ -16253,9 +16239,7 @@ window.copyCoopRoomCode = copyCoopRoomCode;
 window.submitJoinCoopRoom = submitJoinCoopRoom;
 window.launchCoopMission = launchCoopMission;
 
-// ============================================================================
-// MODUL TALENTA OPERATIF (HSR / GENSHIN STYLE TRACES & TALENT TREE)
-// ============================================================================
+// 
 const VITA_TALENTS_KEY = 'vita_talents';
 
 const TALENT_NODES = [
@@ -16882,9 +16866,7 @@ function openTalentTreeFromGame() {
     openTalentTreeModal();
 }
 
-// ============================================================================
-// MODUL ARSIP ANOMALI (BESTIARY) & BENGKEL SENJATA (WORKBENCH)
-// ============================================================================
+// 
 let bestiarySelectedIdx = 0;
 let bestiaryAnimReq = null;
 
@@ -17087,9 +17069,7 @@ window.openWorkbenchFromGame = openWorkbenchFromGame;
 
 
 
-// ============================================================
-// MODE ARENA SURVIVAL TAK BERUJUNG (ENDLESS HORDE MODE)
-// ============================================================
+// 
 let isEndlessMode = false;
 let endlessWave = 1;
 let endlessKills = 0;
