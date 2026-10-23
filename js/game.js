@@ -2858,6 +2858,24 @@ function sArtifact() {
     } catch (e) {}
 }
 
+// Aktivasi Generator Sektor: Arpeggio akord mayor futuristik + resonance surge
+function sGeneratorOnline() {
+    try {
+        const master = getMasterVol();
+        if (master <= 0) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+            setTimeout(() => {
+                try {
+                    playOccultTone(freq, freq * 1.01, 0.32, 0.45 * (master / 100), 'sine');
+                } catch (_) {}
+            }, i * 65);
+        });
+        playOccultTone(110, 220, 0.55, 0.4 * (master / 100), 'triangle');
+        playNoiseBurst(0.22, 1200, 380, 2.8, 0.22 * (master / 100), 'bandpass');
+    } catch (e) {}
+}
+
 // Sobekan Daging & Tulang Retak (Visceral Flesh Hit)
 function sHit() {
     try {
@@ -6741,18 +6759,19 @@ function updatePlayer() {
         if (!a.collected && dist(a, player) < 26) {
             a.collected = true;
             coinsCollected++;
-            sArtifact();
-            const aColor = '#00f0ff';
-            addParticle(a.x, a.y, aColor, 24, 6, 40);
-            addShockwave(a.x, a.y, 55, aColor, 18);
+            sGeneratorOnline();
+            addParticle(a.x, a.y, '#00f0ff', 24, 6, 45);
+            addParticle(a.x, a.y, '#2ecc71', 18, 5, 35);
+            addShockwave(a.x, a.y, 50, '#00f0ff', 20);
+            addShockwave(a.x, a.y, 85, '#2ecc71', 30);
             player.hp = Math.min(player.maxHp, player.hp + 12);
             floatingTexts.push({
                 x: a.x,
                 y: a.y - 20,
-                text: `+${lang === 'en' ? 'GENERATOR RESTORED' : 'GENERATOR DIAKTIFKAN'}!`,
-                color: aColor,
-                life: 75,
-                maxLife: 75
+                text: `+${lang === 'en' ? 'GENERATOR RESTORED! // +12 HP' : 'GENERATOR PULIH! // +12 HP'}`,
+                color: '#00f0ff',
+                life: 85,
+                maxLife: 85
             });
             if (tutorialActive && tutorialStep === 3) {
                 advanceTutorialStep(3);
@@ -12229,16 +12248,16 @@ function drawDirectionArrow() {
     sx = Math.max(margin, Math.min(W - margin, sx));
     sy = Math.max(margin, Math.min(H - margin, sy));
 
-    const pulse = 1 + Math.sin(Date.now() / (isExit ? 150 : 200)) * (isExit ? 0.22 : 0.15);
-    const size = (isExit ? 18 : 14) * pulse;
-    const color = isExit ? '#00ff88' : '#f1c40f';
+    const pulse = 1 + Math.sin(Date.now() / (isExit ? 150 : 200)) * (isExit ? 0.22 : 0.16);
+    const size = (isExit ? 18 : 15) * pulse;
+    const color = isExit ? '#00ff88' : '#00f0ff';
 
     ctx.save();
     ctx.translate(sx, sy);
     ctx.rotate(angle + Math.PI / 2);
     ctx.fillStyle = color;
     ctx.shadowColor = color;
-    ctx.shadowBlur = isExit ? 18 : 10;
+    ctx.shadowBlur = isExit ? 20 : 14;
     ctx.beginPath();
     ctx.moveTo(0, -size);
     ctx.lineTo(size * 0.85, size * 0.65);
@@ -13204,12 +13223,20 @@ function gameLoopFrame() {
             terminalPuzzleActive = false;
         }
 
-        stepSimulation();
-        stepLocalVisuals();
-        updateMonsterProximityAndHeartbeat();
-        stepCamera();
-        updatePerfCounters();
-        renderFrame();
+        try {
+            stepSimulation();
+        } catch (simErr) {
+            console.warn('Simulation recoverable tick exception:', simErr);
+        }
+        try {
+            stepLocalVisuals();
+            updateMonsterProximityAndHeartbeat();
+            stepCamera();
+            updatePerfCounters();
+            renderFrame();
+        } catch (renderErr) {
+            console.warn('Render recoverable frame exception:', renderErr);
+        }
         if (mouseTime > 0) { mouseTime--; if (mouseTime <= 0) mouseActive = false; }
 
         // Co-op 20Hz Snapshot Broadcast (Host -> Peers)

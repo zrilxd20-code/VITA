@@ -344,8 +344,9 @@ body {
 .modal-backdrop, #homeView .modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(6, 2, 6, 0.85);
-    backdrop-filter: blur(6px);
+    background: rgba(4, 3, 8, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     display: none;
     align-items: center;
     justify-content: center;
@@ -357,15 +358,16 @@ body {
 .modal-backdrop.open, #homeView .modal-backdrop.open { display: flex; opacity: 1; }
 .modal, #homeView .modal {
     width: 100%;
-    max-width: 460px;
-    background: linear-gradient(180deg, #170609, #0a0308);
-    border: 1px solid rgba(190, 40, 40, 0.4);
-    border-radius: var(--radius);
-    padding: 28px;
-    box-shadow: inset 0 0 40px rgba(120, 10, 10, 0.12), var(--shadow);
+    max-width: 480px;
+    background: linear-gradient(180deg, #120710 0%, #060309 100%);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-radius: 6px;
+    padding: 26px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 24px rgba(0, 240, 255, 0.12), inset 0 0 32px rgba(0, 240, 255, 0.04);
     text-align: left;
     transform: translateY(16px);
     transition: transform 0.25s ease;
+    position: relative;
   }
 .modal-backdrop.open .modal, #homeView .modal-backdrop.open .modal { transform: translateY(0); }
 #homeView .modal h3 {

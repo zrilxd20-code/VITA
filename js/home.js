@@ -841,8 +841,29 @@ function homeBeep(type) {
       flt.frequency.setValueAtTime(380, now);
       gain.gain.setValueAtTime(0.6 * volMul, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    } else if (type === 'hover') {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(560, now);
+      osc.frequency.exponentialRampToValueAtTime(280, now + 0.02);
+      gain.gain.setValueAtTime(0.08 * volMul, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+      osc.connect(gain); gain.connect(ac.destination);
+      osc.start(now); osc.stop(now + 0.025);
+    } else if (type === 'launch') {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      const flt = ac.createBiquadFilter();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(95, now);
+      osc.frequency.exponentialRampToValueAtTime(32, now + 0.45);
+      flt.type = 'lowpass';
+      flt.frequency.setValueAtTime(240, now);
+      gain.gain.setValueAtTime(0.65 * volMul, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
       osc.connect(flt); flt.connect(gain); gain.connect(ac.destination);
-      osc.start(now); osc.stop(now + 0.16);
+      osc.start(now); osc.stop(now + 0.46);
     }
   } catch (_) {}
 }
@@ -2396,10 +2417,14 @@ function playWebGame(autoStart = false) {
 
 function proceedToWebGame(autoStart = false) {
   if (typeof syncSettingsFromStorage === 'function') syncSettingsFromStorage();
+  try {
+    if (typeof homeBeep === 'function') homeBeep('launch');
+  } catch (_) {}
   const hv = document.getElementById('homeView');
   if (hv) hv.style.display = 'none';
   const dm = document.getElementById('deviceModeModal');
   if (dm) { dm.classList.remove('open'); dm.style.display = 'none'; }
+  document.querySelectorAll('#homeView .modal-backdrop.open').forEach(m => m.classList.remove('open'));
   const gv = document.getElementById('gameView');
   if (gv) gv.style.display = '';
   document.body.classList.add('game-on');
@@ -2925,6 +2950,18 @@ function showPlatformSelector() {
   if (heroBox) heroBox.style.display = 'none';
   if (typeof homeBeep === 'function') homeBeep('close');
 }
+
+// Micro-interaction audio prosedural saat hover tombol di Hub
+document.addEventListener('mouseover', e => {
+  if (!e.target || typeof e.target.closest !== 'function') return;
+  const btn = e.target.closest('#homeView button, #homeView .btn, #homeView [role="button"]');
+  if (btn && !btn.dataset.hoverBound) {
+    btn.dataset.hoverBound = '1';
+    btn.addEventListener('mouseenter', () => {
+      try { if (typeof homeBeep === 'function') homeBeep('hover'); } catch (_) {}
+    });
+  }
+}, { passive: true });
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initHubPlatformView);
