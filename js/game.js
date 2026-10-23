@@ -2517,18 +2517,27 @@ function playEpilogueCutscene(onComplete) {
     const intro = script ? (isId ? script.intro_id : script.intro_en) : 'SECTOR 15 PURGED';
     const lines = script ? (isId ? script.lines_id : script.lines_en) : ['The labyrinth is quiet.'];
 
-    let html = `<div class="prologue-header"><span class="prologue-classify">${isId ? 'MISI SELESAI — FASILITAS AMAN' : 'MISSION COMPLETE — FACILITY SECURE'}</span><span class="prologue-date">${isId ? 'EPILOG NARRATIF' : 'NARRATIVE EPILOGUE'}</span></div>`;
-    html += `<div class="prologue-glitch" data-text="${intro}" style="margin-bottom:18px">${intro}</div>`;
-    lines.forEach((l, i) => {
-        html += `<div class="prologue-line narrator" style="opacity:0;animation:fadeInLine 0.9s forwards;animation-delay:${0.8 + i * 1.4}s;margin-bottom:12px">${l}</div>`;
+    let html = `<div class="prologue-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid rgba(255,215,0,0.25);padding-bottom:8px">` +
+        `<span class="prologue-classify" style="color:#f59e0b;font-weight:bold;letter-spacing:2px;font-size:11px">${isId ? 'MISI SELESAI — FASILITAS AMAN' : 'MISSION COMPLETE — FACILITY SECURE'}</span>` +
+        `<span class="prologue-date" style="color:#94a3b8;font-size:11px;letter-spacing:1px">${isId ? 'EPILOG NARATIF KANONIKAL' : 'CANONICAL EPILOGUE DOSSIER'}</span>` +
+        `</div>`;
+    html += `<div class="epilogue-title" style="color:#ef4444;font-size:15px;font-weight:bold;letter-spacing:2px;margin-bottom:18px;text-shadow:0 0 10px rgba(239,68,68,0.35);line-height:1.5">${intro}</div>`;
+
+    lines.forEach((l) => {
+        let cls = 'epilogue-line';
+        if (l.includes('SURAT WASIAT') || l.includes('TESTAMENT')) {
+            cls += ' letter';
+        } else if (l.includes('ALTERISHA')) {
+            cls += ' comms';
+        }
+        html += `<div class="${cls}">${l}</div>`;
     });
+
     content.innerHTML = html;
     if (btn) {
-        btn.style.opacity = '0';
-        setTimeout(() => {
-            btn.style.opacity = '1';
-            btn.style.transition = 'opacity 0.8s';
-        }, (lines.length * 1400) + 1200);
+        btn.style.opacity = '1';
+        btn.style.display = 'inline-flex';
+        btn.textContent = isId ? 'DEBRIEFING DOSSIER ▸▸' : 'DEBRIEFING DOSSIER ▸▸';
     }
 }
 function finishEpilogue() {
@@ -11400,19 +11409,7 @@ function drawLevel15Corpse() {
         );
     }
 
-    // Floating interaction prompt when player approaches
-    if (player && dist(player, { x: level15Corpse.envelopeX, y: level15Corpse.envelopeY }) < 50) {
-        ctx.save();
-        ctx.fillStyle = '#f59e0b';
-        ctx.font = 'bold 11px monospace';
-        ctx.textAlign = 'center';
-        ctx.shadowColor = '#f59e0b';
-        ctx.shadowBlur = 8;
-        const bob = Math.sin(t * 4.5) * 2;
-        ctx.fillText('✉️ ' + tt('final_corpse_prompt'), envSx, envSy - 20 + bob);
-        ctx.shadowBlur = 0;
-        ctx.restore();
-    }
+    // Surat wasiat & meja di lantai menjadi pajangan visual sakral (tanpa prompt pop-up mengganggu)
 }
 
 function openFinalLetterModal() {
@@ -13576,10 +13573,6 @@ document.addEventListener('keydown', e => {
         } else if (e.key === 'q' || e.key === 'Q') {
             cycleWeapon(true);
         } else if (e.key === 'e' || e.key === 'E') {
-            if (level15Corpse && currentLevel === LEVELS - 1 && player && dist(player, { x: level15Corpse.envelopeX, y: level15Corpse.envelopeY }) < 55) {
-                openFinalLetterModal();
-                return;
-            }
             if (wreckedRobot && currentLevel === 9 && player && dist(player, wreckedRobot) < 55) {
                 openRobotMemoryModal();
                 return;
