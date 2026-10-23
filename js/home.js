@@ -980,8 +980,23 @@ function closeSettingsModal() {
 
 function openControlsModal() {
   closeSidebar();
-  openModal('Field Protocol', 'Maneuver your operative with WASD or Arrow Keys. Collect data chips and biomass artifacts, evade anomalies, and reach the green Sector Goal.', 'WASD / Arrows / Virtual Joystick', 'Press ESC to pause mission.');
-  homeBeep('open');
+  if (typeof openModal === 'function') {
+    openModal('Field Protocol', 'Maneuver your operative with WASD or Arrow Keys. Collect data chips and biomass artifacts, evade anomalies, and reach the green Sector Goal.', 'WASD / Arrows / Virtual Joystick', 'Press ESC to pause mission.');
+  }
+  if (typeof homeBeep === 'function') homeBeep('open');
+}
+
+function closeControlsModal() {
+  if (typeof closeModal === 'function') closeModal();
+  if (typeof homeBeep === 'function') homeBeep('close');
+}
+
+function openManualModal() {
+  if (typeof openControlsModal === 'function') openControlsModal();
+}
+
+function closeManualModal() {
+  if (typeof closeControlsModal === 'function') closeControlsModal();
 }
 
 function openDatabaseModal() {
@@ -2424,7 +2439,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.5.6';
+const APP_VERSION = '2.5.7';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 
@@ -2917,27 +2932,27 @@ if (document.readyState === 'loading') {
   initHubPlatformView();
 }
 
-window.isNativeApp = isNativeApp;
-window.initHubPlatformView = initHubPlatformView;
-window.enterWebHub = enterWebHub;
-window.showPlatformSelector = showPlatformSelector;
-window.showAuthForms = showAuthForms;
-window.togglePasswordVisibility = togglePasswordVisibility;
-window.getSavedCredentials = getSavedCredentials;
-window.openSidebar = openSidebar;
-window.closeSidebar = closeSidebar;
-window.openProfileModal = openProfileModal;
-window.closeProfileModal = closeProfileModal;
-window.openLeaderboardModal = openLeaderboardModal;
-window.closeLeaderboardModal = closeLeaderboardModal;
-window.openSettingsModal = openSettingsModal;
-window.closeSettingsModal = closeSettingsModal;
-window.openControlsModal = openControlsModal;
-window.closeControlsModal = closeControlsModal;
-window.openManualModal = openManualModal;
-window.closeManualModal = closeManualModal;
-window.openAuthModal = openAuthModal;
-window.closeAuthModal = closeAuthModal;
+window.isNativeApp = typeof isNativeApp === 'function' ? isNativeApp : () => false;
+window.initHubPlatformView = typeof initHubPlatformView === 'function' ? initHubPlatformView : () => {};
+window.enterWebHub = typeof enterWebHub === 'function' ? enterWebHub : () => {};
+window.showPlatformSelector = typeof showPlatformSelector === 'function' ? showPlatformSelector : () => {};
+window.showAuthForms = typeof showAuthForms === 'function' ? showAuthForms : () => {};
+window.togglePasswordVisibility = typeof togglePasswordVisibility === 'function' ? togglePasswordVisibility : () => {};
+window.getSavedCredentials = typeof getSavedCredentials === 'function' ? getSavedCredentials : () => null;
+window.openSidebar = typeof openSidebar === 'function' ? openSidebar : () => {};
+window.closeSidebar = typeof closeSidebar === 'function' ? closeSidebar : () => {};
+window.openProfileModal = typeof openProfileModal === 'function' ? openProfileModal : () => {};
+window.closeProfileModal = typeof closeProfileModal === 'function' ? closeProfileModal : () => {};
+window.openLeaderboardModal = typeof openLeaderboardModal === 'function' ? openLeaderboardModal : () => {};
+window.closeLeaderboardModal = typeof closeLeaderboardModal === 'function' ? closeLeaderboardModal : () => {};
+window.openSettingsModal = typeof openSettingsModal === 'function' ? openSettingsModal : () => {};
+window.closeSettingsModal = typeof closeSettingsModal === 'function' ? closeSettingsModal : () => {};
+window.openControlsModal = typeof openControlsModal === 'function' ? openControlsModal : () => {};
+window.closeControlsModal = typeof closeControlsModal === 'function' ? closeControlsModal : () => {};
+window.openManualModal = typeof openManualModal === 'function' ? openManualModal : () => {};
+window.closeManualModal = typeof closeManualModal === 'function' ? closeManualModal : () => {};
+window.openAuthModal = typeof openAuthModal === 'function' ? openAuthModal : () => {};
+window.closeAuthModal = typeof closeAuthModal === 'function' ? closeAuthModal : () => {};
 window.openCodexModal = typeof openCodexModal === 'function' ? openCodexModal : () => {};
 window.closeCodexModal = typeof closeCodexModal === 'function' ? closeCodexModal : () => {};
 window.openDatabaseModal = typeof openDatabaseModal === 'function' ? openDatabaseModal : () => {};
@@ -2951,12 +2966,12 @@ window.closeAndroidDownloadModal = typeof closeAndroidDownloadModal === 'functio
 window.openCoopLobbyModal = typeof openCoopLobbyModal === 'function' ? openCoopLobbyModal : () => {};
 window.closeCoopLobbyModal = typeof closeCoopLobbyModal === 'function' ? closeCoopLobbyModal : () => {};
 window.checkVitaUpdateManual = typeof checkVitaUpdateManual === 'function' ? checkVitaUpdateManual : () => {};
-window.selectGameDirective = selectGameDirective;
+window.selectGameDirective = typeof selectGameDirective === 'function' ? selectGameDirective : () => {};
 window.selectDeviceChoice = typeof selectDeviceChoice === 'function' ? selectDeviceChoice : () => {};
 window.confirmDeviceChoiceAndPlay = typeof confirmDeviceChoiceAndPlay === 'function' ? confirmDeviceChoiceAndPlay : () => {};
 window.playWebGame = typeof playWebGame === 'function' ? playWebGame : () => {};
 window.installPwaFromHub = typeof installPwaFromHub === 'function' ? installPwaFromHub : () => {};
-window.homeBeep = homeBeep;
+window.homeBeep = typeof homeBeep === 'function' ? homeBeep : () => {};
 
 // Otomatis sinkronkan profil operatif dengan Supabase saat Hub dibuka
 async function autoSyncCloudOnStartup() {

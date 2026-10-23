@@ -442,7 +442,7 @@ const T = {
         term_success_msg: 'GENERATOR AKTIF — DAYA PULIH!',
         term_all_nodes_msg: 'SEMUA GENERATOR AKTIF — PINTU KELUAR TERBUKA!',
         term_fail_msg: 'KORSLETING LISTRIK! PREDATOR TERPANCING!',
-        node_prompt_interact: '[E / SENTUH] AKTIFKAN GENERATOR',
+        node_prompt_interact: 'AKTIFKAN GENERATOR',
         trap_hit: 'Jebakan Duri! -{n} HP', level_up: 'NAIK TINGKAT! HP+{h} ATK+{a}',
         death_time_lbl: 'Waktu bermain:', ui_bpm: 'BIOMETRIK:', death_cause_lbl: 'Penyebab Kematian:',
         death_stamp: 'SUBJEK: DIMANGSA', win_stamp: 'SEKTOR DIBERSIHKAN',
@@ -837,7 +837,7 @@ const T = {
         term_success_msg: 'GENERATOR ONLINE — POWER RESTORED!',
         term_all_nodes_msg: 'ALL GENERATORS ONLINE — EXTRACTION UNLOCKED!',
         term_fail_msg: 'SHORT CIRCUIT! PREDATORS ALERTED!',
-        node_prompt_interact: '[E / TOUCH] POWER ON GENERATOR',
+        node_prompt_interact: 'ACTIVATE GENERATOR',
         trap_hit: 'Spike Trap! -{n} HP', level_up: 'LEVEL UP! HP+{h} ATK+{a}',
         death_time_lbl: 'Play time:', ui_bpm: 'BIOMETRIC:', death_cause_lbl: 'Cause of Death:',
         death_stamp: 'SUBJECT: TERMINATED', win_stamp: 'SECTOR PURGED',
@@ -6738,10 +6738,41 @@ function updatePlayer() {
     }
 
     artifacts.forEach(a => {
-        if (!a.collected && !terminalPuzzleActive && dist(a, player) < 28) {
-            if (Date.now() > (a.cooldownUntil || 0)) {
-                openTerminalPuzzleModal(a);
+        if (!a.collected && dist(a, player) < 26) {
+            a.collected = true;
+            coinsCollected++;
+            sArtifact();
+            const aColor = '#00f0ff';
+            addParticle(a.x, a.y, aColor, 24, 6, 40);
+            addShockwave(a.x, a.y, 55, aColor, 18);
+            player.hp = Math.min(player.maxHp, player.hp + 12);
+            floatingTexts.push({
+                x: a.x,
+                y: a.y - 20,
+                text: `+${lang === 'en' ? 'GENERATOR RESTORED' : 'GENERATOR DIAKTIFKAN'}!`,
+                color: aColor,
+                life: 75,
+                maxLife: 75
+            });
+            if (tutorialActive && tutorialStep === 3) {
+                advanceTutorialStep(3);
             }
+            if (artifacts && artifacts.length > 0 && coinsCollected >= artifacts.length) {
+                sWin();
+                addShockwave(player.x, player.y, 140, '#2ecc71', 35);
+                floatingTexts.push({
+                    x: player.x,
+                    y: player.y - 45,
+                    text: `★ ${lang === 'en' ? 'ALL GENERATORS ONLINE // EXIT OPEN' : 'SEMUA GENERATOR AKTIF // PINTU TERBUKA'} ★`,
+                    color: '#2ecc71',
+                    life: 140,
+                    maxLife: 140
+                });
+                if (currentLevel === 0 && !menuDemo) {
+                    spawnTutorialEvacuationAmbush();
+                }
+            }
+            updateUI();
         }
     });
 
@@ -11615,6 +11646,7 @@ function submitTerminalAnswer(choiceIdx) {
 function openTerminalPuzzleModal(node) {
     const modal = document.getElementById('terminalPuzzleModal');
     if (!modal) return;
+    if (terminalPuzzleActive && terminalCurrentNode === node) return;
     terminalCurrentNode = node;
     terminalPuzzleActive = true;
     terminalOpenTime = Date.now();
@@ -11634,7 +11666,7 @@ function openTerminalPuzzleModal(node) {
         touchMove.dy = 0;
     }
 
-    if (terminalPuzzleData.type === 'C') {
+    if (terminalPuzzleData && terminalPuzzleData.type === 'C') {
         if (terminalGlitchTimeout) clearTimeout(terminalGlitchTimeout);
         terminalGlitchTimeout = setTimeout(() => {
             if (terminalPuzzleActive && terminalPuzzleData && terminalPuzzleData.type === 'C') {
@@ -11646,7 +11678,10 @@ function openTerminalPuzzleModal(node) {
     }
 
     renderTerminalPuzzleUI();
+    modal.classList.add('open');
     modal.style.display = 'flex';
+    modal.style.opacity = '1';
+    modal.style.visibility = 'visible';
     if (typeof showCursor === 'function') showCursor();
 }
 
@@ -11656,13 +11691,17 @@ function closeTerminalPuzzleModal(isSuccess, isForced) {
         return;
     }
     const modal = document.getElementById('terminalPuzzleModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+    }
     terminalPuzzleActive = false;
     terminalGlitchCovered = false;
     terminalInputSeq = [];
     terminalSwitches = [0, 0, 0, 0];
     if (terminalCurrentNode) {
-        terminalCurrentNode.cooldownUntil = Date.now() + (isSuccess ? 0 : 1000);
+        terminalCurrentNode.cooldownUntil = Date.now() + (isSuccess ? 0 : 1200);
         terminalCurrentNode = null;
     }
     if (terminalGlitchTimeout) { clearTimeout(terminalGlitchTimeout); terminalGlitchTimeout = null; }
@@ -11758,6 +11797,8 @@ function spawnTutorialEvacuationAmbush() {
 }
 
 function handleTerminalFailure(reason) {
+    if (!terminalPuzzleActive) return;
+    if (Date.now() - terminalOpenTime < 350 && reason !== 'TIMEOUT') return;
     sShortCircuit();
     addShake(18);
     const node = terminalCurrentNode;
@@ -13163,11 +13204,7 @@ function gameLoopFrame() {
             terminalPuzzleActive = false;
         }
 
-        if (terminalPuzzleActive) {
-            updateTerminalTelemetry();
-        } else {
-            stepSimulation();
-        }
+        stepSimulation();
         stepLocalVisuals();
         updateMonsterProximityAndHeartbeat();
         stepCamera();
@@ -13346,13 +13383,6 @@ document.addEventListener('keydown', e => {
             if (wreckedRobot && currentLevel === 9 && player && dist(player, wreckedRobot) < 55) {
                 openRobotMemoryModal();
                 return;
-            }
-            if (artifacts && artifacts.length) {
-                const nearNode = artifacts.find(a => !a.collected && dist(a, player) < 48);
-                if (nearNode && Date.now() > (nearNode.cooldownUntil || 0)) {
-                    openTerminalPuzzleModal(nearNode);
-                    return;
-                }
             }
             cycleWeapon(false);
         }

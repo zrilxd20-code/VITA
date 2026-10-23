@@ -5121,25 +5121,43 @@ body.touch-on #zoomHud,
 /* ============================================================
    TERMINAL REACTIVATION PUZZLE (SECTOR NODE OVERRIDE)
    ============================================================ */
-.terminal-puzzle-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(3, 4, 10, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 10005;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  animation: termPuzzleFade 0.25s ease-out;
+.terminal-puzzle-backdrop,
+#terminalPuzzleModal.terminal-puzzle-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(3, 4, 10, 0.94) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  z-index: 10005 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  opacity: 1 !important;
+  animation: termPuzzleFade 0.25s ease-out forwards;
 }
+
+#terminalPuzzleModal.open,
+#terminalPuzzleModal[style*="display: flex"],
+#terminalPuzzleModal[style*="display:flex"] {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+#terminalPuzzleModal:not(.open):not([style*="display: flex"]):not([style*="display:flex"]) {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 @keyframes termPuzzleFade {
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
 }
 
-.terminal-puzzle-container {
+.terminal-puzzle-container,
+#terminalPuzzleModal .terminal-puzzle-container {
   max-width: 580px;
   width: 100%;
   max-height: 90vh;
@@ -5153,6 +5171,11 @@ body.touch-on #zoomHud,
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 240, 255, 0.18);
   display: flex;
   flex-direction: column;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
   gap: 12px;
   position: relative;
 }
