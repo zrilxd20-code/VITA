@@ -150,6 +150,14 @@ const PLAYER_COLORS = [
 // that first call throw a temporal-dead-zone ReferenceError.
 let coopRoomId = null;
 let isCoopHost = false;
+let coopWs = null;
+let coopPeers = [];
+let netSnapshotInterval = 50; // ms (20Hz)
+let netLastSnapshotTime = 0;
+
+// Admin & dev flags (declared at top to prevent TDZ ReferenceError)
+let isAdmin = false;
+let godmode = false;
 
 // Endless survival mode state (declared up here to avoid TDZ ReferenceError during early init/updateUI)
 let isEndlessMode = false;
@@ -14245,8 +14253,7 @@ function toggleHomePanel(id) {
 
 // ---- ADMIN / TEST MODE (gerbang tes sisi-klien saja, bukan batas keamanan) ----
 const ADMIN_CODE = '123';
-let isAdmin = false;
-let godmode = false;
+// isAdmin & godmode declared at top of file
 
 const ADMIN_WEAPONS_FULL = ['knife', 'rifle', 'grenade', 'bazooka', 'shield', 'minigun'];
 const ADMIN_PERKS_FULL = [
@@ -15526,8 +15533,7 @@ function drawDebugDiagnostics() {
 }
 
 // 
-let coopWs = null;
-let coopPeers = [];
+// coopWs & coopPeers declared at top of file
 let coopRelayUrl = 'ws://localhost:8080';
 // Tautan undangan (parameter ?coop=KODE & relay=ALAMAT) hanya boleh dipakai
 // sekali per pemuatan halaman agar membuka lobi berulang tidak menggeser tab.
@@ -16088,8 +16094,7 @@ function triggerRemotePeerAttack(p) {
 }
 
 // ---- Fase 3 co-op: Sinkronisasi Input, Snapshot 20Hz, dan Client Prediction ----
-let netSnapshotInterval = 50; // ms (20Hz)
-let netLastSnapshotTime = 0;
+// netSnapshotInterval & netLastSnapshotTime declared at top of file
 let netPing = 0;
 let netLastPingTime = 0;
 let netPingInterval = 1500; // ms
