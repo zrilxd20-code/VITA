@@ -4541,6 +4541,9 @@ function buildLevelWorld(level) {
     attackCooldown = 0;
     levelStartTime = Date.now();
     levelTransition = false;
+    if (!menuDemo) {
+        gameState = 'playing';
+    }
 
     initSpores();
     updateUI();
@@ -5890,7 +5893,7 @@ function attackMonster(m, customDmg) {
             });
             sWin();
 
-            // Menempatkan mayat peneliti (Dr. Sara) dan kertas amplop di samping portal exit
+            // Menempatkan mayat peneliti (Dr. Rudra) dan kertas amplop di samping portal exit
             if (exitPos) {
                 level15Corpse = {
                     x: exitPos.x - 38,
@@ -6105,6 +6108,8 @@ function nextLevel() {
                 if (isMilestone) {
                     openWeaponSelectModal(currentLevel + 1);
                 } else {
+                    levelTransition = false;
+                    gameState = 'playing';
                     initLevel(currentLevel + 1);
                 }
             });
@@ -6124,6 +6129,7 @@ function nextLevel() {
 
     setTimeout(() => {
         levelTransition = false;
+        gameState = 'playing';
         initLevel(currentLevel + 1);
     }, 1500);
 }
@@ -6134,6 +6140,8 @@ function openWeaponSelectModal(nextLv) {
     const modal = document.getElementById('weaponSelectScreen');
     const grid = document.getElementById('weaponCardsContainer');
     if (!modal || !grid) {
+        levelTransition = false;
+        gameState = 'playing';
         initLevel(nextLv);
         return;
     }
@@ -6155,6 +6163,8 @@ function openWeaponSelectModal(nextLv) {
     });
 
     if (!choices.length) {
+        levelTransition = false;
+        gameState = 'playing';
         initLevel(nextLv);
         return;
     }
@@ -6164,6 +6174,17 @@ function openWeaponSelectModal(nextLv) {
         const item = ch.item;
         const card = document.createElement('div');
         card.className = 'weapon-card' + (ch.type === 'perk' ? ' perk-card' : '');
+        card.style.cursor = 'pointer';
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', tt(item.nameKey));
+        card.onclick = () => selectWeaponUpgrade(ch.key, ch.type);
+        card.onkeydown = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selectWeaponUpgrade(ch.key, ch.type);
+            }
+        };
         const wName = tt(item.nameKey);
         const wRole = tt(item.roleKey);
         const wDesc = tt(item.descKey);
@@ -6182,7 +6203,7 @@ function openWeaponSelectModal(nextLv) {
                 <div class="spec-item"><span class="spec-label">${tt('spec_range')}:</span><span class="spec-val">${specs.range}</span></div>
                 <div class="spec-item"><span class="spec-label">${tt('spec_special')}:</span><span class="spec-val con">${specs.special}</span></div>
             </div>
-            <button class="btn-choose-weapon" type="button" onclick="selectWeaponUpgrade('${ch.key}', '${ch.type}')">
+            <button class="btn-choose-weapon" type="button" onclick="event.stopPropagation(); selectWeaponUpgrade('${ch.key}', '${ch.type}')">
                 ${btnText}
             </button>
         `;
@@ -6269,6 +6290,7 @@ function selectWeaponUpgrade(key, itemType) {
     pendingNextLevel = null;
     setTimeout(() => {
         levelTransition = false;
+        gameState = 'playing';
         hideCursor();
         initLevel(next);
     }, 400);

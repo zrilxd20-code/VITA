@@ -204,8 +204,8 @@ const SECTOR_TRANSMISSIONS = {
         callsign: 'ALTERISHA // OVERWATCH',
         icon: 'cyber',
         color: '#ff0055',
-        text_en: 'THIS IS IT. SECTOR 15 CORE. The Monolith awaits at the end of the maze. Restore every system node, heed Dr. Sara\'s final will, and purge the cataclysm for all humanity!',
-        text_id: 'INI DIA. INTI SEKTOR 15. The Monolith menunggumu di ujung labirin. Reaktivasi seluruh node sistem, cermati wasiat Dr. Sara, dan musnahkan sang anomali demi masa depan umat manusia!'
+        text_en: 'THIS IS IT. SECTOR 15 CORE. The Monolith awaits at the end of the maze. Restore every system node, heed Dr. Rudra\'s final will, and purge the cataclysm for all humanity!',
+        text_id: 'INI DIA. INTI SEKTOR 15. The Monolith menunggumu di ujung labirin. Reaktivasi seluruh node sistem, cermati wasiat Dr. Rudra, dan musnahkan sang anomali demi masa depan umat manusia!'
     }
 };
 

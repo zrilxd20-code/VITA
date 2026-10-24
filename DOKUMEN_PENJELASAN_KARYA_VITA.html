@@ -225,7 +225,7 @@
     Fasilitas Riset Bawah Tanah <strong>VITA (Biological Anomaly Research Facility)</strong> telah terbengkalai selama ratusan tahun setelah insiden kebocoran biomassa nekrotik <strong>Spesimen CARNIS-07</strong>. Fasilitas ini terbagi menjadi 15 sektor labirin bawah tanah yang terisolasi dalam kegelapan pekat. Pemain terbangun sebagai <strong>PROTOTYPE-19</strong>, sebuah unit robot sibernetik berkasis titanium yang dirancang khusus dengan prosesor saraf stabil untuk menembus kabut beracun yang mematikan bagi manusia biasa.
   </p>
   <p>
-    Tugas Operatif bukan sekadar melarikan diri, melainkan melakukan <strong>SECTOR REACTIVATION (Reaktivasi Sektor)</strong>: menghidupkan kembali node-node daya utama di setiap sektor untuk membuka segel pintu dekompresi darurat, mengungkap kebenaran di balik hilangnya para peneliti melalui rekaman <em>Blackbox Data Log</em> dan wasiat Dr. Sara, hingga menghadapi entitas pengendali biomassa raksasa di pusat terdalam: <strong>The Monolith</strong>.
+    Tugas Operatif bukan sekadar melarikan diri, melainkan melakukan <strong>SECTOR REACTIVATION (Reaktivasi Sektor)</strong>: menghidupkan kembali node-node daya utama di setiap sektor untuk membuka segel pintu dekompresi darurat, mengungkap kebenaran di balik hilangnya para peneliti melalui rekaman <em>Blackbox Data Log</em> dan wasiat Dr. Rudra, hingga menghadapi entitas pengendali biomassa raksasa di pusat terdalam: <strong>The Monolith</strong>.
   </p>
 
   <h3>1.2 Filosofi Desain: Zero External Asset Dependencies</h3>
@@ -299,9 +299,9 @@
     <li><strong>The Monolith (Final Boss Sektor 15):</strong> Inti biomekanik raksasa dengan 3 fase serangan mematikan.</li>
   </ul>
 
-  <h3>2.4 Pohon Talenta Permanen &amp; Arsenal Tier II</h3>
+  <h3>2.4 Pohon Talenta Permanen, Mode Co-op 4 Pemain &amp; Arsenal 6 Senjata</h3>
   <p>
-    Pemain dapat mengumpulkan Nanite Core dari monster yang dikalahkan untuk membuka peningkatan permanen pada <strong>Operative Talent Tree</strong> (peningkatan regenerasi HP, kapasitas amunisi, durasi Phase Dash, dan efisiensi sensor radar) yang tersimpan secara lokal dan persisten antar-sesi bermain.
+    Pemain dapat mengumpulkan Nanite Core dari monster yang dikalahkan untuk membuka peningkatan permanen pada <strong>Operative Talent Tree</strong> (peningkatan regenerasi HP, kapasitas amunisi, durasi Phase Dash, dan efisiensi sensor radar) serta memodifikasi senjata di <strong>Bengkel Senjata (Workbench)</strong> yang tersimpan persisten antar-sesi bermain. Selain mode Kampanye 15 Sektor, tersedia juga <strong>Mode Arena Survival (Endless Horde)</strong> dan <strong>Operasi Co-op Online (hingga 4 Pemain)</strong> berbasis WebSocket relay mandiri.
   </p>
 
   <!-- BAB III -->
@@ -310,9 +310,9 @@
 
   <h3>3.1 Alur Permainan (Core Game Loop)</h3>
   <ol>
-    <li><strong>Penyusupan Labirin:</strong> Masuki sektor baru dengan obor berdaya jangkau terbatas.</li>
-    <li><strong>Eksplorasi &amp; Reaktivasi:</strong> Jelajahi lorong, temukan seluruh Power Node, dan selesaikan teka-teki terminal reaktivasi.</li>
-    <li><strong>Pertahanan &amp; Taktik Tempur:</strong> Hadapi kawanan monster menggunakan 5 jenis senjata (Pisau Taktis, Senapan Pulsa, Shotgun, Meriam Plasma, dan Granat). Manfaatkan tombol <em>Phase Dash</em> untuk menerobos bahaya tanpa terluka.</li>
+    <li><strong>Penyusupan Labirin:</strong> Masuki sektor baru dengan protokol pencahayaan bergantian (Light Protocol &amp; Dark Protocol dengan obor dinamis).</li>
+    <li><strong>Eksplorasi &amp; Reaktivasi:</strong> Jelajahi lorong, temukan seluruh Power Node / Generator Sektor, dan reaktivasi untuk membuka segel pintu keluar.</li>
+    <li><strong>Pertahanan &amp; Taktik Tempur:</strong> Hadapi kawanan monster menggunakan 6 jenis senjata modular (Pisau Taktis, Senapan Serbu AP, Granat Bio-EMP, Bazooka Berat, Perisai Kinetik, dan Minigun Vulcan). Manfaatkan tombol <em>Phase Dash</em> untuk menerobos bahaya tanpa terluka.</li>
     <li><strong>Evakuasi (Airlock Extraction):</strong> Setelah seluruh node aktif, pintu keluar sektor terbuka dan pemain dapat berpindah ke sektor berikutnya.</li>
   </ol>
 
@@ -348,11 +348,11 @@
       </tr>
       <tr>
         <td><strong>Ganti Senjata</strong></td>
-        <td>Tombol Angka 1, 2, 3, 4, 5</td>
-        <td>Tombol Sentuh [SWAP] Senjata</td>
+        <td>Tombol Angka 1–6, Q, E, atau Scroll Mouse</td>
+        <td>Tombol Sentuh [SWAP] Bar Senjata</td>
       </tr>
       <tr>
-        <td><strong>Interaksi Node / Puzzle</strong></td>
+        <td><strong>Interaksi Node / Generator</strong></td>
         <td>Dekati Node / Klik Opsi Terminal</td>
         <td>Sentuh Node / Sentuh Opsi Layar Terminal</td>
       </tr>
@@ -371,9 +371,9 @@
   <ul>
     <li><strong>Tahap 1 &mdash; Perancangan Algoritma Inti:</strong> Perancangan generator labirin berbasis <em>Recursive Backtracker</em> dan <em>Depth-First Search</em> ber-seed PRNG (Mulberry32) untuk menjamin labirin terbuat secara deterministik dan selalu memiliki jalan keluar (bebas softlock).</li>
     <li><strong>Tahap 2 &mdash; Canvas 2D Rendering Engine:</strong> Pembuatan sistem kamera dinamis (Smooth Camera Following), sistem pencahayaan radial obor berbasis gradien matematika, dan rendering visual partikel darah organik.</li>
-    <li><strong>Tahap 3 &mdash; Desain Audio Prosedural:</strong> Pemrograman modul WebAudio API murni untuk menghasilkan efek suara tembakan, desis biomassa, hingga frekuensi radio transmisi radio komunikasi.</li>
-    <li><strong>Tahap 4 &mdash; Desain UI/UX &amp; Aksesibilitas:</strong> Penerapan sistem token CSS modular, optimasi kontrol sentuh ganda (joystick + tombol aksi), dan kepatuhan WAI-ARIA (seluruh 21 modal dialog memiliki role dan label aksesibel).</li>
-    <li><strong>Tahap 5 &mdash; QA &amp; Pengujian Keamanan:</strong> Pembuatan automated test suite (30 modul uji mandiri) untuk mengaudit pencegahan injeksi XSS, integritas save data localStorage, kestabilan loop 60 FPS, dan respon memori bebas crash.</li>
+    <li><strong>Tahap 3 &mdash; Desain Audio Prosedural:</strong> Pemrograman modul WebAudio API murni untuk menghasilkan efek suara tembakan, desis biomassa, hingga frekuensi radio transmisi komunikasi.</li>
+    <li><strong>Tahap 4 &mdash; Desain UI/UX &amp; Aksesibilitas:</strong> Penerapan sistem token CSS modular, optimasi kontrol sentuh ganda (joystick + tombol aksi), dan kepatuhan WAI-ARIA (seluruh modal dialog memiliki role, focus trap, dan label aksesibel).</li>
+    <li><strong>Tahap 5 &mdash; QA &amp; Pengujian Keamanan:</strong> Pembuatan automated test suite (31 modul uji mandiri) untuk mengaudit pencegahan injeksi XSS, integritas save data localStorage, kestabilan loop 60 FPS, determinisme co-op, dan respon memori bebas crash.</li>
   </ul>
 
   <h3>4.2 Alat &amp; Teknologi yang Digunakan</h3>

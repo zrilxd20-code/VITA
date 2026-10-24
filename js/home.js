@@ -2439,6 +2439,8 @@ function proceedToWebGame(autoStart = false) {
     if (ss) ss.style.display = 'none';
   } else {
     if (ss) ss.style.display = 'flex';
+    if (typeof gameState !== 'undefined') gameState = 'menu';
+    if (typeof menuDemo !== 'undefined') menuDemo = true;
   }
   if (typeof resize === 'function') resize();
   if (typeof checkContinueBtn === 'function') checkContinueBtn();
