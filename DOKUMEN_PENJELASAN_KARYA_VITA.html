@@ -372,8 +372,8 @@
     <li><strong>Tahap 1 &mdash; Perancangan Algoritma Inti:</strong> Perancangan generator labirin berbasis <em>Recursive Backtracker</em> dan <em>Depth-First Search</em> ber-seed PRNG (Mulberry32) untuk menjamin labirin terbuat secara deterministik dan selalu memiliki jalan keluar (bebas softlock).</li>
     <li><strong>Tahap 2 &mdash; Canvas 2D Rendering Engine:</strong> Pembuatan sistem kamera dinamis (Smooth Camera Following), sistem pencahayaan radial obor berbasis gradien matematika, dan rendering visual partikel darah organik.</li>
     <li><strong>Tahap 3 &mdash; Desain Audio Prosedural:</strong> Pemrograman modul WebAudio API murni untuk menghasilkan efek suara tembakan, desis biomassa, hingga frekuensi radio transmisi komunikasi.</li>
-    <li><strong>Tahap 4 &mdash; Desain UI/UX &amp; Aksesibilitas:</strong> Penerapan sistem token CSS modular, optimasi kontrol sentuh ganda (joystick + tombol aksi), dan kepatuhan WAI-ARIA (seluruh modal dialog memiliki role, focus trap, dan label aksesibel).</li>
-    <li><strong>Tahap 5 &mdash; QA &amp; Pengujian Keamanan:</strong> Pembuatan automated test suite (31 modul uji mandiri) untuk mengaudit pencegahan injeksi XSS, integritas save data localStorage, kestabilan loop 60 FPS, determinisme co-op, dan respon memori bebas crash.</li>
+    <li><strong>Tahap 4 &mdash; Desain UI/UX, Lokalisasi Dwibahasa &amp; Aksesibilitas:</strong> Penerapan sistem token CSS modular, dukungan dwibahasa penuh (<strong>520 kunci terjemahan paritas 100% Indonesia &amp; Inggris</strong>), optimasi kontrol sentuh ganda (joystick + tombol aksi), dan kepatuhan WAI-ARIA (seluruh modal dialog memiliki role, focus trap, dan label aksesibel).</li>
+    <li><strong>Tahap 5 &mdash; QA &amp; Pengujian Keamanan:</strong> Pembuatan automated test suite (<strong>32 modul uji mandiri</strong>) untuk mengaudit pencegahan injeksi XSS, integritas save data localStorage, kestabilan loop 60 FPS, determinisme co-op, anti-softlock labirin BFS, serta simulasi headless penuh Sektor 1&ndash;15 dan mode Endless Survival bebas crash.</li>
   </ul>
 
   <h3>4.2 Alat &amp; Teknologi yang Digunakan</h3>
@@ -391,6 +391,63 @@
   <p>
     Dengan ukuran yang ultra-ringkas (&plusmn; 1.2 MB), dukungan dwibahasa penuh (Indonesia &amp; Inggris), serta kemampuan berjalan secara mulus di berbagai perangkat (komputer desktop maupun smartphone), karya ini siap diuji dan memberikan pengalaman bermain yang menantang, mendalam, dan berkesan bagi para juri.
   </p>
+
+  <!-- BAB VI -->
+  <h2>BAB VI &mdash; PANDUAN PRESENTASI 5 MENIT &amp; TANYA-JAWAB JURI (OTN 2026)</h2>
+  <p>
+    <em>Bagian ini dirancang sesuai rubrik penilaian resmi Lomba Cipta Game OTN 2026: <strong>Aspek Teknis (20%)</strong>, <strong>Kreativitas &amp; Inovasi (25%)</strong>, <strong>Desain &amp; Interaktivitas (20%)</strong>, dan <strong>Presentasi &amp; Tanya-Jawab (35%)</strong>.</em>
+  </p>
+
+  <h3>6.1 Susunan Alur Presentasi 5 Menit (Pembagian Waktu Ideal)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Waktu</th>
+        <th>Fokus Pembahasan</th>
+        <th>Poin Utama yang Ditunjukkan di Layar (Live Demo)</th>
+        <th>Bobot Rubrik</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>0:00 &ndash; 0:45</strong></td>
+        <td><strong>Pembukaan &amp; Konsep Inovasi</strong></td>
+        <td>Tampilkan Hub <code>#homeView</code>, jelaskan bahwa VITA adalah game <em>Survival Horror Roguelite</em> yang <strong>100% Prosedural (Zero External Assets)</strong>: tanpa file gambar <code>.png</code>/<code>.jpg</code> atau suara <code>.mp3</code> luar, berukuran hanya &plusmn;1.2 MB, dan bebas 100% dari pelanggaran hak cipta aset.</td>
+        <td><strong>Kreativitas &amp; Inovasi (25%)</strong></td>
+      </tr>
+      <tr>
+        <td><strong>0:45 &ndash; 1:45</strong></td>
+        <td><strong>Desain UI/UX, Dwibahasa &amp; Kemudahan Kontrol</strong></td>
+        <td>Buka modal <strong>Bestiary</strong> (12 monster prosedural), <strong>Talent Tree</strong>, dan <strong>Pengaturan</strong> (tunjukkan pergantian bahasa instan Indonesia &harr; Inggris dengan 520 kunci terjemahan). Klik <code>MASUKI LABIRIN</code> &rarr; Layar Mulai <code>#startScreen</code> &rarr; <code>MAIN SEKARANG</code>.</td>
+        <td><strong>Desain &amp; Interaktivitas (20%)</strong></td>
+      </tr>
+      <tr>
+        <td><strong>1:45 &ndash; 3:00</strong></td>
+        <td><strong>Demo Gameplay Inti &amp; Arsitektur Teknis</strong></td>
+        <td>Tunjukkan <strong>Sektor 1</strong> (papan tutorial holografis, aktivasi generator walk-over, panah kompas pintu keluar). Lalu tekan tombol <strong><code>[~]</code> (Panel Admin/Jump)</strong> untuk melompat ke <strong>Sektor 10</strong> (memori robot + Boss Mother Harvester) dan <strong>Sektor 15</strong> (surat wasiat Dr. Rudra + Final Boss <em>The Monolith</em>).</td>
+        <td><strong>Aspek Teknis (20%)</strong></td>
+      </tr>
+      <tr>
+        <td><strong>3:00 &ndash; 5:00</strong></td>
+        <td><strong>Tanya-Jawab Dewan Juri (Q&amp;A)</strong></td>
+        <td>Jawab pertanyaan juri secara lugas mengenai cara kerja algoritma labirin, kecerdasan buatan monster (BFS), sintesis suara WebAudio, dan proses pembuatan.</td>
+        <td><strong>Presentasi (35%)</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>6.2 Kunci Jawaban Singkat untuk Pertanyaan Juri (Cheat Sheet Q&amp;A)</h3>
+  <ul>
+    <li><strong>&ldquo;Bagaimana cara membuat gambar monster dan suara tembakan tanpa file gambar atau MP3?&rdquo;</strong><br>
+      <em>Jawaban:</em> &ldquo;Seluruh bentuk monster digambar menggunakan rumus geometri dan kurva matematika secara <em>real-time</em> (60 frame per detik) di atas <strong>HTML5 Canvas 2D</strong>. Sedangkan suara tembakan, langkah kaki, dan musik atmosfer dibuat menggunakan <strong>WebAudio API</strong> dengan menggabungkan gelombang suara (<em>oscillator</em> sinus, <em>sawtooth</em>, dan <em>noise filter</em>) langsung dari prosesor browser.&rdquo;
+    </li>
+    <li><strong>&ldquo;Bagaimana memastikan labirin yang diacak tidak pernah buntu (softlock)?&rdquo;</strong><br>
+      <em>Jawaban:</em> &ldquo;Labirin dibangkitkan dengan algoritma <em>Recursive Backtracker</em> ber-seed deterministik (<strong>Mulberry32</strong>), lalu diverifikasi oleh algoritma pencarian jalur <strong>Breadth-First Search (BFS)</strong> untuk memastikan setiap generator daya dan pintu keluar selalu terhubung dari titik muncul pemain. Kami juga mengujinya secara otomatis lewat 32 modul <em>automated test</em>.&rdquo;
+    </li>
+    <li><strong>&ldquo;Bagaimana peran kamu dalam memanfaatkan AI selama proses pembuatan?&rdquo;</strong><br>
+      <em>Jawaban:</em> &ldquo;Saya berperan sebagai <em>Game Director</em> dan <em>System Architect</em>: merancang konsep cerita 15 sektor, menentukan mekanik <em>walk-over generator</em>, menyeimbangkan tingkat kesulitan 12 monster, menguji setiap tombol dan alur layar dari awal sampai tamat, serta mengarahkan AI secara bertahap untuk mengimplementasikan dan memperbaiki logika kode hingga lulus seluruh 32 pengujian teknis.&rdquo;
+    </li>
+  </ul>
 
   <div style="margin-top:40px;padding-top:20px;border-top:1px solid var(--border);text-align:center;font-size:9.5pt;color:var(--text-muted);">
     <strong>VITA Project Development Team</strong> &bull; Dibuat untuk Kompetisi Nasional Pengembangan Game (OTN)<br>

@@ -88,8 +88,8 @@ Pemain dapat mengumpulkan Nanite Core dari monster yang dikalahkan untuk membuka
 1. **Tahap 1 — Perancangan Algoritma Inti:** Perancangan generator labirin berbasis Recursive Backtracker dan Depth-First Search ber-seed PRNG (Mulberry32) untuk menjamin labirin terbuat secara deterministik dan selalu memiliki jalan keluar (bebas softlock).
 2. **Tahap 2 — Canvas 2D Rendering Engine:** Pembuatan sistem kamera dinamis (Smooth Camera Following), sistem pencahayaan radial obor berbasis gradien matematika, dan rendering visual partikel darah organik.
 3. **Tahap 3 — Desain Audio Prosedural:** Pemrograman modul WebAudio API murni untuk menghasilkan efek suara tembakan, desis biomassa, hingga frekuensi radio transmisi komunikasi.
-4. **Tahap 4 — Desain UI/UX & Aksesibilitas:** Penerapan sistem token CSS modular, optimasi kontrol sentuh ganda (joystick + tombol aksi), dan kepatuhan WAI-ARIA (seluruh modal dialog memiliki role, focus trap, dan label aksesibel).
-5. **Tahap 5 — QA & Pengujian Keamanan:** Pembuatan automated test suite (31 modul uji mandiri) untuk mengaudit pencegahan injeksi XSS, integritas save data localStorage, kestabilan loop 60 FPS, determinisme co-op, dan respon memori bebas crash.
+4. **Tahap 4 — Desain UI/UX, Lokalisasi Dwibahasa & Aksesibilitas:** Penerapan sistem token CSS modular, dukungan dwibahasa penuh (**520 kunci terjemahan paritas 100% Indonesia & Inggris**), optimasi kontrol sentuh ganda (joystick + tombol aksi), dan kepatuhan WAI-ARIA (seluruh modal dialog memiliki role, focus trap, dan label aksesibel).
+5. **Tahap 5 — QA & Pengujian Keamanan:** Pembuatan automated test suite (**32 modul uji mandiri**) untuk mengaudit pencegahan injeksi XSS, integritas save data localStorage, kestabilan loop 60 FPS, determinisme co-op, anti-softlock labirin BFS, serta simulasi headless penuh Sektor 1–15 dan mode Endless Survival bebas crash.
 
 ### 4.2 Alat & Teknologi yang Digunakan
 - **Bahasa Pemrograman:** JavaScript Modern (ES6+), HTML5, CSS3 murni (Vanilla, tanpa library/framework bloated).
@@ -102,3 +102,26 @@ Pemain dapat mengumpulkan Nanite Core dari monster yang dikalahkan untuk membuka
 VITA: Forgotten Sector membuktikan bahwa game aksi roguelite yang mendalam, memiliki grafis atmosferik, efek pencahayaan dinamis, kecerdasan buatan monster yang kompleks, dan audio sintetis yang hidup dapat diwujudkan secara 100% mandiri (self-contained) tanpa bergantung pada aset gambar maupun rekaman suara luar.
 
 Dengan ukuran yang ultra-ringkas (± 1.2 MB), dukungan dwibahasa penuh (Indonesia & Inggris), serta kemampuan berjalan secara mulus di berbagai perangkat (komputer desktop maupun smartphone), karya ini siap diuji dan memberikan pengalaman bermain yang menantang, mendalam, dan berkesan bagi para juri.
+
+---
+
+## BAB VI — PANDUAN PRESENTASI 5 MENIT & TANYA-JAWAB JURI (OTN 2026)
+*Bagian ini dirancang sesuai rubrik penilaian resmi Lomba Cipta Game OTN 2026: **Aspek Teknis (20%)**, **Kreativitas & Inovasi (25%)**, **Desain & Interaktivitas (20%)**, dan **Presentasi & Tanya-Jawab (35%)**.*
+
+### 6.1 Susunan Alur Presentasi 5 Menit (Pembagian Waktu Ideal)
+
+| Waktu | Fokus Pembahasan | Poin Utama yang Ditunjukkan di Layar (Live Demo) | Bobot Rubrik |
+| :--- | :--- | :--- | :--- |
+| **Menit 0:00 – 0:45** | **Pembukaan & Konsep Inovasi** | Tampilkan Hub `#homeView`, jelaskan bahwa VITA adalah game *Survival Horror Roguelite* yang **100% Prosedural (Zero External Assets)**: tanpa file gambar `.png`/`.jpg` atau suara `.mp3` luar, sehingga berukuran hanya ±1.2 MB dan bebas 100% dari pelanggaran hak cipta aset. | **Kreativitas & Inovasi (25%)** |
+| **Menit 0:45 – 1:45** | **Desain UI/UX, Dwibahasa & Kemudahan Kontrol** | Buka modal **Bestiary** (12 monster prosedural), **Talent Tree**, dan **Pengaturan** (tunjukkan pergantian bahasa instan Indonesia ↔ Inggris dengan 520 kunci terjemahan). Klik `MASUKI LABIRIN` → Layar Mulai `#startScreen` → `MAIN SEKARANG`. | **Desain & Interaktivitas (20%)** |
+| **Menit 1:45 – 3:00** | **Demo Gameplay Inti & Arsitektur Teknis** | Tunjukkan **Sektor 1** (papan tutorial holografis, aktivasi generator walk-over, panah kompas pintu keluar). Lalu tekan tombol **`[~]` (Panel Admin/Jump)** untuk melompat ke **Sektor 10** (memori robot + Boss Mother Harvester) dan **Sektor 15** (surat wasiat Dr. Rudra + Final Boss *The Monolith*). | **Aspek Teknis (20%)** |
+| **Menit 3:00 – 5:00** | **Tanya-Jawab Dewan Juri (Q&A)** | Jawab pertanyaan juri secara lugas mengenai cara kerja algoritma labirin, kecerdasan buatan monster (BFS), sintesis suara WebAudio, dan proses pembuatan. | **Presentasi (35%)** |
+
+### 6.2 Kunci Jawaban Singkat untuk Pertanyaan Juri (Cheat Sheet Q&A)
+1. **"Bagaimana cara membuat gambar monster dan suara tembakan tanpa file gambar atau MP3?"**
+   - *Jawaban:* "Seluruh bentuk monster digambar menggunakan rumus geometri dan kurva matematika secara *real-time* (60 frame per detik) di atas **HTML5 Canvas 2D**. Sedangkan suara tembakan, langkah kaki, dan musik atmosfer dibuat menggunakan **WebAudio API** dengan menggabungkan gelombang suara (*oscillator* sinus, *sawtooth*, dan *noise filter*) langsung dari prosesor browser."
+2. **"Bagaimana memastikan labirin yang diacak tidak pernah buntu (softlock)?"**
+   - *Jawaban:* "Labirin dibangkitkan dengan algoritma *Recursive Backtracker* ber-seed deterministik (**Mulberry32**), lalu diverifikasi oleh algoritma pencarian jalur **Breadth-First Search (BFS)** untuk memastikan setiap generator daya dan pintu keluar selalu terhubung dari titik muncul pemain. Kami juga mengujinya secara otomatis lewat 32 modul *automated test*."
+3. **"Bagaimana peran kamu dalam memanfaatkan AI selama proses pembuatan?"**
+   - *Jawaban:* "Saya berperan sebagai *Game Director* dan *System Architect*: merancang konsep cerita 15 sektor, menentukan mekanik *walk-over generator*, menyeimbangkan tingkat kesulitan 12 monster, menguji setiap tombol dan alur layar dari awal sampai tamat, serta mengarahkan AI secara bertahap untuk mengimplementasikan dan memperbaiki logika kode hingga lulus seluruh 32 pengujian teknis."
+

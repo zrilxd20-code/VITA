@@ -317,7 +317,7 @@
       <span>FACILITY STATUS</span>
       <span class="system-status-dot">&bull; ONLINE</span>
     </div>
-    <div class="sidebar-system-sub">VITA CORE ENGINE v2.4 &bull; LABYRINTH PROTOCOL</div>
+    <div class="sidebar-system-sub">VITA CORE ENGINE v2.5.7 &bull; LABYRINTH PROTOCOL</div>
   </div>
 
   <!-- Compatibility elements for global JS references -->
@@ -343,11 +343,11 @@
     <div class="modal-header-row">
       <h3>
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        <span id="profileModalTitle">OPERATIVE PROFILE DOSSIER</span>
+        <span id="profileModalTitle" data-i18n="profile_modal_title">OPERATIVE PROFILE DOSSIER</span>
       </h3>
       <div style="display:flex;align-items:center;gap:8px">
-        <span class="auth-status-pill unverified" id="portalBadge">STATUS: GUEST &bull; LOCAL</span>
-        <span class="auth-clearance-stamp" id="portalClearance">CLEARANCE: LEVEL-1</span>
+        <span class="auth-status-pill unverified" id="portalBadge" data-i18n="profile_status_guest">STATUS: GUEST &bull; LOCAL</span>
+        <span class="auth-clearance-stamp" id="portalClearance" data-i18n="profile_clearance_lvl1">CLEARANCE: LEVEL-1</span>
         <button class="btn-sidebar-close" type="button" onclick="closeProfileModal()" aria-label="Tutup Profil / Close Profile">✕</button>
       </div>
     </div>
@@ -361,13 +361,13 @@
           </div>
           <label class="btn-upload-pp" for="ppFileInput" title="Upload photo from disk">
             <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-            <span>Upload Photo (Avatar)</span>
+            <span data-i18n="profile_upload_avatar">Upload Photo (Avatar)</span>
           </label>
           <input type="file" id="ppFileInput" accept="image/*" style="display:none">
         </div>
 
         <div class="pp-presets-box">
-          <span class="pp-presets-title">Or Select Division Insignia:</span>
+          <span class="pp-presets-title" data-i18n="profile_insignia_title">Or Select Division Insignia:</span>
           <div class="pp-presets-row">
             <button class="btn-preset-avatar" type="button" onclick="selectPresetAvatar('biohazard')" title="Biohazard">
               <svg class="preset-svg" viewBox="0 0 24 24"><path d="M12 2a1 1 0 0 1 .86.5l1.6 2.76A7.5 7.5 0 0 1 18.5 7.9l2.76-1.6a1 1 0 0 1 1.37.37 1 1 0 0 1-.37 1.36l-2.76 1.6A7.5 7.5 0 0 1 20 12a7.5 7.5 0 0 1-.5 2.63l2.76 1.6a1 1 0 0 1 .37 1.36 1 1 0 0 1-1.37.37L18.5 16.36a7.5 7.5 0 0 1-4.04 2.64l-1.6 2.76A1 1 0 0 1 12 22a1 1 0 0 1-.86-.5l-1.6-2.76A7.5 7.5 0 0 1 5.5 16.36l-2.76 1.6a1 1 0 0 1-1.37-.37 1 1 0 0 1 .37-1.36l2.76-1.6A7.5 7.5 0 0 1 4 12a7.5 7.5 0 0 1 .5-2.63l-2.76-1.6a1 1 0 0 1-.37-1.36 1 1 0 0 1 1.37-.37L5.5 7.9a7.5 7.5 0 0 1 4.04-2.64l1.6-2.76A1 1 0 0 1 12 2zm0 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>
@@ -393,17 +393,17 @@
 
       <div class="profile-meta-col">
         <div class="profile-form-group">
-          <label for="profileUsernameInput">Operative Callsign: <span class="auto-save-tag" id="autoSaveIndicator">● Auto-Saved ✓</span></label>
-          <input type="text" id="profileUsernameInput" placeholder="e.g. AGENT-CARNIS-01" maxlength="24">
+          <label for="profileUsernameInput"><span data-i18n="profile_callsign_lbl">Operative Callsign:</span> <span class="auto-save-tag" id="autoSaveIndicator" data-i18n="profile_autosaved_tag">● Auto-Saved ✓</span></label>
+          <input type="text" id="profileUsernameInput" placeholder="e.g. AGENT-CARNIS-01" data-i18n-placeholder="profile_ph_username" maxlength="24">
         </div>
 
         <div class="profile-form-group">
-          <label for="profilePasscodeInput">Security Passcode (PIN/Password):</label>
-          <input type="password" id="profilePasscodeInput" placeholder="Enter your account passcode" maxlength="32">
+          <label for="profilePasscodeInput" data-i18n="profile_passcode_lbl">Security Passcode (PIN/Password):</label>
+          <input type="password" id="profilePasscodeInput" placeholder="Enter your account passcode" data-i18n-placeholder="profile_ph_passcode" maxlength="32">
         </div>
 
         <div class="profile-form-group">
-          <label for="profileRoleInput">Facility Division / Role:</label>
+          <label for="profileRoleInput" data-i18n="profile_role_lbl">Facility Division / Role:</label>
           <select id="profileRoleInput">
             <option value="Field Operative">Field Operative</option>
             <option value="Anomaly Investigator">Anomaly Investigator</option>
@@ -416,14 +416,14 @@
         <div class="profile-actions-row">
           <button class="btn" id="btnSaveProfile" type="button" onclick="handleSaveFullProfile()">
             <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
-            <span>Save Profile</span>
+            <span data-i18n="profile_save_btn">Save Profile</span>
           </button>
           <button class="btn secondary" id="btnManualCloudSync" type="button" onclick="handleManualCloudSync()" style="border-color:rgba(0,240,255,0.5);color:#00f0ff;">
             <svg class="btn-icon" viewBox="0 0 24 24" style="fill:#00f0ff;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-            <span>Sync Cloud Data</span>
+            <span data-i18n="profile_sync_cloud_btn">Sync Cloud Data</span>
           </button>
           <button class="btn secondary" id="btnResetProfile" type="button" onclick="openAuthModal('login')">
-            Switch Account / Login
+            <span data-i18n="profile_switch_acc_btn">Switch Account / Login</span>
           </button>
         </div>
 
@@ -431,23 +431,23 @@
           <div class="telemetry-pill">
             <span class="tele-lbl">
               <svg class="tele-icon" viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H8v2h8v-2h-3v-3.1c1.94-.37 3.51-1.84 4.09-3.96C19.38 11.63 21 9.55 21 7V5c0-1.1-.9-2-2-2z"/></svg>
-              Record:
+              <span data-i18n="profile_record_lbl">Record:</span>
             </span>
             <span class="tele-val" id="profileBestTime">-</span>
           </div>
           <div class="telemetry-pill">
             <span class="tele-lbl">
               <svg class="tele-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.03 1.35 5.75 3.5 7.6V22h13v-2.4c2.15-1.85 3.5-4.57 3.5-7.6 0-5.52-4.48-10-10-10zm-3 12c-.83 0-1.5-.67-1.5-1.5S8.17 11 9 11s1.5.67 1.5 1.5S9.83 14 9 14zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-              Kills:
+              <span data-i18n="profile_kills_lbl">Kills:</span>
             </span>
             <span class="tele-val" id="profileTotalKills">0</span>
           </div>
           <div class="telemetry-pill">
             <span class="tele-lbl">
               <svg class="tele-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12c0 3.03 1.35 5.75 3.5 7.6V22h13v-2.4c2.15-1.85 3.5-4.57 3.5-7.6 0-5.52-4.48-10-10-10zm-3 12c-.83 0-1.5-.67-1.5-1.5S8.17 11 9 11s1.5.67 1.5 1.5S9.83 14 9 14zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-              DB:
+              <span data-i18n="profile_db_lbl">DB:</span>
             </span>
-            <span class="tele-val" id="profileDbStatus" role="status">Local Encrypted</span>
+            <span class="tele-val" id="profileDbStatus" role="status" data-i18n="profile_db_status_local">Local Encrypted</span>
           </div>
         </div>
       </div>
@@ -461,10 +461,10 @@
     <div class="modal-header-row">
       <h3>
         <svg class="btn-icon" viewBox="0 0 24 24" style="fill:#ffd700"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H8v2h8v-2h-3v-3.1c1.94-.37 3.51-1.84 4.09-3.96C19.38 11.63 21 9.55 21 7V5c0-1.1-.9-2-2-2z"/></svg>
-        <span id="leaderboardModalTitle">GLOBAL OPERATIVE LEADERBOARD &bull; FACILITY NETWORK</span>
+        <span id="leaderboardModalTitle" data-i18n="leaderboard_modal_title">GLOBAL OPERATIVE LEADERBOARD &bull; FACILITY NETWORK</span>
       </h3>
       <div style="display:flex;align-items:center;gap:10px">
-        <button class="btn-micro" type="button" onclick="renderLeaderboard()">↻ Refresh</button>
+        <button class="btn-micro" type="button" onclick="renderLeaderboard()" data-i18n="leaderboard_refresh_btn">↻ Refresh</button>
         <button class="btn-sidebar-close" type="button" onclick="closeLeaderboardModal()" aria-label="Tutup Peringkat / Close Leaderboard">✕</button>
       </div>
     </div>
@@ -473,18 +473,18 @@
       <table class="leaderboard-table">
         <thead>
           <tr>
-            <th>RANK</th>
-            <th>OPERATIVE</th>
-            <th>DIVISION</th>
-            <th>SECTOR</th>
-            <th>TIME</th>
-            <th>KILLS</th>
-            <th>GRADE</th>
+            <th data-i18n="leaderboard_th_rank">RANK</th>
+            <th data-i18n="leaderboard_th_op">OPERATIVE</th>
+            <th data-i18n="leaderboard_th_div">DIVISION</th>
+            <th data-i18n="leaderboard_th_sector">SECTOR</th>
+            <th data-i18n="leaderboard_th_time">TIME</th>
+            <th data-i18n="leaderboard_th_kills">KILLS</th>
+            <th data-i18n="leaderboard_th_grade">GRADE</th>
           </tr>
         </thead>
         <tbody id="leaderboardTbody">
           <tr>
-            <td colspan="7" style="text-align:center;padding:24px;color:var(--text-dim)">
+            <td colspan="7" style="text-align:center;padding:24px;color:var(--text-dim)" data-i18n="leaderboard_fetching">
               Fetching facility telemetry data...
             </td>
           </tr>
@@ -495,7 +495,7 @@
 </div>
 
 <footer>
-  <b>VITA</b> &mdash; BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR &bull; WEB EDITION v2.5.3 &bull; 100% STANDALONE OFFLINE READY
+  <b>VITA</b> &mdash; BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR &bull; WEB EDITION v2.5.7 &bull; 100% STANDALONE OFFLINE READY
 </footer>
 </div>
 
@@ -593,7 +593,7 @@
         <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);padding:10px 14px;border-radius:6px;gap:12px;">
           <div>
             <div style="font-size:11px;color:#a0a0b0;letter-spacing:1px;" data-i18n="settings_cur_ver_lbl">VERSI APLIKASI SAAT INI</div>
-            <div style="font-size:15px;font-weight:bold;color:#00f0ff;" id="settingsAppVersionDisplay">v2.5.3 (Latest)</div>
+            <div style="font-size:15px;font-weight:bold;color:#00f0ff;" id="settingsAppVersionDisplay">v2.5.7 (Latest)</div>
           </div>
           <button class="btn-micro" type="button" onclick="checkVitaUpdateManual()" style="padding:8px 14px;font-weight:bold;color:#0a0a12;background:linear-gradient(135deg,#00f0ff,#0070f3);border:none;cursor:pointer;">
             <span data-i18n="settings_check_update_btn">↻ CEK PEMBARUAN</span>
@@ -629,20 +629,20 @@
     <div class="modal-header-row">
       <h3>
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 3.79 2 6v12c0 2.21 4.48 4 10 4s10-1.79 10-4V6c0-2.21-4.48-4-10-4zm0 2c4.97 0 8 1.43 8 2s-3.03 2-8 2-8-1.43-8-2 3.03-2 8-2zm8 14c0 .57-3.03 2-8 2s-8-1.43-8-2v-2.23c1.89 1.37 5.03 2.23 8 2.23s6.11-.86 8-2.23V18zm0-4c0 .57-3.03 2-8 2s-8-1.43-8-2v-2.23c1.89 1.37 5.03 2.23 8 2.23s6.11-.86 8-2.23V14z"/></svg>
-        <span id="databaseModalTitle">FACILITY NETWORK UPLINK</span>
+        <span id="databaseModalTitle" data-i18n="database_modal_title">FACILITY NETWORK UPLINK</span>
       </h3>
       <button class="btn-sidebar-close" type="button" onclick="closeDatabaseModal()" aria-label="Tutup Database / Close Database">✕</button>
     </div>
     <div class="supabase-config-panel" style="padding:0">
-      <p class="supabase-hint" style="margin-top:0">Link this terminal to the facility network to synchronize global leaderboards and operative dossiers across all sectors.</p>
+      <p class="supabase-hint" style="margin-top:0" data-i18n="database_hint">Link this terminal to the facility network to synchronize global leaderboards and operative dossiers across all sectors.</p>
 
       <div class="profile-form-group">
-        <label for="sbUrlInput">Facility Uplink URL:</label>
-        <input type="text" id="sbUrlInput" value="" placeholder="https://your-facility-uplink.local" autocomplete="off" spellcheck="false">
+        <label for="sbUrlInput" data-i18n="database_url_lbl">Facility Uplink URL:</label>
+        <input type="text" id="sbUrlInput" value="" placeholder="https://your-facility-uplink.local" data-i18n-placeholder="database_ph_url" autocomplete="off" spellcheck="false">
       </div>
       <div class="profile-form-group" style="margin-top:10px">
-        <label for="sbKeyInput">Uplink Access Key:</label>
-        <input type="password" id="sbKeyInput" value="" placeholder="Paste access key — stored only in this terminal" autocomplete="off" spellcheck="false">
+        <label for="sbKeyInput" data-i18n="database_key_lbl">Uplink Access Key:</label>
+        <input type="password" id="sbKeyInput" value="" placeholder="Paste access key — stored only in this terminal" data-i18n-placeholder="database_ph_key" autocomplete="off" spellcheck="false">
       </div>
       <div style="margin-top:12px">
         <span class="supabase-status-tag" id="supabaseStatusTag" role="status">STANDBY</span>
@@ -650,10 +650,10 @@
       <div class="profile-actions-row" style="margin-top:16px">
         <button class="btn" type="button" onclick="handleConnectSupabase()">
           <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span>Establish Uplink</span>
+          <span data-i18n="database_connect_btn">Establish Uplink</span>
         </button>
         <button class="btn secondary" type="button" onclick="handleDisconnectSupabase()">
-          Cut Uplink
+          <span data-i18n="database_disconnect_btn">Cut Uplink</span>
         </button>
       </div>
     </div>
@@ -762,7 +762,7 @@
     </div>
 
     <div style="background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.25);border-radius:6px;padding:12px;font-size:12px;line-height:1.6;color:#e6edf3;">
-      <div style="font-weight:bold;color:#00f0ff;margin-bottom:6px;">PANDUAN MENJALANKAN DI PC:</div>
+      <div style="font-weight:bold;color:#00f0ff;margin-bottom:6px;" data-i18n="pc_guide_title">PANDUAN MENJALANKAN DI PC:</div>
       <div data-i18n="pc_step_1">1. Unduh berkas VITA (.zip atau .exe) langsung dari tombol di atas.</div>
       <div data-i18n="pc_step_2">2. Buka berkas unduhan di komputer Windows Anda (ekstrak jika .zip).</div>
       <div data-i18n="pc_step_3">3. Klik vita.exe untuk langsung bermain di jendela native PC!</div>
@@ -780,7 +780,7 @@
     </div>
 
     <div style="margin-top:14px;text-align:right;">
-      <button class="btn secondary" type="button" onclick="closePcDownloadModal()" style="width:100%;">Tutup</button>
+      <button class="btn secondary" type="button" onclick="closePcDownloadModal()" style="width:100%;" data-i18n="close">Tutup</button>
     </div>
   </div>
 </div>
@@ -811,14 +811,14 @@
     </div>
 
     <div style="background:rgba(255,138,61,0.06);border:1px solid rgba(255,138,61,0.3);border-radius:6px;padding:12px;font-size:12px;line-height:1.6;color:#e6edf3;">
-      <div style="font-weight:bold;color:#ff8a3d;margin-bottom:6px;">PANDUAN INSTALASI DI ANDROID:</div>
+      <div style="font-weight:bold;color:#ff8a3d;margin-bottom:6px;" data-i18n="apk_guide_title">PANDUAN INSTALASI DI ANDROID:</div>
       <div data-i18n="apk_step_1">1. Unduh file APK Android ke perangkat ponsel Anda.</div>
       <div data-i18n="apk_step_2">2. Buka berkas unduhan, izinkan "Instal dari sumber tak dikenal" jika diminta.</div>
       <div data-i18n="apk_step_3">3. Ketuk Pasang (Install) lalu buka VITA di layar ponsel Anda!</div>
     </div>
 
     <div style="margin-top:14px;text-align:right;">
-      <button class="btn secondary" type="button" onclick="closeAndroidDownloadModal()" style="width:100%;">Tutup</button>
+      <button class="btn secondary" type="button" onclick="closeAndroidDownloadModal()" style="width:100%;" data-i18n="close">Tutup</button>
     </div>
   </div>
 </div>
@@ -945,7 +945,7 @@
     <div class="coop-tab-content" id="coopJoinPanel" style="display:none;">
       <div class="coop-join-form">
         <label for="coopJoinInput" class="coop-code-label" data-i18n="coop_enter_code_label">MASUKKAN KODE KAMAR (4 DIGIT)</label>
-        <input type="text" id="coopJoinInput" class="coop-input-code" maxlength="4" placeholder="KODE (cth: 7X49)" autocomplete="off" inputmode="latin" spellcheck="false" oninput="var _h=document.getElementById('coopJoinHint');if(_h)_h.style.display='none';">
+        <input type="text" id="coopJoinInput" class="coop-input-code" maxlength="4" placeholder="KODE (cth: 7X49)" data-i18n-placeholder="coop_code_placeholder" autocomplete="off" inputmode="latin" spellcheck="false" oninput="var _h=document.getElementById('coopJoinHint');if(_h)_h.style.display='none';">
         <div id="coopJoinHint" class="coop-relay-hint" style="display:none;" data-i18n="coop_invite_prefilled">KODE UNDANGAN TERISI OTOMATIS. TEKAN HUBUNGKAN.</div>
         <div id="coopJoinError" class="coop-error-msg" style="display:none;"></div>
         <button class="btn" id="coopConnectBtn" type="button" onclick="submitJoinCoopRoom()">
@@ -962,7 +962,7 @@
     <div class="modal-header-row">
       <h3>
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        <span id="authModalTitle">OPERATIVE TERMINAL &bull; AUTHENTICATION</span>
+        <span id="authModalTitle" data-i18n="auth_modal_title">OPERATIVE TERMINAL &bull; AUTHENTICATION</span>
       </h3>
       <button class="btn-sidebar-close" id="authModalClose" type="button" onclick="closeAuthModal()" aria-label="Close">✕</button>
     </div>
@@ -971,21 +971,21 @@
     <div id="authActiveUserBanner" style="display:none;margin-bottom:16px;padding:14px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.3);border-radius:6px;text-align:left;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
         <div>
-          <div style="font-size:11px;color:#a0a0b0;letter-spacing:1px;text-transform:uppercase;">Akun Sedang Aktif:</div>
+          <div style="font-size:11px;color:#a0a0b0;letter-spacing:1px;text-transform:uppercase;" data-i18n="auth_active_account_lbl">Akun Sedang Aktif:</div>
           <div id="authActiveCallsignText" style="font-size:16px;font-weight:bold;color:#00e5ff;margin-top:2px;">OPERATIVE-01</div>
           <div id="authActiveRoleText" style="font-size:12px;color:#e0e0e0;margin-top:1px;">Field Operative</div>
         </div>
         <div style="text-align:right;">
-          <span class="auth-status-pill verified" id="authActiveStatusBadge" style="font-size:10px;padding:3px 8px;">TERVERIFIKASI</span>
+          <span class="auth-status-pill verified" id="authActiveStatusBadge" style="font-size:10px;padding:3px 8px;" data-i18n="auth_verified_badge">TERVERIFIKASI</span>
           <div style="font-size:10px;color:#00ff88;margin-top:4px;">● Auto-Sync Supabase</div>
         </div>
       </div>
       <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
         <button class="btn danger" id="authModalLogoutBtn" type="button" onclick="handleLogout()" style="width:100%;background:#ef4444;color:#fff;font-weight:bold;padding:10px;">
-          <span>🚪 KELUAR DARI AKUN (LOG OUT)</span>
+          <span data-i18n="auth_logout_btn">🚪 KELUAR DARI AKUN (LOG OUT)</span>
         </button>
         <button class="btn secondary" type="button" onclick="showAuthForms(true)" style="width:100%;font-size:11px;">
-          <span>Ganti Akun / Masuk dengan Akun Lain ▸</span>
+          <span data-i18n="auth_switch_account_btn">Ganti Akun / Masuk dengan Akun Lain ▸</span>
         </button>
       </div>
     </div>
@@ -995,40 +995,40 @@
       <!-- Mode Tabs: Login vs New Account -->
       <div class="coop-tabs-bar" id="authTabsBar" style="margin-bottom:16px;">
         <button class="btn-coop-tab active" id="authTabLoginBtn" type="button" onclick="switchAuthMode('login')">
-          <span>MASUK (LOG IN)</span>
+          <span data-i18n="auth_tab_login">MASUK (LOG IN)</span>
         </button>
         <button class="btn-coop-tab" id="authTabRegisterBtn" type="button" onclick="switchAuthMode('register')">
-          <span>DAFTAR AKUN BARU (NEW ACCOUNT)</span>
+          <span data-i18n="auth_tab_register">DAFTAR AKUN BARU (NEW ACCOUNT)</span>
         </button>
       </div>
 
       <!-- Section 1: Login -->
       <div id="authLoginSection">
-        <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;">
+        <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;" data-i18n="auth_login_desc">
           Masuk dengan akun terdaftar. Nama dan sandi tersimpan otomatis di perangkat ini serta disinkronkan langsung ke cloud Supabase.
         </p>
         <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
-          <label for="loginCallsignInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;">Operative Callsign / Handle:</label>
-          <input type="text" id="loginCallsignInput" placeholder="Masukkan Callsign operatif" autocomplete="username" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){var p=document.getElementById('loginPasscodeInput');if(p)p.focus();}">
+          <label for="loginCallsignInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;" data-i18n="auth_callsign_lbl">Operative Callsign / Handle:</label>
+          <input type="text" id="loginCallsignInput" placeholder="Masukkan Callsign operatif" data-i18n-placeholder="auth_ph_callsign" autocomplete="username" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){var p=document.getElementById('loginPasscodeInput');if(p)p.focus();}">
         </div>
         <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
-          <label for="loginPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;">Security Passcode (PIN/Sandi):</label>
+          <label for="loginPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00e5ff;font-weight:bold;" data-i18n="auth_passcode_lbl">Security Passcode (PIN/Sandi):</label>
           <div style="position:relative;display:flex;align-items:center;">
-            <input type="password" id="loginPasscodeInput" placeholder="Masukkan sandi akun Anda" autocomplete="current-password" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px 40px 10px 10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){handlePerformLogin();}">
+            <input type="password" id="loginPasscodeInput" placeholder="Masukkan sandi akun Anda" data-i18n-placeholder="auth_ph_passcode" autocomplete="current-password" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,229,255,0.4);padding:10px 40px 10px 10px;font-family:inherit;font-size:14px;border-radius:4px;" onkeydown="if(event.key==='Enter'){handlePerformLogin();}">
             <button type="button" onclick="togglePasswordVisibility('loginPasscodeInput', this)" aria-label="Toggle password visibility" style="position:absolute;right:8px;background:none;border:none;color:#00e5ff;cursor:pointer;font-size:16px;padding:4px;" title="Lihat/Sembunyikan Sandi">👁️</button>
           </div>
         </div>
         <div style="margin-bottom:14px;text-align:left;">
           <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#a0a0b0;cursor:pointer;user-select:none;">
             <input type="checkbox" id="authRememberCheckbox" checked style="accent-color:#00e5ff;width:16px;height:16px;cursor:pointer;">
-            <span>Simpan Nama & Sandi di perangkat ini (Auto-Remember)</span>
+            <span data-i18n="auth_remember_me">Simpan Nama & Sandi di perangkat ini (Auto-Remember)</span>
           </label>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <button class="btn" id="btnPerformLogin" type="button" onclick="handlePerformLogin()" style="width:100%;background:linear-gradient(135deg,#00e5ff,#0077b6);color:#021018;font-weight:bold;">
-            <span>MASUK KE AKUN (LOG IN) ▸</span>
+            <span data-i18n="auth_login_submit_btn">MASUK KE AKUN (LOG IN) ▸</span>
           </button>
-          <div style="font-size:11px;color:#00e5ff;margin-top:4px;text-align:center;opacity:0.85;">
+          <div style="font-size:11px;color:#00e5ff;margin-top:4px;text-align:center;opacity:0.85;" data-i18n="auth_login_sync_note">
             ⚡ Otomatis sinkronisasi level, senjata, foto profil & rekor dengan Supabase
           </div>
         </div>
@@ -1036,22 +1036,22 @@
 
       <!-- Section 2: New Account (Register) -->
       <div id="authRegisterSection" style="display:none;">
-        <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;">
+        <p style="font-size:12px;color:var(--text-dim,#a0a0b0);margin-bottom:14px;line-height:1.4;" data-i18n="auth_register_desc">
           Daftarkan akun operatif baru. Identitas dan seluruh pencapaian roguelite Anda akan langsung diamankan di database Supabase.
         </p>
         <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
-          <label for="modalUsernameInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Operative Callsign (3-24 karakter):</label>
-          <input type="text" id="modalUsernameInput" placeholder="Contoh: OPERATIVE-77" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;">
+          <label for="modalUsernameInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;" data-i18n="auth_reg_callsign_lbl">Operative Callsign (3-24 karakter):</label>
+          <input type="text" id="modalUsernameInput" placeholder="Contoh: OPERATIVE-77" data-i18n-placeholder="auth_ph_reg_callsign" maxlength="24" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px;font-family:inherit;font-size:14px;border-radius:4px;">
         </div>
         <div class="profile-form-group" style="margin-bottom:12px;text-align:left;">
-          <label for="modalPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Security Passcode (min. 4 karakter):</label>
+          <label for="modalPasscodeInput" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;" data-i18n="auth_reg_passcode_lbl">Security Passcode (min. 4 karakter):</label>
           <div style="position:relative;display:flex;align-items:center;">
-            <input type="password" id="modalPasscodeInput" placeholder="Buat sandi aman akun baru" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px 40px 10px 10px;font-family:inherit;font-size:14px;border-radius:4px;">
+            <input type="password" id="modalPasscodeInput" placeholder="Buat sandi aman akun baru" data-i18n-placeholder="auth_ph_reg_passcode" maxlength="32" style="width:100%;box-sizing:border-box;background:#12060a;color:#fff;border:1px solid rgba(0,255,136,0.4);padding:10px 40px 10px 10px;font-family:inherit;font-size:14px;border-radius:4px;">
             <button type="button" onclick="togglePasswordVisibility('modalPasscodeInput', this)" aria-label="Toggle password visibility" style="position:absolute;right:8px;background:none;border:none;color:#00ff88;cursor:pointer;font-size:16px;padding:4px;" title="Lihat/Sembunyikan Sandi">👁️</button>
           </div>
         </div>
         <div class="profile-form-group" style="margin-bottom:14px;text-align:left;">
-          <label for="modalRoleSelect" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;">Divisi Fasilitas:</label>
+          <label for="modalRoleSelect" style="display:block;font-size:12px;margin-bottom:4px;color:#00ff88;font-weight:bold;" data-i18n="auth_reg_role_lbl">Divisi Fasilitas:</label>
           <select id="modalRoleSelect" style="width:100%;box-sizing:border-box;background:#12060a;color:#e7d6cf;border:1px solid rgba(0,255,136,0.4);padding:8px;font-family:inherit;font-size:13px;border-radius:4px;">
             <option value="Field Operative">Field Operative</option>
             <option value="Anomaly Investigator">Anomaly Investigator</option>
@@ -1063,15 +1063,15 @@
         <div style="margin-bottom:14px;text-align:left;">
           <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#a0a0b0;cursor:pointer;user-select:none;">
             <input type="checkbox" id="authRegRememberCheckbox" checked style="accent-color:#00ff88;width:16px;height:16px;cursor:pointer;">
-            <span>Simpan sandi & nama akun baru di perangkat ini</span>
+            <span data-i18n="auth_reg_remember">Simpan sandi & nama akun baru di perangkat ini</span>
           </label>
         </div>
         <div style="display:none;" id="modalAutoSaveIndicator"></div>
         <div>
           <button class="btn" id="modalSaveProfileBtn" type="button" onclick="handleModalRegisterProfile()" style="width:100%;background:linear-gradient(135deg,#00ff88,#008855);color:#021a0e;font-weight:bold;">
-            <span>BUAT AKUN BARU (REGISTER) ▸</span>
+            <span data-i18n="auth_register_submit_btn">BUAT AKUN BARU (REGISTER) ▸</span>
           </button>
-          <div style="font-size:11px;color:#00ff88;margin-top:6px;text-align:center;opacity:0.85;">
+          <div style="font-size:11px;color:#00ff88;margin-top:6px;text-align:center;opacity:0.85;" data-i18n="auth_register_sync_note">
             ⚡ Akun baru langsung terdaftar dan diamankan di Supabase Cloud
           </div>
         </div>
@@ -1483,21 +1483,21 @@
 <div id="levelAnnounce"></div>
 
 <div id="pauseScreen">
-    <h2 id="pauseTitle">OPERATION PAUSED</h2>
+    <h2 id="pauseTitle" data-i18n="pause_title">OPERATION PAUSED</h2>
     <div id="pauseStatsBox" class="pause-stats-box">
-        <div class="pause-stat"><span class="pause-stat-lbl">SECTOR</span><span id="pauseSectorVal" class="pause-stat-val">1 / 15</span></div>
-        <div class="pause-stat"><span class="pause-stat-lbl">TIME</span><span id="pauseTimeVal" class="pause-stat-val">00:00</span></div>
-        <div class="pause-stat"><span class="pause-stat-lbl">KILLS</span><span id="pauseKillsVal" class="pause-stat-val">0</span></div>
-        <div class="pause-stat"><span class="pause-stat-lbl">WEAPON</span><span id="pauseLoadoutVal" class="pause-stat-val text-cyan">BLADE</span></div>
+        <div class="pause-stat"><span class="pause-stat-lbl" data-i18n="pause_stat_sector">SECTOR</span><span id="pauseSectorVal" class="pause-stat-val">1 / 15</span></div>
+        <div class="pause-stat"><span class="pause-stat-lbl" data-i18n="pause_stat_time">TIME</span><span id="pauseTimeVal" class="pause-stat-val">00:00</span></div>
+        <div class="pause-stat"><span class="pause-stat-lbl" data-i18n="pause_stat_kills">KILLS</span><span id="pauseKillsVal" class="pause-stat-val">0</span></div>
+        <div class="pause-stat"><span class="pause-stat-lbl" data-i18n="pause_stat_weapon">WEAPON</span><span id="pauseLoadoutVal" class="pause-stat-val text-cyan">BLADE</span></div>
     </div>
     <div class="pause-actions-list">
       <button class="btn" id="pauseResume" onclick="togglePause(false)">
         <svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        <span>RESUME</span>
+        <span data-i18n="resume">RESUME</span>
       </button>
       <button class="btn secondary" id="pauseCodex" onclick="openCodexModal()">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-        <span id="pauseCodexText">CLASSIFIED ARCHIVES</span>
+        <span id="pauseCodexText" data-i18n="pause_codex_btn">CLASSIFIED ARCHIVES</span>
       </button>
       <button class="btn secondary" id="pauseTalents" onclick="openTalentTreeFromGame()" style="border-color:rgba(0,240,255,0.45);color:#00f0ff;">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93l1.86 3.72A5.99 5.99 0 0 1 18 13a6 6 0 1 1-12 0c0-.23.01-.46.04-.68L8 8.6A4 4 0 0 1 12 2zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-4.7 9.14A4 4 0 1 0 16 13c0-.36-.05-.71-.14-1.04l-2.02 4.04a2 2 0 1 1-3.68 0L8.14 11.96c-.33.37-.58.82-.72 1.32l-.12-.14z"/></svg>
@@ -1513,7 +1513,7 @@
       </button>
       <button class="btn secondary" id="pauseSettings" onclick="openPauseSettings()">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-        <span id="pauseSettingsText">FACILITY SETTINGS</span>
+        <span id="pauseSettingsText" data-i18n="pause_settings_btn">FACILITY SETTINGS</span>
       </button>
       <button class="btn secondary" id="pauseCustomizeTouchBtn" onclick="openTouchLayoutEditor()">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
@@ -1525,7 +1525,7 @@
       </button>
       <button class="btn secondary" id="pauseRestart" onclick="restartFromPause()">
         <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-        <span>RESTART LEVEL</span>
+        <span data-i18n="restart">RESTART LEVEL</span>
       </button>
       <button class="btn danger" id="pauseMenu" onclick="backToMenu()" style="grid-column:1 / -1;border-color:#ff3b3b;color:#ff8a8a;background:rgba(255,38,38,0.25);order:2;min-height:46px;font-weight:bold;letter-spacing:2px;box-shadow:0 0 16px rgba(255,38,38,0.3);">
         <svg class="btn-icon" viewBox="0 0 24 24" style="fill:#ff8a8a;"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
@@ -1853,7 +1853,7 @@
         </button>
         <button class="btn secondary" id="btnCodex" onclick="openCodexModal()">
           <svg class="btn-icon" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-          <span id="btnCodexText">ARCHIVES CODEX</span>
+          <span id="btnCodexText" data-i18n="codex_btn">ARCHIVES CODEX</span>
         </button>
         <button class="btn secondary" id="btnControls" onclick="openControlsModal()">HOW TO PLAY</button>
         <button class="btn secondary" id="btnAdmin" onclick="openAdminArsenalModal()" style="border-color:rgba(255,215,0,0.55);color:#ffd700;">
@@ -1862,7 +1862,7 @@
         </button>
         <button class="btn secondary" id="btnBackToHome" onclick="backToMenu()">
           <svg class="btn-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-          <span id="btnBackToHomeText">BACK TO HUB</span>
+          <span id="btnBackToHomeText" data-i18n="btn_back_to_home">BACK TO HUB</span>
         </button>
     </div>
   </div>

@@ -429,14 +429,35 @@ if (settingsModal) {
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (typeof closeSidebar === 'function') closeSidebar();
-    if (typeof closeProfileModal === 'function') closeProfileModal();
-    if (typeof closeLeaderboardModal === 'function') closeLeaderboardModal();
-    if (typeof closeSettingsModal === 'function') closeSettingsModal();
-    if (typeof closeDatabaseModal === 'function') closeDatabaseModal();
-    if (typeof closeAuthModal === 'function') closeAuthModal();
+    const sb = document.getElementById('sidebarDrawer');
+    const hasSb = sb && sb.classList.contains('open');
+    const profM = document.getElementById('profileModal');
+    const hasProf = profM && (profM.classList.contains('open') || profM.style.display === 'flex');
+    const leadM = document.getElementById('leaderboardModal');
+    const hasLead = leadM && (leadM.classList.contains('open') || leadM.style.display === 'flex');
+    const setM = document.getElementById('settingsModal');
+    const hasSet = setM && (setM.classList.contains('open') || setM.style.display === 'flex');
+    const dbM = document.getElementById('databaseModal');
+    const hasDb = dbM && (dbM.classList.contains('open') || dbM.style.display === 'flex');
+    const authM = document.getElementById('authModal');
+    const hasAuth = authM && (authM.classList.contains('open') || authM.style.display === 'flex');
     const gm = document.getElementById('modal');
-    if (gm) gm.classList.remove('open');
+    const hasGm = gm && (gm.classList.contains('open') || gm.style.display === 'flex');
+
+    if (hasSb || hasProf || hasLead || hasSet || hasDb || hasAuth || hasGm) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (hasSb && typeof closeSidebar === 'function') closeSidebar();
+      if (hasProf && typeof closeProfileModal === 'function') closeProfileModal();
+      if (hasLead && typeof closeLeaderboardModal === 'function') closeLeaderboardModal();
+      if (hasSet && typeof closeSettingsModal === 'function') closeSettingsModal();
+      if (hasDb && typeof closeDatabaseModal === 'function') closeDatabaseModal();
+      if (hasAuth && typeof closeAuthModal === 'function') closeAuthModal();
+      if (hasGm) {
+        gm.classList.remove('open');
+        gm.style.display = 'none';
+      }
+    }
   }
 });
 
@@ -1695,19 +1716,20 @@ function applyProfileUI() {
       }
     }
   } else {
+    const isEn = ((typeof lang !== 'undefined' ? lang : (typeof homeSettings !== 'undefined' ? homeSettings.lang : 'id')) === 'en');
     if (bar) bar.style.display = 'none';
-    if (btnOpen) btnOpen.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Sign In / Operative Dossier';
-    if (startText) startText.textContent = 'OPERATIVE: ANONYMOUS [SIGN IN]';
-    if (startBadge) startBadge.textContent = 'GUEST';
+    if (btnOpen) btnOpen.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' + (isEn ? 'Sign In / Operative Dossier' : 'Masuk / Berkas Operatif');
+    if (startText) startText.textContent = isEn ? 'OPERATIVE: ANONYMOUS [SIGN IN]' : 'OPERATIF: ANONIM [MASUK]';
+    if (startBadge) startBadge.textContent = isEn ? 'GUEST' : 'TAMU';
     if (startIcon) startIcon.innerHTML = getPresetSvgMarkup('biohazard');
-    if (btnStartAuth) btnStartAuth.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>SIGN IN / OPERATIVE DOSSIER';
+    if (btnStartAuth) btnStartAuth.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' + (isEn ? 'SIGN IN / OPERATIVE DOSSIER' : 'MASUK / BERKAS OPERATIF');
 
     if (pBadge) {
-      pBadge.textContent = 'STATUS: GUEST // LOCAL';
+      pBadge.textContent = isEn ? 'STATUS: GUEST // LOCAL' : 'STATUS: TAMU // LOKAL';
       pBadge.className = 'auth-status-pill unverified';
     }
-    if (pClearance) pClearance.textContent = 'CLEARANCE: LEVEL-1';
-    if (pDbStatus) pDbStatus.textContent = 'LOCAL ARCHIVE // STANDBY';
+    if (pClearance) pClearance.textContent = isEn ? 'CLEARANCE: LEVEL-1' : 'IZIN AKSES: LEVEL-1';
+    if (pDbStatus) pDbStatus.textContent = isEn ? 'LOCAL ARCHIVE // STANDBY' : 'ARSIP LOKAL // STANDBY';
   }
 
   // Sinkronisasi status koneksi Supabase Cloud
@@ -2792,11 +2814,23 @@ setInterval(checkVitaUpdate, 30 * 60 * 1000);
   document.addEventListener('keydown', (e) => {
     if (!e || !e.key) return;
     if (e.key === 'Escape') {
+      const hv = document.getElementById('homeView');
+      if (!hv || hv.style.display === 'none') return;
       try {
-        const open = document.querySelector('#homeView .modal-backdrop.open');
-        if (open) { open.classList.remove('open'); return; }
+        const open = document.querySelector('.modal-backdrop.open');
+        if (open) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          open.classList.remove('open');
+          open.style.display = 'none';
+          return;
+        }
         const sb = document.getElementById('sidebarDrawer');
-        if (sb && sb.classList.contains('open')) closeSidebar();
+        if (sb && sb.classList.contains('open')) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          closeSidebar();
+        }
       } catch (_) {}
     }
   });

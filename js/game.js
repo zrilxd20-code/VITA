@@ -427,7 +427,7 @@ const T = {
         mode_light: 'TERANG', mode_dark: 'GELAP',
         exit_open: 'TERBUKA', exit_locked: 'TERKUNCI',
         ctrl_bar: 'WASD / Panah / Joystick: Gerak | SPACE / KLIK: Serang | SHIFT: Dash | ESC: Jeda | M: Bisukan',
-        pause_title: 'JEDA OPERASI', resume: 'LANJUT', restart: 'ULANGI DARI AWAL', main_menu: 'MENU UTAMA',
+        pause_title: 'JEDA OPERASI', resume: 'LANJUT', restart: 'ULANGI DARI AWAL', main_menu: 'MENU UTAMA', btn_back_to_home: 'KEMBALI KE HUB',
         start_subtitle: 'Sektor Terlupakan — 15 Sektor Roguelite', play_now: 'MAIN SEKARANG',
         settings: 'PENGATURAN', how_to_play: 'CARA MAIN',
         volume: 'Volume', brightness: 'Kecerahan', language: 'Bahasa', close: 'Tutup',
@@ -678,6 +678,7 @@ const T = {
         coop_copy_code_btn: 'SALIN KODE',
         coop_code_copied: 'KODE DISALIN KE PAPAN KLIP!',
         coop_enter_code_label: 'MASUKKAN KODE KAMAR (4 DIGIT)',
+        coop_code_placeholder: 'KODE (cth: 7X49)',
         coop_connect_btn: 'HUBUNGKAN KE REGU ▸',
         coop_launch_btn: 'LUNCURKAN OPERASI TIM ▸',
         coop_waiting_client: 'MENUNGGU KEPUTUSAN HOST...',
@@ -822,7 +823,76 @@ const T = {
         talent_flux_name: 'Kapasitor Fotonik',
         talent_flux_desc: 'Radius senter +20% dan jeda cooldown Dash berkurang -15% per tingkat.',
         talent_phantom_name: 'Bayangan Listrik Phantom (Talenta Utama)',
-        talent_phantom_desc: 'Melakukan Dash meninggalkan medan kejut listrik statis yang melumpuhkan monster.'
+        talent_phantom_desc: 'Melakukan Dash meninggalkan medan kejut listrik statis yang melumpuhkan monster.',
+        auth_modal_title: 'TERMINAL OPERATIF • AUTENTIKASI',
+        auth_active_account_lbl: 'AKUN SEDANG AKTIF:',
+        auth_verified_badge: 'TERVERIFIKASI',
+        auth_logout_btn: '🚪 KELUAR DARI AKUN (LOG OUT)',
+        auth_switch_account_btn: 'Ganti Akun / Masuk dengan Akun Lain ▸',
+        auth_tab_login: 'MASUK (LOG IN)',
+        auth_tab_register: 'DAFTAR AKUN BARU (NEW ACCOUNT)',
+        auth_login_desc: 'Masuk dengan akun terdaftar. Nama dan sandi tersimpan otomatis di perangkat ini serta disinkronkan langsung ke cloud Supabase.',
+        auth_callsign_lbl: 'Operative Callsign / Handle:',
+        auth_passcode_lbl: 'Security Passcode (PIN/Sandi):',
+        auth_remember_me: 'Simpan Nama & Sandi di perangkat ini (Auto-Remember)',
+        auth_login_submit_btn: 'MASUK KE AKUN (LOG IN) ▸',
+        auth_login_sync_note: '⚡ Otomatis sinkronisasi level, senjata, foto profil & rekor dengan Supabase',
+        auth_register_desc: 'Daftarkan akun operatif baru. Identitas dan seluruh pencapaian roguelite Anda akan langsung diamankan di database Supabase.',
+        auth_reg_callsign_lbl: 'Operative Callsign (3-24 karakter):',
+        auth_reg_passcode_lbl: 'Security Passcode (min. 4 karakter):',
+        auth_reg_role_lbl: 'Divisi Fasilitas:',
+        auth_reg_remember: 'Simpan sandi & nama akun baru di perangkat ini',
+        auth_register_submit_btn: 'BUAT AKUN BARU (REGISTER) ▸',
+        auth_register_sync_note: '⚡ Akun baru langsung terdaftar dan diamankan di Supabase Cloud',
+        auth_ph_callsign: 'Masukkan Callsign operatif',
+        auth_ph_passcode: 'Masukkan sandi akun Anda',
+        auth_ph_reg_callsign: 'Contoh: OPERATIVE-77',
+        auth_ph_reg_passcode: 'Buat sandi aman akun baru',
+        profile_modal_title: 'DOSSIER PROFIL OPERATIF',
+        profile_status_guest: 'STATUS: TAMU • LOKAL',
+        profile_clearance_lvl1: 'IZIN AKSES: LEVEL-1',
+        profile_upload_avatar: 'Unggah Foto (Avatar)',
+        profile_insignia_title: 'Atau Pilih Lambang Divisi:',
+        profile_callsign_lbl: 'Callsign Operatif:',
+        profile_autosaved_tag: '● Tersimpan Otomatis ✓',
+        profile_passcode_lbl: 'Security Passcode (PIN/Sandi):',
+        profile_role_lbl: 'Divisi Fasilitas / Peran:',
+        profile_save_btn: 'Simpan Profil',
+        profile_sync_cloud_btn: 'Sinkronisasi Cloud',
+        profile_switch_acc_btn: 'Ganti Akun / Masuk',
+        profile_record_lbl: 'Rekor:',
+        profile_kills_lbl: 'Musuh:',
+        profile_db_lbl: 'DB:',
+        profile_db_status_local: 'Lokal Terenkripsi',
+        profile_ph_username: 'Contoh: AGENT-CARNIS-01',
+        profile_ph_passcode: 'Masukkan sandi akun Anda',
+        leaderboard_modal_title: 'PAPAN PERINGKAT OPERATIF GLOBAL • JARINGAN FASILITAS',
+        leaderboard_refresh_btn: '↻ Muat Ulang',
+        leaderboard_th_rank: 'PERINGKAT',
+        leaderboard_th_op: 'OPERATIF',
+        leaderboard_th_div: 'DIVISI',
+        leaderboard_th_sector: 'SEKTOR',
+        leaderboard_th_time: 'WAKTU',
+        leaderboard_th_kills: 'MUSUH',
+        leaderboard_th_grade: 'NILAI',
+        leaderboard_fetching: 'Mengambil data telemetri fasilitas...',
+        database_modal_title: 'UPLINK JARINGAN FASILITAS',
+        database_hint: 'Hubungkan terminal ini ke jaringan fasilitas untuk menyinkronkan papan peringkat global dan dossier operatif di seluruh sektor.',
+        database_url_lbl: 'URL Uplink Fasilitas:',
+        database_key_lbl: 'Kunci Akses Uplink:',
+        database_ph_url: 'https://uplink-fasilitas-anda.local',
+        database_ph_key: 'Tempel kunci akses — hanya tersimpan di terminal ini',
+        database_connect_btn: 'Sambungkan Uplink',
+        database_disconnect_btn: 'Putus Uplink',
+        pause_stat_sector: 'SEKTOR',
+        pause_stat_time: 'WAKTU',
+        pause_stat_kills: 'MUSUH',
+        pause_stat_weapon: 'SENJATA',
+        pause_codex_btn: 'ARSIP RAHASIA',
+        pause_settings_btn: 'PENGATURAN FASILITAS',
+        pc_guide_title: 'PANDUAN MENJALANKAN DI PC:',
+        apk_guide_title: 'PANDUAN INSTALASI DI ANDROID:',
+        talent_nanites_unit: 'Nanit'
     },
     en: {
         ui_level: 'Level:', ui_mode: 'Mode:', ui_diff: 'Difficulty:', ui_hp: 'HP:', ui_atk: 'Attack:',
@@ -830,7 +900,7 @@ const T = {
         mode_light: 'LIGHT', mode_dark: 'DARK',
         exit_open: 'OPEN', exit_locked: 'LOCKED',
         ctrl_bar: 'WASD / Arrows / Joystick: Move | SPACE / CLICK: Attack | SHIFT: Dash | ESC: Pause | M: Mute',
-        pause_title: 'OPERATION PAUSED', resume: 'RESUME', restart: 'RESTART LEVEL', main_menu: 'MAIN MENU',
+        pause_title: 'OPERATION PAUSED', resume: 'RESUME', restart: 'RESTART LEVEL', main_menu: 'MAIN MENU', btn_back_to_home: 'BACK TO HUB',
         start_subtitle: 'Forgotten Sector — 15 Roguelite Sectors', play_now: 'PLAY NOW',
         settings: 'SETTINGS', how_to_play: 'HOW TO PLAY',
         volume: 'Volume', brightness: 'Brightness', language: 'Language', close: 'Close',
@@ -1081,6 +1151,7 @@ const T = {
         coop_copy_code_btn: 'COPY CODE',
         coop_code_copied: 'CODE COPIED TO CLIPBOARD!',
         coop_enter_code_label: 'ENTER ROOM CODE (4 DIGITS)',
+        coop_code_placeholder: 'CODE (e.g.: 7X49)',
         coop_connect_btn: 'CONNECT TO SQUAD ▸',
         coop_launch_btn: 'LAUNCH SQUAD OPERATION ▸',
         coop_waiting_client: 'WAITING FOR HOST TO LAUNCH...',
@@ -1225,7 +1296,76 @@ const T = {
         talent_flux_name: 'Photonic Capacitor',
         talent_flux_desc: 'Expands torch radius by +20% and reduces Dash cooldown by -15% per rank.',
         talent_phantom_name: 'Phantom Phase Shock (Major Talent)',
-        talent_phantom_desc: 'Dashing leaves behind a static electric field that slows and zaps nearby monsters.'
+        talent_phantom_desc: 'Dashing leaves behind a static electric field that slows and zaps nearby monsters.',
+        auth_modal_title: 'OPERATIVE TERMINAL • AUTHENTICATION',
+        auth_active_account_lbl: 'ACTIVE OPERATIVE SESSION:',
+        auth_verified_badge: 'VERIFIED',
+        auth_logout_btn: '🚪 LOG OUT OF SESSION',
+        auth_switch_account_btn: 'Switch Account / Log In with Different ID ▸',
+        auth_tab_login: 'LOG IN',
+        auth_tab_register: 'REGISTER NEW ACCOUNT',
+        auth_login_desc: 'Log in with a registered operative handle. Credentials auto-save on this terminal and synchronize with Supabase cloud.',
+        auth_callsign_lbl: 'Operative Callsign / Handle:',
+        auth_passcode_lbl: 'Security Passcode (PIN/Password):',
+        auth_remember_me: 'Remember credentials on this terminal (Auto-Save)',
+        auth_login_submit_btn: 'ACCESS OPERATIVE TERMINAL (LOG IN) ▸',
+        auth_login_sync_note: '⚡ Automatic synchronization of sector depth, loadout, avatar & high scores',
+        auth_register_desc: 'Register a new operative handle. Your profile dossier and roguelite achievements will be stored securely in the facility database.',
+        auth_reg_callsign_lbl: 'Operative Callsign (3-24 characters):',
+        auth_reg_passcode_lbl: 'Security Passcode (min. 4 characters):',
+        auth_reg_role_lbl: 'Facility Division / Role:',
+        auth_reg_remember: 'Remember new operative profile on this terminal',
+        auth_register_submit_btn: 'REGISTER OPERATIVE PROFILE ▸',
+        auth_register_sync_note: '⚡ New operative immediately indexed and synchronized with Supabase Cloud',
+        auth_ph_callsign: 'Enter operative callsign',
+        auth_ph_passcode: 'Enter account passcode',
+        auth_ph_reg_callsign: 'e.g. OPERATIVE-77',
+        auth_ph_reg_passcode: 'Create secure new passcode',
+        profile_modal_title: 'OPERATIVE PROFILE DOSSIER',
+        profile_status_guest: 'STATUS: GUEST • LOCAL',
+        profile_clearance_lvl1: 'CLEARANCE: LEVEL-1',
+        profile_upload_avatar: 'Upload Photo (Avatar)',
+        profile_insignia_title: 'Or Select Division Insignia:',
+        profile_callsign_lbl: 'Operative Callsign:',
+        profile_autosaved_tag: '● Auto-Saved ✓',
+        profile_passcode_lbl: 'Security Passcode (PIN/Password):',
+        profile_role_lbl: 'Facility Division / Role:',
+        profile_save_btn: 'Save Profile',
+        profile_sync_cloud_btn: 'Sync Cloud Data',
+        profile_switch_acc_btn: 'Switch Account / Login',
+        profile_record_lbl: 'Record:',
+        profile_kills_lbl: 'Kills:',
+        profile_db_lbl: 'DB:',
+        profile_db_status_local: 'Local Encrypted',
+        profile_ph_username: 'e.g. AGENT-CARNIS-01',
+        profile_ph_passcode: 'Enter your account passcode',
+        leaderboard_modal_title: 'GLOBAL OPERATIVE LEADERBOARD • FACILITY NETWORK',
+        leaderboard_refresh_btn: '↻ Refresh',
+        leaderboard_th_rank: 'RANK',
+        leaderboard_th_op: 'OPERATIVE',
+        leaderboard_th_div: 'DIVISION',
+        leaderboard_th_sector: 'SECTOR',
+        leaderboard_th_time: 'TIME',
+        leaderboard_th_kills: 'KILLS',
+        leaderboard_th_grade: 'GRADE',
+        leaderboard_fetching: 'Fetching facility telemetry data...',
+        database_modal_title: 'FACILITY NETWORK UPLINK',
+        database_hint: 'Link this terminal to the facility network to synchronize global leaderboards and operative dossiers across all sectors.',
+        database_url_lbl: 'Facility Uplink URL:',
+        database_key_lbl: 'Uplink Access Key:',
+        database_ph_url: 'https://your-facility-uplink.local',
+        database_ph_key: 'Paste access key — stored only in this terminal',
+        database_connect_btn: 'Establish Uplink',
+        database_disconnect_btn: 'Cut Uplink',
+        pause_stat_sector: 'SECTOR',
+        pause_stat_time: 'TIME',
+        pause_stat_kills: 'KILLS',
+        pause_stat_weapon: 'WEAPON',
+        pause_codex_btn: 'CLASSIFIED ARCHIVES',
+        pause_settings_btn: 'FACILITY SETTINGS',
+        pc_guide_title: 'PC EXECUTION GUIDE:',
+        apk_guide_title: 'ANDROID INSTALLATION GUIDE:',
+        talent_nanites_unit: 'Nanites'
     }
 };
 
@@ -1454,7 +1594,7 @@ function updateInstructionsModalLang(activeLang) {
             : '<strong>PC / Keyboard:</strong> [W][A][S][D] / Tombol Panah untuk bergerak. Tekan [SHIFT] untuk Phase Dash (kebal sesaat menembus jebakan).<br><strong>Layar Sentuh HP:</strong> Gerakkan Analog Joystick di kiri bawah layar. Sentuh tombol [DASH] di kanan bawah.';
     }
     if (c2Title) {
-        c2Title.textContent = isEn ? '2. REACTIVASI SECTOR NODE (TERMINAL PUZZLE)' : '2. REAKTIVASI SECTOR NODE (TERMINAL PUZZLE)';
+        c2Title.textContent = isEn ? '2. REACTIVATING SECTOR NODES (TERMINAL PUZZLES)' : '2. REAKTIVASI SECTOR NODE (TERMINAL PUZZLE)';
     }
     if (c2Desc) {
         c2Desc.innerHTML = isEn
@@ -1486,6 +1626,10 @@ function applyLang() {
         const v = tt(el.getAttribute('data-i18n'));
         if (v) el.textContent = v;
     });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+        const v = tt(el.getAttribute('data-i18n-placeholder'));
+        if (v) el.placeholder = v;
+    });
     updateInstructionsModalLang(lang);
     document.getElementById('lblLevel').textContent = tt('ui_level');
     document.getElementById('lblMode').textContent = tt('ui_mode');
@@ -1498,9 +1642,12 @@ function applyLang() {
     document.getElementById('lblTime').textContent = tt('ui_time');
     document.getElementById('controlsText').textContent = tt('ctrl_bar');
     document.getElementById('pauseTitle').textContent = tt('pause_title');
-    document.getElementById('pauseResume').textContent = tt('resume');
-    document.getElementById('pauseRestart').textContent = tt('restart');
-    document.getElementById('pauseMenu').textContent = tt('main_menu');
+    const pResumeSpan = document.querySelector('#pauseResume span') || document.getElementById('pauseResume');
+    if (pResumeSpan) pResumeSpan.textContent = tt('resume');
+    const pRestartSpan = document.querySelector('#pauseRestart span') || document.getElementById('pauseRestart');
+    if (pRestartSpan) pRestartSpan.textContent = tt('restart');
+    const pMenuSpan = document.querySelector('#pauseMenu span') || document.getElementById('pauseMenu');
+    if (pMenuSpan) pMenuSpan.textContent = tt('pause_exit_btn');
     document.getElementById('startSubtitle').textContent = tt('start_subtitle');
     const bStart = document.getElementById('btnStartText') || document.getElementById('btnStart');
     if (bStart) bStart.textContent = tt('play_now');
@@ -1512,12 +1659,14 @@ function applyLang() {
     document.getElementById('sLang').textContent = tt('language');
     const sDiff = document.getElementById('sDiff');
     if (sDiff) sDiff.textContent = tt('diff_label');
-    const diffSel = document.getElementById('gDifficulty');
-    if (diffSel) {
-        diffSel.options[0].text = tt('diff_easy');
-        diffSel.options[1].text = tt('diff_normal');
-        diffSel.options[2].text = tt('diff_hard');
-    }
+    ['gDifficulty', 'homeDifficulty', 'pauseDifficulty'].forEach(function (diffId) {
+        const diffSel = document.getElementById(diffId);
+        if (diffSel && diffSel.options.length >= 3) {
+            diffSel.options[0].text = tt('diff_easy');
+            diffSel.options[1].text = tt('diff_normal');
+            diffSel.options[2].text = tt('diff_hard');
+        }
+    });
     const sQual = document.getElementById('sQuality');
     if (sQual) sQual.textContent = tt('quality');
     const qualSel = document.getElementById('gQuality');
@@ -1650,6 +1799,7 @@ function applyLang() {
     const dRem = document.getElementById('deviceRememberText');
     if (dRem) dRem.textContent = tt('device_remember');
     if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(settings.deviceMode, settings.lang);
+    if (typeof applyProfileUI === 'function') applyProfileUI();
     if (typeof updateUI === 'function' && typeof player !== 'undefined' && player) updateUI();
 }
 
@@ -4717,7 +4867,7 @@ function drawSpores() {
 let playerBpm = 72;
 let ekgPhase = 0;
 function drawEKG() {
-    const ekgEl = document.getElementById('ekgCanvas');
+    const ekgEl = hudEl('ekgCanvas');
     if (!ekgEl) return;
     const ectx = ekgEl.getContext('2d');
     if (!ectx) return;
@@ -6956,6 +7106,13 @@ function updatePlayer() {
 
     // Sector 15 Fallen Researcher Envelope: Pajangan Dokumen di Samping Exit Portal
     // (Pemain dapat berinteraksi secara sukarela dengan tombol E / sentuh; seluruh cerita lengkap berjalan di cutscene epilog setelah menyentuh exit)
+    if (level15Corpse && currentLevel === LEVELS - 1 && !level15Corpse.inspected && player) {
+        const d = dist(player, { x: level15Corpse.envelopeX, y: level15Corpse.envelopeY });
+        if (d < 38) {
+            level15Corpse.inspected = true;
+            openFinalLetterModal();
+        }
+    }
 
     // Check Nanite Medical Chamber Interaction
     if (typeof medPods !== 'undefined' && medPods.length) {
@@ -7466,7 +7623,10 @@ function updateMonsters() {
                 // 1. Letupan Spora Larva Crawl Berkala (Maksimum 3 Crawl aktif di map)
                 if (m.sporeSpawnTimer > 0) m.sporeSpawnTimer--;
                 if (m.sporeSpawnTimer <= 0 && pdist < 18 * CELL) {
-                    const activeCrawls = monsters.filter(o => o.name === 'Crawl' && o.hp > 0).length;
+                    let activeCrawls = 0;
+                    for (let ki = 0; ki < monsters.length; ki++) {
+                        if (monsters[ki] && monsters[ki].name === 'Crawl' && monsters[ki].hp > 0) activeCrawls++;
+                    }
                     if (activeCrawls < 3) {
                         m.sporeSpawnTimer = 300; // 5-6 detik sekali
                         m.hitFlash = 14;
@@ -7680,7 +7840,11 @@ function updateMonsters() {
         // Custom Behavior Pattern: Lich Minion Wave
         if (m.name === 'Lich') {
             if (m.lichSummonTimer > 0) m.lichSummonTimer--;
-            if (m.lichSummonTimer <= 0 && pdist < 260 && monsters.filter(o => o.hp > 0).length < 24) {
+            let aliveMonstersCount = 0;
+            for (let ki = 0; ki < monsters.length; ki++) {
+                if (monsters[ki] && monsters[ki].hp > 0) aliveMonstersCount++;
+            }
+            if (m.lichSummonTimer <= 0 && pdist < 260 && aliveMonstersCount < 24) {
                 m.lichSummonTimer = 280;
                 for (let s = 0; s < 2; s++) {
                     const sAng = Math.random() * Math.PI * 2;
@@ -13339,6 +13503,10 @@ function stepSimulation() {
     updateGasClouds();
     updateTraps();
 
+    if (typeof isEndlessMode !== 'undefined' && isEndlessMode) {
+        checkEndlessWaveProgress();
+    }
+
     // Peluruhan timer combo Adrenaline
     if (comboTimer > 0) {
         comboTimer--;
@@ -13497,6 +13665,7 @@ document.addEventListener('keydown', e => {
     if (isTermMOpen) {
         if (e.key === 'Escape' || e.key === 'Esc') {
             e.preventDefault();
+            e.stopImmediatePropagation();
             if (Date.now() - terminalOpenTime >= 400) {
                 closeTerminalPuzzleModal(false);
             }
@@ -13534,6 +13703,7 @@ document.addEventListener('keydown', e => {
     const isAdminMOpen = adminM && (adminM.classList.contains('open') || adminM.style.display === 'flex');
     if (isAdminMOpen && (e.key === 'Escape' || e.key === 'Esc')) {
         e.preventDefault();
+        e.stopImmediatePropagation();
         closeAdminArsenalModal();
         return;
     }
@@ -13543,6 +13713,7 @@ document.addEventListener('keydown', e => {
     const isRobotMOpen = robotM && robotM.style.display === 'flex';
     if (isRobotMOpen && (e.key === 'Escape' || e.key === 'Esc' || e.key === ' ' || e.key === 'Enter')) {
         e.preventDefault();
+        e.stopImmediatePropagation();
         closeRobotMemoryModal();
         return;
     }
@@ -13551,6 +13722,7 @@ document.addEventListener('keydown', e => {
     const isFinalMOpen = finalM && (finalM.style.display === 'flex' || finalM.classList.contains('open'));
     if (isFinalMOpen && (e.key === 'Escape' || e.key === 'Esc' || e.key === ' ' || e.key === 'Enter')) {
         e.preventDefault();
+        e.stopImmediatePropagation();
         closeFinalLetterModal();
         return;
     }
@@ -13562,16 +13734,105 @@ document.addEventListener('keydown', e => {
 
     if (isLoreOpen && (e.key === 'Escape' || e.key === 'Esc' || e.key === ' ' || e.key === 'Enter')) {
         e.preventDefault();
+        e.stopImmediatePropagation();
         closeLoreModal();
         return;
     }
     if (isCodexOpen && (e.key === 'Escape' || e.key === 'Esc' || e.key === ' ' || e.key === 'Enter')) {
         e.preventDefault();
+        e.stopImmediatePropagation();
         closeCodexModal();
         return;
     }
 
     if (e.key === 'Escape' || e.key === 'Esc') {
+        const bestiaryM = document.getElementById('bestiaryModal');
+        if (bestiaryM && (bestiaryM.classList.contains('open') || bestiaryM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            closeBestiaryModal();
+            return;
+        }
+        const workbenchM = document.getElementById('workbenchModal');
+        if (workbenchM && (workbenchM.classList.contains('open') || workbenchM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            closeWorkbenchModal();
+            return;
+        }
+        const talentM = document.getElementById('talentTreeModal');
+        if (talentM && (talentM.classList.contains('open') || talentM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            closeTalentTreeModal();
+            return;
+        }
+        const pauseSetM = document.getElementById('inGameSettingsModal');
+        if (pauseSetM && (pauseSetM.classList.contains('open') || pauseSetM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            closePauseSettings();
+            return;
+        }
+        const setM = document.getElementById('settingsModal');
+        if (setM && (setM.classList.contains('open') || setM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            closeSettingsModal();
+            return;
+        }
+        const touchM = document.getElementById('touchLayoutModal') || document.getElementById('touchLayoutEditorModal');
+        if (touchM && (touchM.classList.contains('open') || touchM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            if (typeof closeTouchLayoutEditor === 'function') closeTouchLayoutEditor();
+            return;
+        }
+        const authM = document.getElementById('authModal');
+        if (authM && (authM.classList.contains('open') || authM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            closeAuthModal();
+            return;
+        }
+        const profM = document.getElementById('profileModal');
+        if (profM && (profM.classList.contains('open') || profM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            closeProfileModal();
+            return;
+        }
+        const leadM = document.getElementById('leaderboardModal');
+        if (leadM && (leadM.classList.contains('open') || leadM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            closeLeaderboardModal();
+            return;
+        }
+        const dbM = document.getElementById('databaseModal');
+        if (dbM && (dbM.classList.contains('open') || dbM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            closeDatabaseModal();
+            return;
+        }
+        const coopM = document.getElementById('coopLobbyModal');
+        if (coopM && (coopM.classList.contains('open') || coopM.style.display === 'flex')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            if (typeof closeCoopLobby === 'function') closeCoopLobby();
+            else if (typeof closeCoopLobbyModal === 'function') closeCoopLobbyModal();
+            return;
+        }
+        const anyOpenModal = document.querySelector('.modal-backdrop.open');
+        if (anyOpenModal) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            anyOpenModal.classList.remove('open');
+            anyOpenModal.style.display = 'none';
+            return;
+        }
+
         if (tutorialActive) {
             skipTutorial();
             return;
@@ -13612,6 +13873,10 @@ document.addEventListener('keydown', e => {
         } else if (e.key === 'e' || e.key === 'E') {
             if (wreckedRobot && currentLevel === 9 && player && dist(player, wreckedRobot) < 55) {
                 openRobotMemoryModal();
+                return;
+            }
+            if (level15Corpse && currentLevel === LEVELS - 1 && player && dist(player, { x: level15Corpse.envelopeX, y: level15Corpse.envelopeY }) < 55) {
+                openFinalLetterModal();
                 return;
             }
             cycleWeapon(false);
@@ -14491,6 +14756,7 @@ function renderAdminLevels() {
 
 function adminStartAt(level) {
     isAdmin = true;
+    isEndlessMode = false;
     level = Math.max(0, Math.min(LEVELS - 1, Math.floor(Number(level) || 0)));
     ensureAudio();
     closeAdminArsenalModal();
@@ -15644,6 +15910,12 @@ function vita2UpdateTracker(unlocked) {
         return;
     }
     if (el.style.display !== 'flex') el.style.display = 'flex';
+    if (typeof isEndlessMode !== 'undefined' && isEndlessMode) {
+        const w = (typeof endlessWave !== 'undefined') ? endlessWave : 1;
+        setHudText(tx, tt('endless_objective') + ' — ' + tt('endless_badge_wave').replace('{w}', w));
+        el.classList.remove('tracker-ready');
+        return;
+    }
     if (unlocked) {
         setHudText(tx, tt('obj_exit'));
         el.classList.add('tracker-ready');
@@ -16797,7 +17069,7 @@ function addNaniteShards(amount, x, y) {
     if (typeof x === 'number' && typeof y === 'number' && typeof floatingTexts !== 'undefined') {
         floatingTexts.push({
             x: x, y: y - 20,
-            text: `+${amount} ${tt('talent_nanites_lbl')}`,
+            text: `+${amount} ${tt('talent_nanites_unit')}`,
             color: '#00f0ff',
             life: 45, maxLife: 45
         });
@@ -16941,7 +17213,7 @@ function updateTalentInspector() {
         if (btnUpgradeText) btnUpgradeText.textContent = tt('talent_maxed_lbl');
     } else {
         const cost = node.cost[curRank] || node.cost[0] || 50;
-        if (costEl) costEl.textContent = `${cost} ${tt('talent_nanites_lbl')}`;
+        if (costEl) costEl.textContent = `${cost} ${tt('talent_nanites_unit')}`;
         const canAfford = data.nanites >= cost;
         const canUpgrade = isAvail && canAfford;
 
@@ -17252,23 +17524,96 @@ let bestiarySelectedIdx = 0;
 let bestiaryAnimReq = null;
 
 const BESTIARY_SPECIMENS = [
-    { name: 'Slime', threat: 'CLASS-I', code: 'SPECIMEN #01', killKey: 'Slime', weakness: 'Rentan terhadap tebasan pisau cepat & api spora.', bio: 'Amoeboid gelatin sel tunggal yang mencerna materi organik di lantai fasilitas.' },
-    { name: 'Bat', threat: 'CLASS-II', code: 'SPECIMEN #02', killKey: 'Bat', weakness: 'Sonar rapuh terhadap semburan shotgun & EMP.', bio: 'Mamalia terbang yang bermutasi di terowongan gelap, bergerak cepat dan membidik mangsa dari atas.' },
-    { name: 'Crawl', threat: 'CLASS-II', code: 'SPECIMEN #03', killKey: 'Crawl', weakness: 'Jarak serang pendek; mudah diatasi dari jarak jauh.', bio: 'Spesimen berkaki banyak yang merayap di dinding dengan capit kitin tajam.' },
-    { name: 'Ghost', threat: 'CLASS-III', code: 'SPECIMEN #04', killKey: 'Ghost', weakness: 'Fokus energi cahaya senter memecah kamuflase fasanya.', bio: 'Anomali semi-eter yang mampu menembus rintangan dan menyerap energi biologis manusia.' },
-    { name: 'Harvester', threat: 'CLASS-IV', code: 'SPECIMEN #05', killKey: 'Harvester', weakness: 'Titik saraf di pangkal sungut rentan ledakan granat.', bio: 'Organisme pemanen biomassa berakar kuat yang menarik operatif ke dalam kantung pencernaannya.' },
-    { name: 'Dark Knight', threat: 'CLASS-IV', code: 'SPECIMEN #06', killKey: 'Dark Knight', weakness: 'Serangan penetrasi Railgun menembus armor zirah tebalnya.', bio: 'Pelindung fasilitas yang terinfeksi dan termutasi menjadi automata pembunuh berperisai.' },
-    { name: 'Dragon', threat: 'CLASS-V', code: 'SPECIMEN #07', killKey: 'Dragon', weakness: 'Pendinginan Cryo melumpuhkan kelenjar pembakar di tenggorokannya.', bio: 'Reptil karnivora bersayap yang menyemburkan plasma organik panas.' },
-    { name: 'Lich', threat: 'CLASS-V', code: 'SPECIMEN #08', killKey: 'Lich', weakness: 'Hancurkan proyektil jiwanya sebelum mencapai sasaran.', bio: 'Anomali purba yang memancarkan aura nekrotik dan melepaskan proyektil pencari.' },
-    { name: 'Beholder', threat: 'CLASS-V', code: 'SPECIMEN #09', killKey: 'Beholder', weakness: 'Kebutaan sesaat saat terkena kilatan granat EMP.', bio: 'Mata melayang raksasa yang memancarkan sinar desintegrasi jarak jauh.' },
-    { name: 'Mimic', threat: 'CLASS-VI', code: 'SPECIMEN #10', killKey: 'Mimic', weakness: 'Kelemahan terhadap serangan kejutan saat fase kamuflasenya terbuka.', bio: 'Predator metamorfis yang meniru peti pasokan fasilitas untuk menjebak penyelidik.' },
-    { name: 'Final Boss', threat: 'APEX-VII', code: 'SPECIMEN #11', killKey: 'Final Boss', weakness: 'Dodge serangannya lalu serang inti saat fase jeda.', bio: 'Titan hibrida eksperimen bio-senjata prototipe puncak fasilitas.' },
-    { name: 'The Monolith', threat: 'APEX PREDATOR', code: 'SPECIMEN #12', killKey: 'The Monolith', weakness: 'Konsentrasikan seluruh persenjataan berat pada cincin mahkota.', bio: 'Entitas anomali kosmik primordial yang menjadi pusat kegelapan Sektor Terlupakan.' }
+    {
+        name: 'Slime', threat: 'CLASS-I', code: 'SPECIMEN #01', killKey: 'Slime',
+        weakness: 'Rentan terhadap tebasan pisau cepat & api spora.',
+        weaknessEn: 'Vulnerable to rapid tactical blade slashes and spore fire.',
+        bio: 'Amoeboid gelatin sel tunggal yang mencerna materi organik di lantai fasilitas.',
+        bioEn: 'Single-celled amoeboid gelatin that digests organic matter across facility floors.'
+    },
+    {
+        name: 'Bat', threat: 'CLASS-II', code: 'SPECIMEN #02', killKey: 'Bat',
+        weakness: 'Sonar rapuh terhadap semburan shotgun & EMP.',
+        weaknessEn: 'Fragile echolocation sonar disrupted by shotgun spreads and EMP pulses.',
+        bio: 'Mamalia terbang yang bermutasi di terowongan gelap, bergerak cepat dan membidik mangsa dari atas.',
+        bioEn: 'Winged mammal mutated within ventilation shafts, striking rapidly from above.'
+    },
+    {
+        name: 'Crawl', threat: 'CLASS-II', code: 'SPECIMEN #03', killKey: 'Crawl',
+        weakness: 'Jarak serang pendek; mudah diatasi dari jarak jauh.',
+        weaknessEn: 'Short attack reach; easily eliminated at ranged distances.',
+        bio: 'Spesimen berkaki banyak yang merayap di dinding dengan capit kitin tajam.',
+        bioEn: 'Multi-legged specimen scuttling across corridor walls with razor-sharp chitin pincers.'
+    },
+    {
+        name: 'Ghost', threat: 'CLASS-III', code: 'SPECIMEN #04', killKey: 'Ghost',
+        weakness: 'Fokus energi cahaya senter memecah kamuflase fasanya.',
+        weaknessEn: 'Focused flashlight beam disrupts its phase camouflage.',
+        bio: 'Anomali semi-eter yang mampu menembus rintangan dan menyerap energi biologis manusia.',
+        bioEn: 'Semi-ethereal anomaly capable of phasing through obstacles to drain operative biological energy.'
+    },
+    {
+        name: 'Harvester', threat: 'CLASS-IV', code: 'SPECIMEN #05', killKey: 'Harvester',
+        weakness: 'Titik saraf di pangkal sungut rentan ledakan granat.',
+        weaknessEn: 'Neural ganglion at tentacle base vulnerable to explosive ordnance.',
+        bio: 'Organisme pemanen biomassa berakar kuat yang menarik operatif ke dalam kantung pencernaannya.',
+        bioEn: 'Deeply rooted biomass-harvesting organism dragging operatives into its digestive sack.'
+    },
+    {
+        name: 'Dark Knight', threat: 'CLASS-IV', code: 'SPECIMEN #06', killKey: 'Dark Knight',
+        weakness: 'Serangan penetrasi Railgun menembus armor zirah tebalnya.',
+        weaknessEn: 'High-penetration Railgun rounds pierce its heavy reinforced carapace.',
+        bio: 'Pelindung fasilitas yang terinfeksi dan termutasi menjadi automata pembunuh berperisai.',
+        bioEn: 'Infected facility guardian automaton mutated into a heavily shielded killer.'
+    },
+    {
+        name: 'Dragon', threat: 'CLASS-V', code: 'SPECIMEN #07', killKey: 'Dragon',
+        weakness: 'Pendinginan Cryo melumpuhkan kelenjar pembakar di tenggorokannya.',
+        weaknessEn: 'Cryo cooling ruptures the thermal combustion glands inside its gullet.',
+        bio: 'Reptil karnivora bersayap yang menyemburkan plasma organik panas.',
+        bioEn: 'Winged carnivorous bio-reptile expelling superheated organic plasma.'
+    },
+    {
+        name: 'Lich', threat: 'CLASS-V', code: 'SPECIMEN #08', killKey: 'Lich',
+        weakness: 'Hancurkan proyektil jiwanya sebelum mencapai sasaran.',
+        weaknessEn: 'Intercept and destroy soul projectiles before impact.',
+        bio: 'Anomali purba yang memancarkan aura nekrotik dan melepaskan proyektil pencari.',
+        bioEn: 'Ancient anomaly radiating necrotic auras while launching homing occult soul orbs.'
+    },
+    {
+        name: 'Beholder', threat: 'CLASS-V', code: 'SPECIMEN #09', killKey: 'Beholder',
+        weakness: 'Kebutaan sesaat saat terkena kilatan granat EMP.',
+        weaknessEn: 'Temporarily blinded by EMP concussion flares.',
+        bio: 'Mata melayang raksasa yang memancarkan sinar desintegrasi jarak jauh.',
+        bioEn: 'Gigantic floating ocular horror firing long-range molecular disintegration beams.'
+    },
+    {
+        name: 'Mimic', threat: 'CLASS-VI', code: 'SPECIMEN #10', killKey: 'Mimic',
+        weakness: 'Kelemahan terhadap serangan kejutan saat fase kamuflasenya terbuka.',
+        weaknessEn: 'Vulnerable to sudden counter-attacks once camouflage opens.',
+        bio: 'Predator metamorfis yang meniru peti pasokan fasilitas untuk menjebak penyelidik.',
+        bioEn: 'Metamorphic ambush predator disguising itself as facility supply crates to ensnare scouts.'
+    },
+    {
+        name: 'Final Boss', threat: 'APEX-VII', code: 'SPECIMEN #11', killKey: 'Final Boss',
+        weakness: 'Dodge serangannya lalu serang inti saat fase jeda.',
+        weaknessEn: 'Evade heavy swings and unleash focused firepower on core during recovery phase.',
+        bio: 'Titan hibrida eksperimen bio-senjata prototipe puncak fasilitas.',
+        bioEn: 'Apex prototype hybrid bio-weapon titan and culmination of facility genetic experiments.'
+    },
+    {
+        name: 'The Monolith', threat: 'APEX PREDATOR', code: 'SPECIMEN #12', killKey: 'The Monolith',
+        weakness: 'Konsentrasikan seluruh persenjataan berat pada cincin mahkota.',
+        weaknessEn: 'Concentrate all heavy anti-matter armaments onto the pulsating crown ring.',
+        bio: 'Entitas anomali kosmik primordial yang menjadi pusat kegelapan Sektor Terlupakan.',
+        bioEn: 'Primordial cosmic anomaly entity anchoring the necrotic darkness of Forgotten Sector.'
+    }
 ];
 
 function selectBestiarySpecimen(idx) {
     bestiarySelectedIdx = Math.max(0, Math.min(BESTIARY_SPECIMENS.length - 1, idx));
     const s = BESTIARY_SPECIMENS[bestiarySelectedIdx];
+    const isEn = (typeof lang !== 'undefined' ? lang : (typeof homeSettings !== 'undefined' ? homeSettings.lang : 'id')) === 'en';
     const nameEl = document.getElementById('bestiaryMonsterName');
     if (nameEl) nameEl.textContent = s.name;
     const codeEl = document.getElementById('bestiaryMonsterCode');
@@ -17276,9 +17621,9 @@ function selectBestiarySpecimen(idx) {
     const badgeEl = document.getElementById('bestiaryThreatBadge');
     if (badgeEl) badgeEl.textContent = s.threat;
     const weakEl = document.getElementById('bestiaryWeaknessText');
-    if (weakEl) weakEl.textContent = s.weakness;
+    if (weakEl) weakEl.textContent = (isEn && s.weaknessEn) ? s.weaknessEn : s.weakness;
     const bioEl = document.getElementById('bestiaryBioText');
-    if (bioEl) bioEl.textContent = s.bio;
+    if (bioEl) bioEl.textContent = (isEn && s.bioEn) ? s.bioEn : s.bio;
 
     const killsEl = document.getElementById('bestiaryStatKills');
     if (killsEl) {
@@ -17381,10 +17726,33 @@ function openBestiaryFromGame() {
     openBestiaryModal();
 }
 
+function upgradeWorkbenchWeapon(weaponId) {
+    if (!player) return;
+    if (!player.weapons) player.weapons = ['knife'];
+    if (!player.weapons.includes(weaponId)) {
+        player.weapons.push(weaponId);
+    }
+    player.currentWeapon = weaponId;
+    sWeaponUnlock();
+    const wName = tt(WEAPONS[weaponId]?.nameKey || weaponId);
+    floatingTexts.push({
+        x: player.x,
+        y: player.y - 25,
+        text: tt('armory_claim').replace('{w}', wName),
+        color: '#00f0ff',
+        life: 90,
+        maxLife: 90
+    });
+    updateUI();
+    renderWorkbenchModal();
+}
+window.upgradeWorkbenchWeapon = upgradeWorkbenchWeapon;
+
 function renderWorkbenchModal() {
     const grid = document.getElementById('workbenchGrid');
     if (!grid) return;
     grid.innerHTML = '';
+    const isEn = (typeof lang !== 'undefined' ? lang : (typeof homeSettings !== 'undefined' ? homeSettings.lang : 'id')) === 'en';
     const keys = Object.keys(WEAPONS);
     keys.forEach(k => {
         const w = WEAPONS[k];
@@ -17399,10 +17767,10 @@ function renderWorkbenchModal() {
                 <h4 style="margin:0 0 6px 0;font-size:14px;color:#fff;">${tt(w.nameKey)}</h4>
                 <div style="font-size:11px;color:var(--text-dim,#a0a0b0);margin-bottom:6px;">${tt(w.descKey)}</div>
                 <div style="font-size:10px;background:rgba(0,0,0,0.3);padding:6px;border-radius:4px;border:1px solid rgba(255,255,255,0.06);color:#ffd700;">
-                    <b>MOD:</b> ${w.specs?.special || 'Overclocked Firepower'}
+                    <b>MOD:</b> ${(isEn ? w.specsEn?.special : w.specs?.special) || 'Overclocked Firepower'}
                 </div>
             </div>
-            <button class="btn" type="button" onclick="selectWeaponUpgrade('${w.id}', 'weapon')" style="padding:6px 12px;font-size:11px;width:100%;background:rgba(0,229,255,0.15);border-color:#00e5ff;color:#00f0ff;">
+            <button class="btn" type="button" onclick="upgradeWorkbenchWeapon('${w.id}')" style="padding:6px 12px;font-size:11px;width:100%;background:rgba(0,229,255,0.15);border-color:#00e5ff;color:#00f0ff;">
                 <span>${tt('workbench_upgrade_btn')}</span>
             </button>
         `;

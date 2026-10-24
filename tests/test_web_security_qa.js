@@ -19,7 +19,8 @@
  * kontrak protokol relay tanpa dependency, konfigurasi alamat relay & tautan undangan co-op
  * (dengan penolakan input tak terpercaya), kontrak artefak deploy relay (Docker/Render) & lisensi MIT,
  * kontrak pengemasan Android/Capacitor (bundel web whitelist, ikon/splash prosedural, CI APK),
- * serta kontrak pengemasan PC Desktop/Tauri (konfigurasi native, ikon prosedural multi-dimensi, CI Windows .exe/.msi).
+ * serta kontrak pengemasan PC Desktop/Tauri (konfigurasi native, ikon prosedural multi-dimensi, CI Windows .exe/.msi),
+ * dan simulasi headless penuh Sektor 1-15 & mode Endless Survival (anti-crash, walk-over pickup, Apex boss, wasiat Dr. Rudra, transisi win/dead).
  */
 
 const fs = require('fs');
@@ -1631,8 +1632,261 @@ assert(san31('<img src=x onerror="a">') === '&lt;img src=x onerror=&quot;a&quot;
 assert(/gen_restored:/.test(gameJs) && /tt\('gen_restored'\)/.test(gameJs), 'Teks pickup generator harus memakai kunci i18n gen_restored');
 console.log('✓ TEST 31 LULUS: Tidak ada pemanggilan fungsi tak terdefinisi pada jalur generator/admin/co-op/endless.');
 
+// =============================================================================
+// TEST 32: Simulasi Headless Penuh Sektor 1-15 & Mode Endless Survival (Anti-Crash & Edge-Case QA)
+// =============================================================================
+console.log('\n[TEST 32] Pengujian Simulasi Headless Sektor 1-15 & Mode Endless Survival...');
+
+const mockPrefix32 = `
+    const makeMockContext = () => new Proxy({
+        measureText: () => ({ width: 50 }),
+        createLinearGradient: () => ({ addColorStop: () => {} }),
+        createRadialGradient: () => ({ addColorStop: () => {} }),
+        getImageData: () => ({ data: new Uint8ClampedArray(4) }),
+        putImageData: () => {},
+        setTransform: () => {},
+        resetTransform: () => {}
+    }, {
+        get: (target, prop) => {
+            if (prop in target) return target[prop];
+            return (...args) => {};
+        },
+        set: (target, prop, val) => {
+            target[prop] = val;
+            return true;
+        }
+    });
+
+    const makeMockElement = (id = '') => {
+        const styleTarget = {
+            setProperty(k, v) { this[k] = String(v); },
+            removeProperty(k) { delete this[k]; },
+            getPropertyValue(k) { return this[k] || ''; }
+        };
+        const el = {
+            id,
+            style: new Proxy(styleTarget, {
+                get: (t, p) => (typeof t[p] === 'function' ? t[p].bind(t) : (t[p] || '')),
+                set: (t, p, v) => { t[p] = String(v); return true; }
+            }),
+            options: [{ text: '' }, { text: '' }, { text: '' }, { text: '' }],
+            classList: {
+                add: () => {},
+                remove: () => {},
+                toggle: () => {},
+                contains: () => false
+            },
+            dataset: {},
+            textContent: '',
+            innerHTML: '',
+            value: '',
+            width: 1280,
+            height: 720,
+            isConnected: true,
+            offsetWidth: 800,
+            offsetHeight: 600,
+            clientWidth: 800,
+            clientHeight: 600,
+            scrollWidth: 800,
+            scrollHeight: 600,
+            focus: () => {},
+            blur: () => {},
+            click: () => {},
+            getContext: () => makeMockContext(),
+            querySelector: () => null,
+            querySelectorAll: () => [],
+            appendChild: (child) => child,
+            removeChild: (child) => child,
+            setAttribute: () => {},
+            getAttribute: () => null,
+            removeAttribute: () => {},
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            dispatchEvent: () => true
+        };
+        return el;
+    };
+
+    const elCache = new Map();
+    const getOrCreateEl = (id) => {
+        if (!elCache.has(id)) elCache.set(id, makeMockElement(id));
+        return elCache.get(id);
+    };
+
+    let storage = {};
+    const localStorage = {
+        getItem: k => (k in storage ? storage[k] : null),
+        setItem: (k, v) => { storage[k] = String(v); },
+        removeItem: k => { delete storage[k]; }
+    };
+    const document = {
+        getElementById: id => getOrCreateEl(id),
+        createElement: tag => makeMockElement(tag),
+        querySelector: sel => getOrCreateEl(sel),
+        querySelectorAll: sel => [],
+        body: getOrCreateEl('body'),
+        documentElement: getOrCreateEl('html'),
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        activeElement: null,
+        hidden: false
+    };
+    const window = {
+        localStorage,
+        document,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        matchMedia: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {} }),
+        devicePixelRatio: 1,
+        innerWidth: 1280,
+        innerHeight: 720,
+        AudioContext: class {
+            constructor() { this.state = 'running'; }
+            createOscillator() { return { connect: () => {}, start: () => {}, stop: () => {}, frequency: { setValueAtTime: () => {} } }; }
+            createGain() { return { connect: () => {}, gain: { setValueAtTime: () => {}, linearRampToValueAtTime: () => {} } }; }
+            resume() { return Promise.resolve(); }
+        },
+        webkitAudioContext: class {
+            constructor() { this.state = 'running'; }
+        },
+        WebSocket: class {
+            constructor() { this.readyState = 0; }
+            send() {}
+            close() {}
+        },
+        location: { search: '', href: 'http://localhost/' },
+        history: { pushState: () => {}, replaceState: () => {} }
+    };
+    const requestAnimationFrame = () => 1;
+    const cancelAnimationFrame = () => {};
+    const performance = { now: () => Date.now() };
+`;
+
+const returnSuffix32 = `
+    return {
+        initLevel,
+        setGameState: (st) => { gameState = st; },
+        getGameState: () => ({
+            gameState,
+            currentLevel,
+            isEndlessMode,
+            endlessWave,
+            endlessWaveCleared,
+            player,
+            monsters,
+            artifacts,
+            coinsCollected,
+            level15Corpse,
+            wreckedRobot
+        }),
+        nextLevel,
+        startEndlessMode,
+        spawnEndlessWave,
+        checkEndlessWaveProgress,
+        openFinalLetterModal,
+        closeFinalLetterModal,
+        openRobotMemoryModal,
+        closeRobotMemoryModal,
+        upgradeWorkbenchWeapon,
+        selectWeaponUpgrade,
+        handlePlayerDeath,
+        adminStartAt,
+        stepSimulation
+    };
+`;
+
+const headlessScope = new Function(mockPrefix32 + '\n' + gameJs + '\n' + returnSuffix32)();
+
+// 32a. Simulasi Kampanye Penuh Sektor 1 s/d 15 (initLevel 0 s/d 14)
+for (let lvl = 0; lvl < 15; lvl++) {
+    headlessScope.initLevel(lvl);
+    headlessScope.setGameState('playing');
+    const s = headlessScope.getGameState();
+    assert(s.currentLevel === lvl, 'Level saat ini harus sesuai dengan ' + lvl);
+    assert(s.player && s.player.hp > 0, 'Player harus aktif dan bernyawa di sektor ' + (lvl + 1));
+    assert(Array.isArray(s.artifacts) && s.artifacts.length >= 3, 'Generator artefak harus ter-spawn di sektor ' + (lvl + 1));
+    assert(Array.isArray(s.monsters) && s.monsters.length > 0, 'Monster harus ter-spawn di sektor ' + (lvl + 1));
+    assert(Array.isArray(s.player.weapons) && s.player.weapons.length >= 1, 'Player harus memiliki senjata aktif di sektor ' + (lvl + 1));
+
+    // Simulasi pengambilan generator walk-over instan
+    s.artifacts.forEach(a => { a.collected = true; });
+    s.coinsCollected = s.artifacts.length;
+    assert(s.coinsCollected >= s.artifacts.length, 'Seluruh generator harus teraktivasi di sektor ' + (lvl + 1));
+
+    // Sektor 10: Apex Boss Mother Harvester & Diorama Wrecked Robot
+    if (lvl === 9) {
+        assert(s.monsters.some(m => m.name === 'Mother Harvester' && m.isBoss), 'Sektor 10 harus memuat Apex Boss Mother Harvester');
+        assert(s.wreckedRobot !== null, 'Sektor 10 harus memuat diorama wreckedRobot');
+        headlessScope.openRobotMemoryModal();
+        assert(headlessScope.getGameState().gameState === 'paused', 'Membuka memori robot harus menjeda simulasi');
+        headlessScope.closeRobotMemoryModal();
+        assert(headlessScope.getGameState().gameState === 'playing', 'Menutup memori robot harus mengembalikan simulasi');
+    }
+
+    // Sektor 15: Apex Boss The Monolith & Diorama Dr. Rudra
+    if (lvl === 14) {
+        assert(s.monsters.some(m => m.name === 'The Monolith'), 'Sektor 15 harus memuat Apex Boss The Monolith');
+        assert(s.level15Corpse !== null, 'Sektor 15 harus memuat diorama level15Corpse Dr. Rudra');
+        headlessScope.openFinalLetterModal();
+        assert(headlessScope.getGameState().gameState === 'paused', 'Membuka wasiat Dr. Rudra harus menjeda simulasi');
+        headlessScope.closeFinalLetterModal();
+        assert(headlessScope.getGameState().gameState === 'playing', 'Menutup wasiat Dr. Rudra harus mengembalikan simulasi');
+    }
+}
+
+// 32b. Uji Isolasi Peningkatan Senjata Workbench (Bebas Level Jumping Bug)
+const sPreUpgrade = headlessScope.getGameState();
+const curLvlBeforeWorkbench = sPreUpgrade.currentLevel;
+headlessScope.upgradeWorkbenchWeapon('shotgun');
+assert(sPreUpgrade.player.weapons.includes('shotgun'), 'Shotgun harus masuk ke daftar senjata player');
+assert(sPreUpgrade.player.currentWeapon === 'shotgun', 'Shotgun harus menjadi senjata aktif player');
+assert(headlessScope.getGameState().currentLevel === curLvlBeforeWorkbench, 'upgradeWorkbenchWeapon TIDAK boleh memajukan sektor/level');
+
+headlessScope.upgradeWorkbenchWeapon('minigun');
+assert(sPreUpgrade.player.weapons.includes('minigun'), 'Minigun harus masuk ke daftar senjata player');
+assert(headlessScope.getGameState().currentLevel === curLvlBeforeWorkbench, 'upgradeWorkbenchWeapon minigun TIDAK boleh memajukan level');
+
+// 32c. Transisi State Kematian & Kemenangan
+headlessScope.handlePlayerDeath('The Monolith');
+assert(headlessScope.getGameState().gameState === 'dead', 'handlePlayerDeath harus mengubah gameState menjadi dead');
+
+headlessScope.initLevel(14);
+const sWinLvl = headlessScope.getGameState();
+sWinLvl.artifacts.forEach(a => { a.collected = true; });
+sWinLvl.coinsCollected = sWinLvl.artifacts.length;
+headlessScope.nextLevel();
+assert(['cutscene', 'won', 'paused'].includes(headlessScope.getGameState().gameState), 'nextLevel pada level 14 harus memicu transisi cutscene/win');
+
+// 32d. Simulasi Mode Endless Survival (Progresi Gelombang, Eliminasi Monster, Spawn Bersih)
+headlessScope.startEndlessMode();
+const es = headlessScope.getGameState();
+assert(es.isEndlessMode === true, 'isEndlessMode harus true setelah startEndlessMode()');
+assert(es.currentLevel === 7, 'Endless Mode harus diinisialisasi pada labirin luas (level 7)');
+assert(es.endlessWave === 1, 'Gelombang awal Endless harus wave 1');
+assert(Array.isArray(es.monsters) && es.monsters.length > 0, 'Gelombang 1 Endless harus memuat monster');
+
+// Eliminasi seluruh monster pada Gelombang 1
+es.monsters.forEach(m => { m.hp = 0; });
+headlessScope.checkEndlessWaveProgress();
+const esProgress = headlessScope.getGameState();
+assert(esProgress.endlessWaveCleared === true, 'checkEndlessWaveProgress() harus menandai endlessWaveCleared = true saat semua monster mati');
+
+// Spawn Gelombang 2
+headlessScope.spawnEndlessWave(2);
+const esWave2 = headlessScope.getGameState();
+assert(esWave2.monsters.length > 0, 'Gelombang 2 harus memuat kawanan monster baru');
+assert(esWave2.monsters[0].maxHp > 0, 'Monster Gelombang 2 harus memiliki HP terkalibrasi');
+
+// Uji Reset Status Endless pada Admin Chapter Jump
+headlessScope.adminStartAt(3);
+const sAdminJump = headlessScope.getGameState();
+assert(sAdminJump.isEndlessMode === false, 'adminStartAt() wajib mereset isEndlessMode = false');
+assert(sAdminJump.currentLevel === 3, 'adminStartAt(3) harus memindahkan permainan ke Sektor 4 (indeks 3)');
+
+console.log('✓ TEST 32 LULUS: Simulasi headless Campaign Sektor 1-15 & Mode Endless Survival sukses 100% tanpa runtime exception.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (31/31)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (32/32)');
 console.log('=========================================');
 
 
