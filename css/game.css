@@ -4940,8 +4940,8 @@ body.touch-on #gameView #stickZone,
 /* ZOOM HUD DESKTOP STYLING & MOBILE HIDE */
 #zoomHud {
     position: fixed;
-    bottom: 16px;
-    right: 16px;
+    top: 165px;
+    right: 15px;
     z-index: 55;
     display: flex;
     align-items: center;
@@ -4972,7 +4972,9 @@ body.touch-on #gameView #stickZone,
     font-size: 11px;
     font-family: monospace;
 }
-body.touch-on #zoomHud,
+body.touch-on #zoomHud {
+    display: none !important;
+}
 @media (pointer: coarse), (max-width: 900px) {
     #zoomHud {
         display: none !important;
@@ -5320,7 +5322,6 @@ body.touch-on #zoomHud,
   visibility: visible !important;
   transform: none !important;
   pointer-events: auto !important;
-}
   gap: 12px;
   position: relative;
 }
@@ -5741,5 +5742,31 @@ body.touch-on #zoomHud,
   .terminal-switches-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Mobile Viewport Stabilization & Accidental Zoom Lock */
+html, body {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+#gameView {
+  touch-action: none;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Primary Checkpoint Resume Button */
+.btn-continue-primary {
+  background: linear-gradient(135deg, rgba(255, 138, 61, 0.95), rgba(200, 40, 40, 0.95)) !important;
+  border-color: #ff8a3d !important;
+  color: #fff !important;
+  box-shadow: 0 0 20px rgba(255, 138, 61, 0.6) !important;
+  animation: continuePulse 2s infinite ease-in-out;
+}
+@keyframes continuePulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 138, 61, 0.5); }
+  50% { box-shadow: 0 0 28px rgba(255, 138, 61, 0.9); }
 }
 

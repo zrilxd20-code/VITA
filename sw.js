@@ -1,5 +1,5 @@
 /* Hanya aktif saat disajikan via http(s); dibuka via file:// diabaikan */
-const CACHE = 'vita-v2-5-9';
+const CACHE = 'vita-v2-6-0';
 const CORE = [
   './',
   './index.html',

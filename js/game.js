@@ -750,9 +750,12 @@ const T = {
         apk_modal_desc: 'Unduh file APK resmi VITA untuk ponsel Android atau pasang langsung sebagai Progressive Web App (PWA).',
         apk_dl_btn: 'UNDUH LANGSUNG APK ANDROID (4.1 MB)',
         apk_pwa_btn: 'PASANG APLIKASI WEB DI HP (PWA)',
-        apk_step_1: '1. Unduh file APK Android ke perangkat ponsel Anda.',
-        apk_step_2: '2. Buka berkas unduhan, izinkan "Instal dari sumber tak dikenal" jika diminta.',
-        apk_step_3: '3. Ketuk Pasang (Install) lalu buka VITA di layar ponsel Anda!',
+        apk_notice_manual: 'PENTING: File APK TIDAK otomatis muncul di layar utama HP setelah diunduh! Anda harus membuka berkas unduhan lalu menginstalnya.',
+        apk_step_1: '1. Buka bar notifikasi ponsel, ATAU buka Pengelola File (File Manager) > folder Download.',
+        apk_step_2: '2. Ketuk file vita.apk yang baru diunduh, lalu pilih "Pasang / Install" (izinkan instalasi sumber tak dikenal bila diminta).',
+        apk_step_3: '3. Selesai! Ikon aplikasi VITA kini muncul di layar utama dan siap dimainkan offline.',
+        apk_pwa_tip: '💡 Tips Alternatif: Ingin instan tanpa file APK? Ketuk tombol "PASANG APLIKASI WEB DI HP (PWA)" di atas untuk memasang langsung via browser!',
+        restart_confirm: 'Progres Anda saat ini sedang berjalan. Yakin ingin mengulang dari Sektor 1? (Progres checkpoint akan direset).',
         bestiary_btn: 'ARSIP ANOMALI (BESTIARY)',
         bestiary_title: 'ARSIP ANOMALI & PREDATOR FASILITAS',
         bestiary_sub: 'Klasifikasi biologi, taktik bertahan, dan telemetri eliminasi spesimen',
@@ -1223,9 +1226,12 @@ const T = {
         apk_modal_desc: 'Download the official VITA Android APK package or install directly as a Progressive Web App (PWA).',
         apk_dl_btn: 'DIRECT DOWNLOAD ANDROID APK (4.1 MB)',
         apk_pwa_btn: 'INSTALL WEB APP ON MOBILE (PWA)',
-        apk_step_1: '1. Download the Android APK package to your smartphone.',
-        apk_step_2: '2. Open downloaded file, enable "Install unknown apps" if prompted.',
-        apk_step_3: '3. Tap Install and launch VITA from your phone app drawer!',
+        apk_notice_manual: 'IMPORTANT: Downloaded APK files DO NOT automatically install to your phone screen! You must open the downloaded file and install it.',
+        apk_step_1: '1. Pull down your phone notification tray, OR open File Manager > Download folder.',
+        apk_step_2: '2. Tap the downloaded vita.apk file, then select "Install" (allow unknown sources if prompted).',
+        apk_step_3: '3. Complete! The VITA app icon will appear on your phone home screen ready for offline play.',
+        apk_pwa_tip: '💡 Instant Alternative: Want zero APK downloads? Tap "INSTALL WEB APP ON MOBILE (PWA)" above to add VITA directly from your browser!',
+        restart_confirm: 'You have active sector progress. Are you sure you want to restart from Sector 1? (Checkpoint progress will be reset).',
         bestiary_btn: 'ANOMALY ARCHIVE (BESTIARY)',
         bestiary_title: 'FACILITY ANOMALY & PREDATOR ARCHIVES',
         bestiary_sub: 'Biological classification, survival tactics, and specimen elimination telemetry',
@@ -3578,6 +3584,8 @@ function loadHigh() {
         if (Array.isArray(h.savedPerks)) out.savedPerks = h.savedPerks.filter(p => typeof p === 'string');
         if (Number.isFinite(Number(h.savedExp))) out.savedExp = Number(h.savedExp);
         if (Number.isFinite(Number(h.savedPLevel))) out.savedPLevel = Number(h.savedPLevel);
+        if (Number.isFinite(Number(h.savedKills))) out.savedKills = Number(h.savedKills);
+        if (Number.isFinite(Number(h.savedTime))) out.savedTime = Number(h.savedTime);
         if (h.sectorDeaths && typeof h.sectorDeaths === 'object') out.sectorDeaths = h.sectorDeaths;
         if (h.clearedLevels && typeof h.clearedLevels === 'object') out.clearedLevels = h.clearedLevels;
         return out;
@@ -4658,6 +4666,8 @@ function buildLevelWorld(level) {
             high.savedPerks = [...player.perks];
             high.savedExp = player.exp;
             high.savedPLevel = player.plevel;
+            high.savedKills = totalKills;
+            high.savedTime = totalTime;
             saveHigh(high);
             checkContinueBtn();
             if (typeof syncProfileToSupabase === 'function' && typeof getProfile === 'function') {
@@ -6930,6 +6940,10 @@ function updatePlayer() {
     // Auto-fire minigun saat space atau klik mouse ditahan terus
     if ((keys[' '] || isMouseDown) && player.currentWeapon === 'minigun') {
         playerAttack();
+    }
+    // Serangan berulang pada layar sentuh saat tombol serang ditahan
+    if (isTouchAtkPressed && gameState === 'playing') {
+        playerAttack(true);
     }
 
     if (player.invincible > 0) player.invincible--;
@@ -14035,7 +14049,24 @@ function toggleMute() {
 
 // ---- Jeda otomatis saat tab disembunyikan / fokus hilang ----
 document.addEventListener('visibilitychange', () => {
-    if (document.hidden && gameState === 'playing') togglePause(true);
+    if (document.hidden && gameState === 'playing') {
+        togglePause(true);
+        if (typeof player !== 'undefined' && player && currentLevel > 0 && !menuDemo) {
+            try {
+                const high = loadHigh();
+                high.lastLevel = currentLevel;
+                high.savedWeapons = [...player.weapons];
+                high.savedCurrentWeapon = player.currentWeapon;
+                high.savedPerks = [...player.perks];
+                high.savedExp = player.exp;
+                high.savedPLevel = player.plevel;
+                high.savedKills = totalKills;
+                high.savedTime = totalTime;
+                saveHigh(high);
+                checkContinueBtn();
+            } catch (_) {}
+        }
+    }
 });
 window.addEventListener('blur', () => {
     if (gameState === 'playing') togglePause(true);
@@ -14400,13 +14431,27 @@ function setupTouchControls() {
         window.addEventListener('pointerup', endStick);
         window.addEventListener('pointercancel', endStick);
     }
-    if (btnAtk) btnAtk.addEventListener('pointerdown', e => {
-        if (isEditingTouchLayout) return;
-        e.preventDefault();
-        e.stopPropagation();
-        document.body.classList.add('touch-on');
-        if (gameState === 'playing') playerAttack(true);
-    });
+    if (btnAtk) {
+        const startAtk = e => {
+            if (isEditingTouchLayout) return;
+            e.preventDefault();
+            e.stopPropagation();
+            document.body.classList.add('touch-on');
+            isTouchAtkPressed = true;
+            if (gameState === 'playing') playerAttack(true);
+            try { btnAtk.setPointerCapture(e.pointerId); } catch (_) {}
+        };
+        const stopAtk = () => {
+            isTouchAtkPressed = false;
+        };
+        btnAtk.addEventListener('pointerdown', startAtk);
+        btnAtk.addEventListener('pointerup', stopAtk);
+        btnAtk.addEventListener('pointercancel', stopAtk);
+        btnAtk.addEventListener('lostpointercapture', stopAtk);
+        window.addEventListener('pointerup', stopAtk);
+        window.addEventListener('pointercancel', stopAtk);
+        window.addEventListener('blur', stopAtk);
+    }
     if (btnDash) btnDash.addEventListener('pointerdown', e => {
         if (isEditingTouchLayout) return;
         e.preventDefault();
@@ -15163,16 +15208,41 @@ function checkContinueBtn() {
     try {
         const high = loadHigh();
         const last = Math.floor(Number(high.lastLevel));
-        const btn = document.getElementById('btnContinue');
-        if (!btn) return;
+        const btnContinue = document.getElementById('btnContinue');
+        const btnStart = document.getElementById('btnStart');
+        const btnStartText = document.getElementById('btnStartText');
+        if (!btnContinue) return;
         if (Number.isFinite(last) && last > 0 && last < LEVELS) {
-            btn.style.display = '';
-            const label = (lang === 'en' ? 'CONTINUE (LV ' : 'LANJUTKAN (LV ') + (last + 1) + ')';
-            const span = btn.querySelector('span');
+            btnContinue.style.display = '';
+            btnContinue.className = 'btn btn-continue-primary';
+            const label = (lang === 'en' ? 'CONTINUE MISSION (SECTOR ' : 'LANJUTKAN MISI (SEKTOR ') + (last + 1) + ')';
+            const span = btnContinue.querySelector('span');
             if (span) { span.textContent = label; }
-            else { btn.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 13 12 5 21 5 3"/><polygon points="11 3 19 12 11 21 11 3"/></svg><span>' + label + '</span>'; }
+            else { btnContinue.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><polygon points="5 3 13 12 5 21 5 3"/><polygon points="11 3 19 12 11 21 11 3"/></svg><span>' + label + '</span>'; }
+
+            const actions = btnContinue.parentElement;
+            if (actions && btnStart && actions.firstElementChild !== btnContinue) {
+                actions.insertBefore(btnContinue, btnStart);
+            }
+            if (btnStart) {
+                btnStart.className = 'btn secondary';
+                if (btnStartText) {
+                    btnStartText.textContent = (lang === 'en' ? 'START OVER (SECTOR 1)' : 'MULAI DARI AWAL (SEKTOR 1)');
+                }
+            }
         } else {
-            btn.style.display = 'none';
+            btnContinue.style.display = 'none';
+            btnContinue.className = 'btn secondary';
+            if (btnStart) {
+                btnStart.className = 'btn';
+                if (btnStartText) {
+                    btnStartText.textContent = (lang === 'en' ? 'PLAY NOW' : 'MAIN SEKARANG');
+                }
+                const actions = btnStart.parentElement;
+                if (actions && btnContinue && actions.firstElementChild !== btnStart) {
+                    actions.insertBefore(btnStart, actions.firstElementChild);
+                }
+            }
         }
     } catch (e) { /* abaikan */ }
 }
@@ -15203,8 +15273,9 @@ function continueGame(bypassDeviceCheck = false) {
     }
     gameState = 'playing';
     menuDemo = false;
-    totalKills = 0;
-    totalTime = 0;
+    const highState = loadHigh();
+    totalKills = Number.isFinite(highState.savedKills) ? Number(highState.savedKills) : 0;
+    totalTime = Number.isFinite(highState.savedTime) ? Number(highState.savedTime) : 0;
     showHUD();
     hideCursor();
     initLevel(last);
@@ -15432,6 +15503,12 @@ function startTutorialMode() {
 }
 
 function startGame(bypassDeviceCheck = false) {
+    if (!bypassDeviceCheck && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+        const savedLast = Math.floor(Number(loadHigh().lastLevel)) || 0;
+        if (savedLast > 0 && !window.confirm(tt('restart_confirm'))) {
+            return;
+        }
+    }
     if (!bypassDeviceCheck && settings && settings.deviceMode === 'ask') {
         const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || (window.innerWidth <= 820);
         settings.deviceMode = hasTouch ? 'mobile' : 'pc';
@@ -15456,7 +15533,11 @@ function startGame(bypassDeviceCheck = false) {
         delete high.savedPerks;
         delete high.savedExp;
         delete high.savedPLevel;
+        delete high.lastLevel;
+        delete high.savedKills;
+        delete high.savedTime;
         saveHigh(high);
+        checkContinueBtn();
     } catch(e){}
     player = null;
 

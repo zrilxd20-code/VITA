@@ -1888,5 +1888,6 @@ console.log('✓ TEST 32 LULUS: Simulasi headless Campaign Sektor 1-15 & Mode En
 console.log('\n=========================================');
 console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (32/32)');
 console.log('=========================================');
+process.exit(0);
 
 
