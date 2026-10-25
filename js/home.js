@@ -47,6 +47,9 @@ function selectGameDirective(mode) {
       btnPlayText.textContent = isId ? 'MASUK KE DALAM LABIRIN' : 'ENTER THE LABYRINTH';
     }
   }
+  if (typeof checkContinueBtn === 'function') {
+    try { checkContinueBtn(); } catch(_) {}
+  }
 }
 
 // Inisialisasi tampilan directive tombol saat Hub siap
@@ -2494,7 +2497,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.6.0';
+const APP_VERSION = '2.6.1';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 

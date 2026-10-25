@@ -134,6 +134,9 @@ WITH CHECK (
 );
 
 -- 7. Kebijakan Keamanan RLS untuk Profiles
+-- Catatan: Akses publik terhadap data profil dianjurkan melalui view `v_public_profiles`
+-- dan fungsi RPC SECURITY DEFINER (`upsert_operative_profile` & `verify_operative_passcode`)
+-- guna melindungi kolom kredensial (`passcode`).
 DROP POLICY IF EXISTS "Publik dapat melihat profil" ON public.profiles;
 CREATE POLICY "Publik dapat melihat profil" 
 ON public.profiles 
@@ -150,7 +153,10 @@ DROP POLICY IF EXISTS "Pemain dapat memperbarui profil" ON public.profiles;
 CREATE POLICY "Pemain dapat memperbarui profil" 
 ON public.profiles 
 FOR UPDATE 
-USING (true);
+USING (
+    -- Cegah pembajakan akun langsung via REST: hanya perbolehkan update jika passcode kosong atau lewat RPC
+    passcode IS NULL OR passcode = '' OR current_setting('request.jwt.claim.role', true) = 'service_role'
+);
 
 -- 8. FUNGSI AMAN (SECURITY DEFINER RPC): Verifikasi Sandi Operatif
 -- Memeriksa sandi secara langsung di database sehingga hash sandi tidak bocor ke publik

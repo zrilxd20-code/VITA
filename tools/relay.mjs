@@ -41,8 +41,8 @@ function computeAcceptKey(key) {
     return crypto.createHash('sha1').update(key + guid, 'utf8').digest('base64');
 }
 
-function decodeWebSocketFrame(buf) {
-    const cap = 1024 * 1024;
+function decodeWebSocketFrame(buf, maxBytes) {
+    const cap = (typeof maxBytes === 'number' && maxBytes > 0) ? maxBytes : (1024 * 1024);
     if (!buf || buf.length < 2) return null;
     const b0 = buf[0];
     const b1 = buf[1];
@@ -120,9 +120,16 @@ function createFrameParser(maxBytes) {
     let fragmentOpcode = 0;
     return function push(chunk) {
         const out = [];
-        if (chunk && chunk.length) buffer = Buffer.concat([buffer, chunk]);
+        if (chunk && chunk.length) {
+            if (buffer.length + chunk.length > cap + 14) {
+                out.push({ error: 'too_large' });
+                buffer = Buffer.alloc(0);
+                return out;
+            }
+            buffer = Buffer.concat([buffer, chunk]);
+        }
         while (buffer.length >= 2) {
-            const f = decodeWebSocketFrame(buffer);
+            const f = decodeWebSocketFrame(buffer, cap);
             if (!f) break;
             if (f.error) {
                 out.push({ error: f.error });
@@ -317,7 +324,12 @@ function routeMessage(rooms, client, msg) {
     const room = rooms.get(client.roomId);
     if (!room) return;
     const outbound = Object.assign({}, msg, { roomId: room.id, peerIndex: client.peerIndex, from: client.peerIndex });
-    if (type === 'INPUT' || type === 'SNAPSHOT' || type === 'START_GAME' || type === 'PEER_JOIN') {
+    if (type === 'SNAPSHOT' || type === 'START_GAME') {
+        if (!client.isHost && client.peerIndex !== 0) return;
+        broadcast(room, outbound, client);
+        return;
+    }
+    if (type === 'INPUT' || type === 'PEER_JOIN') {
         broadcast(room, outbound, client);
         return;
     }

@@ -1807,6 +1807,9 @@ function applyLang() {
     if (typeof updateStartScreenDevicePill === 'function') updateStartScreenDevicePill(settings.deviceMode, settings.lang);
     if (typeof applyProfileUI === 'function') applyProfileUI();
     if (typeof updateUI === 'function' && typeof player !== 'undefined' && player) updateUI();
+    if (typeof checkContinueBtn === 'function') {
+        try { checkContinueBtn(); } catch(_) {}
+    }
 }
 
 let audioCtx = null;
@@ -4657,7 +4660,7 @@ function buildLevelWorld(level) {
     }
 
     // Save run progress & equipment state
-    if (!menuDemo) {
+    if (!menuDemo && !isEndlessMode) {
         try {
             const high = loadHigh();
             high.lastLevel = level;
@@ -14003,6 +14006,11 @@ function doDash() {
 
 // ---- Checkpoint adil: ulangi level saat ini, skor & waktu run dipertahankan ----
 function retryLevel() {
+    isTouchAtkPressed = false;
+    if (typeof isEndlessMode !== 'undefined' && isEndlessMode) {
+        startEndlessMode();
+        return;
+    }
     const ds = document.getElementById('deathScreen');
     if (ds) ds.style.display = 'none';
     const ps = document.getElementById('pauseScreen');
@@ -14051,7 +14059,7 @@ function toggleMute() {
 document.addEventListener('visibilitychange', () => {
     if (document.hidden && gameState === 'playing') {
         togglePause(true);
-        if (typeof player !== 'undefined' && player && currentLevel > 0 && !menuDemo) {
+        if (typeof player !== 'undefined' && player && currentLevel > 0 && !menuDemo && !isEndlessMode) {
             try {
                 const high = loadHigh();
                 high.lastLevel = currentLevel;
@@ -14432,25 +14440,36 @@ function setupTouchControls() {
         window.addEventListener('pointercancel', endStick);
     }
     if (btnAtk) {
+        let atkPointerId = -1;
         const startAtk = e => {
             if (isEditingTouchLayout) return;
             e.preventDefault();
             e.stopPropagation();
             document.body.classList.add('touch-on');
+            atkPointerId = (e && typeof e.pointerId !== 'undefined') ? e.pointerId : -1;
             isTouchAtkPressed = true;
             if (gameState === 'playing') playerAttack(true);
             try { btnAtk.setPointerCapture(e.pointerId); } catch (_) {}
         };
-        const stopAtk = () => {
-            isTouchAtkPressed = false;
+        const stopAtk = e => {
+            if (!e || typeof e.pointerId === 'undefined' || e.pointerId === atkPointerId || atkPointerId === -1) {
+                isTouchAtkPressed = false;
+                atkPointerId = -1;
+            }
         };
         btnAtk.addEventListener('pointerdown', startAtk);
         btnAtk.addEventListener('pointerup', stopAtk);
         btnAtk.addEventListener('pointercancel', stopAtk);
-        btnAtk.addEventListener('lostpointercapture', stopAtk);
+        btnAtk.addEventListener('lostpointercapture', () => {
+            isTouchAtkPressed = false;
+            atkPointerId = -1;
+        });
         window.addEventListener('pointerup', stopAtk);
         window.addEventListener('pointercancel', stopAtk);
-        window.addEventListener('blur', stopAtk);
+        window.addEventListener('blur', () => {
+            isTouchAtkPressed = false;
+            atkPointerId = -1;
+        });
     }
     if (btnDash) btnDash.addEventListener('pointerdown', e => {
         if (isEditingTouchLayout) return;
@@ -15212,6 +15231,23 @@ function checkContinueBtn() {
         const btnStart = document.getElementById('btnStart');
         const btnStartText = document.getElementById('btnStartText');
         if (!btnContinue) return;
+
+        if (typeof activeGameDirective !== 'undefined' && activeGameDirective === 'endless') {
+            btnContinue.style.display = 'none';
+            btnContinue.className = 'btn secondary';
+            if (btnStart) {
+                btnStart.className = 'btn';
+                if (btnStartText) {
+                    btnStartText.textContent = (lang === 'en' ? 'ENTER SURVIVAL ARENA' : 'MASUK ARENA SURVIVAL');
+                }
+                const actions = btnStart.parentElement;
+                if (actions && btnContinue && actions.firstElementChild !== btnStart) {
+                    actions.insertBefore(btnStart, actions.firstElementChild);
+                }
+            }
+            return;
+        }
+
         if (Number.isFinite(last) && last > 0 && last < LEVELS) {
             btnContinue.style.display = '';
             btnContinue.className = 'btn btn-continue-primary';
@@ -15271,6 +15307,7 @@ function continueGame(bypassDeviceCheck = false) {
         startEndlessMode();
         return;
     }
+    isEndlessMode = false;
     gameState = 'playing';
     menuDemo = false;
     const highState = loadHigh();
@@ -15503,12 +15540,6 @@ function startTutorialMode() {
 }
 
 function startGame(bypassDeviceCheck = false) {
-    if (!bypassDeviceCheck && typeof window !== 'undefined' && typeof window.confirm === 'function') {
-        const savedLast = Math.floor(Number(loadHigh().lastLevel)) || 0;
-        if (savedLast > 0 && !window.confirm(tt('restart_confirm'))) {
-            return;
-        }
-    }
     if (!bypassDeviceCheck && settings && settings.deviceMode === 'ask') {
         const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || (window.innerWidth <= 820);
         settings.deviceMode = hasTouch ? 'mobile' : 'pc';
@@ -15519,6 +15550,20 @@ function startGame(bypassDeviceCheck = false) {
         if (typeof applyTouchLayout === 'function') applyTouchLayout();
     } else if (settings && settings.deviceMode === 'pc') {
         document.body.classList.remove('touch-on');
+    }
+
+    if (typeof activeGameDirective !== 'undefined' && activeGameDirective === 'endless' && typeof startEndlessMode === 'function') {
+        startEndlessMode();
+        return;
+    }
+
+    isEndlessMode = false;
+
+    if (!bypassDeviceCheck && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+        const savedLast = Math.floor(Number(loadHigh().lastLevel)) || 0;
+        if (savedLast > 0 && !window.confirm(tt('restart_confirm'))) {
+            return;
+        }
     }
     ensureAudio();
     document.getElementById('startScreen').style.display = 'none';
@@ -15566,6 +15611,12 @@ function startGame(bypassDeviceCheck = false) {
 }
 
 function restartGame() {
+    isTouchAtkPressed = false;
+    if (typeof isEndlessMode !== 'undefined' && isEndlessMode) {
+        startEndlessMode();
+        return;
+    }
+    isEndlessMode = false;
     const ds = document.getElementById('deathScreen');
     if (ds) ds.style.display = 'none';
     const ws = document.getElementById('winScreen');
@@ -15598,6 +15649,7 @@ function restartGame() {
 }
 
 function togglePause(on) {
+    if (on) isTouchAtkPressed = false;
     const overlay = document.getElementById('pauseScreen');
     if (on) {
         gameState = 'paused';
@@ -15627,6 +15679,8 @@ function restartFromPause() {
 
 function backToMenu() {
     if (typeof isEditingTouchLayout !== 'undefined' && isEditingTouchLayout) return;
+    isEndlessMode = false;
+    isTouchAtkPressed = false;
     gameState = 'menu';
     menuDemo = true;
     stopAmbientDrone();
@@ -18005,27 +18059,51 @@ function checkEndlessWaveProgress() {
         }
         
         // Beri nanite untuk pohon talenta
-        if (typeof addNanites === 'function') {
+        if (typeof addNaniteShards === 'function') {
+            addNaniteShards(50 + endlessWave * 10);
+        } else if (typeof addNanites === 'function') {
             addNanites(50 + endlessWave * 10);
         }
 
-        // Drop amunisi / medpod di posisi pemain
-        if (typeof medPods !== 'undefined' && Array.isArray(medPods)) {
-            medPods.push({ x: player.x + 30, y: player.y + 30, taken: false });
+        // Drop amunisi / medpod di ubin lantai valid dekat posisi pemain
+        if (typeof medPods !== 'undefined' && Array.isArray(medPods) && player && typeof maze !== 'undefined' && maze.length) {
+            let gx = Math.max(1, Math.min(maze[0].length - 2, Math.floor(player.x / CELL)));
+            let gy = Math.max(1, Math.min(maze.length - 2, Math.floor(player.y / CELL)));
+            if (maze[gy] && maze[gy][gx] !== 0) {
+                for (let r = 1; r <= 3; r++) {
+                    let found = false;
+                    for (let dy = -r; dy <= r && !found; dy++) {
+                        for (let dx = -r; dx <= r && !found; dx++) {
+                            const tx = gx + dx, ty = gy + dy;
+                            if (maze[ty] && maze[ty][tx] === 0) {
+                                gx = tx; gy = ty; found = true;
+                            }
+                        }
+                    }
+                    if (found) break;
+                }
+            }
+            medPods.push({
+                x: gx * CELL + CELL / 2,
+                y: gy * CELL + CELL / 2,
+                gx: gx,
+                gy: gy,
+                used: false,
+                pulse: 0
+            });
         }
 
         const clearMsg = tt('endless_wave_clear').replace('{w}', endlessWave);
         if (typeof announceLevel === 'function') announceLevel(clearMsg);
         if (typeof blip === 'function') blip(580, 0.25, 'triangle');
+    }
 
-        setTimeout(function() {
-            if (!isEndlessMode || gameState !== 'playing') return;
-            endlessWave++;
-            endlessWaveCleared = false;
-            spawnEndlessWave(endlessWave);
-            const inMsg = tt('endless_wave_banner').replace('{w}', endlessWave);
-            if (typeof announceLevel === 'function') announceLevel(inMsg);
-        }, 3200);
+    if (endlessWaveCleared && Date.now() - endlessWaveClearTimer >= 3200) {
+        endlessWave++;
+        endlessWaveCleared = false;
+        spawnEndlessWave(endlessWave);
+        const inMsg = tt('endless_wave_banner').replace('{w}', endlessWave);
+        if (typeof announceLevel === 'function') announceLevel(inMsg);
     }
 }
 
