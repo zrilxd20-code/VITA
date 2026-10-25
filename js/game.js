@@ -8593,8 +8593,9 @@ function drawMaze() {
             }
 
             if (maze[y][x] === 1) {
+                const hasFrontFace = (y + 1 < mazeH && maze[y + 1] && maze[y + 1][x] !== 1);
                 let wallColor;
-if (isLight) {
+                if (isLight) {
                     const g = Math.floor(38 + brightness * 34);
                     wallColor = `rgb(${g + 8}, ${g}, ${g - 4})`;
                 } else {
@@ -8602,19 +8603,46 @@ if (isLight) {
                     wallColor = `rgb(${g - 5}, ${g}, ${g + 15})`;
                 }
                 ctx.fillStyle = wallColor;
-                ctx.fillRect(sx, sy, CELL, CELL);
 
-                ctx.fillStyle = isLight ? `rgba(0,0,0,${0.2 * brightness})` : `rgba(0,0,20,${0.3 * brightness})`;
-                ctx.fillRect(sx + 2, sy + 2, CELL - 2, CELL - 2);
+                if (hasFrontFace) {
+                    // Pseudo 2.5D: Wall roof surface (top portion)
+                    ctx.fillRect(sx, sy, CELL, CELL - 7);
 
-                if (isLight) {
-                    ctx.fillStyle = `rgba(255,140,120,${0.1 * brightness})`;
+                    // Roof top highlight bevel
+                    ctx.fillStyle = isLight ? `rgba(255,200,180,${0.22 * brightness})` : `rgba(100,200,255,${0.25 * brightness})`;
                     ctx.fillRect(sx, sy, CELL, 2);
-                    ctx.fillRect(sx, sy, 2, CELL);
+
+                    // Inner roof inset border
+                    ctx.fillStyle = isLight ? `rgba(0,0,0,${0.18 * brightness})` : `rgba(0,0,20,${0.25 * brightness})`;
+                    ctx.fillRect(sx + 2, sy + 2, CELL - 4, CELL - 11);
+
+                    // Wall front-face shadow bevel (seam between roof and front face)
+                    ctx.fillStyle = isLight ? 'rgba(25, 18, 12, 0.45)' : 'rgba(8, 14, 28, 0.65)';
+                    ctx.fillRect(sx, sy + CELL - 8, CELL, 1);
+
+                    // Pseudo 2.5D: Wall vertical front face (facing downward toward corridor)
+                    ctx.fillStyle = isLight ? 'rgba(18, 12, 8, 0.88)' : 'rgba(10, 14, 22, 0.94)';
+                    ctx.fillRect(sx, sy + CELL - 7, CELL, 7);
+
+                    // Front face subtle vertical reinforcing seams
+                    ctx.fillStyle = isLight ? 'rgba(255, 140, 80, 0.08)' : 'rgba(0, 240, 255, 0.06)';
+                    ctx.fillRect(sx + 6, sy + CELL - 7, 1, 7);
+                    ctx.fillRect(sx + CELL - 7, sy + CELL - 7, 1, 7);
+                } else {
+                    // Full solid wall tile (enclosed by other walls)
+                    ctx.fillRect(sx, sy, CELL, CELL);
+                    ctx.fillStyle = isLight ? `rgba(0,0,0,${0.2 * brightness})` : `rgba(0,0,20,${0.3 * brightness})`;
+                    ctx.fillRect(sx + 2, sy + 2, CELL - 2, CELL - 2);
+
+                    if (isLight) {
+                        ctx.fillStyle = `rgba(255,140,120,${0.1 * brightness})`;
+                        ctx.fillRect(sx, sy, CELL, 2);
+                        ctx.fillRect(sx, sy, 2, CELL);
+                    }
                 }
             } else if (maze[y][x] === 0) {
                 let floorColor;
-if (isLight) {
+                if (isLight) {
                     const g = Math.floor(78 + brightness * 42);
                     floorColor = `rgb(${g + 12}, ${g}, ${g - 8})`;
                 } else {
@@ -8624,19 +8652,53 @@ if (isLight) {
                 ctx.fillStyle = floorColor;
                 ctx.fillRect(sx, sy, CELL, CELL);
 
-                if ((x + y) % 3 === 0) {
+                // Industrial panel seam lines (subtle tile borders)
+                ctx.fillStyle = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.22)';
+                ctx.fillRect(sx + CELL - 1, sy, 1, CELL);
+                ctx.fillRect(sx, sy + CELL - 1, CELL, 1);
+
+                // Pseudo 2.5D: Drop shadow cast by wall directly above onto corridor floor
+                if (y > 0 && maze[y - 1] && maze[y - 1][x] === 1) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
+                    ctx.fillRect(sx, sy, CELL, 5);
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+                    ctx.fillRect(sx, sy + 5, CELL, 3);
+                }
+
+                // Deterministic industrial floor grating / rivet accents (zero GC allocation)
+                const tileSeed = (x * 7 + y * 13);
+                if (tileSeed % 11 === 0) {
+                    // Metal ventilation grating
+                    ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.14)' : 'rgba(0, 0, 0, 0.36)';
+                    ctx.fillRect(sx + 6, sy + 9, CELL - 12, 2);
+                    ctx.fillRect(sx + 6, sy + 15, CELL - 12, 2);
+                    ctx.fillRect(sx + 6, sy + 21, CELL - 12, 2);
+                } else if ((x * 11 + y * 5) % 13 === 0) {
+                    // Corner steel rivets
+                    ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.22)' : 'rgba(255, 255, 255, 0.09)';
+                    ctx.fillRect(sx + 4, sy + 4, 2, 2);
+                    ctx.fillRect(sx + CELL - 6, sy + 4, 2, 2);
+                    ctx.fillRect(sx + 4, sy + CELL - 6, 2, 2);
+                    ctx.fillRect(sx + CELL - 6, sy + CELL - 6, 2, 2);
+                } else if ((x + y) % 3 === 0) {
                     ctx.fillStyle = isLight ? `rgba(40,0,0,0.08)` : `rgba(35,0,25,0.12)`;
                     ctx.fillRect(sx + 8, sy + 8, 4, 4);
                 }
             } else if (maze[y][x] === 2) {
                 let floorColor;
-if (isLight) {
+                if (isLight) {
                     floorColor = `rgba(150, 88, 70, ${brightness})`;
                 } else {
                     floorColor = `rgba(42, 14, 42, ${brightness})`;
                 }
                 ctx.fillStyle = floorColor;
                 ctx.fillRect(sx, sy, CELL, CELL);
+
+                // Pseudo 2.5D drop shadow if wall above
+                if (y > 0 && maze[y - 1] && maze[y - 1][x] === 1) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
+                    ctx.fillRect(sx, sy, CELL, 5);
+                }
 
                 ctx.fillStyle = isLight ? `rgba(255,120,60,${0.3 * brightness})` : `rgba(255,60,60,${0.25 * brightness})`;
                 ctx.beginPath();
@@ -8705,13 +8767,14 @@ function drawPlayer(targetPlayer) {
 
     const isMoving = (typeof keys !== 'undefined' && (keys['w'] || keys['s'] || keys['a'] || keys['d'] || keys['arrowup'] || keys['arrowdown'] || keys['arrowleft'] || keys['arrowright'])) || (typeof touchMove !== 'undefined' && touchMove.active) || p.dashing;
     const isLowHp = p.hp < (p.maxHp * 0.3);
-    const flashFlicker = (isLowHp && Math.random() < 0.22) ? (0.25 + Math.random() * 0.5) : 1.0;
+    const microJitter = 1.0 + Math.sin(Date.now() * 0.007) * 0.025;
+    const flashFlicker = ((isLowHp && Math.random() < 0.22) ? (0.25 + Math.random() * 0.5) : 1.0) * microJitter;
 
     
-    // 1. DUAL TACTICAL HEADLIGHTS (Lampu Sorot Senter Volumetrik)
+    // 1. DUAL TACTICAL HEADLIGHTS (Lampu Sorot Senter Volumetrik & Lens Flare)
     
-    const flashLen = currentLevel % 2 === 1 ? 135 : 180;
-    const flashSpread = 0.42;
+    const flashLen = currentLevel % 2 === 1 ? 140 : 185;
+    const flashSpread = 0.43;
 
     for (const side of [-1, 1]) {
         ctx.save();
@@ -8719,9 +8782,9 @@ function drawPlayer(targetPlayer) {
         const lgtY = side * 8.5; // Left & Right headlight emitters on front fenders
         const lgtX = 13;
         const fg = ctx.createRadialGradient(lgtX, lgtY, 4, lgtX + flashLen * 0.7, lgtY, flashLen);
-        fg.addColorStop(0, `rgba(255, 245, 205, ${0.55 * flashFlicker})`);
-        fg.addColorStop(0.35, `rgba(255, 215, 140, ${0.25 * flashFlicker})`);
-        fg.addColorStop(0.75, `rgba(255, 180, 80, ${0.08 * flashFlicker})`);
+        fg.addColorStop(0, `rgba(255, 245, 210, ${0.58 * flashFlicker})`);
+        fg.addColorStop(0.35, `rgba(255, 215, 140, ${0.28 * flashFlicker})`);
+        fg.addColorStop(0.75, `rgba(255, 180, 80, ${0.09 * flashFlicker})`);
         fg.addColorStop(1, 'rgba(255, 150, 50, 0)');
         ctx.fillStyle = fg;
         ctx.beginPath();
@@ -8729,6 +8792,20 @@ function drawPlayer(targetPlayer) {
         ctx.arc(lgtX, lgtY, flashLen, -flashSpread * 0.8, flashSpread * 0.8);
         ctx.closePath();
         ctx.fill();
+
+        // Emitter lens glow flare
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const flareG = ctx.createRadialGradient(lgtX, lgtY, 0, lgtX, lgtY, 8);
+        flareG.addColorStop(0, `rgba(255, 255, 230, ${0.85 * flashFlicker})`);
+        flareG.addColorStop(0.5, `rgba(255, 200, 100, ${0.35 * flashFlicker})`);
+        flareG.addColorStop(1, 'rgba(255, 150, 50, 0)');
+        ctx.fillStyle = flareG;
+        ctx.beginPath();
+        ctx.arc(lgtX, lgtY, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
         ctx.restore();
     }
 
@@ -9270,6 +9347,10 @@ function drawMonsters() {
 
         ctx.save();
         ctx.translate(sx, sy + bob);
+        if (m.hitFlash > 0) {
+            // Visceral combat impact: procedural organic squash & stretch
+            ctx.scale(1.12, 0.88);
+        }
 
         switch (m.name) {
             case 'Slime': {
@@ -10760,11 +10841,12 @@ function drawProjectiles() {
             ctx.save();
             ctx.translate(sx, sy);
             if (p.kind === 'plasma_arc') {
+                ctx.globalCompositeOperation = 'lighter';
                 const angle = Math.atan2(p.dy, p.dx);
                 ctx.rotate(angle);
                 ctx.strokeStyle = '#c084fc';
                 ctx.shadowColor = '#a855f7';
-                ctx.shadowBlur = 14;
+                ctx.shadowBlur = 16;
                 ctx.lineWidth = 3.5;
                 ctx.beginPath();
                 ctx.arc(-6, 0, 16, -Math.PI / 3, Math.PI / 3);
@@ -10775,16 +10857,17 @@ function drawProjectiles() {
                 ctx.arc(-6, 0, 15, -Math.PI / 4, Math.PI / 4);
                 ctx.stroke();
             } else if (p.kind === 'rifle') {
+                ctx.globalCompositeOperation = 'lighter';
                 const angle = Math.atan2(p.dy, p.dx);
                 ctx.rotate(angle);
                 ctx.fillStyle = '#00f0ff';
                 ctx.shadowColor = '#00d2d3';
-                ctx.shadowBlur = 12;
+                ctx.shadowBlur = 14;
                 ctx.fillRect(-14, -2.2, 28, 4.4);
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(-8, -1.1, 18, 2.2);
                 ctx.beginPath();
-                ctx.arc(14, 0, 2.5, 0, Math.PI * 2);
+                ctx.arc(14, 0, 2.8, 0, Math.PI * 2);
                 ctx.fillStyle = '#ffffff';
                 ctx.fill();
             } else if (p.kind === 'cluster_bomb') {
@@ -10838,24 +10921,32 @@ function drawProjectiles() {
                 ctx.arc(-11, 0, 3, 0, Math.PI * 2);
                 ctx.fill();
             } else if (p.kind === 'minigun') {
+                ctx.globalCompositeOperation = 'lighter';
                 const angle = Math.atan2(p.dy, p.dx);
                 ctx.rotate(angle);
                 ctx.fillStyle = '#ffeaa7';
                 ctx.shadowColor = '#fdcb6e';
-                ctx.shadowBlur = 6;
+                ctx.shadowBlur = 8;
                 ctx.fillRect(-5, -1.2, 10, 2.4);
-                ctx.fillStyle = '#fff';
+                ctx.fillStyle = '#ffffff';
                 ctx.fillRect(-2, -0.6, 5, 1.2);
             }
             ctx.restore();
         } else {
+            ctx.save();
+            ctx.globalCompositeOperation = 'lighter';
             ctx.fillStyle = p.color;
             ctx.shadowColor = p.color;
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 12;
             ctx.beginPath();
-            ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+            ctx.arc(sx, sy, 4.5, 0, Math.PI * 2);
             ctx.fill();
-            ctx.shadowBlur = 0;
+            // Intense energy core
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(sx, sy, 2.0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
         }
     });
 }
