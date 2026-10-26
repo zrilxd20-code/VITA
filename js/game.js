@@ -16403,9 +16403,8 @@ function submitJoinCoopRoom() {
 
 // 
 const COOP_DEFAULT_RELAY_URL = 'ws://localhost:8080';
-const COOP_SUPABASE_REALTIME_URL = (typeof DEFAULT_SUPABASE_KEY !== 'undefined')
-    ? ('wss://msribsirdpovuegligcx.supabase.co/realtime/v1/websocket?apikey=' + DEFAULT_SUPABASE_KEY + '&vsn=1.0.0')
-    : 'wss://msribsirdpovuegligcx.supabase.co/realtime/v1/websocket?vsn=1.0.0';
+const COOP_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zcmlic2lyZHBvdnVlZ2xpZ2N4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzgxNjgsImV4cCI6MjEwNTAxNDE2OH0.zxjpGcBnphJG5bCkVH__Ez204obVowIQV4q6Cewl_O4';
+const COOP_SUPABASE_REALTIME_URL = 'wss://msribsirdpovuegligcx.supabase.co/realtime/v1/websocket?apikey=' + COOP_SUPABASE_ANON_KEY + '&vsn=1.0.0';
 let coopPhxHeartbeatTimer = null;
 let coopPhxRef = 0;
 const COOP_RELAY_URL_MAX = 256;
@@ -16474,10 +16473,11 @@ function getDefaultCoopRelayUrl() {
 function resolveCoopRelayUrl() {
     let url = coopRelayUrl;
     const saved = getStoredCoopRelayUrl();
-    if (saved) {
+    const isPublicWeb = (typeof location !== 'undefined' && location.protocol === 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1');
+
+    if (saved && (!isPublicWeb || !isLocalCoopRelayUrl(saved))) {
         url = saved;
     } else if (!url || url === COOP_DEFAULT_RELAY_URL) {
-        const isPublicWeb = (typeof location !== 'undefined' && location.protocol === 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1');
         if (isPublicWeb) {
             return COOP_SUPABASE_REALTIME_URL;
         }
@@ -16610,25 +16610,32 @@ function connectCoopRelay() {
             // Jalur 1: Supabase Cloud Realtime Relay (Web Hosting Publik Tanpa Server Pribadi)
             if (isSupabaseCoopRelay(url)) {
                 coopWs = new WebSocket(url);
-                const topic = `realtime:coop_${coopRoomId}`;
+                const safeRoom = String(coopRoomId || '').toUpperCase().trim();
+                const topic = `realtime:coop_${safeRoom}`;
+                let guestJoinTimer = null;
+
                 coopWs.onopen = () => {
                     coopPhxRef++;
+                    const currentJoinRef = String(coopPhxRef);
                     coopWs.send(JSON.stringify({
                         topic: topic,
                         event: 'phx_join',
                         payload: { config: { broadcast: { self: false } } },
-                        ref: String(coopPhxRef)
+                        ref: currentJoinRef
                     }));
+
                     coopPhxHeartbeatTimer = setInterval(() => {
                         if (coopWs && coopWs.readyState === 1) {
                             coopWs.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: 'hb' }));
                         }
                     }, 25000);
                 };
+
                 coopWs.onmessage = (event) => {
                     try {
                         const data = JSON.parse(event.data);
-                        if (data.event === 'phx_reply' && String(data.ref) === String(coopPhxRef)) {
+                        // Saat channel phoenix berhasil di-join
+                        if (data.event === 'phx_reply' && data.payload && data.payload.status === 'ok') {
                             if (badge) {
                                 badge.textContent = 'RELAY: CLOUD (ONLINE)';
                                 badge.classList.remove('unverified');
@@ -16637,19 +16644,33 @@ function connectCoopRelay() {
                             if (isCoopHost) {
                                 localPlayerIndex = 0;
                             } else {
-                                sendCoopMessage('JOIN', {
-                                    roomId: coopRoomId,
-                                    isHost: false,
-                                    callsign: (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'AGENT-GUEST'
-                                });
+                                const sendGuestJoin = () => {
+                                    if (!coopWs || coopWs.readyState !== 1) return;
+                                    sendCoopMessage('JOIN', {
+                                        roomId: coopRoomId,
+                                        isHost: false,
+                                        callsign: (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'AGENT-GUEST'
+                                    });
+                                };
+                                sendGuestJoin();
+                                if (guestJoinTimer) clearInterval(guestJoinTimer);
+                                guestJoinTimer = setInterval(() => {
+                                    if (!isCoopHost && coopPeers.length <= 1) {
+                                        sendGuestJoin();
+                                    } else {
+                                        clearInterval(guestJoinTimer);
+                                        guestJoinTimer = null;
+                                    }
+                                }, 1500);
                             }
                             return;
                         }
+
                         if (data.event === 'broadcast' && data.payload && data.payload.event === 'coop') {
                             const innerMsg = data.payload.msg;
                             if (!innerMsg || typeof innerMsg !== 'object') return;
 
-                            // Otoritas Host pada Cloud Relay: tangani join tamu secara langsung
+                            // Otoritas Host pada Cloud Relay: sambut tamu yang bergabung
                             if (isCoopHost && innerMsg.type === 'JOIN') {
                                 const guestCallsign = innerMsg.callsign || 'AGENT-GUEST';
                                 let existing = coopPeers.find(p => p.callsign === guestCallsign);
@@ -16676,8 +16697,12 @@ function connectCoopRelay() {
                                 return;
                             }
 
-                            // Tamu menerima WELCOME
+                            // Tamu menerima WELCOME dari Host
                             if (!isCoopHost && innerMsg.type === 'WELCOME') {
+                                if (guestJoinTimer) {
+                                    clearInterval(guestJoinTimer);
+                                    guestJoinTimer = null;
+                                }
                                 if (typeof innerMsg.peerIndex === 'number') {
                                     localPlayerIndex = innerMsg.peerIndex;
                                 }
@@ -16692,6 +16717,7 @@ function connectCoopRelay() {
                         }
                     } catch (_) {}
                 };
+
                 coopWs.onerror = () => {
                     if (badge) {
                         badge.textContent = 'RELAY: CLOUD (OFFLINE)';
@@ -16699,7 +16725,12 @@ function connectCoopRelay() {
                         badge.classList.add('unverified');
                     }
                 };
+
                 coopWs.onclose = () => {
+                    if (guestJoinTimer) {
+                        clearInterval(guestJoinTimer);
+                        guestJoinTimer = null;
+                    }
                     if (coopPhxHeartbeatTimer) {
                         clearInterval(coopPhxHeartbeatTimer);
                         coopPhxHeartbeatTimer = null;
