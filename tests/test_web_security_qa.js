@@ -709,6 +709,24 @@ assert(/sendCoopMessage\(\s*'INPUT'/.test(gameJs), 'Klien harus mengirim tipe pe
 assert(/sendCoopMessage\(\s*'PING'/.test(gameJs), 'Koneksi relay harus mendukung pengiriman PING');
 assert(/sendCoopMessage\(\s*'PONG'/.test(gameJs), 'Relay handler harus membalas dengan PONG');
 
+// 21f. Pengujian spawn entitas peer co-op & auto-seed deterministik
+assert(gameJs.includes('function spawnCoopPeerEntity'), 'Fungsi spawnCoopPeerEntity harus dideklarasikan di game.js');
+const spawnPeerFnSrc = (gameJs.match(/function spawnCoopPeerEntity[\s\S]*?\n\}/) || [''])[0];
+const spawnPeerTest = new Function(`
+    const MAX_PLAYERS = 4;
+    const PLAYER_COLORS = [{ hex: '#00f0ff', glow: 'rgba(0,240,255,0.4)' }, { hex: '#f59e0b', glow: 'rgba(245,158,11,0.4)' }];
+    const CELL = 32;
+    ${spawnPeerFnSrc}
+    return spawnCoopPeerEntity;
+`)();
+const peerEnt = spawnPeerTest(1, 'AGENT-TEST', 120, 150);
+assert(peerEnt && peerEnt.id === 'p1' && peerEnt.peerIndex === 1 && peerEnt.callsign === 'AGENT-TEST', 'spawnCoopPeerEntity harus menghasilkan entitas operatif valid');
+assert(peerEnt.hp === 100 && peerEnt.maxHp === 100 && peerEnt.x === 120 && peerEnt.y === 150, 'Atribut HP dan posisi awal harus sesuai');
+
+// Verifikasi auto-seed dari coopRoomId pada getLevelSeed & bypass prologue
+assert(gameJs.includes('netSessionSeed = hashSeedToUint32(coopRoomId.toUpperCase().trim())'), 'getLevelSeed harus memiliki fallback deterministik berbasis coopRoomId');
+assert(gameJs.includes('const isCoopSession = Boolean(coopRoomId)'), 'startGame harus mendeteksi sesi co-op untuk membypass prologue cutscene');
+
 console.log('✓ TEST 21 LULUS: Sinkronisasi input peer, rekonsiliasi client prediction & HUD badge terverifikasi.');
 
 // TEST 22: Combat Multi-Target, Revive Downed Operative, & Peer Weapon Firing (Fase 4 co-op online).

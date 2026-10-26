@@ -180,6 +180,39 @@ function setLocalPlayerIndex(idx) {
 function getPlayerByPeer(peerIndex) {
     return (players && players[peerIndex]) ? players[peerIndex] : null;
 }
+
+function spawnCoopPeerEntity(peerIndex, callsign, spawnX, spawnY) {
+    const pIdx = Math.max(0, Math.min(MAX_PLAYERS - 1, peerIndex | 0));
+    const col = PLAYER_COLORS[pIdx] || PLAYER_COLORS[0];
+    return {
+        id: 'p' + pIdx,
+        peerIndex: pIdx,
+        callsign: callsign || ('P' + (pIdx + 1)),
+        x: (typeof spawnX === 'number') ? spawnX : (CELL * 1.5),
+        y: (typeof spawnY === 'number') ? spawnY : (CELL * 1.5),
+        hp: 100,
+        maxHp: 100,
+        size: 13,
+        speed: 2.4,
+        dashSpeed: 6.5,
+        facing: 0,
+        dashing: false,
+        dashTimer: 0,
+        dashCooldown: 0,
+        downed: false,
+        reviveProgress: 0,
+        weapons: ['knife', 'rifle'],
+        currentWeapon: 'knife',
+        perks: [],
+        exp: 0,
+        pLevel: 1,
+        invincible: 0,
+        attackAnim: 0,
+        color: col.hex,
+        glowColor: col.glow,
+        afterimages: []
+    };
+}
 let keys = {};
 let totalKills = 0;
 let totalTime = 0;
@@ -780,6 +813,9 @@ const T = {
         endless_wave_clear: 'GELOMBANG {w} DIBERSIHKAN!',
         endless_badge_wave: 'SURVIVAL — GELOMBANG {w}',
         endless_objective: 'BERTAHAN!',
+        endless_evac_success: 'EVAKUASI TAKTIS BERHASIL! GELOMBANG {w} TERCATAT (+BONUS NANIT)',
+        endless_evac_locked: 'HABISI SEMUA ANOMALI DI GELOMBANG INI UNTUK MEMBUKA AIRLOCK EVAKUASI!',
+        endless_evac_open: 'PORTAL EVAKUASI AKTIF — MENUJU AIRLOCK',
         gen_restored: '+GENERATOR PULIH! // +12 HP',
         gen_all_online: '★ SEMUA GENERATOR AKTIF // PINTU TERBUKA ★',
         endless_respite_lbl: 'JEDA PASOKAN: {s}s',
@@ -1256,6 +1292,9 @@ const T = {
         endless_wave_clear: 'WAVE {w} PURGED!',
         endless_badge_wave: 'SURVIVAL — WAVE {w}',
         endless_objective: 'SURVIVE!',
+        endless_evac_success: 'TACTICAL EVACUATION SUCCESSFUL! WAVE {w} RECORDED (+BONUS NANITES)',
+        endless_evac_locked: 'PURGE ALL ANOMALIES IN THIS WAVE TO UNLOCK EVACUATION AIRLOCK!',
+        endless_evac_open: 'EVACUATION AIRLOCK OPEN — PROCEED TO EXTRACTION',
         gen_restored: '+GENERATOR RESTORED! // +12 HP',
         gen_all_online: '★ ALL GENERATORS ONLINE // EXIT OPEN ★',
         endless_respite_lbl: 'SUPPLY RESPITE: {s}s',
@@ -4330,6 +4369,9 @@ function mulberry32(seed) {
 
 // Seed per-sektor: campuran seed sesi + nomor level (agar tiap level berbeda).
 function getLevelSeed(level) {
+    if (netSessionSeed == null && coopRoomId) {
+        netSessionSeed = hashSeedToUint32(coopRoomId.toUpperCase().trim());
+    }
     if (netSessionSeed == null) return null;
     return (netSessionSeed ^ hashSeedToUint32('vita:level:' + level)) >>> 0;
 }
@@ -4654,6 +4696,18 @@ function buildLevelWorld(level) {
     localPlayerIndex = coopLocalIdx;
     cameraX = player.x;
     cameraY = player.y;
+
+    // Co-op Host: Inisialisasi entitas operatif untuk rekan tim yang sudah terhubung di lobi
+    if (isCoopHost && coopPeers && coopPeers.length > 1) {
+        for (let pi = 1; pi < coopPeers.length; pi++) {
+            const peer = coopPeers[pi];
+            if (peer && typeof peer.idx === 'number') {
+                const px = player.x + peer.idx * 28;
+                const py = player.y;
+                players[peer.idx] = spawnCoopPeerEntity(peer.idx, peer.callsign, px, py);
+            }
+        }
+    }
 
     if (isAdmin && typeof grantAdminFullArsenal === 'function') {
         grantAdminFullArsenal(player);
@@ -7169,10 +7223,34 @@ function updatePlayer() {
     }
 
     if (exitPos && !levelTransition && gameState === 'playing' && dist(player, exitPos) < 36) {
-        if (!isEndlessMode && coinsCollected >= artifacts.length) {
+        if (isEndlessMode) {
+            // Mode Endless Survival: Portal exit berfungsi sebagai Evakuasi Taktis!
+            let aliveMonsters = 0;
+            if (monsters && monsters.length) {
+                for (let mi = 0; mi < monsters.length; mi++) {
+                    if (monsters[mi] && monsters[mi].hp > 0) aliveMonsters++;
+                }
+            }
+            if (aliveMonsters === 0 || endlessWaveCleared) {
+                levelTransition = true;
+                evacuateEndlessSurvival();
+            } else if (lockMsgCooldown <= 0) {
+                sLocked();
+                if (!menuDemo) {
+                    floatingTexts.push({
+                        x: player.x, y: player.y - 25,
+                        text: tt('endless_evac_locked'),
+                        color: '#ff9f43',
+                        life: 90,
+                        maxLife: 90
+                    });
+                }
+                lockMsgCooldown = 80;
+            }
+        } else if (coinsCollected >= artifacts.length) {
             sExitOpen();
             nextLevel();
-        } else if (!isEndlessMode && lockMsgCooldown <= 0) {
+        } else if (lockMsgCooldown <= 0) {
             const need = artifacts.length - coinsCollected;
             sLocked();
             if (!menuDemo) {
@@ -13518,22 +13596,14 @@ function applySnapshot(snap, isHost = false) {
 
             let targetP = players[pIdx];
             if (!targetP) {
-                targetP = {
-                    id: sp.id,
-                    peerIndex: pIdx,
-                    callsign: sp.callsign,
-                    x: sp.x,
-                    y: sp.y,
-                    hp: sp.hp,
-                    maxHp: sp.maxHp,
-                    facing: sp.facing,
-                    dashing: sp.dashing,
-                    currentWeapon: sp.curW,
-                    size: sp.size,
-                    weapons: ['knife', 'rifle'],
-                    perks: [],
-                    afterimages: []
-                };
+                targetP = spawnCoopPeerEntity(pIdx, sp.callsign, sp.x, sp.y);
+                targetP.id = sp.id || ('p' + pIdx);
+                targetP.hp = sp.hp;
+                targetP.maxHp = sp.maxHp;
+                targetP.facing = sp.facing;
+                targetP.dashing = sp.dashing;
+                targetP.currentWeapon = sp.curW || 'knife';
+                if (typeof sp.size === 'number') targetP.size = sp.size;
                 players[pIdx] = targetP;
             } else if (pIdx === localPlayerIndex && !isHost) {
                 // Client prediction reconciliation untuk pemain lokal non-host:
@@ -15677,8 +15747,9 @@ function startGame(bypassDeviceCheck = false) {
     } catch(e){}
     player = null;
 
-    // Play prologue cutscene before first level (only once per session)
-    if (!prologuePlayed) {
+    // Play prologue cutscene before first level (only once per session, bypass if in co-op)
+    const isCoopSession = Boolean(coopRoomId);
+    if (!prologuePlayed && !isCoopSession) {
         gameState = 'cutscene';
         menuDemo = false;
         totalKills = 0;
@@ -16315,6 +16386,7 @@ function switchCoopTab(tab) {
 function initHostLobbyRoom() {
     isCoopHost = true;
     coopRoomId = generateRoomCode();
+    netSessionSeed = hashSeedToUint32(coopRoomId.toUpperCase().trim());
     localPlayerIndex = 0;
     const myCallsign = (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'PROTOTYPE-19';
     coopPeers = [
@@ -16378,6 +16450,7 @@ function submitJoinCoopRoom() {
     if (joinHint) joinHint.style.display = 'none';
 
     coopRoomId = code;
+    netSessionSeed = hashSeedToUint32(code.toUpperCase().trim());
     isCoopHost = false;
     // Indeks sementara; relay akan menetapkan indeks final lewat pesan WELCOME
     // (server-host otoritatif, mendukung hingga 4 pemain / indeks 0..3).
@@ -16688,6 +16761,10 @@ function connectCoopRelay() {
                                         peerIndex: assignedIdx,
                                         callsign: guestCallsign
                                     });
+                                    if (gameState === 'playing' && !players[assignedIdx]) {
+                                        const hostP = players[0] || player || { x: CELL * 1.5, y: CELL * 1.5 };
+                                        players[assignedIdx] = spawnCoopPeerEntity(assignedIdx, guestCallsign, hostP.x + assignedIdx * 28, hostP.y);
+                                    }
                                     const launchBtn = document.getElementById('coopLaunchBtn');
                                     if (launchBtn) {
                                         launchBtn.disabled = false;
@@ -17128,6 +17205,7 @@ function handleCoopMessage(msg) {
     if (!msg || typeof msg !== 'object') return;
     if (msg.type === 'START_GAME') {
         if (msg.seed) netSessionSeed = msg.seed;
+        else if (coopRoomId) netSessionSeed = hashSeedToUint32(coopRoomId.toUpperCase().trim());
         closeCoopLobbyModal();
         // proceedToWebGame(true) sudah menangani perpindahan view SEKALIGUS memanggil
         // startGame(true). Memanggil startGame() lagi akan memulai level dua kali
@@ -17152,6 +17230,14 @@ function handleCoopMessage(msg) {
                 tick: msg.seq || msg.tick || 0,
                 time: performance.now()
             };
+            // Host seketika membuat entitas pemain tamu jika belum ada agar
+            // dapat disimulasikan, dimasukkan ke snapshot, dan digambar di arena
+            if (!players[msg.peerIndex]) {
+                const hostP = players[0] || player || { x: CELL * 1.5, y: CELL * 1.5 };
+                const peerInfo = coopPeers.find(p => p.idx === msg.peerIndex);
+                const peerCallsign = (peerInfo && peerInfo.callsign) || ('P' + (msg.peerIndex + 1));
+                players[msg.peerIndex] = spawnCoopPeerEntity(msg.peerIndex, peerCallsign, hostP.x + msg.peerIndex * 28, hostP.y);
+            }
         }
     } else if (msg.type === 'PING') {
         sendCoopMessage('PONG', { t: msg.t, to: msg.from });
@@ -17179,6 +17265,10 @@ function handleCoopMessage(msg) {
             coopPeers.push({ idx: msg.peerIndex, callsign: msg.callsign || ('P' + (msg.peerIndex + 1)), isHost: false });
             updateCoopSlotsUI();
         }
+        if (isCoopHost && gameState === 'playing' && !players[msg.peerIndex]) {
+            const hostP = players[0] || player || { x: CELL * 1.5, y: CELL * 1.5 };
+            players[msg.peerIndex] = spawnCoopPeerEntity(msg.peerIndex, msg.callsign, hostP.x + msg.peerIndex * 28, hostP.y);
+        }
     } else if (msg.type === 'PEER_LEAVE') {
         if (typeof msg.peerIndex === 'number') {
             coopPeers = coopPeers.filter(p => p.idx !== msg.peerIndex);
@@ -17205,7 +17295,7 @@ function handleCoopMessage(msg) {
 function launchCoopMission() {
     if (!isCoopHost) return;
     // Broadcast START_GAME with session seed
-    const sessionSeed = coopRoomId ? hashSeedToUint32(coopRoomId) : Math.floor(Math.random() * 1000000);
+    const sessionSeed = coopRoomId ? hashSeedToUint32(coopRoomId.toUpperCase().trim()) : Math.floor(Math.random() * 1000000);
     netSessionSeed = sessionSeed;
     sendCoopMessage('START_GAME', { seed: sessionSeed });
     closeCoopLobbyModal();
@@ -18376,8 +18466,10 @@ function checkEndlessWaveProgress() {
         }
 
         const clearMsg = tt('endless_wave_clear').replace('{w}', endlessWave);
-        if (typeof announceLevel === 'function') announceLevel(clearMsg);
+        if (typeof announceLevel === 'function') announceLevel(clearMsg + ' — ' + tt('endless_evac_open'));
         if (typeof blip === 'function') blip(580, 0.25, 'triangle');
+        const exitText = hudEl('exitText') || document.getElementById('exitText');
+        if (exitText) setHudText(exitText, tt('endless_evac_open'));
     }
 
     if (endlessWaveCleared && Date.now() - endlessWaveClearTimer >= 3200) {
@@ -18387,6 +18479,29 @@ function checkEndlessWaveProgress() {
         const inMsg = tt('endless_wave_banner').replace('{w}', endlessWave);
         if (typeof announceLevel === 'function') announceLevel(inMsg);
     }
+}
+
+function evacuateEndlessSurvival() {
+    if (!isEndlessMode) return;
+    sExitOpen();
+    try {
+        const high = loadHigh();
+        const prevWave = Math.floor(Number(high.endlessBestWave || 0));
+        if (endlessWave > prevWave) {
+            high.endlessBestWave = endlessWave;
+        }
+        // Beri bonus ekstra nanite atas evakuasi sukses dengan selamat
+        const bonusNanite = 100 + endlessWave * 25;
+        if (typeof addNaniteShards === 'function') addNaniteShards(bonusNanite);
+        saveHigh(high);
+    } catch (_) {}
+
+    const evacMsg = tt('endless_evac_success').replace('{w}', endlessWave);
+    if (typeof announceLevel === 'function') announceLevel(evacMsg);
+
+    setTimeout(() => {
+        backToMenu();
+    }, 1200);
 }
 
 // Window global bindings for in-game UI & modal triggers
