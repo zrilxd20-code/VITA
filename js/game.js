@@ -16445,10 +16445,27 @@ function isLocalCoopRelayUrl(url) {
     return COOP_RELAY_LOCAL_RE.test(String(url || ''));
 }
 
+function getDefaultCoopRelayUrl() {
+    try {
+        if (typeof location !== 'undefined' && location.hostname) {
+            const h = location.hostname;
+            if (h && h !== 'localhost' && h !== '127.0.0.1' && h !== '::1') {
+                const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+                return `${proto}//${h}:8080`;
+            }
+        }
+    } catch (_) {}
+    return COOP_DEFAULT_RELAY_URL;
+}
+
 function resolveCoopRelayUrl() {
     let url = coopRelayUrl;
     const saved = getStoredCoopRelayUrl();
-    if (saved) url = saved;
+    if (saved) {
+        url = saved;
+    } else if (!url || url === COOP_DEFAULT_RELAY_URL) {
+        url = getDefaultCoopRelayUrl();
+    }
     // Cegah mixed-content: halaman https tidak boleh membuka ws:// (diblokir browser).
     try {
         if (typeof location !== 'undefined' && location.protocol === 'https:' && /^ws:\/\//i.test(url)) {
