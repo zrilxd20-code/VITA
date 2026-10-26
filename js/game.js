@@ -13582,6 +13582,12 @@ function serializeSnapshot() {
 function applySnapshot(snap, isHost = false) {
     if (!snap || typeof snap !== 'object') return false;
 
+    // Rekonsiliasi level / sektor aktif dari Host (agar labirin selalu sinkron)
+    if (!isHost && typeof snap.level === 'number' && snap.level !== currentLevel && snap.level >= 0 && snap.level < LEVELS) {
+        currentLevel = snap.level;
+        initLevel(snap.level);
+    }
+
     // Rekonsiliasi koin / artefak
     if (!isHost && typeof snap.coins === 'number' && typeof coinsCollected !== 'undefined') {
         coinsCollected = snap.coins;
