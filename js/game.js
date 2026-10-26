@@ -16403,6 +16403,11 @@ function submitJoinCoopRoom() {
 
 // 
 const COOP_DEFAULT_RELAY_URL = 'ws://localhost:8080';
+const COOP_SUPABASE_REALTIME_URL = (typeof DEFAULT_SUPABASE_KEY !== 'undefined')
+    ? ('wss://msribsirdpovuegligcx.supabase.co/realtime/v1/websocket?apikey=' + DEFAULT_SUPABASE_KEY + '&vsn=1.0.0')
+    : 'wss://msribsirdpovuegligcx.supabase.co/realtime/v1/websocket?vsn=1.0.0';
+let coopPhxHeartbeatTimer = null;
+let coopPhxRef = 0;
 const COOP_RELAY_URL_MAX = 256;
 // Host: nama host / IPv4 / IPv6 dalam kurung siku. Port opsional 1..5 digit.
 // Backtick ditulis sebagai \x60 agar aman bila blok ini dibaca tooling berbasis
@@ -16445,10 +16450,18 @@ function isLocalCoopRelayUrl(url) {
     return COOP_RELAY_LOCAL_RE.test(String(url || ''));
 }
 
+function isSupabaseCoopRelay(url) {
+    return Boolean(url && String(url).indexOf('supabase.co/realtime') !== -1);
+}
+
 function getDefaultCoopRelayUrl() {
     try {
         if (typeof location !== 'undefined' && location.hostname) {
             const h = location.hostname;
+            // Jika diakses dari internet hosting publik (bukan localhost / bukan LAN)
+            if (location.protocol === 'https:' && h !== 'localhost' && h !== '127.0.0.1') {
+                return COOP_SUPABASE_REALTIME_URL;
+            }
             if (h && h !== 'localhost' && h !== '127.0.0.1' && h !== '::1') {
                 const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
                 return `${proto}//${h}:8080`;
@@ -16464,6 +16477,10 @@ function resolveCoopRelayUrl() {
     if (saved) {
         url = saved;
     } else if (!url || url === COOP_DEFAULT_RELAY_URL) {
+        const isPublicWeb = (typeof location !== 'undefined' && location.protocol === 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1');
+        if (isPublicWeb) {
+            return COOP_SUPABASE_REALTIME_URL;
+        }
         url = getDefaultCoopRelayUrl();
     }
     // Cegah mixed-content: halaman https tidak boleh membuka ws:// (diblokir browser).
@@ -16585,6 +16602,118 @@ function connectCoopRelay() {
             if (coopWs) {
                 try { coopWs.close(); } catch (_) {}
             }
+            if (coopPhxHeartbeatTimer) {
+                clearInterval(coopPhxHeartbeatTimer);
+                coopPhxHeartbeatTimer = null;
+            }
+
+            // Jalur 1: Supabase Cloud Realtime Relay (Web Hosting Publik Tanpa Server Pribadi)
+            if (isSupabaseCoopRelay(url)) {
+                coopWs = new WebSocket(url);
+                const topic = `realtime:coop_${coopRoomId}`;
+                coopWs.onopen = () => {
+                    coopPhxRef++;
+                    coopWs.send(JSON.stringify({
+                        topic: topic,
+                        event: 'phx_join',
+                        payload: { config: { broadcast: { self: false } } },
+                        ref: String(coopPhxRef)
+                    }));
+                    coopPhxHeartbeatTimer = setInterval(() => {
+                        if (coopWs && coopWs.readyState === 1) {
+                            coopWs.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: 'hb' }));
+                        }
+                    }, 25000);
+                };
+                coopWs.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.event === 'phx_reply' && String(data.ref) === String(coopPhxRef)) {
+                            if (badge) {
+                                badge.textContent = 'RELAY: CLOUD (ONLINE)';
+                                badge.classList.remove('unverified');
+                                badge.classList.add('verified');
+                            }
+                            if (isCoopHost) {
+                                localPlayerIndex = 0;
+                            } else {
+                                sendCoopMessage('JOIN', {
+                                    roomId: coopRoomId,
+                                    isHost: false,
+                                    callsign: (typeof profileCallsign !== 'undefined' && profileCallsign) ? profileCallsign : 'AGENT-GUEST'
+                                });
+                            }
+                            return;
+                        }
+                        if (data.event === 'broadcast' && data.payload && data.payload.event === 'coop') {
+                            const innerMsg = data.payload.msg;
+                            if (!innerMsg || typeof innerMsg !== 'object') return;
+
+                            // Otoritas Host pada Cloud Relay: tangani join tamu secara langsung
+                            if (isCoopHost && innerMsg.type === 'JOIN') {
+                                const guestCallsign = innerMsg.callsign || 'AGENT-GUEST';
+                                let existing = coopPeers.find(p => p.callsign === guestCallsign);
+                                let assignedIdx = existing ? existing.idx : coopPeers.length;
+                                if (assignedIdx < MAX_PLAYERS) {
+                                    if (!existing) {
+                                        coopPeers.push({ idx: assignedIdx, callsign: guestCallsign, isHost: false });
+                                    }
+                                    updateCoopSlotsUI();
+                                    sendCoopMessage('WELCOME', {
+                                        peerIndex: assignedIdx,
+                                        peers: coopPeers.map(p => ({ idx: p.idx, callsign: p.callsign, isHost: p.isHost }))
+                                    });
+                                    sendCoopMessage('PEER_JOIN', {
+                                        peerIndex: assignedIdx,
+                                        callsign: guestCallsign
+                                    });
+                                    const launchBtn = document.getElementById('coopLaunchBtn');
+                                    if (launchBtn) {
+                                        launchBtn.disabled = false;
+                                        launchBtn.textContent = tt('coop_launch_btn');
+                                    }
+                                }
+                                return;
+                            }
+
+                            // Tamu menerima WELCOME
+                            if (!isCoopHost && innerMsg.type === 'WELCOME') {
+                                if (typeof innerMsg.peerIndex === 'number') {
+                                    localPlayerIndex = innerMsg.peerIndex;
+                                }
+                                if (Array.isArray(innerMsg.peers)) {
+                                    coopPeers = innerMsg.peers;
+                                    updateCoopSlotsUI();
+                                }
+                                return;
+                            }
+
+                            handleCoopMessage(innerMsg);
+                        }
+                    } catch (_) {}
+                };
+                coopWs.onerror = () => {
+                    if (badge) {
+                        badge.textContent = 'RELAY: CLOUD (OFFLINE)';
+                        badge.classList.remove('verified');
+                        badge.classList.add('unverified');
+                    }
+                };
+                coopWs.onclose = () => {
+                    if (coopPhxHeartbeatTimer) {
+                        clearInterval(coopPhxHeartbeatTimer);
+                        coopPhxHeartbeatTimer = null;
+                    }
+                    if (badge) {
+                        badge.textContent = typeof tt === 'function' ? tt('coop_disconnected') : 'RELAY: DISCONNECTED';
+                        badge.classList.remove('verified');
+                        badge.classList.add('unverified');
+                    }
+                };
+                return;
+            }
+
+            // Jalur 2: Relay WebSocket Lokal / Dedicated (tools/relay.mjs)
             coopWs = new WebSocket(url);
             coopWs.onopen = () => {
                 if (badge) {
@@ -16631,11 +16760,25 @@ function connectCoopRelay() {
 }
 
 function sendCoopMessage(type, payload) {
-    if (coopWs && coopWs.readyState === WebSocket.OPEN) {
-        try {
+    if (!coopWs || coopWs.readyState !== WebSocket.OPEN) return;
+    try {
+        if (isSupabaseCoopRelay(coopWs.url || '')) {
+            const topic = `realtime:coop_${coopRoomId}`;
+            coopPhxRef++;
+            coopWs.send(JSON.stringify({
+                topic: topic,
+                event: 'broadcast',
+                payload: {
+                    type: 'broadcast',
+                    event: 'coop',
+                    msg: { type, roomId: coopRoomId, ...payload }
+                },
+                ref: String(coopPhxRef)
+            }));
+        } else {
             coopWs.send(JSON.stringify({ type, roomId: coopRoomId, ...payload }));
-        } catch (_) {}
-    }
+        }
+    } catch (_) {}
 }
 
 // ---- Fase 4 co-op: Multi-Target Monster AI, Revive Downed Operative, & Peer Combat ----
