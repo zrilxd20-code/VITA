@@ -1064,12 +1064,6 @@ function closeDatabaseModal() {
   homeBeep('close');
 }
 
-function openDesktopModal() {
-  // v2.0: Desktop Pygame edition retired (Web-only). Redirect legacy callers to Field Manual.
-  if (typeof openControlsModal === 'function') openControlsModal();
-  else if (typeof openModal === 'function') openModal('VITA — Web Edition', 'Desktop edition retired in v2.0. Play instantly in browser.', '', '');
-}
-
 // Kompatibilitas switchDashTab jika terpanggil
 function switchDashTab(tabId) {
   if (tabId === 'profile') openProfileModal();
@@ -1459,25 +1453,6 @@ async function handleModalRegisterProfile() {
     console.error('Error saat registrasi:', e);
     alert('An error occurred during registration: ' + e.message);
   }
-}
-
-// Akses Tamu Cepat
-function handleQuickGuest() {
-  const guestCode = Math.floor(100 + Math.random() * 900);
-  const guestProf = {
-    isLoggedIn: true,
-    name: 'GUEST-' + guestCode,
-    role: 'Field Operative',
-    avatar: '',
-    presetEmoji: 'biohazard',
-    passcode: '',
-    provider: 'guest',
-    status: 'GUEST // LOCAL'
-  };
-  setProfile(guestProf);
-  closeAuthModal();
-  homeBeep('click');
-  showSaveIndicator('Guest Mode Active');
 }
 
 function handleSaveFullProfile() {
@@ -2523,7 +2498,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.6.8';
+const APP_VERSION = '2.6.9';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 
@@ -2829,6 +2804,7 @@ window.addEventListener('load', () => {
     }
   } catch (_) {}
   setTimeout(checkVitaUpdate, 2500);
+  setTimeout(autoSyncCloudOnStartup, 3200);
   try {
     const params = new URLSearchParams(window.location.search);
     const act = params.get('action');

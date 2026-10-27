@@ -9532,30 +9532,6 @@ function drawPlayer(targetPlayer) {
     }
 }
 
-// Pixel-art monster 1:1 dengan teaser homepage (maps & palet FOES di home.js).
-// Kalau home.js tak termuat, kembali false agar aman.
-function drawPixelFoe(key, px, t, ph, blink, flash) {
-    if (typeof FOES === 'undefined' || !FOES[key]) return false;
-    const foe = FOES[key];
-    const frame = foe.frames[Math.floor(t * 2.2 + ph) % foe.frames.length];
-    const rows = frame.length, cols = frame[0].length;
-    const w = cols * px, h = rows * px;
-    const ox = -w / 2, oy = -h / 2;
-    const skip = blink ? (key === 'eye' ? 'P' : 'E') : null;
-    ctx.fillStyle = 'rgba(0,0,0,0.4)';
-    ctx.fillRect(ox + px, h / 2 - 1, w - px * 2, 2);
-    for (let y = 0; y < rows; y++) {
-        const row = frame[y];
-        for (let x = 0; x < row.length; x++) {
-            const ch = row[x];
-            if (ch === '.' || ch === skip) continue;
-            ctx.fillStyle = flash ? '#fff' : foe.pal[ch];
-            ctx.fillRect(ox + x * px, oy + y * px, px, px);
-        }
-    }
-    return true;
-}
-
 function drawMonsters() {
     const t = Date.now() / 1000;
 
@@ -13255,15 +13231,15 @@ function drawDarkModeOverlay() {
 // Menambahkan warna lingkungan unik di setiap zona (spora hijau, eldritch ungu, darah merah, dll)
 function drawSektorFogTint() {
     const smod = getSektorMod(currentLevel);
-    if (!smod.fogTint) return;
+    if (!smod || !smod.fogTint) return;
     ctx.save();
     ctx.fillStyle = smod.fogTint;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(-W * 2, -H * 2, W * 5, H * 5);
     // Pulse bernapas halus untuk sektor horror (9+)
     if (smod.heartbeat) {
         const pulse = Math.sin(Date.now() / 800) * 0.03 + 0.02;
         ctx.fillStyle = `rgba(120,0,0,${pulse})`;
-        ctx.fillRect(0, 0, W, H);
+        ctx.fillRect(-W * 2, -H * 2, W * 5, H * 5);
     }
     ctx.restore();
 }
@@ -13542,6 +13518,7 @@ function renderGame() {
     drawSpores();
     drawFloatingTexts();
     drawDarkModeOverlay();
+    drawSektorFogTint();
     drawLightModeEffects();
     drawDirectionArrow();
     drawExitCompassPulse();
@@ -14015,6 +13992,9 @@ function gameLoopFrame() {
         const termModalEl = document.getElementById('terminalPuzzleModal');
         if (terminalPuzzleActive && (!termModalEl || termModalEl.style.display === 'none')) {
             terminalPuzzleActive = false;
+        }
+        if (terminalPuzzleActive) {
+            updateTerminalTelemetry();
         }
 
         try {
