@@ -317,13 +317,26 @@ function syncAccountDataFromCloud(remote) {
 
   // Update vita_profile
   const cleanStatus = String(remote.clearance || `${(remote.role || 'OPERATIVE').toUpperCase()} // CLOUD SYNCED`).split('#M:')[0].trim();
+  let preservedPasscode = '';
+  try {
+    const localProf = JSON.parse(localStorage.getItem('vita_profile') || '{}');
+    if (localProf && localProf.passcode && !isHashedPasscode(localProf.passcode) && localProf.passcode.length <= 32) {
+      preservedPasscode = localProf.passcode;
+    } else {
+      const cred = JSON.parse(localStorage.getItem('vita_saved_credentials') || '{}');
+      if (cred && cred.username === remote.username && cred.passcode && !isHashedPasscode(cred.passcode) && cred.passcode.length <= 32) {
+        preservedPasscode = cred.passcode;
+      }
+    }
+  } catch (_) {}
+
   const prof = {
     isLoggedIn: true,
     name: remote.username,
     role: remote.role || 'Field Operative',
     avatar: (remote.avatar && remote.avatar.length < 50000) ? remote.avatar : '',
     presetEmoji: remote.preset_emoji || 'biohazard',
-    passcode: remote.passcode || '',
+    passcode: preservedPasscode || remote.passcode || '',
     provider: 'facility',
     status: cleanStatus || `${(remote.role || 'OPERATIVE').toUpperCase()} // CLOUD SYNCED`
   };

@@ -112,7 +112,8 @@ function createMockElement(tag, id = '', className = '') {
                 scale() {},
                 drawImage() {},
                 fillText() {},
-                strokeText() {}
+                strokeText() {},
+                ellipse() {}
             };
         },
         width: 1280,

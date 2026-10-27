@@ -1467,7 +1467,18 @@ function handleSaveFullProfile() {
   prof.isLoggedIn = true;
   prof.name = name;
   prof.role = role;
-  if (passcode) prof.passcode = passcode;
+  if (passcode) {
+    const isHash = (typeof isHashedPasscode === 'function' && isHashedPasscode(passcode)) || passcode.length > 32;
+    if (!isHash) {
+      prof.passcode = passcode;
+      try {
+        const cred = typeof getStoredCredentials === 'function' ? getStoredCredentials() : null;
+        if (cred && cred.username === name) {
+          saveCredentials(name, passcode, true);
+        }
+      } catch (_) {}
+    }
+  }
   prof.status = `${role.toUpperCase()} // VERIFIED`;
   if (!prof.provider || prof.provider === 'guest') prof.provider = 'facility';
   setProfile(prof);
@@ -1653,11 +1664,34 @@ function applyProfileUI() {
   if (mUInput && document.activeElement !== mUInput) {
     mUInput.value = currentName;
   }
-  if (passInput && prof.passcode && document.activeElement !== passInput) {
-    passInput.value = prof.passcode;
+  const isPassHash = (typeof isHashedPasscode === 'function' && isHashedPasscode(prof.passcode)) || (prof.passcode && prof.passcode.length > 32);
+  let displayPass = '';
+  try {
+    const cred = typeof getStoredCredentials === 'function' ? getStoredCredentials() : null;
+    if (cred && cred.username === prof.name && cred.passcode && !isHashedPasscode(cred.passcode) && cred.passcode.length <= 32) {
+      displayPass = cred.passcode;
+    }
+  } catch (_) {}
+
+  if (passInput && document.activeElement !== passInput) {
+    if (displayPass) {
+      passInput.value = displayPass;
+    } else if (isPassHash) {
+      passInput.value = '';
+      passInput.placeholder = '•••••••• (Sandi Diamankan / Ubah di sini)';
+    } else {
+      passInput.value = prof.passcode || '';
+    }
   }
-  if (mPassInput && prof.passcode && document.activeElement !== mPassInput) {
-    mPassInput.value = prof.passcode;
+  if (mPassInput && document.activeElement !== mPassInput) {
+    if (displayPass) {
+      mPassInput.value = displayPass;
+    } else if (isPassHash) {
+      mPassInput.value = '';
+      mPassInput.placeholder = '•••••••• (Sandi Diamankan / Ubah di sini)';
+    } else {
+      mPassInput.value = prof.passcode || '';
+    }
   }
   if (rInput && prof.role) {
     rInput.value = prof.role;
@@ -2498,7 +2532,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.6.9';
+const APP_VERSION = '2.7.0';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 

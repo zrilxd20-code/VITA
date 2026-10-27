@@ -352,14 +352,19 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 10005;
-    padding: 22px;
+    padding: 20px 16px;
     opacity: 0;
     transition: opacity 0.25s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 .modal-backdrop.open, #homeView .modal-backdrop.open { display: flex !important; opacity: 1 !important; pointer-events: auto !important; }
 .modal, #homeView .modal {
     width: 100%;
     max-width: 480px;
+    max-height: min(88vh, 88dvh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background: linear-gradient(180deg, #120710 0%, #060309 100%);
     border: 1px solid rgba(0, 240, 255, 0.35);
     border-radius: 6px;
@@ -369,6 +374,9 @@ body {
     transform: translateY(16px);
     transition: transform 0.25s ease;
     position: relative;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 54, 54, 0.5) rgba(10, 3, 6, 0.5);
   }
 .modal-backdrop.open .modal, #homeView .modal-backdrop.open .modal { transform: translateY(0); }
 #homeView .modal h3 {
