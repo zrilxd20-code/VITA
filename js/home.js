@@ -2497,7 +2497,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.6.4';
+const APP_VERSION = '2.6.5';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 
@@ -2792,6 +2792,15 @@ if (document.readyState === 'loading') {
 }
 
 window.addEventListener('load', () => {
+  try {
+    if (!sessionStorage.getItem('vita_boot_loaded') && typeof triggerFacilityLoading === 'function') {
+      sessionStorage.setItem('vita_boot_loaded', '1');
+      triggerFacilityLoading({
+        title: (typeof T !== 'undefined' && T[homeSettings.lang || 'id']?.loading_boot_title) || 'MEMULAI PROTOKOL SISTEM VITA',
+        duration: 900
+      });
+    }
+  } catch (_) {}
   setTimeout(checkVitaUpdate, 2500);
   try {
     const params = new URLSearchParams(window.location.search);

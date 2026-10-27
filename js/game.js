@@ -816,6 +816,22 @@ const T = {
         endless_evac_success: 'EVAKUASI TAKTIS BERHASIL! GELOMBANG {w} TERCATAT (+BONUS NANIT)',
         endless_evac_locked: 'HABISI SEMUA ANOMALI DI GELOMBANG INI UNTUK MEMBUKA AIRLOCK EVAKUASI!',
         endless_evac_open: 'PORTAL EVAKUASI AKTIF — MENUJU AIRLOCK',
+        coop_waiting_squad: 'MENUNGGU OPERATIF LAIN: {c}/{t} DI AIRLOCK!',
+        coop_squad_at_exit: 'AIRLOCK EVAKUASI: {c}/{t} OPERATIF KUMPUL',
+        loading_boot_title: 'MEMULAI PROTOKOL SISTEM VITA',
+        loading_sector_title: 'DEKONTAMINASI AIRLOCK — MENUJU SEKTOR {s}',
+        loading_step_1: 'MEMERIKSA INTEGRITAS ARSIP SEKTOR...',
+        loading_step_2: 'MENGALIBRASI AKTUATOR PROTOTIPE...',
+        loading_step_3: 'MEMBANGUN TOPOLOGI LABIRIN & ANOMALI...',
+        loading_step_4: 'SINKRONISASI PROTOKOL TAKTIS BERHASIL ✓',
+        loading_tip_1: 'Phase Dash (SHIFT / Tombol Dash) memberikan kekebalan mutlak dari duri dan serangan anomali.',
+        loading_tip_2: 'Ganti senjata sesuai tipe musuh: Pisau untuk jarak dekat, Senapan untuk jarak jauh, Minigun untuk kawanan musuh.',
+        loading_tip_3: 'Reaktivasi semua generator di lorong untuk membuka pintu airlock menuju sektor berikutnya.',
+        loading_tip_4: 'Pada Operasi Co-op, seluruh rekan tim yang hidup harus berkumpul di airlock agar pintu sektor terbuka.',
+        loading_tip_5: 'Waspadai Anomali Mimic: perhatikan getaran atau denyut kecil sebelum mengambil piringan data.',
+        loading_tip_6: 'Harvester menyamarkan filamen merah di lantai batu; jangan melintasinya sembarangan.',
+        loading_tip_7: 'Tingkatkan Pohon Talenta di Hub untuk mendapatkan zirah, regenerasi, dan daya tembak permanen.',
+        loading_tip_8: 'Injak MedPod di lorong untuk memulihkan zirah bionikmu saat kondisi genting.',
         gen_restored: '+GENERATOR PULIH! // +12 HP',
         gen_all_online: '★ SEMUA GENERATOR AKTIF // PINTU TERBUKA ★',
         endless_respite_lbl: 'JEDA PASOKAN: {s}s',
@@ -1295,6 +1311,22 @@ const T = {
         endless_evac_success: 'TACTICAL EVACUATION SUCCESSFUL! WAVE {w} RECORDED (+BONUS NANITES)',
         endless_evac_locked: 'PURGE ALL ANOMALIES IN THIS WAVE TO UNLOCK EVACUATION AIRLOCK!',
         endless_evac_open: 'EVACUATION AIRLOCK OPEN — PROCEED TO EXTRACTION',
+        coop_waiting_squad: 'WAITING FOR SQUAD: {c}/{t} AT AIRLOCK!',
+        coop_squad_at_exit: 'EXTRACTION AIRLOCK: {c}/{t} OPERATIVES ASSEMBLED',
+        loading_boot_title: 'INITIALIZING VITA SYSTEM PROTOCOL',
+        loading_sector_title: 'AIRLOCK DECONTAMINATION — PROCEEDING TO SECTOR {s}',
+        loading_step_1: 'CHECKING SECTOR ARCHIVE INTEGRITY...',
+        loading_step_2: 'CALIBRATING PROTOTYPE ACTUATORS...',
+        loading_step_3: 'CONSTRUCTING LABYRINTH TOPOLOGY & ANOMALIES...',
+        loading_step_4: 'TACTICAL PROTOCOL SYNCHRONIZATION COMPLETE ✓',
+        loading_tip_1: 'Phase Dash (SHIFT / Dash Button) provides absolute invulnerability through spikes and hostile attacks.',
+        loading_tip_2: 'Switch armaments dynamically: Blade for close quarters, Rifle for distance, Minigun for hordes.',
+        loading_tip_3: 'Reactivate all sector generators in the corridors to unlock the extraction airlock doors.',
+        loading_tip_4: 'In Co-op Operations, all surviving squad members must assemble at the airlock to proceed.',
+        loading_tip_5: 'Beware of Mimic Anomalies: look for subtle breathing or twitching before picking up data discs.',
+        loading_tip_6: 'The Harvester disguises crimson filaments along stone floors; avoid stepping on active rootlines.',
+        loading_tip_7: 'Upgrade your permanent Talent Tree in the Hub to unlock defensive shields and nanite firepower.',
+        loading_tip_8: 'Step onto Medical Pods in corridors to instantly restore vital bionic chassis armor.',
         gen_restored: '+GENERATOR RESTORED! // +12 HP',
         gen_all_online: '★ ALL GENERATORS ONLINE // EXIT OPEN ★',
         endless_respite_lbl: 'SUPPLY RESPITE: {s}s',
@@ -4970,6 +5002,99 @@ function drawEKG() {
     ectx.shadowBlur = 0;
 }
 
+function getCoopExitSquadStatus() {
+    if (!exitPos || !players || players.length <= 1) {
+        return { allReady: true, count: 1, total: 1 };
+    }
+    let activeTotal = 0;
+    let inExitCount = 0;
+    const exitRadius = 52;
+    for (let i = 0; i < players.length; i++) {
+        const p = players[i];
+        if (!p) continue;
+        if (p.hp > 0 && !p.downed) {
+            activeTotal++;
+            if (dist(p, exitPos) <= exitRadius) {
+                inExitCount++;
+            }
+        }
+    }
+    if (activeTotal === 0) return { allReady: true, count: 0, total: 0 };
+    return {
+        allReady: inExitCount >= activeTotal,
+        count: inExitCount,
+        total: activeTotal
+    };
+}
+
+let activeLoadingInterval = null;
+function triggerFacilityLoading(options, onComplete) {
+    const screen = document.getElementById('facilityLoadingScreen');
+    if (!screen) {
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
+    if (activeLoadingInterval) {
+        clearInterval(activeLoadingInterval);
+        activeLoadingInterval = null;
+    }
+    const headerEl = document.getElementById('loadingHeaderTag');
+    const statusEl = document.getElementById('loadingStatusText');
+    const barEl = document.getElementById('loadingProgressBar');
+    const stepEl = document.getElementById('loadingStepNum');
+    const pctEl = document.getElementById('loadingPercent');
+    const tipMsgEl = document.getElementById('loadingTipMsg');
+
+    const title = (options && options.title) || tt('loading_boot_title');
+    const duration = (options && options.duration) || 1050;
+    const steps = (options && options.steps) || [
+        tt('loading_step_1'),
+        tt('loading_step_2'),
+        tt('loading_step_3'),
+        tt('loading_step_4')
+    ];
+
+    if (headerEl) headerEl.textContent = title;
+    if (barEl) barEl.style.width = '0%';
+    if (pctEl) pctEl.textContent = '0%';
+    if (stepEl) stepEl.textContent = 'MODUL 01 / 0' + steps.length;
+    if (statusEl) statusEl.textContent = steps[0];
+    if (tipMsgEl) {
+        const tipIdx = Math.floor(Math.random() * 8) + 1;
+        tipMsgEl.textContent = tt('loading_tip_' + tipIdx);
+    }
+
+    screen.style.display = 'flex';
+    void screen.offsetWidth;
+    screen.classList.add('active');
+
+    const startTime = performance.now();
+    activeLoadingInterval = setInterval(() => {
+        const elapsed = performance.now() - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const pct = Math.floor(progress * 100);
+        if (barEl) barEl.style.width = pct + '%';
+        if (pctEl) pctEl.textContent = pct + '%';
+        const stepIdx = Math.min(steps.length - 1, Math.floor(progress * steps.length));
+        if (stepEl) stepEl.textContent = 'MODUL 0' + (stepIdx + 1) + ' / 0' + steps.length;
+        if (statusEl) statusEl.textContent = steps[stepIdx];
+
+        if (progress >= 1) {
+            clearInterval(activeLoadingInterval);
+            activeLoadingInterval = null;
+            setTimeout(() => {
+                screen.classList.remove('active');
+                setTimeout(() => {
+                    screen.style.display = 'none';
+                    if (typeof onComplete === 'function') onComplete();
+                }, 280);
+            }, 80);
+        }
+    }, 35);
+}
+window.triggerFacilityLoading = triggerFacilityLoading;
+window.getCoopExitSquadStatus = getCoopExitSquadStatus;
+
 function updateUI() {
     setHudText(hudEl('levelText'), currentLevel + 1);
     setHudText(hudEl('modeText'), currentLevel % 2 === 1 ? tt('mode_light') : tt('mode_dark'));
@@ -5024,7 +5149,14 @@ function updateUI() {
     } else {
         unlocked = artifacts.length > 0 && coinsCollected >= artifacts.length;
         setHudText(hudEl('artifactText'), `${coinsCollected} / ${artifacts.length}`);
-        setHudText(hudEl('exitText'), unlocked ? tt('exit_open') : tt('exit_locked'));
+        let exitStatus = unlocked ? tt('exit_open') : tt('exit_locked');
+        if (unlocked && coopRoomId && players && players.length > 1) {
+            const sq = getCoopExitSquadStatus();
+            if (!sq.allReady) {
+                exitStatus = tt('coop_squad_at_exit').replace('{c}', sq.count).replace('{t}', sq.total);
+            }
+        }
+        setHudText(hudEl('exitText'), exitStatus);
     }
     setHudText(hudEl('timeText'), Math.floor((Date.now() - levelStartTime) / 1000));
     renderWeaponHUD();
@@ -6325,9 +6457,14 @@ function nextLevel() {
                 if (isMilestone) {
                     openWeaponSelectModal(currentLevel + 1);
                 } else {
-                    levelTransition = false;
-                    gameState = 'playing';
-                    initLevel(currentLevel + 1);
+                    triggerFacilityLoading({
+                        title: tt('loading_sector_title').replace('{s}', currentLevel + 2),
+                        duration: 950
+                    }, () => {
+                        levelTransition = false;
+                        gameState = 'playing';
+                        initLevel(currentLevel + 1);
+                    });
                 }
             });
         }, 500);
@@ -6345,10 +6482,15 @@ function nextLevel() {
     }
 
     setTimeout(() => {
-        levelTransition = false;
-        gameState = 'playing';
-        initLevel(currentLevel + 1);
-    }, 1500);
+        triggerFacilityLoading({
+            title: tt('loading_sector_title').replace('{s}', currentLevel + 2),
+            duration: 950
+        }, () => {
+            levelTransition = false;
+            gameState = 'playing';
+            initLevel(currentLevel + 1);
+        });
+    }, 1000);
 }
 
 let pendingNextLevel = null;
@@ -6505,12 +6647,15 @@ function selectWeaponUpgrade(key, itemType) {
 
     const next = pendingNextLevel != null ? pendingNextLevel : (currentLevel + 1);
     pendingNextLevel = null;
-    setTimeout(() => {
+    triggerFacilityLoading({
+        title: tt('loading_sector_title').replace('{s}', next + 1),
+        duration: 950
+    }, () => {
         levelTransition = false;
         gameState = 'playing';
         hideCursor();
         initLevel(next);
-    }, 400);
+    });
 }
 
 function switchWeapon(keyOrIdx) {
@@ -7248,8 +7393,30 @@ function updatePlayer() {
                 lockMsgCooldown = 80;
             }
         } else if (coinsCollected >= artifacts.length) {
-            sExitOpen();
-            nextLevel();
+            const isCoopSession = Boolean(coopRoomId && players && players.length > 1);
+            if (isCoopSession) {
+                const squad = getCoopExitSquadStatus();
+                if (squad.allReady) {
+                    sExitOpen();
+                    nextLevel();
+                } else if (lockMsgCooldown <= 0) {
+                    sLocked();
+                    if (!menuDemo) {
+                        floatingTexts.push({
+                            x: exitPos.x,
+                            y: exitPos.y - 25,
+                            text: tt('coop_waiting_squad').replace('{c}', squad.count).replace('{t}', squad.total),
+                            color: '#00f0ff',
+                            life: 75,
+                            maxLife: 75
+                        });
+                    }
+                    lockMsgCooldown = 60;
+                }
+            } else {
+                sExitOpen();
+                nextLevel();
+            }
         } else if (lockMsgCooldown <= 0) {
             const need = artifacts.length - coinsCollected;
             sLocked();
@@ -13585,7 +13752,16 @@ function applySnapshot(snap, isHost = false) {
     // Rekonsiliasi level / sektor aktif dari Host (agar labirin selalu sinkron)
     if (!isHost && typeof snap.level === 'number' && snap.level !== currentLevel && snap.level >= 0 && snap.level < LEVELS) {
         currentLevel = snap.level;
-        initLevel(snap.level);
+        if (typeof triggerFacilityLoading === 'function') {
+            triggerFacilityLoading({
+                title: tt('loading_sector_title').replace('{s}', snap.level + 1),
+                duration: 950
+            }, () => {
+                initLevel(snap.level);
+            });
+        } else {
+            initLevel(snap.level);
+        }
     }
 
     // Rekonsiliasi koin / artefak
@@ -15762,19 +15938,29 @@ function startGame(bypassDeviceCheck = false) {
         totalTime = 0;
         playPrologueCutscene(function() {
             // After prologue ends, start gameplay
+            triggerFacilityLoading({
+                title: tt('loading_sector_title').replace('{s}', 1),
+                duration: 950
+            }, () => {
+                gameState = 'playing';
+                showHUD();
+                hideCursor();
+                initLevel(0);
+            });
+        });
+    } else {
+        triggerFacilityLoading({
+            title: tt('loading_sector_title').replace('{s}', 1),
+            duration: 950
+        }, () => {
             gameState = 'playing';
+            menuDemo = false;
+            totalKills = 0;
+            totalTime = 0;
             showHUD();
             hideCursor();
             initLevel(0);
         });
-    } else {
-        gameState = 'playing';
-        menuDemo = false;
-        totalKills = 0;
-        totalTime = 0;
-        showHUD();
-        hideCursor();
-        initLevel(0);
     }
 }
 

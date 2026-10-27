@@ -5770,3 +5770,170 @@ html, body {
   50% { box-shadow: 0 0 28px rgba(255, 138, 61, 0.9); }
 }
 
+/* =============================================================================
+   FACILITY SCI-FI SYSTEM LOADING OVERLAY
+   ============================================================================= */
+.facility-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  background: radial-gradient(circle at center, #0a0e1c 0%, #04060b 80%, #020306 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e2e8f0;
+  font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.facility-loading-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.facility-loading-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.78) 100%);
+  pointer-events: none;
+}
+.facility-loading-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0, 240, 255, 0.015) 0px, rgba(0, 240, 255, 0.015) 1px, transparent 1px, transparent 3px);
+  pointer-events: none;
+}
+.facility-loading-box {
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width: 520px;
+  background: rgba(12, 16, 28, 0.92);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 12px;
+  padding: 32px 28px 24px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
+  text-align: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.loading-lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.loading-emblem {
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
+  animation: loadingEmblemPulse 2.4s ease-in-out infinite;
+}
+@keyframes loadingEmblemPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.5)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.85)); }
+}
+.loading-brand {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.loading-title {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #ff3b3b;
+  text-shadow: 0 0 14px rgba(255, 59, 59, 0.6);
+  line-height: 1;
+}
+.loading-sub {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #94a3b8;
+  margin-top: 4px;
+  font-family: monospace;
+}
+.loading-header-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-family: monospace;
+  font-weight: bold;
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+.loading-status-text {
+  font-size: 13px;
+  color: #cbd5e1;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  min-height: 20px;
+  font-family: monospace;
+}
+.loading-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
+}
+.loading-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00f0ff, #38bdf8, #10b981);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.8);
+  transition: width 0.15s ease-out;
+}
+.loading-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 11px;
+  font-family: monospace;
+  color: #64748b;
+}
+.loading-percent {
+  color: #00f0ff;
+  font-weight: bold;
+}
+.loading-tip-card {
+  margin-top: 22px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid #00f0ff;
+  border-radius: 6px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+.loading-tip-lbl {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: bold;
+  color: #00f0ff;
+  margin-bottom: 3px;
+  font-family: monospace;
+}
+.loading-tip-msg {
+  color: #e2e8f0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading-emblem { animation: none !important; }
+  .loading-bar { transition: none !important; }
+}
+

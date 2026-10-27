@@ -23,9 +23,9 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>VITA — Forgotten Sector</title>
-<link rel="stylesheet" href="css/tokens.css?v=2.6.4">
-<link rel="stylesheet" href="css/home.css?v=2.6.4">
-<link rel="stylesheet" href="css/game.css?v=2.6.4">
+<link rel="stylesheet" href="css/tokens.css?v=2.6.5">
+<link rel="stylesheet" href="css/home.css?v=2.6.5">
+<link rel="stylesheet" href="css/game.css?v=2.6.5">
 </head>
 <body class="hud-hidden">
 <div id="homeView">
@@ -495,7 +495,7 @@
 </div>
 
 <footer>
-  <b>VITA</b> &mdash; BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR &bull; WEB EDITION v2.6.4 &bull; 100% STANDALONE OFFLINE READY
+  <b>VITA</b> &mdash; BIOLOGICAL ANOMALY RESEARCH FACILITY &bull; FORGOTTEN SECTOR &bull; WEB EDITION v2.6.5 &bull; 100% STANDALONE OFFLINE READY
 </footer>
 </div>
 
@@ -593,7 +593,7 @@
         <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);padding:10px 14px;border-radius:6px;gap:12px;">
           <div>
             <div style="font-size:11px;color:#a0a0b0;letter-spacing:1px;" data-i18n="settings_cur_ver_lbl">VERSI APLIKASI SAAT INI</div>
-            <div style="font-size:15px;font-weight:bold;color:#00f0ff;" id="settingsAppVersionDisplay">v2.6.4 (Latest)</div>
+            <div style="font-size:15px;font-weight:bold;color:#00f0ff;" id="settingsAppVersionDisplay">v2.6.5 (Latest)</div>
           </div>
           <button class="btn-micro" type="button" onclick="checkVitaUpdateManual()" style="padding:8px 14px;font-weight:bold;color:#0a0a12;background:linear-gradient(135deg,#00f0ff,#0070f3);border:none;cursor:pointer;">
             <span data-i18n="settings_check_update_btn">↻ CEK PEMBARUAN</span>
@@ -1231,6 +1231,44 @@
   </div>
 </div>
 
+
+<!-- FACILITY SCI-FI SYSTEM LOADING OVERLAY -->
+<div id="facilityLoadingScreen" class="facility-loading-overlay" style="display:none;" aria-live="polite">
+    <div class="facility-loading-vignette"></div>
+    <div class="facility-loading-scanlines"></div>
+    <div class="facility-loading-box">
+        <div class="loading-lockup">
+            <svg class="loading-emblem" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                <polygon class="em-ring" points="50,4 89.8,27 89.8,73 50,96 10.2,73 10.2,27"/>
+                <polygon class="em-ring-inner" points="50,16 79.4,33 79.4,67 50,84 20.6,67 20.6,33"/>
+                <path class="em-v" d="M32 37 L50 69 L68 37"/>
+                <circle class="em-core" cx="50" cy="53" r="3.2"/>
+            </svg>
+            <div class="loading-brand">
+                <span class="loading-title">VITA</span>
+                <span class="loading-sub">FORGOTTEN SECTOR</span>
+            </div>
+        </div>
+
+        <div class="loading-header-tag" id="loadingHeaderTag">PROTOKOL INISIALISASI FASILITAS</div>
+        <div class="loading-status-text" id="loadingStatusText">MENGHUBUNGKAN AKTUATOR BIO-SEKTOR...</div>
+
+        <!-- Progress Bar -->
+        <div class="loading-track">
+            <div class="loading-bar" id="loadingProgressBar"></div>
+        </div>
+        <div class="loading-meta-row">
+            <span class="loading-step-num" id="loadingStepNum">MODUL 01 / 04</span>
+            <span class="loading-percent" id="loadingPercent">0%</span>
+        </div>
+
+        <!-- Tactical Survival Tip -->
+        <div class="loading-tip-card">
+            <span class="loading-tip-lbl" id="loadingTipLbl">PETUNJUK TAKTIS:</span>
+            <span class="loading-tip-msg" id="loadingTipMsg">Phase Dash (SHIFT / Tombol Dash) memberikan kekebalan mutlak dari duri dan serangan anomali.</span>
+        </div>
+    </div>
+</div>
 
 <!-- PROLOGUE CUTSCENE OVERLAY -->
 <div id="prologueScreen">
@@ -2092,9 +2130,9 @@
 
 </div><!-- /#gameView -->
 
-<script src="js/supabase.js?v=2.6.4"></script>
-<script src="js/home.js?v=2.6.4"></script>
-<script src="js/prologue.js?v=2.6.4"></script>
-<script src="js/game.js?v=2.6.4"></script>
+<script src="js/supabase.js?v=2.6.5"></script>
+<script src="js/home.js?v=2.6.5"></script>
+<script src="js/prologue.js?v=2.6.5"></script>
+<script src="js/game.js?v=2.6.5"></script>
 </body>
 </html>
