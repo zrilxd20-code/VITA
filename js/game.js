@@ -5062,7 +5062,8 @@ function triggerFacilityLoading(options, onComplete) {
 
     const opts = (typeof options === 'object' && options) ? options : {};
     const title = opts.title || tt('loading_boot_title');
-    const duration = opts.duration || 850;
+    // Durasi ideal terkalibrasi: ~1250ms (tidak terlalu cepat, tidak lama, semua sistem mantap siap)
+    const duration = opts.duration || 1250;
     const steps = opts.steps || [
         tt('loading_step_1'),
         tt('loading_step_2'),
@@ -5088,13 +5089,18 @@ function triggerFacilityLoading(options, onComplete) {
     screen.classList.add('active');
     void screen.offsetWidth;
 
-    // SEGERA jalankan onPrepare saat tirai sudah menutup rapat
+    // SEGERA jalankan onPrepare saat tirai sudah menutup rapat agar semua sistem siap
     if (typeof opts.onPrepare === 'function') {
         try {
             opts.onPrepare();
         } catch (err) {
             console.error('Error during loading onPrepare:', err);
         }
+    }
+
+    // Pastikan frame pertama game ter-render di bawah tirai loading
+    if (typeof gameState !== 'undefined' && gameState === 'playing' && typeof renderFrame === 'function') {
+        try { renderFrame(); } catch (_) {}
     }
 
     const startTime = performance.now();
@@ -5112,17 +5118,26 @@ function triggerFacilityLoading(options, onComplete) {
             clearInterval(activeLoadingInterval);
             activeLoadingInterval = null;
 
-            // Lepaskan curtain-instant agar fade-out mulus
-            screen.classList.remove('curtain-instant');
-            void screen.offsetWidth;
+            if (barEl) barEl.style.width = '100%';
+            if (pctEl) pctEl.textContent = '100%';
+            if (stepEl) stepEl.textContent = 'MODUL 0' + steps.length + ' / 0' + steps.length;
+            if (statusEl) statusEl.textContent = steps[steps.length - 1];
 
+            // Render ulang 1 frame lagi untuk memastikan sinkronisasi kanvas & HUD sempurna
+            if (typeof gameState !== 'undefined' && gameState === 'playing' && typeof renderFrame === 'function') {
+                try { renderFrame(); } catch (_) {}
+            }
+
+            // Jeda sejenak (150ms) pada 100% agar status modul terverifikasi mata
             setTimeout(() => {
+                screen.classList.remove('curtain-instant');
+                void screen.offsetWidth;
                 screen.classList.remove('active');
                 setTimeout(() => {
                     screen.style.display = 'none';
                     if (typeof onComplete === 'function') onComplete();
-                }, 320);
-            }, 60);
+                }, 340);
+            }, 150);
         }
     }, 28);
 }
@@ -6493,7 +6508,7 @@ function nextLevel() {
                 } else {
                     triggerFacilityLoading({
                         title: tt('loading_sector_title').replace('{s}', currentLevel + 2),
-                        duration: 850,
+                        duration: 1250,
                         instant: true,
                         onPrepare: () => {
                             levelTransition = false;
@@ -6520,7 +6535,7 @@ function nextLevel() {
     setTimeout(() => {
         triggerFacilityLoading({
             title: tt('loading_sector_title').replace('{s}', currentLevel + 2),
-            duration: 850,
+            duration: 1250,
             instant: true,
             onPrepare: () => {
                 levelTransition = false;
@@ -6687,7 +6702,7 @@ function selectWeaponUpgrade(key, itemType) {
     pendingNextLevel = null;
     triggerFacilityLoading({
         title: tt('loading_sector_title').replace('{s}', next + 1),
-        duration: 850,
+        duration: 1250,
         instant: true,
         onPrepare: () => {
             levelTransition = false;
@@ -14425,7 +14440,7 @@ function retryLevel() {
     if (typeof triggerFacilityLoading === 'function') {
         triggerFacilityLoading({
             title: tt('loading_sector_title').replace('{s}', currentLevel + 1),
-            duration: 750,
+            duration: 1200,
             instant: true,
             onPrepare: doRetry
         });
@@ -15993,7 +16008,7 @@ function startGame(bypassDeviceCheck = false) {
             // After prologue ends, start gameplay with instant curtain and background init
             triggerFacilityLoading({
                 title: tt('loading_sector_title').replace('{s}', 1),
-                duration: 800,
+                duration: 1250,
                 instant: true,
                 onPrepare: () => {
                     gameState = 'playing';
@@ -16006,7 +16021,7 @@ function startGame(bypassDeviceCheck = false) {
     } else {
         triggerFacilityLoading({
             title: tt('loading_sector_title').replace('{s}', 1),
-            duration: 800,
+            duration: 1250,
             instant: true,
             onPrepare: () => {
                 document.getElementById('startScreen').style.display = 'none';
@@ -16064,7 +16079,7 @@ function restartGame() {
     if (typeof triggerFacilityLoading === 'function') {
         triggerFacilityLoading({
             title: tt('loading_sector_title').replace('{s}', 1),
-            duration: 750,
+            duration: 1200,
             instant: true,
             onPrepare: doRestart
         });
@@ -16133,7 +16148,7 @@ function backToMenu() {
     if (typeof triggerFacilityLoading === 'function') {
         triggerFacilityLoading({
             title: tt('loading_game_to_hub'),
-            duration: 700,
+            duration: 1150,
             instant: true,
             onPrepare: doReturnToHub
         });
@@ -18656,7 +18671,7 @@ function startEndlessMode() {
     if (typeof triggerFacilityLoading === 'function') {
         triggerFacilityLoading({
             title: 'PROTOKOL SURVIVAL TAK HINGGA — GELOMBANG 1',
-            duration: 800,
+            duration: 1250,
             instant: true,
             onPrepare: doStartEndless
         });
