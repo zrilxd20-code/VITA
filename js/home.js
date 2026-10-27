@@ -1744,6 +1744,22 @@ function applyProfileUI() {
     if (pDbStatus) pDbStatus.textContent = isEn ? 'LOCAL ARCHIVE // STANDBY' : 'ARSIP LOKAL // STANDBY';
   }
 
+  // Tampilkan tombol yang sesuai:
+  // - Jika belum login (Guest): tombol Log In & Sign Up
+  // - Jika sudah login: tombol Log Out & Ganti Akun
+  const guestRow = document.getElementById('profileGuestActionsRow');
+  const userRow = document.getElementById('profileUserActionsRow');
+  const isAuthAccount = prof.isLoggedIn && prof.provider !== 'guest' && prof.name && !String(prof.name).startsWith('GUEST-');
+  if (guestRow && userRow) {
+    if (isAuthAccount) {
+      guestRow.style.display = 'none';
+      userRow.style.display = 'flex';
+    } else {
+      guestRow.style.display = 'flex';
+      userRow.style.display = 'none';
+    }
+  }
+
   // Sinkronisasi status koneksi Supabase Cloud
   const sbTag = document.getElementById('supabaseStatusTag');
   const sbUrlIn = document.getElementById('sbUrlInput');
@@ -2532,7 +2548,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.7.0';
+const APP_VERSION = '2.7.1';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 

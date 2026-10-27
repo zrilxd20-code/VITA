@@ -818,6 +818,15 @@ body {
   align-items: center;
   margin-top: 6px;
 }
+.profile-actions-row .btn {
+  padding: 11px 18px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  border-radius: 4px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 #btnSaveProfile, #modalSaveProfileBtn {
   background: linear-gradient(135deg, #16a34a, #15803d) !important;
   color: #ffffff !important;

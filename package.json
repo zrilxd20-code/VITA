@@ -1,6 +1,6 @@
 {
   "name": "vita-forgotten-sector",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "VITA — Forgotten Sector. Web-only top-down survival horror maze roguelite. Zero external runtime assets.",
   "license": "MIT",
   "engines": {
