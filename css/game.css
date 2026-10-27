@@ -5785,9 +5785,14 @@ html, body {
   font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   -webkit-user-select: none;
+}
+.facility-loading-overlay.curtain-instant {
+  transition: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 .facility-loading-overlay.active {
   opacity: 1;

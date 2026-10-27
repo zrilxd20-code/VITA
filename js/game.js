@@ -819,11 +819,17 @@ const T = {
         coop_waiting_squad: 'MENUNGGU OPERATIF LAIN: {c}/{t} DI AIRLOCK!',
         coop_squad_at_exit: 'AIRLOCK EVAKUASI: {c}/{t} OPERATIF KUMPUL',
         loading_boot_title: 'MEMULAI PROTOKOL SISTEM VITA',
+        loading_hub_to_game: 'MEMULAI SISTEM OPERATIF VITA',
+        loading_game_to_hub: 'MENUTUP SESI TAKTIS — KEMBALI KE HUB',
         loading_sector_title: 'DEKONTAMINASI AIRLOCK — MENUJU SEKTOR {s}',
         loading_step_1: 'MEMERIKSA INTEGRITAS ARSIP SEKTOR...',
         loading_step_2: 'MENGALIBRASI AKTUATOR PROTOTIPE...',
         loading_step_3: 'MEMBANGUN TOPOLOGI LABIRIN & ANOMALI...',
         loading_step_4: 'SINKRONISASI PROTOKOL TAKTIS BERHASIL ✓',
+        loading_step_hub_1: 'MENGHUBUNGKAN KONSOL ARSIP...',
+        loading_step_hub_2: 'MENYIAPKAN PROTOKOL LABIRIN...',
+        loading_step_hub_3: 'SINKRONISASI BIOMETRIK OPERATIF...',
+        loading_step_hub_4: 'AKSES SEKTOR DIBERIKAN ✓',
         loading_tip_1: 'Phase Dash (SHIFT / Tombol Dash) memberikan kekebalan mutlak dari duri dan serangan anomali.',
         loading_tip_2: 'Ganti senjata sesuai tipe musuh: Pisau untuk jarak dekat, Senapan untuk jarak jauh, Minigun untuk kawanan musuh.',
         loading_tip_3: 'Reaktivasi semua generator di lorong untuk membuka pintu airlock menuju sektor berikutnya.',
@@ -1314,11 +1320,17 @@ const T = {
         coop_waiting_squad: 'WAITING FOR SQUAD: {c}/{t} AT AIRLOCK!',
         coop_squad_at_exit: 'EXTRACTION AIRLOCK: {c}/{t} OPERATIVES ASSEMBLED',
         loading_boot_title: 'INITIALIZING VITA SYSTEM PROTOCOL',
+        loading_hub_to_game: 'INITIALIZING VITA OPERATIVE SYSTEM',
+        loading_game_to_hub: 'CLOSING TACTICAL SESSION — RETURNING TO HUB',
         loading_sector_title: 'AIRLOCK DECONTAMINATION — PROCEEDING TO SECTOR {s}',
         loading_step_1: 'CHECKING SECTOR ARCHIVE INTEGRITY...',
         loading_step_2: 'CALIBRATING PROTOTYPE ACTUATORS...',
         loading_step_3: 'CONSTRUCTING LABYRINTH TOPOLOGY & ANOMALIES...',
         loading_step_4: 'TACTICAL PROTOCOL SYNCHRONIZATION COMPLETE ✓',
+        loading_step_hub_1: 'CONNECTING ARCHIVE CONSOLE...',
+        loading_step_hub_2: 'PREPARING LABYRINTH PROTOCOL...',
+        loading_step_hub_3: 'SYNCHRONIZING OPERATIVE BIOMETRICS...',
+        loading_step_hub_4: 'SECTOR ACCESS GRANTED ✓',
         loading_tip_1: 'Phase Dash (SHIFT / Dash Button) provides absolute invulnerability through spikes and hostile attacks.',
         loading_tip_2: 'Switch armaments dynamically: Blade for close quarters, Rifle for distance, Minigun for hordes.',
         loading_tip_3: 'Reactivate all sector generators in the corridors to unlock the extraction airlock doors.',
@@ -5031,6 +5043,9 @@ let activeLoadingInterval = null;
 function triggerFacilityLoading(options, onComplete) {
     const screen = document.getElementById('facilityLoadingScreen');
     if (!screen) {
+        if (options && typeof options.onPrepare === 'function') {
+            try { options.onPrepare(); } catch (_) {}
+        }
         if (typeof onComplete === 'function') onComplete();
         return;
     }
@@ -5045,14 +5060,16 @@ function triggerFacilityLoading(options, onComplete) {
     const pctEl = document.getElementById('loadingPercent');
     const tipMsgEl = document.getElementById('loadingTipMsg');
 
-    const title = (options && options.title) || tt('loading_boot_title');
-    const duration = (options && options.duration) || 1050;
-    const steps = (options && options.steps) || [
+    const opts = (typeof options === 'object' && options) ? options : {};
+    const title = opts.title || tt('loading_boot_title');
+    const duration = opts.duration || 850;
+    const steps = opts.steps || [
         tt('loading_step_1'),
         tt('loading_step_2'),
         tt('loading_step_3'),
         tt('loading_step_4')
     ];
+    const isInstant = opts.instant !== false;
 
     if (headerEl) headerEl.textContent = title;
     if (barEl) barEl.style.width = '0%';
@@ -5065,8 +5082,20 @@ function triggerFacilityLoading(options, onComplete) {
     }
 
     screen.style.display = 'flex';
-    void screen.offsetWidth;
+    if (isInstant) {
+        screen.classList.add('curtain-instant');
+    }
     screen.classList.add('active');
+    void screen.offsetWidth;
+
+    // SEGERA jalankan onPrepare saat tirai sudah menutup rapat
+    if (typeof opts.onPrepare === 'function') {
+        try {
+            opts.onPrepare();
+        } catch (err) {
+            console.error('Error during loading onPrepare:', err);
+        }
+    }
 
     const startTime = performance.now();
     activeLoadingInterval = setInterval(() => {
@@ -5082,15 +5111,20 @@ function triggerFacilityLoading(options, onComplete) {
         if (progress >= 1) {
             clearInterval(activeLoadingInterval);
             activeLoadingInterval = null;
+
+            // Lepaskan curtain-instant agar fade-out mulus
+            screen.classList.remove('curtain-instant');
+            void screen.offsetWidth;
+
             setTimeout(() => {
                 screen.classList.remove('active');
                 setTimeout(() => {
                     screen.style.display = 'none';
                     if (typeof onComplete === 'function') onComplete();
-                }, 280);
-            }, 80);
+                }, 320);
+            }, 60);
         }
-    }, 35);
+    }, 28);
 }
 window.triggerFacilityLoading = triggerFacilityLoading;
 window.getCoopExitSquadStatus = getCoopExitSquadStatus;
@@ -6459,11 +6493,13 @@ function nextLevel() {
                 } else {
                     triggerFacilityLoading({
                         title: tt('loading_sector_title').replace('{s}', currentLevel + 2),
-                        duration: 950
-                    }, () => {
-                        levelTransition = false;
-                        gameState = 'playing';
-                        initLevel(currentLevel + 1);
+                        duration: 850,
+                        instant: true,
+                        onPrepare: () => {
+                            levelTransition = false;
+                            gameState = 'playing';
+                            initLevel(currentLevel + 1);
+                        }
                     });
                 }
             });
@@ -6484,11 +6520,13 @@ function nextLevel() {
     setTimeout(() => {
         triggerFacilityLoading({
             title: tt('loading_sector_title').replace('{s}', currentLevel + 2),
-            duration: 950
-        }, () => {
-            levelTransition = false;
-            gameState = 'playing';
-            initLevel(currentLevel + 1);
+            duration: 850,
+            instant: true,
+            onPrepare: () => {
+                levelTransition = false;
+                gameState = 'playing';
+                initLevel(currentLevel + 1);
+            }
         });
     }, 1000);
 }
@@ -6649,12 +6687,14 @@ function selectWeaponUpgrade(key, itemType) {
     pendingNextLevel = null;
     triggerFacilityLoading({
         title: tt('loading_sector_title').replace('{s}', next + 1),
-        duration: 950
-    }, () => {
-        levelTransition = false;
-        gameState = 'playing';
-        hideCursor();
-        initLevel(next);
+        duration: 850,
+        instant: true,
+        onPrepare: () => {
+            levelTransition = false;
+            gameState = 'playing';
+            hideCursor();
+            initLevel(next);
+        }
     });
 }
 
@@ -14354,31 +14394,44 @@ function retryLevel() {
         startEndlessMode();
         return;
     }
-    const ds = document.getElementById('deathScreen');
-    if (ds) ds.style.display = 'none';
-    const ps = document.getElementById('pauseScreen');
-    if (ps) ps.classList.remove('open');
-    const pro = document.getElementById('prologueScreen');
-    if (pro) {
-        pro.classList.remove('active', 'fade-out');
-        pro.style.display = 'none';
+    const doRetry = () => {
+        const ds = document.getElementById('deathScreen');
+        if (ds) ds.style.display = 'none';
+        const ps = document.getElementById('pauseScreen');
+        if (ps) ps.classList.remove('open');
+        const pro = document.getElementById('prologueScreen');
+        if (pro) {
+            pro.classList.remove('active', 'fade-out');
+            pro.style.display = 'none';
+        }
+        gameState = 'playing';
+        menuDemo = false;
+        isMouseDown = false;
+        keys = {};
+        if (typeof touchMove !== 'undefined') {
+            touchMove.active = false;
+            touchMove.dx = 0;
+            touchMove.dy = 0;
+        }
+        hitStop = 0;
+        screenShake = 0;
+        hurtFlash = 0;
+        levelTransition = false;
+        showHUD();
+        hideCursor();
+        initLevel(currentLevel);
+    };
+
+    if (typeof triggerFacilityLoading === 'function') {
+        triggerFacilityLoading({
+            title: tt('loading_sector_title').replace('{s}', currentLevel + 1),
+            duration: 750,
+            instant: true,
+            onPrepare: doRetry
+        });
+    } else {
+        doRetry();
     }
-    gameState = 'playing';
-    menuDemo = false;
-    isMouseDown = false;
-    keys = {};
-    if (typeof touchMove !== 'undefined') {
-        touchMove.active = false;
-        touchMove.dx = 0;
-        touchMove.dy = 0;
-    }
-    hitStop = 0;
-    screenShake = 0;
-    hurtFlash = 0;
-    levelTransition = false;
-    showHUD();
-    hideCursor();
-    initLevel(currentLevel);
 }
 
 // ---- Bisukan / nyalakan suara cepat (tombol M) ----
@@ -15909,7 +15962,6 @@ function startGame(bypassDeviceCheck = false) {
         }
     }
     ensureAudio();
-    document.getElementById('startScreen').style.display = 'none';
     document.getElementById('deathScreen').style.display = 'none';
     document.getElementById('winScreen').style.display = 'none';
     if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
@@ -15932,34 +15984,40 @@ function startGame(bypassDeviceCheck = false) {
     // Play prologue cutscene before first level (only once per session, bypass if in co-op)
     const isCoopSession = Boolean(coopRoomId);
     if (!prologuePlayed && !isCoopSession) {
+        document.getElementById('startScreen').style.display = 'none';
         gameState = 'cutscene';
         menuDemo = false;
         totalKills = 0;
         totalTime = 0;
         playPrologueCutscene(function() {
-            // After prologue ends, start gameplay
+            // After prologue ends, start gameplay with instant curtain and background init
             triggerFacilityLoading({
                 title: tt('loading_sector_title').replace('{s}', 1),
-                duration: 950
-            }, () => {
-                gameState = 'playing';
-                showHUD();
-                hideCursor();
-                initLevel(0);
+                duration: 800,
+                instant: true,
+                onPrepare: () => {
+                    gameState = 'playing';
+                    showHUD();
+                    hideCursor();
+                    initLevel(0);
+                }
             });
         });
     } else {
         triggerFacilityLoading({
             title: tt('loading_sector_title').replace('{s}', 1),
-            duration: 950
-        }, () => {
-            gameState = 'playing';
-            menuDemo = false;
-            totalKills = 0;
-            totalTime = 0;
-            showHUD();
-            hideCursor();
-            initLevel(0);
+            duration: 800,
+            instant: true,
+            onPrepare: () => {
+                document.getElementById('startScreen').style.display = 'none';
+                gameState = 'playing';
+                menuDemo = false;
+                totalKills = 0;
+                totalTime = 0;
+                showHUD();
+                hideCursor();
+                initLevel(0);
+            }
         });
     }
 }
@@ -15970,36 +16028,49 @@ function restartGame() {
         startEndlessMode();
         return;
     }
-    isEndlessMode = false;
-    const ds = document.getElementById('deathScreen');
-    if (ds) ds.style.display = 'none';
-    const ws = document.getElementById('winScreen');
-    if (ws) ws.style.display = 'none';
-    const ps = document.getElementById('pauseScreen');
-    if (ps) ps.classList.remove('open');
-    const pro = document.getElementById('prologueScreen');
-    if (pro) {
-        pro.classList.remove('active', 'fade-out');
-        pro.style.display = 'none';
+    const doRestart = () => {
+        isEndlessMode = false;
+        const ds = document.getElementById('deathScreen');
+        if (ds) ds.style.display = 'none';
+        const ws = document.getElementById('winScreen');
+        if (ws) ws.style.display = 'none';
+        const ps = document.getElementById('pauseScreen');
+        if (ps) ps.classList.remove('open');
+        const pro = document.getElementById('prologueScreen');
+        if (pro) {
+            pro.classList.remove('active', 'fade-out');
+            pro.style.display = 'none';
+        }
+        gameState = 'playing';
+        menuDemo = false;
+        totalKills = 0;
+        totalTime = 0;
+        isMouseDown = false;
+        keys = {};
+        if (typeof touchMove !== 'undefined') {
+            touchMove.active = false;
+            touchMove.dx = 0;
+            touchMove.dy = 0;
+        }
+        hitStop = 0;
+        screenShake = 0;
+        hurtFlash = 0;
+        levelTransition = false;
+        showHUD();
+        hideCursor();
+        initLevel(0);
+    };
+
+    if (typeof triggerFacilityLoading === 'function') {
+        triggerFacilityLoading({
+            title: tt('loading_sector_title').replace('{s}', 1),
+            duration: 750,
+            instant: true,
+            onPrepare: doRestart
+        });
+    } else {
+        doRestart();
     }
-    gameState = 'playing';
-    menuDemo = false;
-    totalKills = 0;
-    totalTime = 0;
-    isMouseDown = false;
-    keys = {};
-    if (typeof touchMove !== 'undefined') {
-        touchMove.active = false;
-        touchMove.dx = 0;
-        touchMove.dy = 0;
-    }
-    hitStop = 0;
-    screenShake = 0;
-    hurtFlash = 0;
-    levelTransition = false;
-    showHUD();
-    hideCursor();
-    initLevel(0);
 }
 
 function togglePause(on) {
@@ -16033,22 +16104,42 @@ function restartFromPause() {
 
 function backToMenu() {
     if (typeof isEditingTouchLayout !== 'undefined' && isEditingTouchLayout) return;
-    isEndlessMode = false;
-    isTouchAtkPressed = false;
-    gameState = 'menu';
-    menuDemo = true;
-    stopAmbientDrone();
-    stopProceduralOST();
-    document.getElementById('pauseScreen').classList.remove('open');
-    hideHUD();
-    showCursor();
-    document.getElementById('startScreen').style.display = 'flex';
-    initLevel(0);
-    const gv = document.getElementById('gameView');
-    const hv = document.getElementById('homeView');
-    if (gv) gv.style.display = 'none';
-    if (hv) hv.style.display = '';
-    document.body.classList.remove('game-on');
+    const doReturnToHub = () => {
+        isEndlessMode = false;
+        isTouchAtkPressed = false;
+        gameState = 'menu';
+        menuDemo = true;
+        stopAmbientDrone();
+        stopProceduralOST();
+        const ps = document.getElementById('pauseScreen');
+        if (ps) ps.classList.remove('open');
+        const ds = document.getElementById('deathScreen');
+        if (ds) ds.style.display = 'none';
+        const ws = document.getElementById('winScreen');
+        if (ws) ws.style.display = 'none';
+        hideHUD();
+        showCursor();
+        const ss = document.getElementById('startScreen');
+        if (ss) ss.style.display = 'flex';
+        initLevel(0);
+        const gv = document.getElementById('gameView');
+        const hv = document.getElementById('homeView');
+        if (gv) gv.style.display = 'none';
+        if (hv) hv.style.display = '';
+        document.body.classList.remove('game-on');
+        if (typeof resize === 'function') resize();
+    };
+
+    if (typeof triggerFacilityLoading === 'function') {
+        triggerFacilityLoading({
+            title: tt('loading_game_to_hub'),
+            duration: 700,
+            instant: true,
+            onPrepare: doReturnToHub
+        });
+    } else {
+        doReturnToHub();
+    }
 }
 
 const adminCodeInput = document.getElementById('adminCode');
@@ -18519,45 +18610,58 @@ window.openWorkbenchFromGame = openWorkbenchFromGame;
 
 function startEndlessMode() {
     ensureAudio();
-    isEndlessMode = true;
-    endlessWave = 1;
-    endlessKills = 0;
-    endlessWaveCleared = false;
-    endlessWaveClearTimer = 0;
-    
-    // Sembunyikan semua overlay menu
-    const ss = document.getElementById('startScreen'); if (ss) ss.style.display = 'none';
-    const ds = document.getElementById('deathScreen'); if (ds) ds.style.display = 'none';
-    const ws = document.getElementById('winScreen'); if (ws) ws.style.display = 'none';
-    const ps = document.getElementById('pauseScreen'); if (ps) ps.classList.remove('open');
-    const pro = document.getElementById('prologueScreen'); if (pro) pro.style.display = 'none';
+    const doStartEndless = () => {
+        isEndlessMode = true;
+        endlessWave = 1;
+        endlessKills = 0;
+        endlessWaveCleared = false;
+        endlessWaveClearTimer = 0;
+        
+        // Sembunyikan semua overlay menu
+        const ss = document.getElementById('startScreen'); if (ss) ss.style.display = 'none';
+        const ds = document.getElementById('deathScreen'); if (ds) ds.style.display = 'none';
+        const ws = document.getElementById('winScreen'); if (ws) ws.style.display = 'none';
+        const ps = document.getElementById('pauseScreen'); if (ps) ps.classList.remove('open');
+        const pro = document.getElementById('prologueScreen'); if (pro) pro.style.display = 'none';
 
-    gameState = 'playing';
-    menuDemo = false;
-    totalKills = 0;
-    totalTime = 0;
-    showHUD();
-    hideCursor();
+        gameState = 'playing';
+        menuDemo = false;
+        totalKills = 0;
+        totalTime = 0;
+        showHUD();
+        hideCursor();
 
-    // Inisialisasi arena luas (menggunakan template labirin Sektor 8 ber-seed acak)
-    currentLevel = 7;
-    initLevel(7);
-    artifacts = [];
-    coinsCollected = 0;
+        // Inisialisasi arena luas (menggunakan template labirin Sektor 8 ber-seed acak)
+        currentLevel = 7;
+        initLevel(7);
+        artifacts = [];
+        coinsCollected = 0;
 
-    // Kustomisasi objektif dan HUD arena survival
-    const badge = hudEl('uiBadge') || document.getElementById('uiBadge');
-    if (badge) setHudText(badge, tt('endless_badge_wave').replace('{w}', '1'));
-    const exitText = hudEl('exitText') || document.getElementById('exitText');
-    if (exitText) setHudText(exitText, tt('endless_objective'));
-    const artText = hudEl('artifactText') || document.getElementById('artifactText');
-    if (artText) setHudText(artText, '—');
-    
-    // Spawn gelombang monster pertama
-    spawnEndlessWave(1);
+        // Kustomisasi objektif dan HUD arena survival
+        const badge = hudEl('uiBadge') || document.getElementById('uiBadge');
+        if (badge) setHudText(badge, tt('endless_badge_wave').replace('{w}', '1'));
+        const exitText = hudEl('exitText') || document.getElementById('exitText');
+        if (exitText) setHudText(exitText, tt('endless_objective'));
+        const artText = hudEl('artifactText') || document.getElementById('artifactText');
+        if (artText) setHudText(artText, '—');
+        
+        // Spawn gelombang monster pertama
+        spawnEndlessWave(1);
 
-    if (typeof announceLevel === 'function') {
-        announceLevel(tt('endless_wave_banner').replace('{w}', '1'));
+        if (typeof announceLevel === 'function') {
+            announceLevel(tt('endless_wave_banner').replace('{w}', '1'));
+        }
+    };
+
+    if (typeof triggerFacilityLoading === 'function') {
+        triggerFacilityLoading({
+            title: 'PROTOKOL SURVIVAL TAK HINGGA — GELOMBANG 1',
+            duration: 800,
+            instant: true,
+            onPrepare: doStartEndless
+        });
+    } else {
+        doStartEndless();
     }
 }
 

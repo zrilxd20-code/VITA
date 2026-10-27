@@ -2451,31 +2451,57 @@ function proceedToWebGame(autoStart = false) {
   try {
     if (typeof homeBeep === 'function') homeBeep('launch');
   } catch (_) {}
-  const hv = document.getElementById('homeView');
-  if (hv) hv.style.display = 'none';
-  const dm = document.getElementById('deviceModeModal');
-  if (dm) { dm.classList.remove('open'); dm.style.display = 'none'; }
-  document.querySelectorAll('#homeView .modal-backdrop.open').forEach(m => m.classList.remove('open'));
-  const gv = document.getElementById('gameView');
-  if (gv) gv.style.display = '';
-  document.body.classList.add('game-on');
-  const ss = document.getElementById('startScreen');
-  if (autoStart) {
-    if (ss) ss.style.display = 'none';
-  } else {
-    if (ss) ss.style.display = 'flex';
-    if (typeof gameState !== 'undefined') gameState = 'menu';
-    if (typeof menuDemo !== 'undefined') menuDemo = true;
-  }
-  if (typeof resize === 'function') resize();
-  if (typeof checkContinueBtn === 'function') checkContinueBtn();
-  if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
-  if (autoStart && typeof startGame === 'function') {
-    if (activeGameDirective === 'endless' && typeof startEndlessMode === 'function') {
-      startEndlessMode();
+
+  const doSwitchToGame = () => {
+    const hv = document.getElementById('homeView');
+    if (hv) hv.style.display = 'none';
+    const dm = document.getElementById('deviceModeModal');
+    if (dm) { dm.classList.remove('open'); dm.style.display = 'none'; }
+    document.querySelectorAll('#homeView .modal-backdrop.open').forEach(m => m.classList.remove('open'));
+    const gv = document.getElementById('gameView');
+    if (gv) gv.style.display = '';
+    document.body.classList.add('game-on');
+    const ss = document.getElementById('startScreen');
+    if (autoStart) {
+      if (ss) ss.style.display = 'none';
     } else {
-      startGame(true);
+      if (ss) ss.style.display = 'flex';
+      if (typeof gameState !== 'undefined') gameState = 'menu';
+      if (typeof menuDemo !== 'undefined') menuDemo = true;
     }
+    if (typeof resize === 'function') resize();
+    if (typeof checkContinueBtn === 'function') checkContinueBtn();
+    if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
+    if (autoStart && typeof startGame === 'function') {
+      if (activeGameDirective === 'endless' && typeof startEndlessMode === 'function') {
+        startEndlessMode();
+      } else {
+        startGame(true);
+      }
+    }
+  };
+
+  if (typeof triggerFacilityLoading === 'function') {
+    const activeLang = homeSettings.lang || 'id';
+    const title = (typeof T !== 'undefined' && T[activeLang]?.loading_hub_to_game)
+      ? T[activeLang].loading_hub_to_game
+      : 'MEMULAI SISTEM OPERATIF VITA';
+    const steps = (typeof T !== 'undefined' && T[activeLang]?.loading_step_hub_1) ? [
+      T[activeLang].loading_step_hub_1,
+      T[activeLang].loading_step_hub_2,
+      T[activeLang].loading_step_hub_3,
+      T[activeLang].loading_step_hub_4
+    ] : null;
+
+    triggerFacilityLoading({
+      title: title,
+      duration: 750,
+      steps: steps,
+      instant: true,
+      onPrepare: doSwitchToGame
+    });
+  } else {
+    doSwitchToGame();
   }
 }
 
@@ -2497,7 +2523,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.6.5';
+const APP_VERSION = '2.6.6';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 
