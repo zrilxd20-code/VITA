@@ -2523,7 +2523,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.6.7';
+const APP_VERSION = '2.6.8';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 
@@ -2676,9 +2676,10 @@ async function checkVitaUpdate(manual = false) {
   }
 }
 
-window.checkVitaUpdateManual = function() {
+function checkVitaUpdateManual() {
   checkVitaUpdate(true);
-};
+}
+window.checkVitaUpdateManual = checkVitaUpdateManual;
 
 function isApkOrWebView() {
   try {
