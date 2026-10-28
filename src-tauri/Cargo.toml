@@ -1,6 +1,6 @@
 [package]
 name = "vita"
-version = "2.7.1"
+version = "2.7.2"
 description = "VITA — Forgotten Sector. Top-down survival horror maze roguelite."
 authors = ["zrilxd20-code"]
 license = "MIT"

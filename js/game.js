@@ -7752,7 +7752,64 @@ function followPath(m, speed) {
     return true;
 }
 
+function updateMonstersGuestCoop() {
+    if (!monsters || !monsters.length) return;
+
+    // Update Boss HUD Status jika ada boss aktif
+    const activeBoss = monsters.find(m => m.hp > 0 && (m.isBoss || m.isMonolith || m.name === 'The Monolith' || m.name === 'Mother Harvester'));
+    const bossHud = hudEl('bossHud');
+    if (bossHud) {
+        if (activeBoss && gameState === 'playing' && !menuDemo) {
+            if (bossHud.style.display !== 'block') bossHud.style.display = 'block';
+            const fill = hudEl('bossBarFill');
+            if (fill) {
+                const widthStr = Math.max(0, Math.min(100, (activeBoss.hp / activeBoss.maxHp) * 100)) + '%';
+                if (fill.style.width !== widthStr) fill.style.width = widthStr;
+            }
+            const nameEl = hudEl('bossHudName');
+            setHudText(nameEl, activeBoss.name.toUpperCase());
+            const phaseEl = hudEl('bossHudPhase');
+            if (phaseEl) {
+                const pct = activeBoss.hp / activeBoss.maxHp;
+                setHudText(phaseEl, pct > 0.66 ? tt('boss_monolith_phase1') : (pct > 0.33 ? tt('boss_monolith_phase2') : tt('boss_monolith_phase3')));
+            }
+        } else if (bossHud.style.display !== 'none') {
+            bossHud.style.display = 'none';
+        }
+    }
+
+    // Perhalus pergerakan monster mengikuti posisi otoritatif dari Host (interpolasi mulus 60fps)
+    for (let i = 0; i < monsters.length; i++) {
+        const m = monsters[i];
+        if (!m || m.hp <= 0) continue;
+
+        if (typeof m.targetX === 'number' && typeof m.targetY === 'number') {
+            const d = Math.hypot(m.targetX - m.x, m.targetY - m.y);
+            if (d > 48) {
+                m.x = m.targetX;
+                m.y = m.targetY;
+            } else if (d > 0.5) {
+                m.x += (m.targetX - m.x) * 0.35;
+                m.y += (m.targetY - m.y) * 0.35;
+            }
+        }
+
+        // Efek kosmetik & animasi visual monster
+        if (m.hitFlash > 0) m.hitFlash--;
+        if (m.blink > 0) m.blink--;
+        else m.blink = 60 + Math.floor(Math.random() * 180);
+    }
+}
+
 function updateMonsters() {
+    if (typeof coopRoomId !== 'undefined' && coopRoomId && !isCoopHost) {
+        // Mode Guest Co-op: Host memegang kontrol otoritatif monster secara penuh.
+        // Klien cukup menginterpolasikan posisi ke target snapshot dan memperbarui visual kosmetik,
+        // tanpa beban kalkulasi BFS pathfinding dan separation forces O(N^2).
+        updateMonstersGuestCoop();
+        return;
+    }
+
     separationForces();
 
     // Update Boss HUD Status
@@ -13824,8 +13881,13 @@ function applySnapshot(snap, isHost = false) {
                 // Hanya koreksi posisi bila deviasi > 28px untuk mencegah jitter
                 const errDist = Math.hypot(sp.x - targetP.x, sp.y - targetP.y);
                 if (errDist > 28) {
-                    targetP.x += (sp.x - targetP.x) * 0.35;
-                    targetP.y += (sp.y - targetP.y) * 0.35;
+                    if (errDist > 80) {
+                        targetP.x = sp.x;
+                        targetP.y = sp.y;
+                    } else {
+                        targetP.x += (sp.x - targetP.x) * 0.25;
+                        targetP.y += (sp.y - targetP.y) * 0.25;
+                    }
                 }
                 targetP.hp = sp.hp;
                 targetP.maxHp = sp.maxHp;
@@ -17346,6 +17408,7 @@ let netLastPingTime = 0;
 let netPingInterval = 1500; // ms
 let netInputSeq = 0;
 let peerInputs = {}; // { [peerIndex]: { dx, dy, facing, dashing, firing, tick, time } }
+let netLastSentInput = { dx: 0, dy: 0, facing: 0, dashing: false, firing: false, active: false, time: 0 };
 
 function sampleAndSendPeerInput() {
     if (isCoopHost || !coopWs || coopWs.readyState !== WebSocket.OPEN) return;
@@ -17374,46 +17437,71 @@ function sampleAndSendPeerInput() {
         lp.facing = Math.atan2(wy - lp.y, wx - lp.x);
     }
 
-    const isDashing = !!(keys['shift'] || (typeof isDashPressed !== 'undefined' && isDashPressed));
+    const isDashing = !!(lp.dashing || keys['shift'] || (typeof isDashPressed !== 'undefined' && isDashPressed));
     const isFiring = !!(keys[' '] || isMouseDown || (typeof isFirePressed !== 'undefined' && isFirePressed));
 
-    // Client prediction: gerak seketika secara responsif di klien
-    let speed = lp.speed || 2.4;
-    if (isDashing && (!lp.dashCooldown || lp.dashCooldown <= 0)) {
-        lp.dashing = true;
-        lp.dashTimer = 10;
-        lp.dashCooldown = 40;
-    }
-    if (lp.dashing && lp.dashTimer > 0) {
-        speed = lp.dashSpeed || 6.5;
-        lp.dashTimer--;
-    } else {
-        lp.dashing = false;
-    }
-    if (lp.dashCooldown > 0) lp.dashCooldown--;
-    if (dx !== 0 || dy !== 0) {
-        moveEntity(lp, dx * speed, dy * speed);
-    }
+    // CATATAN KRUSIAL MULTIPLAYER:
+    // Client-side prediction fisik (moveEntity) sudah dijalankan satu kali secara otoritatif
+    // oleh updatePlayer() di stepSimulation(). Dilarang memanggil moveEntity() lagi di sini
+    // agar kecepatan tamu tidak berlipat ganda (200%) yang memicu desync rubberbanding.
 
-    netInputSeq++;
-    sendCoopMessage('INPUT', {
-        peerIndex: localPlayerIndex,
-        seq: netInputSeq,
-        dx: Math.round(dx * 100) / 100,
-        dy: Math.round(dy * 100) / 100,
-        facing: Math.round(lp.facing * 100) / 100,
-        dashing: lp.dashing,
-        firing: isFiring
-    });
+    const curDx = Math.round(dx * 100) / 100;
+    const curDy = Math.round(dy * 100) / 100;
+    const curFacing = Math.round(lp.facing * 100) / 100;
+    const now = performance.now();
+
+    const inputChanged = (
+        curDx !== netLastSentInput.dx ||
+        curDy !== netLastSentInput.dy ||
+        Math.abs(curFacing - netLastSentInput.facing) > 0.08 ||
+        isDashing !== netLastSentInput.dashing ||
+        isFiring !== netLastSentInput.firing
+    );
+
+    const isMovingOrActive = (curDx !== 0 || curDy !== 0 || isDashing || isFiring);
+    const timeSinceLastSend = now - netLastSentInput.time;
+
+    // Rate-limiting cerdas: kirim seketika saat ada perubahan arah/aksi,
+    // batasi stream gerak aktif ke ~30Hz (33ms) agar tidak membanjiri relay/jaringan,
+    // dan kirim 1 frame konfirmasi berhenti saat pemain kembali idle.
+    if (inputChanged || (isMovingOrActive && timeSinceLastSend >= 33) || (!isMovingOrActive && netLastSentInput.active)) {
+        netInputSeq++;
+        sendCoopMessage('INPUT', {
+            peerIndex: localPlayerIndex,
+            seq: netInputSeq,
+            dx: curDx,
+            dy: curDy,
+            facing: curFacing,
+            dashing: isDashing,
+            firing: isFiring
+        });
+
+        netLastSentInput.dx = curDx;
+        netLastSentInput.dy = curDy;
+        netLastSentInput.facing = curFacing;
+        netLastSentInput.dashing = isDashing;
+        netLastSentInput.firing = isFiring;
+        netLastSentInput.active = isMovingOrActive;
+        netLastSentInput.time = now;
+    }
 }
 
 function updateRemotePeers() {
     if (!isCoopHost || !players) return;
+    const now = performance.now();
     for (let i = 1; i < players.length; i++) {
         const p = players[i];
         if (!p) continue;
         const input = peerInputs[i];
         if (input) {
+            // Jika input paket lebih tua dari 150ms tanpa pembaruan, netralkan agar tidak terus berjalan ke dinding
+            if (typeof input.time === 'number' && (now - input.time > 150)) {
+                input.dx = 0;
+                input.dy = 0;
+                input.firing = false;
+                input.dashing = false;
+            }
+
             let speed = p.speed || 2.4;
             if (input.dashing && (!p.dashCooldown || p.dashCooldown <= 0)) {
                 p.dashing = true;

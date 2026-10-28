@@ -2548,7 +2548,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.7.1';
+const APP_VERSION = '2.7.2';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 
