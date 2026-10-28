@@ -5301,6 +5301,14 @@ function isWall(x, y) {
 }
 
 function moveEntity(e, dx, dy) {
+    if (!e || !Number.isFinite(dx) || !Number.isFinite(dy)) return false;
+    // Cegah tembus dinding labirin akibat teleport/delta spike ekstrem
+    const distDelta = Math.hypot(dx, dy);
+    if (distDelta > 32) {
+        const factor = 32 / distDelta;
+        dx *= factor;
+        dy *= factor;
+    }
     if (e.isPhasing && e.isPhasing > 0) {
         e.x += dx;
         e.y += dy;
@@ -6413,6 +6421,8 @@ function gainExp(n) {
 }
 
 function nextLevel() {
+    if (levelTransition) return;
+    levelTransition = true;
     totalTime += Math.floor((Date.now() - levelStartTime) / 1000);
 
     // Tandai sektor berhasil diselesaikan dan reset penghitung kematian sektor ini
@@ -7129,6 +7139,7 @@ function updatePlayer() {
         if (player.dashTimer % 2 === 0) {
             addParticle(player.x, player.y, '#8fa8ff', 2, 2, 14);
             if (!player.afterimages) player.afterimages = [];
+            if (player.afterimages.length > 10) player.afterimages.shift();
             player.afterimages.push({
                 x: player.x,
                 y: player.y,
@@ -7140,6 +7151,7 @@ function updatePlayer() {
 
         // Perk Thermal Trail: Drop scorching fire patches along dash trajectory
         if (player && player.perkThermal) {
+            if (thermalTrails.length > 25) thermalTrails.shift();
             thermalTrails.push({
                 x: player.x,
                 y: player.y,
@@ -7761,16 +7773,17 @@ function updateMonstersGuestCoop() {
     if (bossHud) {
         if (activeBoss && gameState === 'playing' && !menuDemo) {
             if (bossHud.style.display !== 'block') bossHud.style.display = 'block';
+            const maxHpSafe = Math.max(1, Number(activeBoss.maxHp) || 1);
+            const pct = Math.max(0, Math.min(1, (Number(activeBoss.hp) || 0) / maxHpSafe));
             const fill = hudEl('bossBarFill');
             if (fill) {
-                const widthStr = Math.max(0, Math.min(100, (activeBoss.hp / activeBoss.maxHp) * 100)) + '%';
+                const widthStr = Math.round(pct * 100) + '%';
                 if (fill.style.width !== widthStr) fill.style.width = widthStr;
             }
             const nameEl = hudEl('bossHudName');
             setHudText(nameEl, activeBoss.name.toUpperCase());
             const phaseEl = hudEl('bossHudPhase');
             if (phaseEl) {
-                const pct = activeBoss.hp / activeBoss.maxHp;
                 setHudText(phaseEl, pct > 0.66 ? tt('boss_monolith_phase1') : (pct > 0.33 ? tt('boss_monolith_phase2') : tt('boss_monolith_phase3')));
             }
         } else if (bossHud.style.display !== 'none') {
@@ -7818,16 +7831,17 @@ function updateMonsters() {
     if (bossHud) {
         if (activeBoss && gameState === 'playing' && !menuDemo) {
             if (bossHud.style.display !== 'block') bossHud.style.display = 'block';
+            const maxHpSafe = Math.max(1, Number(activeBoss.maxHp) || 1);
+            const pct = Math.max(0, Math.min(1, (Number(activeBoss.hp) || 0) / maxHpSafe));
             const fill = hudEl('bossBarFill');
             if (fill) {
-                const widthStr = Math.max(0, Math.min(100, (activeBoss.hp / activeBoss.maxHp) * 100)) + '%';
+                const widthStr = Math.round(pct * 100) + '%';
                 if (fill.style.width !== widthStr) fill.style.width = widthStr;
             }
             const nameEl = hudEl('bossHudName');
             setHudText(nameEl, activeBoss.name.toUpperCase());
             const phaseEl = hudEl('bossHudPhase');
             if (phaseEl) {
-                const pct = activeBoss.hp / activeBoss.maxHp;
                 setHudText(phaseEl, pct > 0.66 ? tt('boss_monolith_phase1') : (pct > 0.33 ? tt('boss_monolith_phase2') : tt('boss_monolith_phase3')));
             }
         } else if (bossHud.style.display !== 'none') {
@@ -17917,7 +17931,8 @@ function getTalentTreeData() {
             const r = Math.max(0, Math.min(n.maxRank, Number(ranks[n.id]) || 0));
             safeRanks[n.id] = (n.id === 'core') ? 1 : r;
         });
-        const nanites = Math.max(0, Number(raw.nanites) || (raw.nanites === undefined ? 50 : 0));
+        const rawN = Number(raw.nanites);
+        const nanites = Number.isFinite(rawN) ? Math.max(0, Math.floor(rawN)) : 50;
         return { nanites, ranks: safeRanks };
     } catch (_) {
         return {

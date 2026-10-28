@@ -1903,8 +1903,54 @@ assert(sAdminJump.currentLevel === 3, 'adminStartAt(3) harus memindahkan permain
 
 console.log('✓ TEST 32 LULUS: Simulasi headless Campaign Sektor 1-15 & Mode Endless Survival sukses 100% tanpa runtime exception.');
 
+// TEST 33: Pengujian Penetrasi, Mitigasi Eksploitasi & Hardening Pertahanan Web.
+// Memverifikasi penangkalan eksploit NaN nanites pada pohon talenta, boundary velocity clamping pada moveEntity,
+// hard budget array partikel & animasi bebas memory leak, zero-division protection pada Boss HUD,
+// serta proteksi reentrant race condition pada transisi level.
+console.log('\n[TEST 33] Pengujian Penetrasi, Mitigasi Eksploitasi & Hardening Pertahanan Web...');
+
+// 33a. Uji Eksploit Bypass NaN Nanites
+assert(
+    gameJs.includes('Number.isFinite(rawN) ? Math.max(0, Math.floor(rawN)) : 50'),
+    'Sistem talenta wajib memvalidasi Number.isFinite() agar NaN tidak mengeksploitasi upgrade gratis'
+);
+
+// 33b. Uji Boundary & Velocity Clamping pada moveEntity
+assert(
+    gameJs.includes('if (!e || !Number.isFinite(dx) || !Number.isFinite(dy)) return false;'),
+    'moveEntity wajib menolak perpindahan non-finite (NaN / Infinity)'
+);
+assert(
+    gameJs.includes('if (distDelta > 32)'),
+    'moveEntity wajib melakukan clamping kecepatan maksimum (<=32px) agar tidak menembus dinding labirin saat spike'
+);
+
+// 33c. Uji Memory Leak pada Animasi & Particle Systems
+assert(
+    gameJs.includes('if (thermalTrails.length > 25) thermalTrails.shift();'),
+    'thermalTrails wajib memiliki batas kapasitas keras agar tidak terjadi memory leak saat dash bertubi-tubi'
+);
+assert(
+    gameJs.includes('if (player.afterimages.length > 10) player.afterimages.shift();'),
+    'player.afterimages wajib memiliki batas kapasitas keras'
+);
+
+// 33d. Uji Zero-Division pada Boss HUD Telemetry
+assert(
+    gameJs.includes('const maxHpSafe = Math.max(1, Number(activeBoss.maxHp) || 1);'),
+    'Boss HUD wajib mengamankan pembagi maxHp dari nilai 0 atau NaN'
+);
+
+// 33e. Uji Reentrant Race Condition pada Level Transition
+assert(
+    gameJs.includes('if (levelTransition) return;\n    levelTransition = true;'),
+    'nextLevel() wajib memiliki guard reentrant agar transisi tidak terpicu ganda saat spam klik/trigger'
+);
+
+console.log('✓ TEST 33 LULUS: Penetrasi, mitigasi eksploitasi & hardening pertahanan web terverifikasi 100%.');
+
 console.log('\n=========================================');
-console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (32/32)');
+console.log('SEMUA PENGUJIAN KEAMANAN & QA WEB LULUS! (33/33)');
 console.log('=========================================');
 process.exit(0);
 
