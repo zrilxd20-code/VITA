@@ -4,9 +4,40 @@ try {
   const savedDir = localStorage.getItem('vita_game_directive');
   if (savedDir === 'endless' || savedDir === 'campaign') activeGameDirective = savedDir;
 } catch(_) {}
+if (typeof window !== 'undefined') window.activeGameDirective = activeGameDirective;
+
+function updateStartScreenDirectiveUI() {
+  const isEndless = (typeof activeGameDirective !== 'undefined' && activeGameDirective === 'endless');
+  const isId = (homeSettings && homeSettings.lang === 'id');
+  const eyebrow = document.getElementById('startEyebrow');
+  const sub = document.getElementById('startSubtitle');
+  const btnStartText = document.getElementById('btnStartText');
+  const btnContinue = document.getElementById('btnContinue');
+
+  if (eyebrow) {
+    eyebrow.textContent = isEndless 
+      ? (isId ? 'ARENA SURVIVAL — PERTAHANAN HORDE' : 'SURVIVAL ARENA — HORDE DEFENSE')
+      : (isId ? 'ARSIP RAHASIA FASILITAS' : 'CLASSIFIED ARCHIVES');
+  }
+  if (sub) {
+    sub.innerHTML = isEndless
+      ? (isId ? 'Mode Pertahanan Gelombang Monster Tanpa Henti (Wave Mode &mdash; Bertahan &amp; Evakuasi)' : 'Endless Monster Waves Defense (Wave Mode &mdash; Survive &amp; Evacuate)')
+      : (isId ? 'Sektor Terlupakan &mdash; 15 Sektor Roguelite' : 'Forgotten Sector &mdash; 15 Roguelite Sectors');
+  }
+  if (btnStartText) {
+    btnStartText.textContent = isEndless
+      ? (isId ? 'MASUK ARENA SURVIVAL' : 'ENTER SURVIVAL ARENA')
+      : (isId ? 'MAIN SEKARANG' : 'PLAY NOW');
+  }
+  if (isEndless && btnContinue) {
+    btnContinue.style.display = 'none';
+  }
+}
+if (typeof window !== 'undefined') window.updateStartScreenDirectiveUI = updateStartScreenDirectiveUI;
 
 function selectGameDirective(mode) {
   activeGameDirective = (mode === 'endless') ? 'endless' : 'campaign';
+  if (typeof window !== 'undefined') window.activeGameDirective = activeGameDirective;
   try { localStorage.setItem('vita_game_directive', activeGameDirective); } catch(_) {}
   
   const btnC = document.getElementById('btnDirectiveCampaign');
@@ -42,11 +73,12 @@ function selectGameDirective(mode) {
   }
   if (btnPlayText) {
     if (activeGameDirective === 'endless') {
-      btnPlayText.textContent = isId ? 'MASUK ARENA SURVIVAL // HORDE' : 'ENTER SURVIVAL ARENA // HORDE';
+      btnPlayText.textContent = isId ? 'MASUK ARENA SURVIVAL — HORDE' : 'ENTER SURVIVAL ARENA — HORDE';
     } else {
       btnPlayText.textContent = isId ? 'MASUK KE DALAM LABIRIN' : 'ENTER THE LABYRINTH';
     }
   }
+  updateStartScreenDirectiveUI();
   if (typeof checkContinueBtn === 'function') {
     try { checkContinueBtn(); } catch(_) {}
   }
@@ -409,6 +441,23 @@ function sanitizeHomeSettings(raw) {
     touchScale, touchOpacity
   };
 }
+function applyHomeBrightness(val) {
+  const b = Math.max(30, Math.min(180, Math.round(Number(val) || 100)));
+  const factor = (b / 100).toFixed(2);
+  document.documentElement.style.setProperty('--app-brightness', factor);
+  document.documentElement.style.setProperty('--hub-bright', factor);
+  const home = document.getElementById('homeView');
+  if (home) {
+    home.style.setProperty('--hub-bright', factor);
+    home.style.filter = 'brightness(' + factor + ')';
+  }
+  const startSc = document.getElementById('startScreen');
+  if (startSc) startSc.style.filter = 'brightness(' + factor + ')';
+  if (typeof window.applyBrightness === 'function') {
+    try { window.applyBrightness(b); } catch (e) {}
+  }
+}
+window.applyHomeBrightness = applyHomeBrightness;
 let homeSettings;
 try {
   homeSettings = sanitizeHomeSettings(JSON.parse(localStorage.getItem(HOME_SETTINGS_KEY) || '{}'));
@@ -417,6 +466,7 @@ try {
   console.warn('Preferensi VITA tidak dapat dibaca, memakai nilai default.', error);
 }
 try { localStorage.setItem(HOME_SETTINGS_KEY, JSON.stringify(homeSettings)); } catch (e) {}
+try { applyHomeBrightness(homeSettings.brightness); } catch (e) {}
 const settingsModal = document.getElementById('settingsModal');
 const saveHomeSettings = () => { try { localStorage.setItem(HOME_SETTINGS_KEY, JSON.stringify(homeSettings)); } catch (e) {} };
 const settingsOpenBtn = document.getElementById('settingsOpen');
@@ -634,7 +684,7 @@ function saveLocalAccount(prof) {
       passcode: prof.passcode || '',
       savedPasscode: prof.savedPasscode || (accounts[key] && accounts[key].savedPasscode) || '',
       provider: prof.provider || 'facility',
-      status: prof.status || `${(prof.role || 'OPERATIVE').toUpperCase()} // REGISTERED`,
+      status: prof.status || `${(prof.role || 'OPERATIVE').toUpperCase()} — REGISTERED`,
       updatedAt: new Date().toISOString()
     };
     localStorage.setItem(VITA_ACCOUNTS_KEY, JSON.stringify(accounts));
@@ -655,7 +705,7 @@ function getProfile() {
       if (raw.presetEmoji !== undefined && typeof raw.presetEmoji !== 'string') raw.presetEmoji = 'biohazard';
       if (raw.role !== undefined && typeof raw.role !== 'string') raw.role = 'Field Operative';
       if (raw.provider !== undefined && typeof raw.provider !== 'string') raw.provider = 'guest';
-      if (raw.status !== undefined && typeof raw.status !== 'string') raw.status = 'GUEST // LOCAL';
+      if (raw.status !== undefined && typeof raw.status !== 'string') raw.status = 'GUEST — LOCAL';
       return raw;
     }
   } catch (e) {}
@@ -666,7 +716,7 @@ function getProfile() {
     avatar: '',
     presetEmoji: 'biohazard',
     provider: 'guest',
-    status: 'GUEST // LOCAL'
+    status: 'GUEST — LOCAL'
   };
 }
 
@@ -801,6 +851,7 @@ function getHomeAudioCtx() {
 
 function homeBeep(type) {
   try {
+    if (homeSettings && homeSettings.muted) return;
     if (typeof sCinematicUI === 'function') {
       sCinematicUI(type);
       return;
@@ -917,7 +968,7 @@ function selectPresetAvatar(emoji) {
   prof.presetEmoji = emoji;
   prof.isLoggedIn = true;
   if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
-  prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // ACTIVE`;
+  prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} — ACTIVE`;
   setProfile(prof);
   showSaveIndicator('Division Insignia Saved');
   highlightActivePresetAvatar(emoji);
@@ -1140,7 +1191,7 @@ function openAuthModal(mode = 'login') {
         forms.style.display = 'none';
         if (activeCallsign) activeCallsign.textContent = prof.name;
         if (activeRole) activeRole.textContent = prof.role || 'Field Operative';
-        if (activeBadge) activeBadge.textContent = prof.status ? prof.status.split('//')[0].trim() : 'TERVERIFIKASI';
+        if (activeBadge) activeBadge.textContent = prof.status ? (prof.status.includes('—') ? prof.status.split('—')[0].trim() : prof.status.split('//')[0].trim()) : 'TERVERIFIKASI';
       } else {
         banner.style.display = 'none';
         forms.style.display = 'block';
@@ -1242,7 +1293,7 @@ async function handlePerformLogin() {
               presetEmoji: remote.preset_emoji || 'biohazard',
               passcode: remote.passcode || passcode,
               provider: remote.provider || 'facility',
-              status: `${(remote.role || 'OPERATIVE').toUpperCase()} // CLOUD VERIFIED`
+              status: `${(remote.role || 'OPERATIVE').toUpperCase()} — CLOUD VERIFIED`
             };
             setProfile(prof);
             syncRes = { prof, high: { highestLevel: 1 } };
@@ -1295,7 +1346,7 @@ async function handlePerformLogin() {
         isLoggedIn: true,
         passcode: targetProf.passcode || passcode,
         savedPasscode: passcode,
-        status: `${(targetProf.role || 'OPERATIVE').toUpperCase()} // LOCAL VERIFIED`
+        status: `${(targetProf.role || 'OPERATIVE').toUpperCase()} — LOCAL VERIFIED`
       };
 
       setProfile(prof);
@@ -1426,7 +1477,7 @@ async function handleModalRegisterProfile() {
       presetEmoji: curProf.presetEmoji || 'biohazard',
       passcode: hashedPasscode,
       provider: 'facility',
-      status: `${role.toUpperCase()} // OFFICIAL ROSTER`
+      status: `${role.toUpperCase()} — OFFICIAL ROSTER`
     };
 
     const remChk = document.getElementById('authRegRememberCheckbox');
@@ -1479,7 +1530,7 @@ function handleSaveFullProfile() {
       } catch (_) {}
     }
   }
-  prof.status = `${role.toUpperCase()} // VERIFIED`;
+  prof.status = `${role.toUpperCase()} — VERIFIED`;
   if (!prof.provider || prof.provider === 'guest') prof.provider = 'facility';
   setProfile(prof);
   homeBeep('save');
@@ -1542,7 +1593,7 @@ function handleLogout() {
     presetEmoji: 'biohazard',
     passcode: '',
     provider: 'guest',
-    status: 'GUEST // LOCAL'
+    status: 'GUEST — LOCAL'
   };
   try { localStorage.setItem(VITA_PROFILE_KEY, JSON.stringify(defaultGuest)); } catch (e) {}
   applyProfileUI();
@@ -1654,7 +1705,7 @@ function applyProfileUI() {
   // Set Sidebar Text
   if (sbName) sbName.textContent = prof.name || 'GUEST-77';
   if (sbRole) sbRole.textContent = prof.role || 'Field Operative';
-  if (sbStatus) sbStatus.textContent = prof.isLoggedIn ? (prof.status || 'OPERATIVE // ACTIVE') : 'GUEST // LOCAL';
+  if (sbStatus) sbStatus.textContent = prof.isLoggedIn ? (prof.status || 'OPERATIVE — ACTIVE') : 'GUEST — LOCAL';
 
   // Inputs
   const currentName = (prof.name && prof.name !== 'GUEST-77') ? prof.name : (prof.name || '');
@@ -1708,7 +1759,7 @@ function applyProfileUI() {
     if (bar) bar.style.display = 'flex';
     if (btnOpen) btnOpen.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' + escapeLbHtml(prof.name);
     if (nameEl) nameEl.textContent = 'OPERATIVE: ' + prof.name.toUpperCase();
-    if (statusEl) statusEl.textContent = prof.status || 'OPERATIVE // ACTIVE';
+    if (statusEl) statusEl.textContent = prof.status || 'OPERATIVE — ACTIVE';
 
     if (startText) startText.textContent = 'OPERATIVE: ' + prof.name.toUpperCase();
     if (startBadge) startBadge.textContent = prof.provider === 'guest' ? 'GUEST' : 'REGISTERED';
@@ -1716,7 +1767,7 @@ function applyProfileUI() {
     if (btnStartAuth) btnStartAuth.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>DOSSIER: ' + escapeLbHtml(prof.name).toUpperCase();
 
     if (pBadge) {
-      pBadge.textContent = 'ACTIVE IDENTITY // ' + (prof.provider === 'guest' ? 'GUEST' : 'VERIFIED');
+      pBadge.textContent = 'ACTIVE IDENTITY — ' + (prof.provider === 'guest' ? 'GUEST' : 'VERIFIED');
       pBadge.className = 'auth-status-pill ' + (prof.provider === 'guest' ? 'guest' : 'verified');
     }
     if (pClearance) pClearance.textContent = prof.provider === 'guest' ? 'CLEARANCE: LEVEL-1' : 'CLEARANCE: LEVEL-2';
@@ -1728,7 +1779,7 @@ function applyProfileUI() {
       }
     }
   } else {
-    const isEn = ((typeof lang !== 'undefined' ? lang : (typeof homeSettings !== 'undefined' ? homeSettings.lang : 'id')) === 'en');
+    const isEn = ((typeof window !== 'undefined' && typeof window.lang !== 'undefined' ? window.lang : (typeof homeSettings !== 'undefined' ? homeSettings.lang : 'id')) === 'en');
     if (bar) bar.style.display = 'none';
     if (btnOpen) btnOpen.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' + (isEn ? 'Sign In / Operative Dossier' : 'Masuk / Berkas Operatif');
     if (startText) startText.textContent = isEn ? 'OPERATIVE: ANONYMOUS [SIGN IN]' : 'OPERATIF: ANONIM [MASUK]';
@@ -1737,11 +1788,11 @@ function applyProfileUI() {
     if (btnStartAuth) btnStartAuth.innerHTML = '<svg class="btn-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>' + (isEn ? 'SIGN IN / OPERATIVE DOSSIER' : 'MASUK / BERKAS OPERATIF');
 
     if (pBadge) {
-      pBadge.textContent = isEn ? 'STATUS: GUEST // LOCAL' : 'STATUS: TAMU // LOKAL';
+      pBadge.textContent = isEn ? 'STATUS: GUEST — LOCAL' : 'STATUS: TAMU — LOKAL';
       pBadge.className = 'auth-status-pill unverified';
     }
     if (pClearance) pClearance.textContent = isEn ? 'CLEARANCE: LEVEL-1' : 'IZIN AKSES: LEVEL-1';
-    if (pDbStatus) pDbStatus.textContent = isEn ? 'LOCAL ARCHIVE // STANDBY' : 'ARSIP LOKAL // STANDBY';
+    if (pDbStatus) pDbStatus.textContent = isEn ? 'LOCAL ARCHIVE — STANDBY' : 'ARSIP LOKAL — STANDBY';
   }
 
   // Tampilkan tombol yang sesuai:
@@ -2038,7 +2089,7 @@ if (ppFileInput) {
       prof.avatar = dataUrl;
       prof.isLoggedIn = true;
       if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
-      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // ACTIVE`;
+      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} — ACTIVE`;
       setProfile(prof);
       showSaveIndicator(`Avatar Photo Saved (${approxKb} KB)`);
     });
@@ -2056,7 +2107,7 @@ if (modalFileInput) {
       prof.avatar = dataUrl;
       prof.isLoggedIn = true;
       if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
-      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // ACTIVE`;
+      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} — ACTIVE`;
       setProfile(prof);
       showSaveIndicator(`Avatar Photo Saved (${approxKb} KB)`);
     });
@@ -2088,7 +2139,7 @@ function setupProfileLiveListeners() {
       prof.name = cleanVal;
       prof.isLoggedIn = true;
       if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
-      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // ACTIVE`;
+      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} — ACTIVE`;
       try { localStorage.setItem(VITA_PROFILE_KEY, JSON.stringify(prof)); } catch (err) {}
 
       const nameEl = document.getElementById('operativeName');
@@ -2156,7 +2207,7 @@ function setupProfileLiveListeners() {
       const prof = getProfile();
       prof.role = rInput.value;
       prof.isLoggedIn = true;
-      prof.status = `${rInput.value.toUpperCase()} // ACTIVE`;
+      prof.status = `${rInput.value.toUpperCase()} — ACTIVE`;
       setProfile(prof);
       showSaveIndicator('Division Saved');
     });
@@ -2173,7 +2224,7 @@ function setupProfileLiveListeners() {
       prof.name = getCurrentCallsign();
       prof.isLoggedIn = true;
       if (!prof.provider || prof.provider === 'guest') prof.provider = 'custom';
-      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} // PHOTO ACTIVE`;
+      prof.status = `${(prof.role || 'OPERATIVE').toUpperCase()} — PHOTO ACTIVE`;
       setProfile(prof);
       showSaveIndicator(`Avatar Photo Saved (${approxKb} KB)`);
       homeBeep('save');
@@ -2204,7 +2255,7 @@ renderLeaderboard();
       homeSettings.brightness = Math.max(30, Math.min(180, v));
       const bVal = document.getElementById('homeBrightnessVal');
       if (bVal) bVal.textContent = homeSettings.brightness + '%';
-      if (typeof applyBrightness === 'function') applyBrightness(homeSettings.brightness);
+      applyHomeBrightness(homeSettings.brightness);
     } else if (id === 'homeSfx') {
       homeSettings.sfxVolume = Math.max(0, Math.min(100, v));
       const sVal = document.getElementById('homeSfxVal');
@@ -2495,6 +2546,7 @@ function proceedToWebGame(autoStart = false) {
       if (typeof menuDemo !== 'undefined') menuDemo = true;
     }
     if (typeof resize === 'function') resize();
+    if (typeof updateStartScreenDirectiveUI === 'function') updateStartScreenDirectiveUI();
     if (typeof checkContinueBtn === 'function') checkContinueBtn();
     if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
     if (autoStart && typeof startGame === 'function') {
@@ -2548,7 +2600,7 @@ function compareSemver(a, b) {
   }
   return 0;
 }
-const APP_VERSION = '2.7.2';
+const APP_VERSION = '2.7.3';
 const VITA_CLOUD_HOST = 'https://vita-game-three.vercel.app';
 const UPDATE_TXT = {
   id: { 

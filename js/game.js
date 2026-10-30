@@ -404,7 +404,7 @@ function sanitizeSettings(raw) {
 
     const difficulty = VITA_DIFFS.includes(s.difficulty) ? s.difficulty : 'normal';
     const lang0 = s.lang === 'id' ? 'id' : 'en';
-    const quality = (s.quality && VITA_QUALS.includes(s.quality) && s.quality !== 'retro') ? s.quality : 'hd';
+    const quality = (s.quality && VITA_QUALS.includes(s.quality)) ? s.quality : 'hd';
 
     const deviceMode = (s.deviceMode === 'pc' || s.deviceMode === 'mobile' || s.deviceMode === 'ask') ? s.deviceMode : 'ask';
     const autoAim = (s.autoAim !== undefined) ? !!s.autoAim : true;
@@ -697,7 +697,7 @@ const T = {
         layout_reset_toast: 'Tata letak tombol HP dikembalikan ke posisi default.',
         robot_continue: 'LANJUTKAN MISI ▸',
         final_corpse_prompt: '[E / SENTUH] BACA SURAT AMPLOP TERAKHIR',
-        final_letter_badge: 'DOKUMEN WASIAT TERAKHIR // RES-01',
+        final_letter_badge: 'DOKUMEN WASIAT TERAKHIR — RES-01',
         final_letter_title: 'SURAT TERAKHIR DR. RUDRA',
         final_letter_sub: 'Ditemukan di samping jasad Dr. Rudra di koridor evakuasi Sektor 15',
         final_letter_close: 'SIMPAN WASIAT & MENUJU PORTAL EVAKUASI ▸',
@@ -731,7 +731,7 @@ const T = {
         coop_err_generic: 'KONEKSI RELAY GAGAL. PASTIKAN SERVER RELAY AKTIF (npm run relay).',
         coop_relay_url_label: 'ALAMAT RELAY (WEBSOCKET)',
         coop_relay_apply_btn: 'TERAPKAN',
-        coop_relay_hint: 'Alamat relay publik (ws:// atau wss://) agar bisa bermain lintas jaringan. Kosongkan untuk lokal.',
+        coop_relay_hint: 'Alamat relay publik (protokol ws atau wss) agar bisa bermain lintas jaringan. Kosongkan untuk lokal.',
         coop_badge_local: 'RELAY: LOKAL',
         coop_badge_online: 'RELAY: ONLINE',
         coop_connected: 'RELAY: TERHUBUNG',
@@ -838,8 +838,8 @@ const T = {
         loading_tip_6: 'Harvester menyamarkan filamen merah di lantai batu; jangan melintasinya sembarangan.',
         loading_tip_7: 'Tingkatkan Pohon Talenta di Hub untuk mendapatkan zirah, regenerasi, dan daya tembak permanen.',
         loading_tip_8: 'Injak MedPod di lorong untuk memulihkan zirah bionikmu saat kondisi genting.',
-        gen_restored: '+GENERATOR PULIH! // +12 HP',
-        gen_all_online: '★ SEMUA GENERATOR AKTIF // PINTU TERBUKA ★',
+        gen_restored: '+GENERATOR PULIH! (+12 HP)',
+        gen_all_online: '★ SEMUA GENERATOR AKTIF — PINTU TERBUKA ★',
         endless_respite_lbl: 'JEDA PASOKAN: {s}s',
         endless_highest_wave_lbl: 'Rekor Gelombang Tertinggi:',
         endless_survival_time_lbl: 'Waktu Bertahan Terbaik:',
@@ -1198,7 +1198,7 @@ const T = {
         layout_reset_toast: 'Mobile button layout restored to default.',
         robot_continue: 'CONTINUE MISSION ▸',
         final_corpse_prompt: '[E / TAP] READ FINAL ENVELOPE LETTER',
-        final_letter_badge: 'FINAL TESTAMENT MEMORANDUM // RES-01',
+        final_letter_badge: 'FINAL TESTAMENT MEMORANDUM — RES-01',
         final_letter_title: 'DR. RUDRA\'S FINAL LETTER',
         final_letter_sub: 'Recovered beside the fallen Dr. Rudra at Sector 15 extraction',
         final_letter_close: 'PRESERVE TESTAMENT & ENTER EXTRACTION ▸',
@@ -1232,7 +1232,7 @@ const T = {
         coop_err_generic: 'RELAY CONNECTION FAILED. MAKE SURE THE RELAY IS RUNNING (npm run relay).',
         coop_relay_url_label: 'RELAY ADDRESS (WEBSOCKET)',
         coop_relay_apply_btn: 'APPLY',
-        coop_relay_hint: 'Public relay address (ws:// or wss://) to play across networks. Leave empty for local.',
+        coop_relay_hint: 'Public relay address (ws or wss protocol) to play across networks. Leave empty for local.',
         coop_badge_local: 'RELAY: LOCAL',
         coop_badge_online: 'RELAY: ONLINE',
         coop_connected: 'RELAY: CONNECTED',
@@ -1339,8 +1339,8 @@ const T = {
         loading_tip_6: 'The Harvester disguises crimson filaments along stone floors; avoid stepping on active rootlines.',
         loading_tip_7: 'Upgrade your permanent Talent Tree in the Hub to unlock defensive shields and nanite firepower.',
         loading_tip_8: 'Step onto Medical Pods in corridors to instantly restore vital bionic chassis armor.',
-        gen_restored: '+GENERATOR RESTORED! // +12 HP',
-        gen_all_online: '★ ALL GENERATORS ONLINE // EXIT OPEN ★',
+        gen_restored: '+GENERATOR RESTORED! (+12 HP)',
+        gen_all_online: '★ ALL GENERATORS ONLINE — EXIT OPEN ★',
         endless_respite_lbl: 'SUPPLY RESPITE: {s}s',
         endless_highest_wave_lbl: 'Highest Wave Record:',
         endless_survival_time_lbl: 'Best Survival Time:',
@@ -1750,7 +1750,7 @@ function applyLang() {
     if (sDiff) sDiff.textContent = tt('diff_label');
     ['gDifficulty', 'homeDifficulty', 'pauseDifficulty'].forEach(function (diffId) {
         const diffSel = document.getElementById(diffId);
-        if (diffSel && diffSel.options.length >= 3) {
+        if (diffSel && diffSel.options && diffSel.options.length >= 3) {
             diffSel.options[0].text = tt('diff_easy');
             diffSel.options[1].text = tt('diff_normal');
             diffSel.options[2].text = tt('diff_hard');
@@ -1759,7 +1759,7 @@ function applyLang() {
     const sQual = document.getElementById('sQuality');
     if (sQual) sQual.textContent = tt('quality');
     const qualSel = document.getElementById('gQuality');
-    if (qualSel) {
+    if (qualSel && qualSel.options) {
         for (let i = 0; i < qualSel.options.length; i++) {
             const opt = qualSel.options[i];
             const qKey = QUAL_I18N_KEY[opt.value];
@@ -1769,7 +1769,7 @@ function applyLang() {
     // Sinkronkan label kualitas di Hub & menu jeda (keduanya punya daftar sama).
     ['homeQuality', 'pauseQuality'].forEach(function (selId) {
         const sel = document.getElementById(selId);
-        if (!sel) return;
+        if (!sel || !sel.options) return;
         for (let i = 0; i < sel.options.length; i++) {
             const opt = sel.options[i];
             const qKey = QUAL_I18N_KEY[opt.value];
@@ -1972,27 +1972,20 @@ function applyBrightness(val) {
     if (canvas) canvas.style.filter = `brightness(${factor})`;
     const minimap = document.getElementById('minimap');
     if (minimap) minimap.style.filter = `brightness(${factor})`;
-    // Ambience Hub (homeView) ikut meredup/terang lewat satu CSS custom property,
-    // supaya lapisan latar tetap mempertahankan filter blur()-nya masing-masing.
-    // (Dulu baris ini menargetkan id '#emberCanvas' yang tidak pernah ada.)
+
+    // Terapkan kecerahan real-time ke CSS token, Hub, dan Start Screen
+    try {
+        document.documentElement.style.setProperty('--app-brightness', factor);
+    } catch (_) {}
     const homeView = document.getElementById('homeView');
-    if (homeView) homeView.style.setProperty('--hub-bright', factor);
-
-    const gBri = document.getElementById('gBrightness');
-    if (gBri && Number(gBri.value) !== settings.brightness) gBri.value = settings.brightness;
-    const hBri = document.getElementById('homeBrightness');
-    if (hBri && Number(hBri.value) !== settings.brightness) hBri.value = settings.brightness;
-    const pBri = document.getElementById('pauseBrightness');
-    if (pBri && Number(pBri.value) !== settings.brightness) pBri.value = settings.brightness;
-    const gBriVal = document.getElementById('gBrightnessVal');
-    if (gBriVal) gBriVal.textContent = settings.brightness + '%';
-    const hBriVal = document.getElementById('homeBrightnessVal');
-    if (hBriVal) hBriVal.textContent = settings.brightness + '%';
-    const pBriVal = document.getElementById('pauseBrightnessVal');
-    if (pBriVal) pBriVal.textContent = settings.brightness + '%';
-    if (typeof homeSettings !== 'undefined') homeSettings.brightness = settings.brightness;
-
-    persistSettings();
+    if (homeView) {
+        homeView.style.setProperty('--hub-bright', factor);
+        homeView.style.filter = `brightness(${factor})`;
+    }
+    const startScreen = document.getElementById('startScreen');
+    if (startScreen) {
+        startScreen.style.filter = `brightness(${factor})`;
+    }
 }
 let activeSfxCount = 0;
 const MAX_CONCURRENT_SFX = 12;
@@ -2177,7 +2170,7 @@ function startProceduralOST() {
         if (ostActive || gameState !== 'playing' || menuDemo) return;
         const ac = ensureAudio();
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         ostActive = true;
         const now = ac.currentTime;
 
@@ -2351,7 +2344,7 @@ function sCommsBeep() {
     try {
         const ac = ensureAudio();
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         const now = ac.currentTime;
         const osc = ac.createOscillator();
         const g = ac.createGain();
@@ -2372,7 +2365,7 @@ function sDataDecode() {
     try {
         const ac = ensureAudio();
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         const now = ac.currentTime;
         [800, 1200, 1600, 2400].forEach((f, i) => {
             const osc = ac.createOscillator();
@@ -2668,7 +2661,7 @@ function displayCodexLog(log) {
     const text = (lang === 'id' && log.body_id) ? log.body_id : (log.body_en || '');
 
     bodyEl.innerHTML = `
-        <div class="codex-stamp">TOP SECRET // CLASSIFIED</div>
+        <div class="codex-stamp">TOP SECRET — CLASSIFIED</div>
         <h3 class="codex-doc-title">${title}</h3>
         <div class="codex-doc-meta">SOURCE / AUTHOR: ${author} &bull; SECTOR ${log.level + 1}</div>
         <div class="codex-doc-body">${text}</div>
@@ -2839,7 +2832,7 @@ function sCinematicUI(type) {
         const ac = ensureAudio();
         const now = ac.currentTime;
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
 
         if (type === 'click') {
             // Tekanan tombol konsol taktil berbobot (280Hz->65Hz + klik akustik renyah)
@@ -2884,7 +2877,7 @@ function playOrganicHeartbeat(intensity) {
         const ac = ensureAudio();
         const now = ac.currentTime;
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
 
         [0, 0.14].forEach(delay => {
             const osc = ac.createOscillator();
@@ -2944,7 +2937,7 @@ function playNoiseBurst(dur, f0, f1, q, vol, filterType, pos) {
         if (spatial.muted || spatial.volMult <= 0.001) return;
         const ac = ensureAudio();
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         const effVol = (Number.isFinite(vol) ? vol : 0.6) * spatial.volMult;
         if (effVol <= 0.001) return;
 
@@ -2988,7 +2981,7 @@ function playOccultTone(freq0, freq1, dur, vol, type, pos) {
         if (spatial.muted || spatial.volMult <= 0.001) return;
         const ac = ensureAudio();
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         const effVol = (Number.isFinite(vol) ? vol : 0.5) * spatial.volMult;
         if (effVol <= 0.001) return;
 
@@ -3025,7 +3018,7 @@ function sCritHit(pos) {
         if (spatial.muted || spatial.volMult <= 0.001) return;
         const ac = ensureAudio();
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         const now = ac.currentTime;
         const effVol = (master / 100) * spatial.volMult * 0.85;
 
@@ -3243,7 +3236,7 @@ function sDie() {
     try {
         const ac = ensureAudio();
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         // Ledakan statis robekan terakhir
         playNoiseBurst(0.4, 2200, 60, 2.0, 0.9, 'lowpass');
         playOccultTone(110, 18, 0.9, 0.85, 'sawtooth');
@@ -3365,7 +3358,7 @@ function sEASAlarm() {
         const ac = ensureAudio();
         const now = ac.currentTime;
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
 
         [853, 960].forEach(freq => {
             const osc = ac.createOscillator();
@@ -3388,7 +3381,7 @@ function sMonolithRoar() {
         const ac = ensureAudio();
         const now = ac.currentTime;
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
 
         // Vita Carnis Coelum Carnis Sky Trumpet: Nada dissonan 75Hz & 112.5Hz
         const osc1 = ac.createOscillator();
@@ -3441,7 +3434,7 @@ function sGeigerClick() {
         if (now - lastGeigerTime < 0.22) return;
         lastGeigerTime = now;
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         // Klik analog hangat frekuensi rendah-menengah
         playNoiseBurst(0.015, 860, 220, 2.5, 0.22, 'bandpass');
     } catch (e) {}
@@ -3453,7 +3446,7 @@ function sStaticBurst() {
         if (gameState !== 'playing' || menuDemo) return;
         const ac = ensureAudio();
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         const dur = 0.14;
         const buf = ac.createBuffer(1, Math.floor(ac.sampleRate * dur), ac.sampleRate);
         const data = buf.getChannelData(0);
@@ -3483,7 +3476,7 @@ function playGutturalGrowl(params, pos) {
         if (spatial.muted || spatial.volMult <= 0.001) return;
         const ac = ensureAudio();
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
         const effVol = (params.vol || 0.6) * spatial.volMult;
         if (effVol <= 0.001) return;
 
@@ -5145,8 +5138,17 @@ window.triggerFacilityLoading = triggerFacilityLoading;
 window.getCoopExitSquadStatus = getCoopExitSquadStatus;
 
 function updateUI() {
-    setHudText(hudEl('levelText'), currentLevel + 1);
-    setHudText(hudEl('modeText'), currentLevel % 2 === 1 ? tt('mode_light') : tt('mode_dark'));
+    if (isEndlessMode) {
+        setHudText(hudEl('lblLevel'), lang === 'en' ? 'Wave:' : 'Gelombang:');
+        setHudText(hudEl('levelText'), endlessWave || 1);
+        setHudText(hudEl('levelMaxText'), ' (∞)');
+        setHudText(hudEl('modeText'), 'HORDE');
+    } else {
+        setHudText(hudEl('lblLevel'), lang === 'en' ? 'Level:' : 'Level:');
+        setHudText(hudEl('levelText'), currentLevel + 1);
+        setHudText(hudEl('levelMaxText'), ' / ' + LEVELS);
+        setHudText(hudEl('modeText'), currentLevel % 2 === 1 ? tt('mode_light') : tt('mode_dark'));
+    }
     const diffKey = settings.difficulty || 'normal';
     const diffLabel = diffKey === 'easy' ? tt('diff_easy') : (diffKey === 'hard' ? tt('diff_hard') : tt('diff_normal'));
     setHudText(hudEl('diffText'), diffLabel.toUpperCase());
@@ -5194,7 +5196,7 @@ function updateUI() {
     let unlocked = false;
     if (isEndlessMode) {
         setHudText(hudEl('artifactText'), '—');
-        setHudText(hudEl('exitText'), tt('endless_objective'));
+        setHudText(hudEl('exitText'), endlessWaveCleared ? tt('endless_evac_open') : tt('endless_objective'));
     } else {
         unlocked = artifacts.length > 0 && coinsCollected >= artifacts.length;
         setHudText(hudEl('artifactText'), `${coinsCollected} / ${artifacts.length}`);
@@ -5938,11 +5940,14 @@ function handlePlayerDeath(cause) {
         ds.classList.add('cinematic-open');
     }
     const dLevel = document.getElementById('deathLevel');
+    const dLevelLbl = document.getElementById('deathLevelLbl');
     if (dLevel) {
         if (isEndlessMode) {
-            dLevel.textContent = tt('endless_badge_wave').replace('{w}', endlessWave);
+            if (dLevelLbl) dLevelLbl.textContent = lang === 'en' ? 'Wave reached:' : 'Gelombang tercapai:';
+            dLevel.textContent = (lang === 'en' ? 'Wave ' : 'Gelombang ') + endlessWave + ' (∞)';
         } else {
-            dLevel.textContent = currentLevel + 1;
+            if (dLevelLbl) dLevelLbl.textContent = lang === 'en' ? 'Sector reached:' : 'Sektor tercapai:';
+            dLevel.textContent = (currentLevel + 1) + ' / ' + LEVELS;
         }
     }
     if (isEndlessMode) {
@@ -11114,7 +11119,7 @@ function drawMonsters() {
 
             ctx.font = 'bold 10px monospace';
             ctx.fillStyle = '#ffffff';
-            ctx.fillText(`${Math.ceil(pct * 100)}% // APEX CARNIS TITAN`, 0, barY + 9.5);
+            ctx.fillText(`${Math.ceil(pct * 100)}% — APEX CARNIS TITAN`, 0, barY + 9.5);
         } else if (m.isMotherHarvester || m.name === 'Mother Harvester') {
             const headTopY = -m.size * 1.15;
             ctx.fillStyle = '#ff3333';
@@ -11143,7 +11148,7 @@ function drawMonsters() {
 
             ctx.font = 'bold 9px monospace';
             ctx.fillStyle = '#ffffff';
-            ctx.fillText(`${Math.ceil(pct * 100)}% // CONGREGENTUR CARNIS`, 0, barY + 8);
+            ctx.fillText(`${Math.ceil(pct * 100)}% — CONGREGENTUR CARNIS`, 0, barY + 8);
         } else if (m.name === 'Final Boss') {
             ctx.fillStyle = '#ff3b3b';
             ctx.font = 'bold 10px monospace';
@@ -12173,8 +12178,8 @@ function sTerminalTick(high) {
 
 const TERMINAL_RIDDLES = [
     {
-        titleId: 'PROTOKOL DEKODIFIKASI BIOLOGIS // SPESIMEN AMOEBOID',
-        titleEn: 'BIOLOGICAL DECODING PROTOCOL // AMOEBOID SPECIMEN',
+        titleId: 'PROTOKOL DEKODIFIKASI BIOLOGIS — SPESIMEN AMOEBOID',
+        titleEn: 'BIOLOGICAL DECODING PROTOCOL — AMOEBOID SPECIMEN',
         loreId: 'CATATAN DR. SARA (LOG #03): "Spesimen Amoeboid membelah diri secara instan bila terkena benturan kinetik biasa. Satu-satunya metode melumpuhkan inti sitoplasmanya tanpa memicu replikasi adalah...?"',
         loreEn: 'DR. SARA’S LOG (#03): "Amoeboid specimens replicate instantly upon kinetic impact. The only protocol to neutralize their cytoplasmic core without triggering mitosis is...?"',
         choicesId: ['Suhu Ekstrem Termal (Thermal Venting)', 'Radiasi Medan Magnet', 'Frekuensi Gelombang Suara Ultrasonik'],
@@ -12182,8 +12187,8 @@ const TERMINAL_RIDDLES = [
         correct: 0
     },
     {
-        titleId: 'LOG OTORISASI REAKTOR // SUB-GRID KELISTRIKAN',
-        titleEn: 'REACTOR AUTHORIZATION LOG // ELECTRICAL SUB-GRID',
+        titleId: 'LOG OTORISASI REAKTOR — SUB-GRID KELISTRIKAN',
+        titleEn: 'REACTOR AUTHORIZATION LOG — ELECTRICAL SUB-GRID',
         loreId: 'LOG INSINYUR KELISTRIKAN: "Untuk membuka katup daya darurat Sektor, kalikan jumlah nomor tiga sektor awal bio-hazard (Sektor 1, 2, dan 3) dengan angka keamanan 7:"',
         loreEn: 'FACILITY ELECTRICAL LOG: "To override sector emergency valve, sum the first three bio-hazard sectors (Sectors 1, 2, and 3) then multiply by security key 7:"',
         choicesId: ['35', '42', '49'],
@@ -12191,8 +12196,8 @@ const TERMINAL_RIDDLES = [
         correct: 1
     },
     {
-        titleId: 'DOKUMEN TAKTIK ANOMALI // ENTITAS VESPER',
-        titleEn: 'ANOMALY TACTICAL ARCHIVE // VESPER ENTITY',
+        titleId: 'DOKUMEN TAKTIK ANOMALI — ENTITAS VESPER',
+        titleEn: 'ANOMALY TACTICAL ARCHIVE — VESPER ENTITY',
         loreId: 'LOG KEAMANAN SEKTOR: "Predator Vesper berburu dalam gelap menggunakan sensor sonar membran sayap. Kelemahan fatal anatominya saat bersiap menyergap adalah...?"',
         loreEn: 'SECURITY SECTOR ARCHIVE: "Vesper predators hunt in dark corridors using wing membrane sonar. Their fatal anatomical vulnerability during ambush posture is...?"',
         choicesId: ['Sensor sonar dibutakan oleh letupan Cahaya Nova', 'Armor sayap kebal terhadap peluru', 'Dapat menyerap gas beracun'],
@@ -12200,8 +12205,8 @@ const TERMINAL_RIDDLES = [
         correct: 0
     },
     {
-        titleId: 'ARCHIVE ENTITAS APEX // THE MONOLITH',
-        titleEn: 'APEX ENTITY ARCHIVE // THE MONOLITH',
+        titleId: 'ARCHIVE ENTITAS APEX — THE MONOLITH',
+        titleEn: 'APEX ENTITY ARCHIVE — THE MONOLITH',
         loreId: 'LOG PENELITIAN UTAMA: "The Monolith adalah entitas piramida parasit raksasa. Kapan perisai kristalnya terbuka dan rentan terhadap tembakan langsung operatif?"',
         loreEn: 'PRIMARY RESEARCH LOG: "The Monolith is a colossal parasitic organism. When is its crystalline shield exposed and vulnerable to direct operative strikes?"',
         choicesId: ['Saat melepaskan letupan Nova Spora', 'Saat melayang tenang di udara', 'Saat menyerap peluru kinetik'],
@@ -12209,8 +12214,8 @@ const TERMINAL_RIDDLES = [
         correct: 0
     },
     {
-        titleId: 'PROSEDUR AIRLOCK FASILITAS // EVAKUASI AKHIR',
-        titleEn: 'FACILITY AIRLOCK PROCEDURE // FINAL EVACUATION',
+        titleId: 'PROSEDUR AIRLOCK FASILITAS — EVAKUASI AKHIR',
+        titleEn: 'FACILITY AIRLOCK PROCEDURE — FINAL EVACUATION',
         loreId: 'PANDUAN OPERASIONAL: "Protokol kuncian pintu Ekstraksi Sektor mensyaratkan status seluruh Node Daya berada pada kondisi...?"',
         loreEn: 'OPERATIONAL MANUAL: "The Sector Extraction airlock protocol strictly requires all Power Nodes to be in state...?"',
         choicesId: ['100% Seluruh Node Terkoneksi & Online', '50% Sebagian Node Cadangan', 'Mode Hibernasi Darurat'],
@@ -12236,7 +12241,7 @@ function generateTerminalPuzzle() {
         const p = seqPool[Math.floor(Math.random() * seqPool.length)];
         return {
             type: 'A',
-            badge: lang === 'en' ? 'PROTOCOL A // VOLTAGE SEQUENCE ROUTING' : 'PROTOKOL A // PENYEIMBANG TEGANGAN REAKTOR',
+            badge: lang === 'en' ? 'PROTOCOL A — VOLTAGE SEQUENCE ROUTING' : 'PROTOKOL A — PENYEIMBANG TEGANGAN REAKTOR',
             seqText: p.seq,
             choices: p.choices,
             correct: p.correct
@@ -12245,7 +12250,7 @@ function generateTerminalPuzzle() {
         const r = TERMINAL_RIDDLES[Math.floor(Math.random() * TERMINAL_RIDDLES.length)];
         return {
             type: 'B',
-            badge: lang === 'en' ? 'PROTOCOL B // CORRUPTED ARCHIVE LOG RIDDLE' : 'PROTOKOL B // TEKA-TEKI LOG ARSIP DARURAT',
+            badge: lang === 'en' ? 'PROTOCOL B — CORRUPTED ARCHIVE LOG RIDDLE' : 'PROTOKOL B — TEKA-TEKI LOG ARSIP DARURAT',
             title: lang === 'en' ? r.titleEn : r.titleId,
             lore: lang === 'en' ? r.loreEn : r.loreId,
             choices: lang === 'en' ? r.choicesEn : r.choicesId,
@@ -12258,7 +12263,7 @@ function generateTerminalPuzzle() {
         const d4 = Math.floor(Math.random() * 9) + 1;
         return {
             type: 'C',
-            badge: lang === 'en' ? 'PROTOCOL C // BIOSENSOR MEMORY CALIBRATION' : 'PROTOKOL C // KALIBRASI MEMORI BIOSENSOR',
+            badge: lang === 'en' ? 'PROTOCOL C — BIOSENSOR MEMORY CALIBRATION' : 'PROTOKOL C — KALIBRASI MEMORI BIOSENSOR',
             code: [d1, d2, d3, d4],
             glitchCovered: false
         };
@@ -12288,7 +12293,7 @@ function generateTerminalPuzzle() {
         const t = targets[Math.floor(Math.random() * targets.length)];
         return {
             type: 'D',
-            badge: lang === 'en' ? 'PROTOCOL D // CIRCUIT SWITCH BYPASS OVERRIDE' : 'PROTOKOL D // SAKLAR BYPASS JARINGAN ARUS',
+            badge: lang === 'en' ? 'PROTOCOL D — CIRCUIT SWITCH BYPASS OVERRIDE' : 'PROTOKOL D — SAKLAR BYPASS JARINGAN ARUS',
             prompt: lang === 'en' ? t.promptEn : t.promptId,
             pattern: t.pattern
         };
@@ -14252,11 +14257,11 @@ document.addEventListener('keydown', e => {
             closeSettingsModal();
             return;
         }
-        const touchM = document.getElementById('touchLayoutModal') || document.getElementById('touchLayoutEditorModal');
-        if (touchM && (touchM.classList.contains('open') || touchM.style.display === 'flex')) {
+        const touchM = document.getElementById('touchLayoutEditor');
+        if (touchM && (isEditingTouchLayout || touchM.style.display !== 'none')) {
             e.preventDefault();
             e.stopImmediatePropagation();
-            if (typeof closeTouchLayoutEditor === 'function') closeTouchLayoutEditor();
+            cancelTouchLayoutEditor();
             return;
         }
         const authM = document.getElementById('authModal');
@@ -14669,14 +14674,35 @@ function attachDraggableControl(el) {
     el.addEventListener('pointercancel', endDrag);
 }
 
+let touchEditorSource = 'none';
+let wasGameViewHiddenForEditor = false;
+
 function openTouchLayoutEditor() {
     if (gameState === 'playing') togglePause(true);
     const inGameModal = document.getElementById('inGameSettingsModal');
+    const wasInGameSettings = inGameModal && (inGameModal.style.display === 'flex' || inGameModal.style.display === 'block');
     if (inGameModal) inGameModal.style.display = 'none';
     const hModal = document.getElementById('settingsModal');
+    const wasFacilitySettings = hModal && hModal.classList.contains('open');
     if (hModal) hModal.classList.remove('open');
     const ps = document.getElementById('pauseScreen');
+    const wasPause = ps && ps.classList.contains('open');
     if (ps) ps.classList.remove('open');
+    const ss = document.getElementById('startScreen');
+    const wasStart = ss && (ss.style.display === 'flex' || ss.style.display === 'block');
+
+    touchEditorSource = wasInGameSettings ? 'inGameSettings' : (wasFacilitySettings ? 'facilitySettings' : (wasPause ? 'pause' : (wasStart ? 'startScreen' : 'none')));
+
+    // Bila dibuka dari Hub, tampilkan container gameView agar touchUI muncul
+    const gv = document.getElementById('gameView');
+    wasGameViewHiddenForEditor = gv && (gv.style.display === 'none');
+    if (wasGameViewHiddenForEditor && gv) {
+        gv.style.display = 'block';
+    }
+
+    if (ss && wasStart) {
+        ss.style.pointerEvents = 'none';
+    }
 
     isEditingTouchLayout = true;
     document.body.classList.add('editing-touch-layout');
@@ -14721,6 +14747,8 @@ function openTouchLayoutEditor() {
         if (oVal) oVal.textContent = oRange.value + '%';
     }
 
+    applyTouchStyle();
+    setupTouchLayoutEditorListeners();
     sCinematicUI('open');
 }
 
@@ -14749,8 +14777,19 @@ function saveTouchLayout() {
 
     isEditingTouchLayout = false;
     document.body.classList.remove('editing-touch-layout');
+    if (settings && settings.deviceMode === 'pc') {
+        document.body.classList.remove('touch-on');
+    }
     const overlay = document.getElementById('touchLayoutEditor');
     if (overlay) overlay.style.display = 'none';
+
+    if (wasGameViewHiddenForEditor) {
+        const gv = document.getElementById('gameView');
+        if (gv) gv.style.display = 'none';
+        wasGameViewHiddenForEditor = false;
+    }
+    const ss = document.getElementById('startScreen');
+    if (ss) ss.style.pointerEvents = 'auto';
 
     const exitBtn = document.getElementById('btnTouchExit');
     if (exitBtn) {
@@ -14761,7 +14800,14 @@ function saveTouchLayout() {
     announceAdmin(tt('layout_saved_toast'));
     sCinematicUI('save');
     applyTouchLayout();
-    if (gameState === 'paused') {
+
+    if (touchEditorSource === 'facilitySettings') {
+        const hModal = document.getElementById('settingsModal');
+        if (hModal) hModal.classList.add('open');
+    } else if (touchEditorSource === 'inGameSettings') {
+        const inGameModal = document.getElementById('inGameSettingsModal');
+        if (inGameModal) inGameModal.style.display = 'flex';
+    } else if (gameState === 'paused' || touchEditorSource === 'pause') {
         const ps = document.getElementById('pauseScreen');
         if (ps) ps.classList.add('open');
     }
@@ -14785,6 +14831,21 @@ function resetTouchLayout(fromEditor = false) {
         const oRange = document.getElementById('editorOpacityRange');
         const oVal = document.getElementById('editorOpacityVal');
         if (oRange) { oRange.value = 85; if (oVal) oVal.textContent = '85%'; }
+
+        const sw = window.innerWidth;
+        const sh = window.innerHeight;
+        const map = getTouchElementsMap();
+        for (const k in map) {
+            const el = map[k];
+            if (el) {
+                const rect = el.getBoundingClientRect();
+                el.style.position = 'fixed';
+                el.style.left = Math.max(8, Math.min(sw - el.offsetWidth - 8, rect.left)) + 'px';
+                el.style.top = Math.max(8, Math.min(sh - el.offsetHeight - 8, rect.top)) + 'px';
+                el.style.right = 'auto';
+                el.style.bottom = 'auto';
+            }
+        }
     }
 
     announceAdmin(tt('layout_reset_toast'));
@@ -14804,8 +14865,19 @@ function cancelTouchLayoutEditor() {
 
     isEditingTouchLayout = false;
     document.body.classList.remove('editing-touch-layout');
+    if (settings && settings.deviceMode === 'pc') {
+        document.body.classList.remove('touch-on');
+    }
     const overlay = document.getElementById('touchLayoutEditor');
     if (overlay) overlay.style.display = 'none';
+
+    if (wasGameViewHiddenForEditor) {
+        const gv = document.getElementById('gameView');
+        if (gv) gv.style.display = 'none';
+        wasGameViewHiddenForEditor = false;
+    }
+    const ss = document.getElementById('startScreen');
+    if (ss) ss.style.pointerEvents = 'auto';
 
     const exitBtn = document.getElementById('btnTouchExit');
     if (exitBtn) {
@@ -14814,10 +14886,21 @@ function cancelTouchLayoutEditor() {
     }
 
     sCinematicUI('close');
-    if (gameState === 'paused') {
+
+    if (touchEditorSource === 'facilitySettings') {
+        const hModal = document.getElementById('settingsModal');
+        if (hModal) hModal.classList.add('open');
+    } else if (touchEditorSource === 'inGameSettings') {
+        const inGameModal = document.getElementById('inGameSettingsModal');
+        if (inGameModal) inGameModal.style.display = 'flex';
+    } else if (gameState === 'paused' || touchEditorSource === 'pause') {
         const ps = document.getElementById('pauseScreen');
         if (ps) ps.classList.add('open');
     }
+}
+
+function closeTouchLayoutEditor() {
+    cancelTouchLayoutEditor();
 }
 
 function onEditorScaleInput(val) {
@@ -14836,10 +14919,67 @@ function onEditorOpacityInput(val) {
     persistSettings();
 }
 
+let touchLayoutListenersBound = false;
+function setupTouchLayoutEditorListeners() {
+    if (touchLayoutListenersBound) return;
+    touchLayoutListenersBound = true;
+
+    const btnDef = document.getElementById('btnEditorDefault');
+    if (btnDef) {
+        btnDef.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            resetTouchLayout(true);
+        });
+        btnDef.addEventListener('pointerdown', e => e.stopPropagation());
+    }
+    const btnCancel = document.getElementById('btnEditorCancel');
+    if (btnCancel) {
+        btnCancel.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            cancelTouchLayoutEditor();
+        });
+        btnCancel.addEventListener('pointerdown', e => e.stopPropagation());
+    }
+    const btnSave = document.getElementById('btnEditorSave');
+    if (btnSave) {
+        btnSave.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            saveTouchLayout();
+        });
+        btnSave.addEventListener('pointerdown', e => e.stopPropagation());
+    }
+    const scaleRange = document.getElementById('editorScaleRange');
+    if (scaleRange) {
+        scaleRange.addEventListener('input', e => {
+            e.stopPropagation();
+            onEditorScaleInput(e.target.value);
+        });
+        scaleRange.addEventListener('pointerdown', e => e.stopPropagation());
+    }
+    const opacityRange = document.getElementById('editorOpacityRange');
+    if (opacityRange) {
+        opacityRange.addEventListener('input', e => {
+            e.stopPropagation();
+            onEditorOpacityInput(e.target.value);
+        });
+        opacityRange.addEventListener('pointerdown', e => e.stopPropagation());
+    }
+    const topbar = document.querySelector('.layout-editor-topbar');
+    if (topbar) {
+        topbar.addEventListener('pointerdown', e => e.stopPropagation());
+        topbar.addEventListener('mousedown', e => e.stopPropagation());
+        topbar.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+    }
+}
+
 window.addEventListener('resize', applyTouchLayout);
 
 const touchStick = { ox: 0, oy: 0 };
 function setupTouchControls() {
+    setupTouchLayoutEditorListeners();
     const ui = document.getElementById('touchUI');
     if (!ui) return;
     const zone = document.getElementById('stickZone');
@@ -15692,6 +15832,9 @@ function createMonster(typeKey, x, y) {
 
 function checkContinueBtn() {
     try {
+        if (typeof updateStartScreenDirectiveUI === 'function') {
+            updateStartScreenDirectiveUI();
+        }
         const high = loadHigh();
         const last = Math.floor(Number(high.lastLevel));
         const btnContinue = document.getElementById('btnContinue');
@@ -15770,7 +15913,9 @@ function continueGame(bypassDeviceCheck = false) {
     document.getElementById('deathScreen').style.display = 'none';
     document.getElementById('winScreen').style.display = 'none';
     if (typeof checkDeviceOrientationPrompt === 'function') checkDeviceOrientationPrompt();
-    if (typeof activeGameDirective !== 'undefined' && activeGameDirective === 'endless' && typeof startEndlessMode === 'function') {
+    const isDirectiveEndless = (typeof activeGameDirective !== 'undefined' && activeGameDirective === 'endless') ||
+                               (typeof window !== 'undefined' && window.activeGameDirective === 'endless');
+    if (isDirectiveEndless && typeof startEndlessMode === 'function') {
         startEndlessMode();
         return;
     }
@@ -15806,7 +15951,7 @@ function prologueTypeBlip() {
         const ac = ensureAudio();
         const now = ac.currentTime;
         const master = Number(settings.volume);
-        if (master <= 0) return;
+        if (master <= 0 || (settings && settings.muted)) return;
 
         const osc = ac.createOscillator();
         const g = ac.createGain();
@@ -16019,7 +16164,9 @@ function startGame(bypassDeviceCheck = false) {
         document.body.classList.remove('touch-on');
     }
 
-    if (typeof activeGameDirective !== 'undefined' && activeGameDirective === 'endless' && typeof startEndlessMode === 'function') {
+    const isDirectiveEndless = (typeof activeGameDirective !== 'undefined' && activeGameDirective === 'endless') ||
+                               (typeof window !== 'undefined' && window.activeGameDirective === 'endless');
+    if (isDirectiveEndless && typeof startEndlessMode === 'function') {
         startEndlessMode();
         return;
     }
@@ -16151,7 +16298,14 @@ function togglePause(on) {
         gameState = 'paused';
         stopAmbientDrone();
         const secVal = document.getElementById('pauseSectorVal');
-        if (secVal) secVal.textContent = (currentLevel + 1) + ' / ' + LEVELS;
+        const secLbl = overlay ? overlay.querySelector('[data-i18n="pause_stat_sector"]') : null;
+        if (isEndlessMode) {
+            if (secLbl) secLbl.textContent = lang === 'en' ? 'WAVE' : 'GELOMBANG';
+            if (secVal) secVal.textContent = endlessWave + ' (∞)';
+        } else {
+            if (secLbl) secLbl.textContent = lang === 'en' ? 'SECTOR' : 'SEKTOR';
+            if (secVal) secVal.textContent = (currentLevel + 1) + ' / ' + LEVELS;
+        }
         const timeVal = document.getElementById('pauseTimeVal');
         const sessionTime = totalTime + Math.floor((Date.now() - levelStartTime) / 1000);
         if (timeVal) timeVal.textContent = formatTime(sessionTime);
@@ -16177,6 +16331,7 @@ function backToMenu() {
     if (typeof isEditingTouchLayout !== 'undefined' && isEditingTouchLayout) return;
     const doReturnToHub = () => {
         isEndlessMode = false;
+        if (typeof updateStartScreenDirectiveUI === 'function') updateStartScreenDirectiveUI();
         isTouchAtkPressed = false;
         gameState = 'menu';
         menuDemo = true;
@@ -18734,10 +18889,20 @@ function startEndlessMode() {
         initLevel(7);
         artifacts = [];
         coinsCollected = 0;
+        generators = [];
+        traps = [];
+        terminalPuzzleActive = false;
+        terminalCurrentNode = null;
+        level15Corpse = null;
+        exitTile = null;
 
         // Kustomisasi objektif dan HUD arena survival
+        setHudText(hudEl('lblLevel'), lang === 'en' ? 'Wave:' : 'Gelombang:');
+        setHudText(hudEl('levelText'), '1');
+        setHudText(hudEl('levelMaxText'), ' (∞)');
+        setHudText(hudEl('modeText'), 'HORDE');
         const badge = hudEl('uiBadge') || document.getElementById('uiBadge');
-        if (badge) setHudText(badge, tt('endless_badge_wave').replace('{w}', '1'));
+        if (badge) setHudText(badge, (lang === 'en' ? 'SURVIVAL ARENA — WAVE 1' : 'ARENA SURVIVAL — GELOMBANG 1'));
         const exitText = hudEl('exitText') || document.getElementById('exitText');
         if (exitText) setHudText(exitText, tt('endless_objective'));
         const artText = hudEl('artifactText') || document.getElementById('artifactText');
@@ -18802,8 +18967,11 @@ function spawnEndlessWave(wave) {
         }
     }
 
+    setHudText(hudEl('lblLevel'), lang === 'en' ? 'Wave:' : 'Gelombang:');
+    setHudText(hudEl('levelText'), wave);
+    setHudText(hudEl('levelMaxText'), ' (∞)');
     const badge = hudEl('uiBadge') || document.getElementById('uiBadge');
-    if (badge) setHudText(badge, tt('endless_badge_wave').replace('{w}', wave));
+    if (badge) setHudText(badge, (lang === 'en' ? 'SURVIVAL ARENA — WAVE ' : 'ARENA SURVIVAL — GELOMBANG ') + wave);
     const exitText = hudEl('exitText') || document.getElementById('exitText');
     if (exitText) setHudText(exitText, tt('endless_objective'));
 }
@@ -18938,4 +19106,13 @@ window.adminStartAt = typeof adminStartAt === 'function' ? adminStartAt : () => 
 window.adminTestBoss = typeof adminTestBoss === 'function' ? adminTestBoss : () => {};
 window.openPauseSettings = typeof openPauseSettings === 'function' ? openPauseSettings : () => {};
 window.closePauseSettings = typeof closePauseSettings === 'function' ? closePauseSettings : () => {};
+window.openTouchLayoutEditor = typeof openTouchLayoutEditor === 'function' ? openTouchLayoutEditor : () => {};
+window.cancelTouchLayoutEditor = typeof cancelTouchLayoutEditor === 'function' ? cancelTouchLayoutEditor : () => {};
+window.closeTouchLayoutEditor = typeof closeTouchLayoutEditor === 'function' ? closeTouchLayoutEditor : () => {};
+window.saveTouchLayout = typeof saveTouchLayout === 'function' ? saveTouchLayout : () => {};
+window.resetTouchLayout = typeof resetTouchLayout === 'function' ? resetTouchLayout : () => {};
+window.onEditorScaleInput = typeof onEditorScaleInput === 'function' ? onEditorScaleInput : () => {};
+window.onEditorOpacityInput = typeof onEditorOpacityInput === 'function' ? onEditorOpacityInput : () => {};
+window.applyBrightness = typeof applyBrightness === 'function' ? applyBrightness : () => {};
+window.setMasterVolume = typeof setMasterVolume === 'function' ? setMasterVolume : () => {};
 

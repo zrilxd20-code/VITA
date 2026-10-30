@@ -89,7 +89,7 @@ const PROLOGUE_SCRIPT = [
 const SECTOR_TRANSMISSIONS = {
     0: {
         speaker: 'DR. SARA — COMMS',
-        callsign: 'DR. SARA // RES-01',
+        callsign: 'DR. SARA — RES-01',
         icon: 'dna',
         color: '#2ecc71',
         text_en: 'Prototype-19, bio-telemetry synchronized. Reactivate all power generators in the corridors to destabilize the quarantine gate locks. Watch the shadows at the corners!',
@@ -97,7 +97,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     1: {
         speaker: 'DR. RAINSER — SYSTEMS',
-        callsign: 'DR. RAINSER // ENG',
+        callsign: 'DR. RAINSER — ENG',
         icon: 'biohazard',
         color: '#3498db',
         text_en: 'Sector generator is experiencing power fluctuations. Keep an eye on the minimap radar to chart dead-end corridors and track nearby anomalies!',
@@ -105,7 +105,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     2: {
         speaker: 'LT. VAD — TACTICAL',
-        callsign: 'LT. VAD // SEC-OPS',
+        callsign: 'LT. VAD — SEC-OPS',
         icon: 'shield',
         color: '#3498db',
         text_en: 'Sector 3 is infested with Crawl-Morph nests. They track footstep vibrations. Use your agility to land lethal backstabs from behind or keep your firing distance!',
@@ -113,7 +113,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     3: {
         speaker: 'LT. VAD — HAZARD',
-        callsign: 'LT. VAD // SEC-OPS',
+        callsign: 'LT. VAD — SEC-OPS',
         icon: 'shield',
         color: '#f1c40f',
         text_en: 'Operative alert! Corridor floors are rigged with mechanical spike traps. Trigger Phase Dash (SHIFT) to surge through spikes and projectiles unharmed!',
@@ -121,7 +121,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     4: {
         speaker: 'DR. RAINSER — ALARM',
-        callsign: 'DR. RAINSER // ENG',
+        callsign: 'DR. RAINSER — ENG',
         icon: 'biohazard',
         color: '#e74c3c',
         text_en: 'A massive Bio-Harvester anomaly is patrolling this sector! Avoid engaging in narrow bottlenecks. Lure them into open junctions so you don\'t get cornered!',
@@ -129,7 +129,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     5: {
         speaker: 'LT. VAD — ARMORY',
-        callsign: 'LT. VAD // SEC-OPS',
+        callsign: 'LT. VAD — SEC-OPS',
         icon: 'shield',
         color: '#2ecc71',
         text_en: 'Adapt your arsenal to corridor geometry. Blade for rapid point-blank strikes, Rifle for long corridors, and Grenades to bounce explosives around tight corners!',
@@ -137,7 +137,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     6: {
         speaker: 'DR. SARA — SPECTRAL',
-        callsign: 'DR. SARA // RES-01',
+        callsign: 'DR. SARA — RES-01',
         icon: 'dna',
         color: '#9b59b6',
         text_en: 'Spectrometry detects Phantasm anomalies. Labyrinth walls cannot hold them—they phase straight through concrete bulkheads! Do not remain stationary in a room!',
@@ -145,7 +145,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     7: {
         speaker: 'DR. RAINSER — WARNING',
-        callsign: 'DR. RAINSER // ENG',
+        callsign: 'DR. RAINSER — ENG',
         icon: 'biohazard',
         color: '#e67e22',
         text_en: 'Sensors detect irregular frequencies from supply caches. Stay cautious—some containers are camouflaged Decoy Mimic ambushers! Test them with a strike from range first!',
@@ -153,7 +153,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     8: {
         speaker: 'DR. SARA — BIOMETRICS',
-        callsign: 'DR. SARA // RES-01',
+        callsign: 'DR. SARA — RES-01',
         icon: 'dna',
         color: '#e74c3c',
         text_en: 'Biometric BPM telemetry is spiking! Anomaly density at intersections is peaking. Prioritize the fastest generator reactivation route and reach the extraction airlock immediately!',
@@ -161,7 +161,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     9: {
         speaker: 'LT. VAD — CHECKPOINT',
-        callsign: 'LT. VAD // SEC-OPS',
+        callsign: 'LT. VAD — SEC-OPS',
         icon: 'shield',
         color: '#00f0ff',
         text_en: 'Outstanding work, Prototype-19! Exterior perimeter Sectors 1-10 are fully cleared. Prepare yourself... we are descending into the deeper facility vaults!',
@@ -169,7 +169,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     10: {
         speaker: 'ALTERISHA — TELEMETRY',
-        callsign: 'ALTERISHA // OVERWATCH',
+        callsign: 'ALTERISHA — OVERWATCH',
         icon: 'cyber',
         color: '#00f0ff',
         text_en: 'Prototype-19, you have breached the deepest vault chambers. Anomalies here project psychic fields. Re-energize the sector nodes and do not let them encircle you!',
@@ -177,7 +177,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     11: {
         speaker: 'ALTERISHA — WARNING',
-        callsign: 'ALTERISHA // OVERWATCH',
+        callsign: 'ALTERISHA — OVERWATCH',
         icon: 'cyber',
         color: '#00f0ff',
         text_en: 'Labyrinth temperature is plummeting. Organic bio-walls are reacting to your presence. Purge all node corruptions to force the airlock open!',
@@ -185,7 +185,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     12: {
         speaker: 'ALTERISHA — BIOMASS SURGE',
-        callsign: 'ALTERISHA // OVERWATCH',
+        callsign: 'ALTERISHA — OVERWATCH',
         icon: 'biohazard',
         color: '#e74c3c',
         text_en: 'Biomass interference is bleeding into our comms! Sector 13 is crawling with apex horrors. Ready all heavy armaments and surge with Phase Dash!',
@@ -193,7 +193,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     13: {
         speaker: 'DR. SARA — FINAL APPROACH',
-        callsign: 'DR. SARA // RES-01',
+        callsign: 'DR. SARA — RES-01',
         icon: 'dna',
         color: '#9b59b6',
         text_en: 'Prototype-19... the tremors in this sector converge directly beneath us. We are approaching the epicenter of The Monolith. Hold the line, I beg you!',
@@ -201,7 +201,7 @@ const SECTOR_TRANSMISSIONS = {
     },
     14: {
         speaker: 'ALTERISHA — APEX DIRECTIVE',
-        callsign: 'ALTERISHA // OVERWATCH',
+        callsign: 'ALTERISHA — OVERWATCH',
         icon: 'cyber',
         color: '#ff0055',
         text_en: 'THIS IS IT. SECTOR 15 CORE. The Monolith awaits at the end of the maze. Restore every system node, heed Dr. Rudra\'s final will, and purge the cataclysm for all humanity!',
@@ -214,8 +214,8 @@ const LORE_DATA_LOGS = [
     {
         id: 'log_01',
         level: 1, // Appears in Sector 2
-        title_en: 'PROJECT VITA // INCEPTION MEMO #01',
-        title_id: 'PROYEK VITA // MEMORANDUM AWAL #01',
+        title_en: 'PROJECT VITA — INCEPTION MEMO #01',
+        title_id: 'PROYEK VITA — MEMORANDUM AWAL #01',
         author: 'DIRECTOR V. CROSS',
         body_en: '"We sought immortality through synthetic biomatter. The Carnis cell cultures demonstrated spontaneous cellular regeneration beyond any natural limit. We believed we had conquered mortality."',
         body_id: '"Kami mencari keabadian melalui biomassa sintetis. Kultur sel Carnis menunjukkan regenerasi sel spontan melampaui batas alami. Kami mengira telah menaklukkan kematian."'
@@ -232,8 +232,8 @@ const LORE_DATA_LOGS = [
     {
         id: 'log_03',
         level: 6, // Appears in Sector 7
-        title_en: 'SECURITY COUNCIL RECORD // PROTOCOL-19',
-        title_id: 'CATATAN DEWAN KEAMANAN // PROTOKOL-19',
+        title_en: 'SECURITY COUNCIL RECORD — PROTOCOL-19',
+        title_id: 'CATATAN DEWAN KEAMANAN — PROTOKOL-19',
         author: 'COMMAND CENTRAL',
         body_en: '"Standard combat units cannot withstand bio-assimilation. Only a synthetic titanium chassis fused with a re-stabilized neural processor can survive the necrotic fog. They named it Prototype-19."',
         body_id: '"Unit tempur biasa tak tahan asimilasi biologis. Hanya sasis titanium sintetis yang dipadu prosesor saraf stabil yang mampu menembus kabut nekrotik. Mereka menamainya Prototype-19."'
@@ -241,17 +241,17 @@ const LORE_DATA_LOGS = [
     {
         id: 'log_04',
         level: 8, // Appears in Sector 9
-        title_en: 'MORPHOLOGY ANALYSIS // FEAR MIMICRY',
-        title_id: 'ANALISIS MORFOLOGI // MIMIKRI KETAKUTAN',
-        author: 'DR. K. REEVES // NEURO-BIOLOGY',
+        title_en: 'MORPHOLOGY ANALYSIS — FEAR MIMICRY',
+        title_id: 'ANALISIS MORFOLOGI — MIMIKRI KETAKUTAN',
+        author: 'DR. K. REEVES — NEURO-BIOLOGY',
         body_en: '"Carnis tissue assimilating human subjects does not merely absorb organic mass, but also residual neural impulses in the cerebral cortex. The organism reconstructs its form based on the host\'s strongest phobias—masked humanoids, winged predators, and the dread of being watched. They adapt into forms best suited to paralyze their prey."',
         body_id: '"Sampel jaringan Carnis yang mengasimilasi subjek manusia tidak hanya menyerap materi organik, tetapi juga jejak impuls pada korteks serebral. Organisme ini mencetak ulang bentuk fisiknya berdasarkan ketakutan terkuat inangnya—figur bertopeng, predator bersayap, hingga rasa takut diawasi. Mereka mengadaptasi bentuk yang paling efektif memicu kelumpuhan reaksi pada mangsanya."'
     },
     {
         id: 'log_05',
         level: 10, // Appears in Sector 11
-        title_en: 'THE APEX MANIFESTO // COELUM CARNIS',
-        title_id: 'MANIFESTO APEX // COELUM CARNIS',
+        title_en: 'THE APEX MANIFESTO — COELUM CARNIS',
+        title_id: 'MANIFESTO APEX — COELUM CARNIS',
         author: 'RECOVERED AUDIO FRAGMENT',
         body_en: '"The Monoliths are not weapons. They are antennas. When the 7 pillars connect their neural frequencies, human consciousness will cease individuality and become eternal flesh."',
         body_id: '"Monolith bukanlah senjata. Mereka adalah antena. Saat ke-7 pilar menyatukan frekuensi sarafnya, kesadaran manusia akan melebur dari individu menjadi daging abadi."'
@@ -265,7 +265,7 @@ const EPILOGUE_SCRIPT = {
     lines_en: [
         'The necrotic red fog dissipates from the corridors of the Forgotten Sector.',
         'At the evacuation airlock threshold, Prototype-19 discovers the fallen silhouette of Dr. Rudra beside a sealed field letter...',
-        'ALTERISHA // COMMS: "Wait... that... that was him... The person who vanished from us all this time... Prototype-19, scan and unseal his testament."',
+        'ALTERISHA — COMMS: "Wait... that... that was him... The person who vanished from us all this time... Prototype-19, scan and unseal his testament."',
         'SURAT WASIAT DR. RUDRA: "Hai... Mungkin saat kalian membaca surat ini, aku telah tiada. Semua ini demi kita semua. Aku pergi sendiri meneliti sektor terdalam hingga Monolith-07..."',
         'SURAT WASIAT DR. RUDRA: "Aku sangat rindu bekerja sama dengan kalian, serta partner yang teramat berharga bagiku, Alterisha... Janganlah kalian bersedih. Selamat tinggal... aku mencintaimu, Dear Alterisha."',
         'ALTERISHA: "...Bodoh. Kenapa kau harus memikul beban ini sendirian... Selamat jalan, Rudra. Janjimu... akan kami jaga selamanya."',
@@ -275,7 +275,7 @@ const EPILOGUE_SCRIPT = {
     lines_id: [
         'Kabut merah nekrotik perlahan memudar dari lorong-lorong Sektor Terlupakan.',
         'Di ambang pintu evakuasi, Prototype-19 menemukan jasad Dr. Rudra terbaring di samping meja dokumen dan amplop bersegel lilin...',
-        'ALTERISHA // SALURAN TRANSMISI: "Tunggu... itu... sosok yang menghilang dari kita selama ini... Prototype-19, pindai dan buka surat wasiatnya."',
+        'ALTERISHA — SALURAN TRANSMISI: "Tunggu... itu... sosok yang menghilang dari kita selama ini... Prototype-19, pindai dan buka surat wasiatnya."',
         'SURAT WASIAT DR. RUDRA: "Hai... Mungkin saat kalian membaca surat ini, aku telah tiada. Semua ini demi kita semua. Aku menyelinap dan pergi sendiri meneliti hingga Monolith-07..."',
         'SURAT WASIAT DR. RUDRA: "Aku sangat rindu bekerja sama dengan kalian, dan partner yang teramat berharga bagiku, Alterisha... Janganlah kalian bersedih. Selamat tinggal... aku mencintaimu, Dear Alterisha."',
         'ALTERISHA: "...Bodoh. Kenapa kau harus memikul semua ini sendirian... Selamat jalan, Rudra. Janjimu... akan kami jaga selamanya."',
@@ -437,8 +437,8 @@ const NARRATIVE_INTERLUDES = {
                 signal_en: '(final page of Dr. Rudra\'s testament).......',
                 body_id: '"Aku sangat rindu bekerja sama dengan kalian, dan partner yang teramat berharga bagiku, Alterisha... Janganlah kalian bersedih. Selamat tinggal... aku mencintaimu, Dear Alterisha."',
                 body_en: '"I dearly miss working alongside all of you, and my most treasured partner, Alterisha... Do not weep for me. Farewell... I love you, Dear Alterisha."',
-                tail_id: '(tertanda: Dr. Rudra // Lead Researcher)',
-                tail_en: '(signed: Dr. Rudra // Lead Researcher)'
+                tail_id: '(tertanda: Dr. Rudra — Lead Researcher)',
+                tail_en: '(signed: Dr. Rudra — Lead Researcher)'
             },
             {
                 speaker: 'ALTERISHA',

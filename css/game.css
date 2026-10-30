@@ -2513,33 +2513,51 @@ body.low-health-warning #gameView .vignette {
 }
 
 /* ============================================================
-   TOUCH CONTROLS LAYOUT EDITOR
+   TOUCH CONTROLS LAYOUT EDITOR (GLOBAL HIGH-Z LAYER 20050/20060)
    ============================================================ */
 #touchLayoutEditor {
     position: fixed;
     inset: 0;
-    z-index: 10005;
-    background: rgba(5, 7, 12, 0.65);
-    backdrop-filter: blur(3px);
-    pointer-events: none;
+    z-index: 20050 !important;
+    background: rgba(5, 7, 12, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    pointer-events: none !important;
 }
 .layout-editor-topbar {
     position: fixed;
-    top: 12px;
+    top: 16px;
     left: 50%;
     transform: translateX(-50%);
     width: min(94vw, 760px);
-    background: rgba(10, 14, 24, 0.95);
-    border: 1px solid rgba(0, 229, 255, 0.5);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 229, 255, 0.2);
-    border-radius: 10px;
-    padding: 12px 18px;
+    background: rgba(10, 14, 24, 0.98) !important;
+    border: 1px solid rgba(0, 229, 255, 0.7) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.95), 0 0 25px rgba(0, 229, 255, 0.35) !important;
+    border-radius: 12px;
+    padding: 14px 20px;
     color: #e6edf3;
-    pointer-events: auto;
-    z-index: 10007;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+    z-index: 20060 !important;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+}
+.layout-editor-topbar, .layout-editor-topbar * {
+    touch-action: auto;
+    -webkit-user-select: auto;
+    user-select: auto;
+    pointer-events: auto !important;
+}
+.layout-editor-topbar button {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+}
+.layout-editor-topbar input[type="range"] {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    touch-action: pan-x !important;
 }
 .layout-editor-heading {
     text-align: center;
@@ -2591,10 +2609,11 @@ body.low-health-warning #gameView .vignette {
     0%, 100% { border-color: rgba(0, 240, 255, 0.8); box-shadow: 0 0 12px rgba(0, 240, 255, 0.4); }
     50% { border-color: rgba(255, 215, 0, 0.85); box-shadow: 0 0 20px rgba(255, 215, 0, 0.55); }
 }
-body.editing-touch-layout #gameView #touchUI {
+body.editing-touch-layout #gameView #touchUI,
+body.editing-touch-layout #touchUI {
     display: block !important;
-    pointer-events: auto !important;
-    z-index: 10006;
+    pointer-events: none !important;
+    z-index: 20040 !important;
 }
 body.editing-touch-layout #touchLayoutEditor {
     display: block !important;
@@ -4935,6 +4954,8 @@ body.touch-on #gameView #stickZone,
     width: 118px !important;
     height: 118px !important;
     z-index: 65 !important;
+    transform: scale(var(--touch-scale, 1));
+    transform-origin: bottom left;
 }
 
 /* ZOOM HUD DESKTOP STYLING & MOBILE HIDE */
